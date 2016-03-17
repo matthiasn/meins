@@ -34,7 +34,7 @@
   [:div:div.l-box-lrg.pure-g
    [:div.pure-u-1-2
     [:div [:textarea {:type      "text"
-                      :style     {:height (str (+ 20 (count (s/split-lines (:input @local)))) "em")}
+                      :style     {:height (str (+ 12 (count (s/split-lines (:input @local)))) "em")}
                       :value     (:input @local)
                       :on-change #(swap! local assoc-in [:input] (.. % -target -value))}]]
     [:div [:button {:on-click (fn [_ev] (send-w-geolocation {:md (:input @local)} put-fn))} "save"]]]
@@ -43,8 +43,9 @@
     [:h1 "Past entries"]
     [:hr]
     (for [entry (reverse (:entries @observed))]
-      [:div
-       (.format (js/moment (:timestamp entry)))
+      ^{:key (:timestamp entry)}
+      [:div.entry
+       [:span.timestamp (.format (js/moment (:timestamp entry)) "MMMM Do YYYY, h:mm:ss a")]
        (markdown-render (:md entry))
        [:hr]])]
    #_[:div.pure-u-sm-1 (h/pp-div @observed)]])

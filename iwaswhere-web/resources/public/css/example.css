@@ -11,7 +11,7 @@
 * Most of these are inherited from Base, but I want to change a few.
 */
 body {
-    color: #7f8c8d;
+    color: #576364;
     font-size: 13px;
     font-family: "Lato", sans-serif;
 }
@@ -262,4 +262,13 @@ textarea {
 
 .markdown h1:first-child {
     margin-top: 0;
+}
+
+.timestamp {
+    font-size: 0.6em;
+}
+
+.entry p {
+    margin-top: 0.3em;
+    margin-bottom: 0.7em;
 }
