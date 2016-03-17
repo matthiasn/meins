@@ -4,6 +4,7 @@
             [matthiasn.systems-toolbox-ui.helpers :as h]
             [clojure.string :as s]
             [cljsjs.moment]
+            [cljsjs.leaflet]
             [cljs.pprint :as pp]))
 
 (defn w-geolocation
@@ -49,6 +50,18 @@
        (markdown-render (:md entry))
        [:hr]])]
    #_[:div.pure-u-sm-1 (h/pp-div @observed)]])
+
+;(.setView (.map js/L "map") #js [10 20] 10)
+
+(defn home-did-mount []
+  (let [map (.setView (.map js/L "map") #js [53.565221099999995 9.9832887] 13)]
+    ;; NEED TO REPLACE FIXME with your mapID!
+    (.addTo (.tileLayer js/L "http://{s}.tile.osm.org/{z}/{x}/{y}.png"
+                        (clj->js {:attribution "Map data &copy; [...]"
+                                  :maxZoom 18}))
+            map)))
+
+(home-did-mount)
 
 (defn cmp-map
   [cmp-id]

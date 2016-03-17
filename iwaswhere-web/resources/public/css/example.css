@@ -272,3 +272,5 @@ textarea {
     margin-top: 0.3em;
     margin-bottom: 0.7em;
 }
+
+#map { height: 180px; }

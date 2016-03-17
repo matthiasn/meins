@@ -13,6 +13,7 @@
                  [clj-pid "0.1.2"]
                  [markdown-clj "0.9.86"]
                  [cljsjs/moment "2.10.6-3"]
+                 [cljsjs/leaflet "0.7.3-4"]
                  [matthiasn/systems-toolbox "0.5.14"]
                  [matthiasn/systems-toolbox-ui "0.5.6"]
                  [matthiasn/systems-toolbox-sente "0.5.12"]
