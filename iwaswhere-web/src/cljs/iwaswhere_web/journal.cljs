@@ -2,6 +2,7 @@
   (:require [markdown.core :as md]
             [matthiasn.systems-toolbox-ui.reagent :as r]
             [matthiasn.systems-toolbox-ui.helpers :as h]
+            [matthiasn.systems-toolbox.component :as st]
             [clojure.string :as s]
             [cljsjs.moment]
             [cljsjs.leaflet]
@@ -38,7 +39,10 @@
                       :style     {:height (str (+ 6 (count (s/split-lines (:input @local)))) "em")}
                       :value     (:input @local)
                       :on-change #(swap! local assoc-in [:input] (.. % -target -value))}]]
-    [:div [:button {:on-click (fn [_ev] (send-w-geolocation {:md (:input @local)} put-fn))} "save"]]]
+    [:div [:button {:on-click (fn [_ev] (send-w-geolocation {} put-fn)
+                                (put-fn [:text-entry/persist {:md (:input @local)
+                                                              :timestamp (st/now)}]))} "save"]]]
+   #_
    [:div.pure-u-1.markdown (markdown-render (:input @local))]
    [:div.pure-u-1
     [:h1 "Past entries"]
@@ -48,6 +52,8 @@
       [:div.entry
        [:span.timestamp (.format (js/moment (:timestamp entry)) "MMMM Do YYYY, h:mm:ss a")]
        (markdown-render (:md entry))
+       (when-let [lat (:latitude entry)]
+         [:div [:span "lat: " lat " lon: " (:longitude entry)]])
        [:hr]])]
    #_[:div.pure-u-sm-1 (h/pp-div @observed)]])
 

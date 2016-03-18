@@ -1,4 +1,4 @@
-# iWasHere
+# iWasWhere
 
 This is the web and backend portion of a system for tracking the user's movement in space, plus related tasks and ideas.
 
@@ -26,6 +26,3 @@ By default, the webserver exposed by the systems-toolbox library listens on port
 
     $ HOST="0.0.0.0" PORT=8010 lein run
 
-## License
-
-Distributed under the Eclipse Public License either version 1.0 or (at your option) any later version.

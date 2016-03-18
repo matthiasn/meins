@@ -13,7 +13,6 @@
       [:link {:href "/bower_components/pure/pure-min.css", :media "screen", :rel "stylesheet"}]
       [:link {:href "/bower_components/pure/grids-responsive-min.css", :media "screen", :rel "stylesheet"}]
       [:link {:href "/bower_components/leaflet/dist/leaflet.css", :media "screen", :rel "stylesheet"}]
-      ;[:link {:href "leaflet.inc.css", :media "screen", :rel "stylesheet"}]
       [:link {:href "/css/example.css", :media "screen", :rel "stylesheet"}]
       [:link {:href "/images/favicon.png", :rel "shortcut icon", :type "image/png"}]]
      [:body

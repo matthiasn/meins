@@ -36,4 +36,5 @@
   {:cmp-id      cmp-id
    :state-fn    state-fn
    :handler-map {:geo-entry/persist geo-entry-persist-fn
+                 :text-entry/persist geo-entry-persist-fn
                  :state/get         state-get-fn}})
