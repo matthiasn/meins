@@ -33,14 +33,14 @@
   "Renders Journal div"
   [{:keys [observed local put-fn]}]
   [:div:div.l-box-lrg.pure-g
-   [:div.pure-u-1-2
+   [:div.pure-u-1
     [:div [:textarea {:type      "text"
-                      :style     {:height (str (+ 12 (count (s/split-lines (:input @local)))) "em")}
+                      :style     {:height (str (+ 6 (count (s/split-lines (:input @local)))) "em")}
                       :value     (:input @local)
                       :on-change #(swap! local assoc-in [:input] (.. % -target -value))}]]
     [:div [:button {:on-click (fn [_ev] (send-w-geolocation {:md (:input @local)} put-fn))} "save"]]]
-   [:div.pure-u-1-2.markdown (markdown-render (:input @local))]
-   [:div.pure-u-1-2
+   [:div.pure-u-1.markdown (markdown-render (:input @local))]
+   [:div.pure-u-1
     [:h1 "Past entries"]
     [:hr]
     (for [entry (reverse (:entries @observed))]

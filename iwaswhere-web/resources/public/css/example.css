@@ -4,7 +4,6 @@
     box-sizing: border-box;
 }
 
-
 /*
 * -- BASE STYLES --
 * Most of these are inherited from Base, but I want to change a few.
@@ -77,11 +76,13 @@ label {
 .home-menu {
     padding: 0.5em;
     text-align: center;
-    box-shadow: 0 1px 1px rgba(0,0,0, 0.10);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.10);
 }
+
 .home-menu.pure-menu-open {
     background: #2d3e50;
 }
+
 .pure-menu.pure-menu-open.pure-menu-fixed {
     /* Fixed menus normally have a border at the bottom. */
     border-bottom: none;
@@ -100,6 +101,7 @@ label {
 .home-menu a {
     color: #6FBEF3;
 }
+
 .home-menu li a:hover,
 .home-menu li a:focus {
     background: none;
@@ -162,6 +164,7 @@ label {
     .home-menu {
         text-align: left;
     }
+
     .home-menu ul {
         float: right;
     }
@@ -170,7 +173,6 @@ label {
     /*    .splash-container {
     height: 500px;
   }*/
-
     /* We decrease the width of the .splash, since we have more width
     to work with */
     .splash {
@@ -181,7 +183,6 @@ label {
     .splash-head {
         /*font-size: 250%;*/
     }
-
 
     /* We remove the border-separator assigned to .l-box-lrg */
     .l-box-lrg {
@@ -203,12 +204,11 @@ label {
 }
 
 .pure-menu-heading {
-    text-transform: none!important;
+    text-transform: none !important;
 }
 
 textarea {
-    width: 90%;
-    height: 10em;
+    width: 100%;
 }
 
 .markdown h1:first-child {
@@ -224,4 +224,6 @@ textarea {
     margin-bottom: 0.7em;
 }
 
-#map { height: 180px; }
+#map {
+    height: 180px;
+}
