@@ -10,6 +10,7 @@
      [:head
       [:meta {:name "viewport" :content "width=device-width, minimum-scale=1.0"}]
       [:title "iWasWhere"]
+      [:link {:href "/bower_components/lato/css/lato.css", :media "screen", :rel "stylesheet"}]
       [:link {:href "/bower_components/pure/pure-min.css", :media "screen", :rel "stylesheet"}]
       [:link {:href "/bower_components/pure/grids-responsive-min.css", :media "screen", :rel "stylesheet"}]
       [:link {:href "/bower_components/leaflet/dist/leaflet.css", :media "screen", :rel "stylesheet"}]

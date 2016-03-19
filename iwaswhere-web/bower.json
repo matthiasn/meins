@@ -17,6 +17,7 @@
     "tests"
   ],
   "dependencies": {
-    "pure": "~0.5.0"
+    "pure": "~0.5.0",
+    "lato": "^0.3.0"
   }
 }

@@ -42,10 +42,7 @@
     [:div [:button {:on-click (fn [_ev] (send-w-geolocation {} put-fn)
                                 (put-fn [:text-entry/persist {:md (:input @local)
                                                               :timestamp (st/now)}]))} "save"]]]
-   #_
-   [:div.pure-u-1.markdown (markdown-render (:input @local))]
    [:div.pure-u-1
-    [:h1 "Past entries"]
     [:hr]
     (for [entry (reverse (:entries @observed))]
       ^{:key (:timestamp entry)}
