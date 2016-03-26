@@ -233,6 +233,10 @@ textarea {
     height: 180px;
 }
 
+.map {
+    height: 180px;
+}
+
 .pure-g [class *="pure-u"] {
     font-family: "Lato";
 }
