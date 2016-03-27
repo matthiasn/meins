@@ -14,13 +14,14 @@
       [:link {:href "/bower_components/pure/pure-min.css", :media "screen", :rel "stylesheet"}]
       [:link {:href "/bower_components/pure/grids-responsive-min.css", :media "screen", :rel "stylesheet"}]
       [:link {:href "/bower_components/leaflet/dist/leaflet.css", :media "screen", :rel "stylesheet"}]
-      [:link {:href "/css/example.css", :media "screen", :rel "stylesheet"}]
+      [:link {:href "/css/iwaswhere.css", :media "screen", :rel "stylesheet"}]
       [:link {:href "/images/favicon.png", :rel "shortcut icon", :type "image/png"}]]
      [:body
       [:div.header
        [:div.home-menu.pure-menu.pure-menu-open.pure-menu-horizontal.pure-menu-fixed
         [:a.pure-menu-heading {:href ""} "iWasWhere?"]]]
       [:div.content-wrapper
-       [:div.content [:div#journal]]
-       [:div.content [:div#map]]]
+       [:div.content [:div#map]]
+       [:div.content [:div#new-entry]]
+       [:div.content [:div#journal]]]
       [:script {:src "/js/build/iwaswhere.js"}]]]))
