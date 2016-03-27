@@ -229,14 +229,27 @@ textarea {
     margin-bottom: 0.3em;
 }
 
-#map {
-    height: 180px;
-}
-
 .map {
     height: 130px;
 }
 
 .pure-g [class *="pure-u"] {
     font-family: "Lato";
+}
+
+a {
+    text-decoration: none;
+    font-weight: 400;
+}
+
+hr {
+    height: 1px;
+    border: 0;
+    background: #BBB;
+}
+
+textarea {
+    font-family: "Lato";
+    font-weight: 300;
+    color: #576364;
 }

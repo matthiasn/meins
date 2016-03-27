@@ -25,19 +25,9 @@
                                  (pp/pprint w-geoloc)
                                  (put-fn [:geo-entry/persist w-geoloc]))))))
 
-(defn pan-to
-  [map]
-  (let [geo (.-geolocation js/navigator)]
-    (.getCurrentPosition geo (fn [pos]
-                               (let [coords (.-coords pos)
-                                     latitude (.-latitude coords)
-                                     longitude (.-longitude coords)]
-                                 (.panTo map (new js/L.LatLng latitude longitude))
-                                 (.addTo (.marker js/L #js [latitude longitude]) map))))))
-
 (defn new-entry-view
   "Renders Journal div"
-  [{:keys [observed local put-fn]}]
+  [{:keys [local put-fn]}]
   [:div:div.l-box-lrg.pure-g
    [:div.pure-u-1
     [:div [:textarea#input
@@ -47,23 +37,11 @@
             :style     {:height (str (+ 6 (count (s/split-lines (:input @local)))) "em")}}]]
     [:div [:button {:on-click (fn [_ev]
                                 (send-w-geolocation {} put-fn)
-                                (pan-to (:map @local))
                                 (put-fn [:text-entry/persist {:md        (.-value (h/by-id "input"))
-                                                              :timestamp (st/now)}]))} "save"]
-     [:button {:on-click (fn [_ev] (pan-to (:map @local)))} "update map"]]]])
-
-(defn init
-  []
-  (let [map (.map js/L "map" (clj->js {:scrollWheelZoom false}))
-        map (.setView map #js [0 0] 13)]
-    (.addTo (.tileLayer js/L "http://{s}.tile.osm.org/{z}/{x}/{y}.png" (clj->js {:maxZoom 18})) map)
-    (pan-to map)
-    (set! (.-imagePath js/L.Icon.Default) "bower_components/leaflet/dist/images/")
-{:map map}))
+                                                              :timestamp (st/now)}]))} "save"]]]])
 
 (defn cmp-map
   [cmp-id]
   (r/cmp-map {:cmp-id  cmp-id
-              :initial-state (init)
               :view-fn new-entry-view
               :dom-id  "new-entry"}))

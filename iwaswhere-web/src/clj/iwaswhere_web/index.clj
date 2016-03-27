@@ -21,7 +21,6 @@
        [:div.home-menu.pure-menu.pure-menu-open.pure-menu-horizontal.pure-menu-fixed
         [:a.pure-menu-heading {:href ""} "iWasWhere?"]]]
       [:div.content-wrapper
-       [:div.content [:div#map]]
        [:div.content [:div#new-entry]]
        [:div.content [:div#journal]]]
       [:script {:src "/js/build/iwaswhere.js"}]]]))
