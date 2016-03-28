@@ -36,15 +36,14 @@
      :timestamp (st/now)}))
 
 (defn new-entry-view
-  "Renders Journal div"
+  "Renders Journal div."
   [{:keys [local put-fn]}]
   [:div:div.l-box-lrg.pure-g
    [:div.pure-u-1
-    [:div [:textarea#input
+    [:div [:textarea#new-entry
            {:type      "text"
             ; TODO: occasionally store content into localstorage
-            :on-change #(reset! local (parse-entry (.. % -target -value)))
-            :style     {:height (str (+ 6 (count (s/split-lines (:input @local)))) "em")}}]]
+            :on-change #(reset! local (parse-entry (.. % -target -value)))}]]
 #_    (h/pp-div @local)
     [:div.entry-footer
      [:button {:on-click (fn [_ev]

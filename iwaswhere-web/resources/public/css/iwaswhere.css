@@ -258,10 +258,15 @@ textarea {
     margin: 5px;
     padding: 1px 5px;
     color: white;
+    font-size: 0.8em;
     background-color: #0078e7;
 }
 
 .entry-footer {
     margin-top: 5px;
     height: 1.8em;
+}
+
+#new-entry {
+    height: 7em;
 }
