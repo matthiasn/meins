@@ -5,21 +5,17 @@
             [cljsjs.leaflet]
             [cljs.pprint :as pp]))
 
-(defn w-geolocation
-  [data pos]
-  (let [coords (.-coords pos)
-        latitude (.-latitude coords)
-        longitude (.-longitude coords)]
-    (merge data {:latitude  latitude
-                 :longitude longitude})))
-
 (defn send-w-geolocation
+  "Calls geolocation, sends entry enriched by geo information inside the
+  callback function"
   [data put-fn]
-  (let [geo (.-geolocation js/navigator)]
-    (.getCurrentPosition geo (fn [pos]
-                               (let [w-geoloc (w-geolocation data pos)]
-                                 (pp/pprint w-geoloc)
-                                 (put-fn [:geo-entry/persist w-geoloc]))))))
+  (.getCurrentPosition
+    (.-geolocation js/navigator)
+    (fn [pos]
+      (let [coords (.-coords pos)]
+        (put-fn [:geo-entry/persist
+                 (merge data {:latitude  (.-latitude coords)
+                              :longitude (.-longitude coords)})])))))
 
 (defn parse-entry
   "Parses entry for hastags and mentions."
@@ -44,9 +40,10 @@
                          (put-fn [:text-entry/save @local]))}]]
     #_(h/pp-div @local)
     [:div.entry-footer
-     [:button {:on-click (fn [_ev] (let [entry @local]
-                                     (send-w-geolocation entry put-fn)
-                                     (put-fn [:text-entry/persist entry])))} "save"]
+     [:button {:on-click #(let [entry @local]
+                           (put-fn [:text-entry/persist entry])
+                           (send-w-geolocation entry put-fn))}
+      "save"]
      (for [hashtag (:tags @local)]
        ^{:key (str "tag-" hashtag)}
        [:span.hashtag hashtag])]]])
