@@ -9,7 +9,7 @@
   (when-let [text (:md entry)]
     (let [
           tags (into [] (re-seq #"(?m)(?!^)#[\w-]+" text))
-          mentions (into [] (re-seq #"@\\w+" text))]
+          mentions (into [] (re-seq #"@\w+" text))]
       (merge entry
              {:tags     tags
               :mentions mentions}))))
