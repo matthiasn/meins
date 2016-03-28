@@ -28,11 +28,11 @@
 (defn parse-entry
   "Parses entry for hastags and mentions."
   [text]
-  (let [tags (into [] (re-seq (js/RegExp. "(?!^)#\\w+" "m") text))
+  (let [tags (into [] (re-seq (js/RegExp. "(?!^)#[\\w\\-]+" "m") text))
         mentions (into [] (re-seq (js/RegExp. "@\\w+" "m") text))]
-    {:md text
-     :tags tags
-     :mentions mentions
+    {:md        text
+     :tags      tags
+     :mentions  mentions
      :timestamp (st/now)}))
 
 (defn new-entry-view
@@ -44,11 +44,11 @@
            {:type      "text"
             ; TODO: occasionally store content into localstorage
             :on-change #(reset! local (parse-entry (.. % -target -value)))}]]
-#_    (h/pp-div @local)
+    #_(h/pp-div @local)
     [:div.entry-footer
      [:button {:on-click (fn [_ev]
-                                (send-w-geolocation {} put-fn)
-                                (put-fn [:text-entry/persist @local]))} "save"]
+                           (send-w-geolocation {} put-fn)
+                           (put-fn [:text-entry/persist @local]))} "save"]
      (for [hashtag (:tags @local)]
        ^{:key (str "tag-" hashtag)}
        [:span.hashtag hashtag])]]])
