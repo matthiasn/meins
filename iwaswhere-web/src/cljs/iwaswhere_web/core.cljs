@@ -24,6 +24,7 @@
                              :client/journal-cmp]
                       :to   :client/ws-cmp}]
      [:cmd/route {:from :client/ws-cmp :to :client/store-cmp}]
+     [:cmd/route {:from :client/new-entry-cmp :to :client/store-cmp}]
      [:cmd/observe-state {:from :client/store-cmp :to :client/journal-cmp}]]))
 
 (init (sente/cmp-map :client/ws-cmp))

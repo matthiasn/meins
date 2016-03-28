@@ -1,9 +1,6 @@
 (ns iwaswhere-web.new-entry
-  (:require [markdown.core :as md]
-            [matthiasn.systems-toolbox-ui.reagent :as r]
-            [matthiasn.systems-toolbox-ui.helpers :as h]
+  (:require [matthiasn.systems-toolbox-ui.reagent :as r]
             [matthiasn.systems-toolbox.component :as st]
-            [clojure.string :as s]
             [cljsjs.moment]
             [cljsjs.leaflet]
             [cljs.pprint :as pp]))
@@ -43,7 +40,9 @@
     [:div [:textarea#new-entry
            {:type      "text"
             ; TODO: occasionally store content into localstorage
-            :on-change #(reset! local (parse-entry (.. % -target -value)))}]]
+            :on-change (fn [ev]
+                         (reset! local (parse-entry (.. ev -target -value)))
+                         (put-fn [:text-entry/save @local]))}]]
     #_(h/pp-div @local)
     [:div.entry-footer
      [:button {:on-click (fn [_ev]

@@ -2,6 +2,7 @@
   (:require [markdown.core :as md]
             [matthiasn.systems-toolbox-ui.reagent :as r]
             [clojure.string :as s]
+            [clojure.set :as set]
             [iwaswhere-web.leaflet :as l]
             [cljsjs.moment]))
 
@@ -30,22 +31,35 @@
                       (reducer (:mentions entry) mentions-replacer))]
     [:div {:dangerouslySetInnerHTML {:__html (md/md->html md-string)}}]))
 
+(defn entries-filter-fn
+  "Creates a filter function which ensures that all tags in the new entry are contained in
+  the filtered entry. This filters entries so that only entries that are relevant to the new
+  entry are shown."
+  ; TODO: also enable OR filter
+  [new-entry]
+  (fn [entry]
+    (let [entry-tags (set (:tags entry))
+          new-entry-tags (set (:tags new-entry))]
+      (set/subset? new-entry-tags entry-tags))))
+
 (defn journal-view
   "Renders journal div, one entry per item, with map if geo data exists in the entry."
   [{:keys [observed]}]
-  [:div:div.l-box-lrg.pure-g
-   [:div.pure-u-1
-    [:hr]
-    (for [entry (reverse (:entries @observed))]
-      ^{:key (:timestamp entry)}
-      [:div.entry
-       [:span.timestamp (.format (js/moment (:timestamp entry)) "MMMM Do YYYY, h:mm:ss a")]
-       (markdown-render entry)
-       (when-let [lat (:latitude entry)]
-         [l/leaflet-component {:id  (str "map" (:timestamp entry))
-                               :lat lat
-                               :lon (:longitude entry)}])
-       [:hr]])]])
+  (let [store-snapshot @observed]
+    [:div:div.l-box-lrg.pure-g
+     [:div.pure-u-1
+      [:hr]
+      (let [entries (reverse (:entries store-snapshot))]
+        (for [entry (take 50 (filter (entries-filter-fn (:new-entry store-snapshot)) entries))]
+          ^{:key (:timestamp entry)}
+          [:div.entry
+           [:span.timestamp (.format (js/moment (:timestamp entry)) "MMMM Do YYYY, h:mm:ss a")]
+           (markdown-render entry)
+           (when-let [lat (:latitude entry)]
+             [l/leaflet-component {:id  (str "map" (:timestamp entry))
+                                   :lat lat
+                                   :lon (:longitude entry)}])
+           [:hr]]))]]))
 
 (defn cmp-map
   [cmp-id]
