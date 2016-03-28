@@ -11,8 +11,7 @@
         latitude (.-latitude coords)
         longitude (.-longitude coords)]
     (merge data {:latitude  latitude
-                 :longitude longitude
-                 :timestamp (.-timestamp pos)})))
+                 :longitude longitude})))
 
 (defn send-w-geolocation
   [data put-fn]
@@ -45,9 +44,9 @@
                          (put-fn [:text-entry/save @local]))}]]
     #_(h/pp-div @local)
     [:div.entry-footer
-     [:button {:on-click (fn [_ev]
-                           (send-w-geolocation {} put-fn)
-                           (put-fn [:text-entry/persist @local]))} "save"]
+     [:button {:on-click (fn [_ev] (let [entry @local]
+                                     (send-w-geolocation entry put-fn)
+                                     (put-fn [:text-entry/persist entry])))} "save"]
      (for [hashtag (:tags @local)]
        ^{:key (str "tag-" hashtag)}
        [:span.hashtag hashtag])]]])
