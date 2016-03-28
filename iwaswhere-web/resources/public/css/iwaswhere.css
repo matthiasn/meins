@@ -253,3 +253,15 @@ textarea {
     font-weight: 300;
     color: #576364;
 }
+
+.hashtag {
+    margin: 5px;
+    padding: 1px 5px;
+    color: white;
+    background-color: #0078e7;
+}
+
+.entry-footer {
+    margin-top: 5px;
+    height: 1.8em;
+}

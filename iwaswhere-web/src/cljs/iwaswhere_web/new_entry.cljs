@@ -25,6 +25,16 @@
                                  (pp/pprint w-geoloc)
                                  (put-fn [:geo-entry/persist w-geoloc]))))))
 
+(defn parse-entry
+  "Parses entry for hastags and mentions."
+  [text]
+  (let [tags (into [] (re-seq (js/RegExp. "(?!^)#\\w+" "m") text))
+        mentions (into [] (re-seq (js/RegExp. "@\\w+" "m") text))]
+    {:md text
+     :tags tags
+     :mentions mentions
+     :timestamp (st/now)}))
+
 (defn new-entry-view
   "Renders Journal div"
   [{:keys [local put-fn]}]
@@ -33,12 +43,16 @@
     [:div [:textarea#input
            {:type      "text"
             ; TODO: occasionally store content into localstorage
-            :on-change #(swap! local assoc-in [:input] (.. % -target -value))
+            :on-change #(reset! local (parse-entry (.. % -target -value)))
             :style     {:height (str (+ 6 (count (s/split-lines (:input @local)))) "em")}}]]
-    [:div [:button {:on-click (fn [_ev]
+#_    (h/pp-div @local)
+    [:div.entry-footer
+     [:button {:on-click (fn [_ev]
                                 (send-w-geolocation {} put-fn)
-                                (put-fn [:text-entry/persist {:md        (.-value (h/by-id "input"))
-                                                              :timestamp (st/now)}]))} "save"]]]])
+                                (put-fn [:text-entry/persist @local]))} "save"]
+     (for [hashtag (:tags @local)]
+       ^{:key (str "tag-" hashtag)}
+       [:span.hashtag hashtag])]]])
 
 (defn cmp-map
   [cmp-id]
