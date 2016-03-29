@@ -82,6 +82,7 @@ label {
 
 .home-menu.pure-menu-open {
     background: #2d3e50;
+    z-index: 1001; /* Oddly, Leaflet controls have the z-index fairly high */
 }
 
 .pure-menu.pure-menu-open.pure-menu-fixed {
@@ -269,4 +270,12 @@ textarea {
 
 #new-entry {
     height: 7em;
+}
+
+.toggle-map {
+    margin-left: 10px;
+}
+
+.inactive {
+    color: #AAA;
 }

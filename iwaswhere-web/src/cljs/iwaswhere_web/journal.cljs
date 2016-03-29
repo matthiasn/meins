@@ -7,26 +7,45 @@
 
 (defn journal-view
   "Renders journal div, one entry per item, with map if geo data exists in the entry."
-  [{:keys [observed]}]
-  (let [store-snapshot @observed]
+  [{:keys [observed local]}]
+  (let [local-snapshot @local
+        store-snapshot @observed
+        show-all-maps? (:show-all-maps local-snapshot)
+        show-hashtags? (:show-hashtags local-snapshot)]
     [:div:div.l-box-lrg.pure-g
      [:div.pure-u-1
+      [:span.fa.toggle-map.pull-right
+       {:class (if show-all-maps? "fa-map" "fa-map-o")
+        :on-click #(swap! local update-in [:show-all-maps] not)}]
+      [:span.fa.fa-hashtag.toggle-map.pull-right
+       {:class (when-not show-hashtags? "inactive")
+        :on-click #(swap! local update-in [:show-hashtags] not)}]
       [:hr]
       (let [entries (reverse (:entries store-snapshot))]
         (for [entry (take 50 (filter (h/entries-filter-fn (:new-entry store-snapshot)) entries))]
-          ^{:key (:timestamp entry)}
-          [:div.entry
-           [:span.timestamp (.format (js/moment (:timestamp entry)) "MMMM Do YYYY, h:mm:ss a")]
-           (m/markdown-render entry)
-           (when-let [lat (:latitude entry)]
-             [l/leaflet-component {:id  (str "map" (:timestamp entry))
-                                   :lat lat
-                                   :lon (:longitude entry)}])
-           [:hr]]))]]))
+          (let [ts (:timestamp entry)
+                map? (:latitude entry)
+                show-map? (contains? (:show-maps-for local-snapshot) ts)]
+            ^{:key ts}
+            [:div.entry
+             [:span.timestamp (.format (js/moment ts) "MMMM Do YYYY, h:mm:ss a")]
+             (when map?
+               [:span.fa.fa-map-o.toggle-map
+                {:on-click #(if show-map? (swap! local update-in [:show-maps-for] disj ts)
+                                          (swap! local update-in [:show-maps-for] conj ts))}])
+
+             (m/markdown-render entry show-hashtags?)
+             (when (and map? (or show-map? show-all-maps?))
+               [l/leaflet-component {:id  (str "map" (:timestamp entry))
+                                     :lat  (:latitude entry)
+                                     :lon (:longitude entry)}])
+             [:hr]])))]]))
 
 (defn cmp-map
   [cmp-id]
   (r/cmp-map {:cmp-id  cmp-id
-              :initial-state {}
+              :initial-state {:show-maps-for #{}
+                              :show-all-maps false
+                              :show-hashtags true}
               :view-fn journal-view
               :dom-id  "journal"}))
