@@ -9,7 +9,7 @@
   [show-hashtags?]
   (fn [acc hashtag]
     (let [f-hashtag (if show-hashtags? hashtag (subs hashtag 1))]
-      (s/replace acc hashtag (str "**" f-hashtag "**")))))
+      (s/replace acc (re-pattern (str "[^*]" hashtag "(?!\\w)")) (str " **" f-hashtag "**")))))
 
 (defn mentions-replacer
   "Replaces mentions in entry text."
