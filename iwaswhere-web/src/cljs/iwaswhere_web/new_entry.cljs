@@ -18,10 +18,11 @@
                               :longitude (.-longitude coords)})])))))
 
 (defn parse-entry
-  "Parses entry for hastags and mentions."
+  "Parses entry for hastags and mentions. Either can consist of any of the word characters, dashes
+  and unicode characters that for example comprise German 'Umlaute'."
   [text]
-  (let [tags (into [] (re-seq (js/RegExp. "(?!^)#[\\w\\-]+" "m") text))
-        mentions (into [] (re-seq (js/RegExp. "@\\w+" "m") text))]
+  (let [tags (into [] (re-seq (js/RegExp. "(?!^)#[\\w\\-\\u00C0-\\u017F]+" "m") text))
+        mentions (into [] (re-seq (js/RegExp. "@[\\w\\-\\u00C0-\\u017F]+" "m") text))]
     {:md        text
      :tags      tags
      :mentions  mentions
