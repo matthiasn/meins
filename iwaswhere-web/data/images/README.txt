@@ -1,0 +1,1 @@
+Imported photos will be stored here, with their original filename prepended by the photo capture timestamp in milliseconds since epoch.

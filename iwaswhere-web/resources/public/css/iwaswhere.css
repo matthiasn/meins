@@ -284,3 +284,7 @@ img{
     height: auto;
     width: 100%;
 }
+
+.entry-header {
+    line-height: 1.4em;
+}

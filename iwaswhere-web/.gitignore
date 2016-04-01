@@ -1,4 +1,7 @@
-data/
+data/*.edn
+data/.gitignore
+data/images
+data/image-import
 /target
 /classes
 /checkouts

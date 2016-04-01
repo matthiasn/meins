@@ -6,7 +6,7 @@
             [clj-pid.core :as pid]
             [io.aviso.logging :as pretty]
             [iwaswhere-web.store :as st]
-            [matthiasn.systems-toolbox.scheduler :as sched]))
+            [iwaswhere-web.imports :as i]))
 
 (pretty/install-pretty-logging)
 (pretty/install-uncaught-exception-handler)
@@ -14,16 +14,22 @@
 (defonce switchboard (sb/component :server/switchboard))
 
 (defn restart!
-  "Starts or restarts system by asking switchboard to fire up the provided ws-cmp, a scheduler
-  component and the ptr component, which handles and counts messages about mouse moves."
+  "Starts or restarts system by asking switchboard to fire up the ws-cmp for serving the
+  client side application and providing bi-directional communication with the client,
+  plus the store and imports components.
+  Then, routes messages to the store and imports components for which those have a
+  handler function. Also route messages from imports to store component.
+  Finally, send all messages from store component to client via the ws component."
   []
   (sb/send-mult-cmd
     switchboard
-    [[:cmd/init-comp (sente/cmp-map :server/ws-cmp index/index-page)] ; WebSocket component
-     [:cmd/init-comp (sched/cmp-map :server/scheduler-cmp)]           ; scheduling component
-     [:cmd/init-comp (st/cmp-map :server/store-cmp)]                  ; component for processing mouse moves
-     [:cmd/route-all {:from [:server/store-cmp] :to :server/ws-cmp}]  ; route all messages to ws-cmp
-     [:cmd/route {:from :server/ws-cmp :to :server/store-cmp}]]))
+    [[:cmd/init-comp (sente/cmp-map :server/ws-cmp index/sente-map)]
+     [:cmd/init-comp (i/cmp-map :server/imports-cmp)]
+     [:cmd/init-comp (st/cmp-map :server/store-cmp)]
+     [:cmd/route {:from :server/ws-cmp :to :server/store-cmp}]
+     [:cmd/route {:from :server/ws-cmp :to :server/imports-cmp}]
+     [:cmd/route {:from :server/imports-cmp :to :server/store-cmp}]
+     [:cmd/route-all {:from [:server/store-cmp] :to :server/ws-cmp}]]))
 
 (defn -main
   "Starts the application from command line, saves and logs process ID. The system that is fired up when

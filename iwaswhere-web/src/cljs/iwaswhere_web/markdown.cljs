@@ -23,10 +23,11 @@
 
 (defn markdown-render
   "Renders a markdown div using :dangerouslySetInnerHTML. Not that dangerous here since
-  application is only running locally, so in doubt we could only harm ourselves."
+  application is only running locally, so in doubt we could only harm ourselves.
+  Returns nil when entry does not contain markdown text."
   [entry show-hashtags?]
-  (let [md-string (-> entry
-                      :md
-                      (reducer (:tags entry) (hashtags-replacer show-hashtags?))
-                      (reducer (:mentions entry) mentions-replacer))]
-    [:div {:dangerouslySetInnerHTML {:__html (md/md->html md-string)}}]))
+  (when-let [md-string (:md entry)]
+    (let [formatted-md (-> md-string
+                           (reducer (:tags entry) (hashtags-replacer show-hashtags?))
+                           (reducer (:mentions entry) mentions-replacer))]
+      [:div {:dangerouslySetInnerHTML {:__html (md/md->html formatted-md)}}])))

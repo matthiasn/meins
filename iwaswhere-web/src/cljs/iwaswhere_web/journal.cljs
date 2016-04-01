@@ -28,17 +28,20 @@
                 show-map? (contains? (:show-maps-for local-snapshot) ts)]
             ^{:key ts}
             [:div.entry
-             [:span.timestamp (.format (js/moment ts) "MMMM Do YYYY, h:mm:ss a")]
-             (when map?
-               [:span.fa.fa-map-o.toggle-map
-                {:on-click #(if show-map? (swap! local update-in [:show-maps-for] disj ts)
-                                          (swap! local update-in [:show-maps-for] conj ts))}])
-
-             (m/markdown-render entry show-hashtags?)
+             [:div.entry-header
+              [:span.timestamp (.format (js/moment ts) "MMMM Do YYYY, h:mm:ss a")]
+              (when map?
+                [:span.fa.fa-map-o.toggle-map
+                 {:on-click #(if show-map?
+                              (swap! local update-in [:show-maps-for] disj ts)
+                              (swap! local update-in [:show-maps-for] conj ts))}])]
              (when (and map? (or show-map? show-all-maps?))
                [l/leaflet-component {:id  (str "map" (:timestamp entry))
                                      :lat  (:latitude entry)
                                      :lon (:longitude entry)}])
+             (m/markdown-render entry show-hashtags?)
+             (when-let [img-file (:img-file entry)]
+               [:img {:src (str "/photos/" img-file)}])
              [:hr]])))]]))
 
 (defn cmp-map
