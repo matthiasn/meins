@@ -279,3 +279,8 @@ textarea {
 .inactive {
     color: #AAA;
 }
+
+img{
+    height: auto;
+    width: 100%;
+}

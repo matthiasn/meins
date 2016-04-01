@@ -14,6 +14,7 @@
                  [markdown-clj "0.9.86"]
                  [cljsjs/moment "2.10.6-3"]
                  [cljsjs/leaflet "0.7.7-2"]
+                 [com.drewnoakes/metadata-extractor "2.8.1"]
                  [ubergraph "0.2.1"]
                  [matthiasn/systems-toolbox "0.5.14"]
                  [matthiasn/systems-toolbox-ui "0.5.6"]

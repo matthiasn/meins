@@ -45,6 +45,7 @@
                            (put-fn [:text-entry/persist entry])
                            (send-w-geolocation entry put-fn))}
       "save"]
+     [:button {:on-click #(put-fn [:import/photos])} "import photos"]
      (for [hashtag (:tags @local)]
        ^{:key (str "tag-" hashtag)}
        [:span.hashtag hashtag])]]])
