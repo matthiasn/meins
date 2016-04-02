@@ -4,7 +4,8 @@
             [iwaswhere-web.files :as f]
             [clj-time.coerce :as c]
             [me.raynes.fs :as fs]
-            [clj-time.format :as tf])
+            [clj-time.format :as tf]
+            [clojure.tools.logging :as log])
   (:import [com.drew.imaging ImageMetadataReader]))
 
 (defn dms-to-dd
@@ -24,14 +25,13 @@
           dd)))))
 
 (defn extract-ts
-  "Converts GPS timestamp strings into milliseconds since epoch.
+  "Converts concatenated GPS timestamp strings into milliseconds since epoch.
   Example from iPhone 6s camera app:
     'GPS Date Stamp' '2016:03:30'
     'GPS Time-Stamp' '20:07:57.00 UTC'"
-  [d t]
-  (let [f (tf/formatter "yyyy:MM:dd HH:mm:ss.SS z")
-        dt (tf/parse f (str d " " t))]
-    (c/to-long dt)))
+  [ts]
+  (let [f (tf/formatter "yyyy:MM:dd HH:mm:ss.SS z")]
+    (c/to-long (tf/parse f ts))))
 
 (defn extract-from-tag
   "Creates map for a single Exif directory.
@@ -53,25 +53,29 @@
         lon-ref (get raw-exif "GPS Longitude Ref")
         gps-date (get raw-exif "GPS Date Stamp")
         gps-time (get raw-exif "GPS Time-Stamp")]
-        {:raw-exif raw-exif
-         :timestamp (extract-ts gps-date gps-time)
-         :latitude (dms-to-dd lat-dms lat-ref)
-         :longitude (dms-to-dd lon-dms lon-ref)}))
+    {:raw-exif  raw-exif
+     :timestamp (if gps-date
+                  (extract-ts (str gps-date " " gps-time))
+                  ;; workaround since EXIF editor doesn't add timezone
+                  (extract-ts (str (get raw-exif "Date/Time") ".00 UTC")))
+     :latitude  (dms-to-dd lat-dms lat-ref)
+     :longitude (dms-to-dd lon-dms lon-ref)}))
 
 (defn import-photos
   "Imports photos from respective directory."
   [{:keys [put-fn]}]
-    (let [files (file-seq (clojure.java.io/file "data/image-import"))]
-      (doseq [img (f/filter-by-name files #"[A-Za-z0-9_]+.jpg")]
-        (let [filename (.getName img)
-              rel-path (.getPath img)
-              file-info (exif-for-file img)
-              target-filename (str (:timestamp file-info) "-" filename)
-              new-entry (merge file-info
-                               {:img-file target-filename
-                                :tags ["#photo"]})]
-          (fs/rename rel-path (str "data/images/" target-filename))
-          (put-fn [:geo-entry/persist new-entry])))))
+  (let [files (file-seq (clojure.java.io/file "data/image-import"))]
+    (doseq [img (f/filter-by-name files #"[A-Za-z0-9_]+.jpg")]
+      (let [filename (.getName img)]
+        (try (let [rel-path (.getPath img)
+                   file-info (exif-for-file img)
+                   target-filename (str (:timestamp file-info) "-" filename)
+                   new-entry (merge file-info
+                                    {:img-file target-filename
+                                     :tags     ["#photo"]})]
+               (fs/rename rel-path (str "data/images/" target-filename))
+               (put-fn [:geo-entry/persist new-entry]))
+             (catch Exception ex (log/error (str "Error while importing " filename) ex)))))))
 
 (defn cmp-map
   [cmp-id]
