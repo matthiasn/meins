@@ -67,7 +67,7 @@
 
 (defn import-photos
   "Imports photos from respective directory."
-  [{:keys [put-fn]}]
+  [{:keys [put-fn msg-meta]}]
   (let [files (file-seq (clojure.java.io/file "data/image-import"))]
     (log/info "importing photos")
     (doseq [img (f/filter-by-name files #"[A-Za-z0-9_]+.(jpg|JPG|PNG|png)")]
@@ -80,7 +80,7 @@
                                     {:img-file target-filename
                                      :tags     ["#photo"]})]
                (fs/rename rel-path (str "data/images/" target-filename))
-               (put-fn [:geo-entry/persist new-entry]))
+               (put-fn (with-meta [:geo-entry/persist new-entry] msg-meta)))
              (catch Exception ex (log/error (str "Error while importing " filename) ex)))))))
 
 (defn cmp-map
