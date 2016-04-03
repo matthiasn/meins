@@ -41,7 +41,8 @@
                                      :lon (:longitude entry)}])
              (m/markdown-render entry show-hashtags?)
              (when-let [img-file (:img-file entry)]
-               [:img {:src (str "/photos/" img-file)}])
+               [:a {:href   (str "/photos/" img-file) :target "_blank"}
+                [:img {:src (str "/photos/" img-file)}]])
              [:hr]])))]]))
 
 (defn cmp-map
