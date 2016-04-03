@@ -3,6 +3,7 @@
   (:require [clojure.pprint :as pp]
             [iwaswhere-web.files :as f]
             [clj-time.coerce :as c]
+            [matthiasn.systems-toolbox.component :as st]
             [me.raynes.fs :as fs]
             [clj-time.format :as tf]
             [clojure.tools.logging :as log])
@@ -13,16 +14,17 @@
   when not all 3 groups dm, m, and s are contained in coord string. Result negative
   when coord in Western or Southern Hemisphere according to ref argument."
   [coord ref]
-  (let [matcher (re-matcher #"(\d{1,3})° (\d{1,2})' (\d{1,2}\.?\d+?)" coord)
-        [_dms d m s] (re-find matcher)]
-    (when (and d m s)
-      (let [d (read-string d)
-            m (read-string m)
-            s (read-string s)
-            dd (float (+ d (/ m 60) (/ s 3600)))]
-        (if (contains? #{"W" "S"} ref)
-          (- dd)
-          dd)))))
+  (when coord
+    (let [matcher (re-matcher #"(\d{1,3})° (\d{1,2})' (\d{1,2}\.?\d+?)" coord)
+          [_dms d m s] (re-find matcher)]
+      (when (and d m s)
+        (let [d (read-string d)
+              m (read-string m)
+              s (read-string s)
+              dd (float (+ d (/ m 60) (/ s 3600)))]
+          (if (contains? #{"W" "S"} ref)
+            (- dd)
+            dd))))))
 
 (defn extract-ts
   "Converts concatenated GPS timestamp strings into milliseconds since epoch.
@@ -31,7 +33,9 @@
     'GPS Time-Stamp' '20:07:57.00 UTC'"
   [ts]
   (let [f (tf/formatter "yyyy:MM:dd HH:mm:ss.SS z")]
-    (c/to-long (tf/parse f ts))))
+    (when (and (seq ts)
+               (re-matches #"\d{4}:\d{2}:\d{2} \d{2}:\d{2}:\d{2}\.\d{2} [A-Z]{1,5}" ts))
+      (c/to-long (tf/parse f ts)))))
 
 (defn extract-from-tag
   "Creates map for a single Exif directory.
@@ -54,10 +58,10 @@
         gps-date (get raw-exif "GPS Date Stamp")
         gps-time (get raw-exif "GPS Time-Stamp")]
     {:raw-exif  raw-exif
-     :timestamp (if gps-date
-                  (extract-ts (str gps-date " " gps-time))
-                  ;; workaround since EXIF editor doesn't add timezone
-                  (extract-ts (str (get raw-exif "Date/Time") ".00 UTC")))
+     :timestamp (or (extract-ts (str gps-date " " gps-time))
+                    (extract-ts (str (get raw-exif "Date/Time") ".00 UTC"))
+                    (extract-ts (str (get raw-exif "Date/Time Original") ".00 UTC"))
+                    (st/now))
      :latitude  (dms-to-dd lat-dms lat-ref)
      :longitude (dms-to-dd lon-dms lon-ref)}))
 
@@ -65,8 +69,10 @@
   "Imports photos from respective directory."
   [{:keys [put-fn]}]
   (let [files (file-seq (clojure.java.io/file "data/image-import"))]
-    (doseq [img (f/filter-by-name files #"[A-Za-z0-9_]+.jpg")]
+    (log/info "importing photos")
+    (doseq [img (f/filter-by-name files #"[A-Za-z0-9_]+.(jpg|JPG|PNG|png)")]
       (let [filename (.getName img)]
+        (log/info "Trying to import " filename)
         (try (let [rel-path (.getPath img)
                    file-info (exif-for-file img)
                    target-filename (str (:timestamp file-info) "-" filename)
