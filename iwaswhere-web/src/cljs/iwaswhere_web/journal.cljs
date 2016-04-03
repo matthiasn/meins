@@ -21,7 +21,7 @@
        {:class (when-not show-hashtags? "inactive")
         :on-click #(swap! local update-in [:show-hashtags] not)}]
       [:hr]
-      (let [entries (reverse (:entries store-snapshot))]
+      (let [entries (:entries store-snapshot)]
         (for [entry (take 50 (filter (h/entries-filter-fn (:new-entry store-snapshot)) entries))]
           (let [ts (:timestamp entry)
                 map? (:latitude entry)

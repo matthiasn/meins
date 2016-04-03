@@ -1,24 +1,29 @@
 (ns iwaswhere-web.store
   (:require [iwaswhere-web.imports :as i]
             [iwaswhere-web.files :as f]
+            [iwaswhere-web.graph :as g]
             [ubergraph.core :as uber]
             [clojure.pprint :as pp]))
 
 (defn state-get-fn
   "Handler function for retrieving current state."
   [{:keys [current-state]}]
-  {:emit-msg [:state/new {:entries (vals (:entries-map current-state))}]})
+  {:emit-msg [:state/new (g/extract-sorted-entries current-state)]})
 
 (defn state-fn
   "Initial state function, creates state atom and then parses all files in
-  data directory into the component state."
+  data directory into the component state.
+  Entries are stored as attributes of graph nodes, where the node itself is
+  timestamp of an entry. A sort order by descending timestamp is maintained
+  in a sorted set of the nodes."
   [_put-fn]
-  (let [state (atom {:entries-map (sorted-map)})
+  (let [state (atom {:sorted-entries (sorted-set-by >)
+                     :graph          (uber/graph)})
         files (file-seq (clojure.java.io/file "./data"))]
     (doseq [f (f/filter-by-name files #"\d{13}.edn")]
       (let [parsed (clojure.edn/read-string (slurp f))
             ts (:timestamp parsed)]
-        (swap! state assoc-in [:entries-map ts] parsed)))
+        (swap! state g/add-node ts parsed)))
     {:state state}))
 
 (defn cmp-map
