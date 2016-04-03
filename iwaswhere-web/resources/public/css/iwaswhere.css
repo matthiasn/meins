@@ -288,3 +288,7 @@ img{
 .entry-header {
     line-height: 1.4em;
 }
+
+button {
+    margin-right: 5px;
+}
