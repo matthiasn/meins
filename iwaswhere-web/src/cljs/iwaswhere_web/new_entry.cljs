@@ -41,11 +41,12 @@
                          (put-fn [:text-entry/save @local]))}]]
     #_(h/pp-div @local)
     [:div.entry-footer
-     [:button {:on-click #(let [entry @local]
-                           (put-fn [:text-entry/persist entry])
-                           (send-w-geolocation entry put-fn))}
+     [:button.pure-button.pure-button-primary
+      {:on-click #(let [entry @local]
+                   (put-fn [:text-entry/persist entry])
+                   (send-w-geolocation entry put-fn))}
       "save"]
-     [:button {:on-click #(put-fn [:import/photos])} "import photos"]
+     [:button.pure-button {:on-click #(put-fn [:import/photos])} [:span.fa.fa-camera-retro] " import"]
      (for [hashtag (:tags @local)]
        ^{:key (str "tag-" hashtag)}
        [:span.hashtag hashtag])]]])
