@@ -24,10 +24,9 @@
   (let [tags (:tags entry)]
     (reduce (fn [acc tag]
               (-> acc
-                  (uber/add-nodes :hashtags)
-                  (uber/add-nodes {:tag tag})
-                  (uber/add-edges [{:tag tag} (:timestamp entry) {:relationship :CONTAINS}])
-                  (uber/add-edges [:hashtags {:tag tag} {:relationship :IS}])))
+                  (uber/add-nodes :hashtags  {:tag tag})
+                  (uber/add-edges [{:tag tag} (:timestamp entry) {:relationship :CONTAINS}]
+                                  [:hashtags {:tag tag} {:relationship :IS}])))
             graph
             tags)))
 
@@ -38,17 +37,14 @@
   (let [dt (ctc/from-long (:timestamp entry))
         year (ct/year dt)
         month (ct/month dt)
-        day (ct/day dt)
         year-node {:type :timeline/year :year year}
         month-node {:type :timeline/month :year year :month month}
-        day-node {:type :timeline/day :year year :month month :day day}]
+        day-node {:type :timeline/day :year year :month month :day (ct/day dt)}]
     (-> graph
-        (uber/add-nodes year-node)
-        (uber/add-nodes month-node)
-        (uber/add-nodes day-node)
-        (uber/add-edges [year-node month-node])
-        (uber/add-edges [month-node day-node])
-        (uber/add-edges [day-node (:timestamp entry) {:relationship :DATE}]))))
+        (uber/add-nodes year-node month-node day-node)
+        (uber/add-edges [year-node month-node]
+                        [month-node day-node]
+                        [day-node (:timestamp entry) {:relationship :DATE}]))))
 
 (defn add-node
   "Adds node to both graph and the sorted set, which maintains the entries sorted by timestamp."
