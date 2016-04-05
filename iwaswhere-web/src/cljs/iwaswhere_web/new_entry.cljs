@@ -31,9 +31,9 @@
 (defn new-entry-view
   "Renders Journal div."
   [{:keys [local put-fn]}]
-  [:div:div.l-box-lrg.pure-g
+  [:div.l-box-lrg.pure-g
    [:div.pure-u-1
-    [:div [:textarea#new-entry
+    [:div [:textarea#new-entry-textbox
            {:type      "text"
             ; TODO: occasionally store content into localstorage
             :on-change (fn [ev]
@@ -41,15 +41,19 @@
                          (put-fn [:text-entry/save @local]))}]]
     #_(h/pp-div @local)
     [:div.entry-footer
-     [:button.pure-button.pure-button-primary
-      {:on-click #(let [entry @local]
-                   (put-fn [:text-entry/persist entry])
-                   (send-w-geolocation entry put-fn))}
-      "save"]
-     [:button.pure-button {:on-click #(put-fn [:import/photos])} [:span.fa.fa-camera-retro] " import"]
-     (for [hashtag (:tags @local)]
-       ^{:key (str "tag-" hashtag)}
-       [:span.hashtag hashtag])]]])
+     [:div
+      [:button.pure-button.pure-button-primary
+       {:on-click #(let [entry @local]
+                    (put-fn [:text-entry/persist entry])
+                    (send-w-geolocation entry put-fn))}
+       "save"]
+      [:button.pure-button {:on-click #(put-fn [:import/photos])} [:span.fa.fa-camera-retro] " import"]]
+     (let [tags (:tags @local)]
+       (when (seq tags)
+         [:div.hashtags
+          (for [hashtag (:tags @local)]
+            ^{:key (str "tag-" hashtag)}
+            [:span.hashtag hashtag])]))]]])
 
 (defn cmp-map
   [cmp-id]

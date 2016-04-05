@@ -12,7 +12,7 @@
         store-snapshot @observed
         show-all-maps? (:show-all-maps local-snapshot)
         show-hashtags? (:show-hashtags local-snapshot)]
-    [:div:div.l-box-lrg.pure-g
+    [:div.l-box-lrg.pure-g
      [:div.pure-u-1
       [:span.fa.toggle-map.pull-right
        {:class (if show-all-maps? "fa-map" "fa-map-o")
