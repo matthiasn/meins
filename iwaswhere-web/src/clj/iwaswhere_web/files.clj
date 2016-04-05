@@ -15,4 +15,4 @@
         filename (str "./data/" (:timestamp msg-payload) ".edn")]
     (spit filename (with-out-str (pp/pprint msg-payload)))
     {:new-state new-state
-     :emit-msg  [:state/new (g/extract-sorted-entries new-state)]}))
+     :emit-msg  [:state/new (g/get-filtered-results new-state msg-payload)]}))

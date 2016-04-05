@@ -7,8 +7,8 @@
 
 (defn state-get-fn
   "Handler function for retrieving current state."
-  [{:keys [current-state]}]
-  {:emit-msg [:state/new (g/extract-sorted-entries current-state)]})
+  [{:keys [current-state msg-payload]}]
+  {:emit-msg [:state/new (g/get-filtered-results current-state msg-payload)]})
 
 (defn state-fn
   "Initial state function, creates state atom and then parses all files in

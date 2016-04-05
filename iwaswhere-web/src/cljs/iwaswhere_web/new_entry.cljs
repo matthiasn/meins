@@ -37,21 +37,27 @@
            {:type      "text"
             ; TODO: occasionally store content into localstorage
             :on-change (fn [ev]
-                         (reset! local (parse-entry (.. ev -target -value)))
-                         (put-fn [:text-entry/save @local]))}]]
+                         (let [prev-tags (or (:prev-tags @local) #{})
+                               new-state (parse-entry (.. ev -target -value))
+                               new-tags (:tags new-state)]
+                           (swap! local assoc-in [:entry] new-state)
+                           (put-fn [:text-entry/save new-state])
+                           (when (not= prev-tags new-tags)
+                             (put-fn [:state/get {:tags new-tags}])
+                             (swap! local assoc-in [:prev-tags] new-tags))))}]]
     #_(h/pp-div @local)
     [:div.entry-footer
      [:div
       [:button.pure-button.pure-button-primary
-       {:on-click #(let [entry @local]
+       {:on-click #(let [entry (:entry @local)]
                     (put-fn [:text-entry/persist entry])
                     (send-w-geolocation entry put-fn))}
        "save"]
       [:button.pure-button {:on-click #(put-fn [:import/photos])} [:span.fa.fa-camera-retro] " import"]]
-     (let [tags (:tags @local)]
+     (let [tags (:tags (:entry @local))]
        (when (seq tags)
          [:div.hashtags
-          (for [hashtag (:tags @local)]
+          (for [hashtag tags]
             ^{:key (str "tag-" hashtag)}
             [:span.hashtag hashtag])]))]]])
 
