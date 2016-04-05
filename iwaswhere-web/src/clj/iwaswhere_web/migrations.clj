@@ -1,15 +1,14 @@
 (ns iwaswhere-web.migrations
   "This namespace is used for migrating entries to new versions."
-  (:require [iwaswhere-web.store :as s]
+  (:require [iwaswhere-web.files :as f]
             [clojure.pprint :as pp]))
 
 (defn add-tags-mentions
   "Parses entry for hastags and mentions."
   [entry]
   (when-let [text (:md entry)]
-    (let [
-          tags (into [] (re-seq #"(?m)(?!^)#[\w-]+" text))
-          mentions (into [] (re-seq #"@\w+" text))]
+    (let [tags (set (re-seq #"(?m)(?!^)#[\w-]+" text))
+          mentions (set (re-seq #"@\w+" text))]
       (merge entry
              {:tags     tags
               :mentions mentions}))))
@@ -19,7 +18,7 @@
   data directory into the component state."
   [conversion-fn]
   (let [files (file-seq (clojure.java.io/file "./data"))]
-    (doseq [f (s/filter-by-name files #"\d{13}.edn")]
+    (doseq [f (f/filter-by-name files #"\d{13}.edn")]
       (let [parsed (clojure.edn/read-string (slurp f))
             converted (conversion-fn parsed)
             filename (str "./data/" (:timestamp converted) ".edn")]
