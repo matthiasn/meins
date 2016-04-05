@@ -2,6 +2,7 @@ data/*.edn
 data/.gitignore
 data/images
 data/image-import
+data-test/
 /target
 /classes
 /checkouts

@@ -16,20 +16,22 @@
   Entries are stored as attributes of graph nodes, where the node itself is
   timestamp of an entry. A sort order by descending timestamp is maintained
   in a sorted set of the nodes."
-  [_put-fn]
-  (let [state (atom {:sorted-entries (sorted-set-by >)
-                     :graph          (uber/graph)})
-        files (file-seq (clojure.java.io/file "./data"))]
-    (doseq [f (f/filter-by-name files #"\d{13}.edn")]
-      (let [parsed (clojure.edn/read-string (slurp f))
-            ts (:timestamp parsed)]
-        (swap! state g/add-node ts parsed)))
-    {:state state}))
+  [path]
+  (fn
+    [_put-fn]
+    (let [state (atom {:sorted-entries (sorted-set-by >)
+                       :graph          (uber/graph)})
+          files (file-seq (clojure.java.io/file path))]
+      (doseq [f (f/filter-by-name files #"\d{13}.edn")]
+        (let [parsed (clojure.edn/read-string (slurp f))
+              ts (:timestamp parsed)]
+          (swap! state g/add-node ts parsed)))
+      {:state state})))
 
 (defn cmp-map
   [cmp-id]
   {:cmp-id      cmp-id
-   :state-fn    state-fn
+   :state-fn    (state-fn "./data")
    :handler-map {:geo-entry/persist  f/geo-entry-persist-fn
                  :text-entry/persist f/geo-entry-persist-fn
                  :state/get          state-get-fn
