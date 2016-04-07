@@ -14,6 +14,7 @@
                  [clj-time "0.11.0"]
                  [me.raynes/fs "1.4.6"]
                  [markdown-clj "0.9.86"]
+                 [cheshire "5.5.0"]
                  [cljsjs/moment "2.10.6-3"]
                  [cljsjs/leaflet "0.7.7-2"]
                  [com.drewnoakes/metadata-extractor "2.8.1"]

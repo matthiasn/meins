@@ -53,7 +53,8 @@
                     (put-fn [:text-entry/persist entry])
                     (send-w-geolocation entry put-fn))}
        "save"]
-      [:button.pure-button {:on-click #(put-fn [:import/photos])} [:span.fa.fa-camera-retro] " import"]]
+      [:button.pure-button {:on-click #(put-fn [:import/photos])} [:span.fa.fa-camera-retro] " import"]
+      [:button.pure-button {:on-click #(put-fn [:import/geo])} [:span.fa.fa-map-o ] " import"]]
      (let [tags (:tags (:entry @local))]
        (when (seq tags)
          [:div.hashtags

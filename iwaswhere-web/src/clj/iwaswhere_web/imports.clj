@@ -3,11 +3,13 @@
   (:require [clojure.pprint :as pp]
             [iwaswhere-web.files :as f]
             [clj-time.coerce :as c]
+            [cheshire.core :as cc]
             [matthiasn.systems-toolbox.component :as st]
             [me.raynes.fs :as fs]
             [clj-time.format :as tf]
             [clojure.tools.logging :as log])
-  (:import [com.drew.imaging ImageMetadataReader]))
+  (:import [com.drew.imaging ImageMetadataReader]
+           (java.io BufferedReader)))
 
 (defn dms-to-dd
   "Converts DMS (degree, minute, second) to DD (decimal degree) format. Returns nil
@@ -83,7 +85,23 @@
                (put-fn (with-meta [:geo-entry/persist new-entry] msg-meta)))
              (catch Exception ex (log/error (str "Error while importing " filename) ex)))))))
 
+(defn import-geo
+  "Imports geo data from respective directory."
+  [{:keys [put-fn msg-meta]}]
+  (let [files (file-seq (clojure.java.io/file "data/geo-import"))]
+    (log/info "importing photos")
+    (doseq [file (f/filter-by-name files #"[-0-9]+.(json)")]
+      (let [filename (.getName file)]
+        (log/info "Trying to import " filename)
+        (try (let [lines (line-seq (clojure.java.io/reader file))]
+               (doseq [line lines]
+                 (let [geo-entry (cc/parse-string line true)]
+                   (prn geo-entry)
+                   (put-fn (with-meta [:geo-entry/persist geo-entry] msg-meta)))))
+             (catch Exception ex (log/error (str "Error while importing " filename) ex)))))))
+
 (defn cmp-map
   [cmp-id]
   {:cmp-id      cmp-id
-   :handler-map {:import/photos import-photos}})
+   :handler-map {:import/photos import-photos
+                 :import/geo    import-geo}})
