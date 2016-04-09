@@ -19,9 +19,10 @@
                  [cljsjs/leaflet "0.7.7-2"]
                  [com.drewnoakes/metadata-extractor "2.8.1"]
                  [ubergraph "0.2.1"]
-                 [matthiasn/systems-toolbox "0.5.14"]
-                 [matthiasn/systems-toolbox-ui "0.5.6"]
-                 [matthiasn/systems-toolbox-sente "0.5.12"]
+                 [camel-snake-kebab "0.3.2"]
+                 [matthiasn/systems-toolbox "0.5.16"]
+                 [matthiasn/systems-toolbox-ui "0.5.7"]
+                 [matthiasn/systems-toolbox-sente "0.5.14"]
                  [clj-time "0.11.0"]]
 
   :source-paths ["src/clj/"]

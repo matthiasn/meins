@@ -80,24 +80,35 @@
                    target-filename (str (:timestamp file-info) "-" filename)
                    new-entry (merge file-info
                                     {:img-file target-filename
-                                     :tags     ["#photo"]})]
+                                     :tags     #{"#photo"}})]
                (fs/rename rel-path (str "data/images/" target-filename))
                (put-fn (with-meta [:geo-entry/persist new-entry] msg-meta)))
              (catch Exception ex (log/error (str "Error while importing " filename) ex)))))))
 
 (defn import-geo
-  "Imports geo data from respective directory."
+  "Imports geo data from respective directory.
+  For now, only pays attention to visits."
   [{:keys [put-fn msg-meta]}]
   (let [files (file-seq (clojure.java.io/file "data/geo-import"))]
     (log/info "importing photos")
-    (doseq [file (f/filter-by-name files #"[-0-9]+.(json)")]
+    (doseq [file (f/filter-by-name files #"visits.json" #_#"[-0-9]+.(json)")]
       (let [filename (.getName file)]
         (log/info "Trying to import " filename)
         (try (let [lines (line-seq (clojure.java.io/reader file))]
                (doseq [line lines]
-                 (let [geo-entry (cc/parse-string line true)]
-                   (prn geo-entry)
-                   (put-fn (with-meta [:geo-entry/persist geo-entry] msg-meta)))))
+                 (let [raw-visit (cc/parse-string line true)
+                       arrival-ts (:arrival-timestamp raw-visit)
+                       departure-ts (:departure-timestamp raw-visit)
+                       dur (-> (- departure-ts arrival-ts)
+                                    (/ 6000)
+                                    (Math/floor)
+                                    (/ 10))
+                       visit (merge raw-visit {:timestamp arrival-ts
+                                               :md        (if (> dur 9999)
+                                                            "No departure recorded #visit"
+                                                            (str "Duration: " dur "m #visit"))
+                                               :tags #{"#visit"}})]
+                   (put-fn (with-meta [:geo-entry/persist visit] msg-meta)))))
              (catch Exception ex (log/error (str "Error while importing " filename) ex)))))))
 
 (defn cmp-map
