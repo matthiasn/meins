@@ -4,7 +4,7 @@
             [clojure.pprint :as pp]))
 
 (defn add-tags-mentions
-  "Parses entry for hastags and mentions."
+  "Parses entry for hashtags and mentions."
   [entry]
   (when-let [text (:md entry)]
     (let [tags (set (re-seq #"(?m)(?!^)#[\w-]+" text))

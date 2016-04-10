@@ -2,12 +2,14 @@
   "This namespace does imports, for example of photos."
   (:require [clojure.pprint :as pp]
             [iwaswhere-web.files :as f]
+            [iwaswhere-web.migrations :as m]
             [clj-time.coerce :as c]
             [cheshire.core :as cc]
             [matthiasn.systems-toolbox.component :as st]
             [me.raynes.fs :as fs]
             [clj-time.format :as tf]
-            [clojure.tools.logging :as log])
+            [clojure.tools.logging :as log]
+            [clojure.string :as s])
   (:import [com.drew.imaging ImageMetadataReader]
            (java.io BufferedReader)))
 
@@ -96,7 +98,7 @@
         (log/info "Trying to import " filename)
         (try (let [lines (line-seq (clojure.java.io/reader file))]
                (doseq [line lines]
-                 (let [raw-visit (cc/parse-string line true)
+                 (let [raw-visit (cc/parse-string line #(keyword (s/replace % "_" "-")))
                        arrival-ts (:arrival-timestamp raw-visit)
                        departure-ts (:departure-timestamp raw-visit)
                        dur (-> (- departure-ts arrival-ts)
@@ -111,8 +113,23 @@
                    (put-fn (with-meta [:geo-entry/persist visit] msg-meta)))))
              (catch Exception ex (log/error (str "Error while importing " filename) ex)))))))
 
+(defn import-phone
+  "Imports text entries from phone."
+  [{:keys [put-fn msg-meta]}]
+  (let [files (file-seq (clojure.java.io/file "data/geo-import"))]
+    (log/info "importing photos")
+    (doseq [file (f/filter-by-name files #"text-entries.json")]
+      (let [filename (.getName file)]
+        (log/info "Trying to import " filename)
+        (try (let [lines (line-seq (clojure.java.io/reader file))]
+               (doseq [line lines]
+                 (let [entry (m/add-tags-mentions (cc/parse-string line #(keyword (s/replace % "_" "-"))))]
+                   (put-fn (with-meta [:geo-entry/persist entry] msg-meta)))))
+             (catch Exception ex (log/error (str "Error while importing " filename) ex)))))))
+
 (defn cmp-map
   [cmp-id]
   {:cmp-id      cmp-id
    :handler-map {:import/photos import-photos
-                 :import/geo    import-geo}})
+                 :import/geo    import-geo
+                 :import/phone  import-phone}})
