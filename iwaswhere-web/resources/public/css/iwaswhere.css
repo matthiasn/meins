@@ -277,8 +277,8 @@ textarea {
     min-height: 6em;
 }
 
-.toggle-map {
-    margin-left: 10px;
+.toggle {
+    margin-left: 7px;
 }
 
 .inactive {
@@ -297,4 +297,12 @@ img{
 button {
     margin-right: 5px;
     padding: 0.2em 0.5em 0.3em 0.5em !important;
+}
+
+.edit-md pre {
+    margin: 0.3em 0 0.7em 0;
+}
+
+.edit-md pre code {
+    font-family: "Lato";
 }
