@@ -16,7 +16,7 @@
   "Creates the initial component state atom."
   [put-fn]
   (put-fn [:state/get {}])
-  {:state (atom {:entries []
+  {:state (atom {:entries   []
                  :new-entry {}})})
 
 (defn cmp-map

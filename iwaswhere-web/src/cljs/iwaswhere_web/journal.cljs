@@ -1,19 +1,8 @@
 (ns iwaswhere-web.journal
   (:require [matthiasn.systems-toolbox-ui.reagent :as r]
             [iwaswhere-web.leaflet :as l]
-            [iwaswhere-web.helpers :as h]
             [iwaswhere-web.markdown :as m]
             [cljsjs.moment]))
-
-(defn textarea
-  [local put-fn]
-  [:div
-   [:textarea
-    {:type      "text"
-     :on-change (fn [ev]
-                  (let [new-state (h/parse-entry (.. ev -target -value))]
-                    (swap! local assoc-in [:entry] new-state)
-                    (put-fn [:text-entry/update new-state])))}]])
 
 (defn journal-entry
   "Renders individual journal entry."

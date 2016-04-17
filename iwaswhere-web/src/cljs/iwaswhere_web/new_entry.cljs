@@ -3,7 +3,6 @@
             [iwaswhere-web.helpers :as h]
             [cljsjs.moment]
             [cljsjs.leaflet]
-            [cljs.pprint :as pp]
             [matthiasn.systems-toolbox.component :as st]))
 
 (defn send-w-geolocation

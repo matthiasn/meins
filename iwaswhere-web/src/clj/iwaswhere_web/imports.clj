@@ -17,18 +17,20 @@
   "Converts DMS (degree, minute, second) to DD (decimal degree) format. Returns nil
   when not all 3 groups dm, m, and s are contained in coord string. Result negative
   when coord in Western or Southern Hemisphere according to ref argument."
-  [coord ref]
-  (when coord
-    (let [matcher (re-matcher #"(\d{1,3})° (\d{1,2})' (\d{1,2}\.?\d+?)" coord)
-          [_dms d m s] (re-find matcher)]
-      (when (and d m s)
-        (let [d (read-string d)
-              m (read-string m)
-              s (read-string s)
-              dd (float (+ d (/ m 60) (/ s 3600)))]
-          (if (contains? #{"W" "S"} ref)
-            (- dd)
-            dd))))))
+  [exif coord-key ref-key]
+  (let [coord (get exif coord-key)
+        ref (get exif ref-key)]
+    (when coord
+      (let [matcher (re-matcher #"(\d{1,3})° (\d{1,2})' (\d{1,2}\.?\d+?)" coord)
+            [_dms d m s] (re-find matcher)]
+        (when (and d m s)
+          (let [d (read-string d)
+                m (read-string m)
+                s (read-string s)
+                dd (float (+ d (/ m 60) (/ s 3600)))]
+            (if (contains? #{"W" "S"} ref)
+              (- dd)
+              dd)))))))
 
 (defn extract-ts
   "Converts concatenated GPS timestamp strings into milliseconds since epoch.
@@ -54,20 +56,14 @@
   (let [metadata (ImageMetadataReader/readMetadata file)
         exif-directories (.getDirectories metadata)
         tags (map #(.getTags %) exif-directories)
-        raw-exif (into {} (map extract-from-tag tags))
-        lat-dms (get raw-exif "GPS Latitude")
-        lat-ref (get raw-exif "GPS Latitude Ref")
-        lon-dms (get raw-exif "GPS Longitude")
-        lon-ref (get raw-exif "GPS Longitude Ref")
-        gps-date (get raw-exif "GPS Date Stamp")
-        gps-time (get raw-exif "GPS Time-Stamp")]
-    {:raw-exif  raw-exif
-     :timestamp (or (extract-ts (str gps-date " " gps-time))
-                    (extract-ts (str (get raw-exif "Date/Time") ".00 UTC"))
-                    (extract-ts (str (get raw-exif "Date/Time Original") ".00 UTC"))
+        exif (into {} (map extract-from-tag tags))]
+    {:raw-exif  exif
+     :timestamp (or (extract-ts (str (get exif "GPS Date Stamp") " " (get exif "GPS Time-Stamp")))
+                    (extract-ts (str (get exif "Date/Time") ".00 UTC"))
+                    (extract-ts (str (get exif "Date/Time Original") ".00 UTC"))
                     (st/now))
-     :latitude  (dms-to-dd lat-dms lat-ref)
-     :longitude (dms-to-dd lon-dms lon-ref)}))
+     :latitude  (dms-to-dd exif "GPS Latitude" "GPS Latitude Ref")
+     :longitude (dms-to-dd exif "GPS Longitude" "GPS Longitude Ref")}))
 
 (defn import-photos
   "Imports photos from respective directory."
@@ -80,9 +76,8 @@
         (try (let [rel-path (.getPath img)
                    file-info (exif-for-file img)
                    target-filename (str (:timestamp file-info) "-" filename)
-                   new-entry (merge file-info
-                                    {:img-file target-filename
-                                     :tags     #{"#photo"}})]
+                   new-entry (merge file-info {:img-file target-filename
+                                               :tags     #{"#photo"}})]
                (fs/rename rel-path (str "data/images/" target-filename))
                (put-fn (with-meta [:geo-entry/persist new-entry] msg-meta)))
              (catch Exception ex (log/error (str "Error while importing " filename) ex)))))))

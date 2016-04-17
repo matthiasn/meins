@@ -34,5 +34,4 @@
    :state-fn    (state-fn "./data")
    :handler-map {:geo-entry/persist  f/geo-entry-persist-fn
                  :text-entry/persist f/geo-entry-persist-fn
-                 :state/get          state-get-fn
-                 :import/photos      i/import-photos}})
+                 :state/get          state-get-fn}})
