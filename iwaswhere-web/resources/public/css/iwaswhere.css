@@ -305,4 +305,5 @@ button {
 
 .edit-md pre code {
     font-family: "Lato";
+    outline: none;
 }

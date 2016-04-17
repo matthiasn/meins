@@ -45,7 +45,6 @@
      [:pre [:code {:content-editable true} md-string]]
      [:button.pure-button.pure-button-primary
       {:on-click (fn [ev]
-                   (let [updated (merge entry
-                                        (h/parse-entry (get-content ev)))]
+                   (let [updated (merge entry (h/parse-entry (get-content ev)))]
                      (put-fn [:text-entry/persist updated])))}
       [:span.fa.fa-floppy-o] " save"]]))

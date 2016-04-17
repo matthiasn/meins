@@ -61,8 +61,8 @@
        {:class    (when-not show-hashtags? "inactive")
         :on-click #(swap! local update-in [:show-hashtags] not)}]
       [:hr]
-      (for [entry (:entries store-snapshot)]
-        (journal-entry entry local put-fn show-all-maps? show-hashtags?))]]))
+      (doall (for [entry (:entries store-snapshot)]
+               (journal-entry entry local put-fn show-all-maps? show-hashtags?)))]]))
 
 (defn cmp-map
   [cmp-id]
