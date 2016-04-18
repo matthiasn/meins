@@ -4,6 +4,17 @@
             [iwaswhere-web.markdown :as m]
             [cljsjs.moment]))
 
+(defn hashtags-list
+  "Horizontally renders hashtags list."
+  [entry]
+  (let [tags (:tags entry)]
+    (when (seq tags)
+      [:div.pure-u-1
+       [:div.hashtags
+        (for [hashtag tags]
+          ^{:key (str "tag-" hashtag)}
+          [:span.hashtag hashtag])]])))
+
 (defn journal-entry
   "Renders individual journal entry."
   [entry local put-fn show-all-maps? show-hashtags?]
@@ -24,6 +35,7 @@
        {:on-click #(if editable?
                     (swap! local update-in [:show-edit-for] disj ts)
                     (swap! local update-in [:show-edit-for] conj ts))}]]
+     (hashtags-list entry)
      (when (and map? (or show-map? show-all-maps?))
        [l/leaflet-component {:id  (str "map" (:timestamp entry))
                              :lat (:latitude entry)
