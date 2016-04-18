@@ -43,7 +43,7 @@
         ts (:timestamp entry)
         get-content #(aget (.. % -target -parentElement -parentElement -firstChild -firstChild) "innerText")
         update-temp-fn (fn [ev] (let [updated (merge entry (h/parse-entry (get-content ev)))]
-                                  (put-fn [:update/temp-entry {:ts ts :updated updated}])))
+                                  (put-fn [:update/temp-entry {:timestamp ts :updated updated}])))
         save-fn (fn [ev] (put-fn [:text-entry/persist (merge entry (h/parse-entry (get-content ev)))]))]
     [:div.edit-md
      [:pre [:code {:content-editable true :on-input update-temp-fn} md-string]]

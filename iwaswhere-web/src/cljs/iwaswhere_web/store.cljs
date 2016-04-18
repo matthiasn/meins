@@ -21,18 +21,18 @@
   journal entry. Requires the key to exist on the application state as a set."
   [{:keys [current-state msg-payload]}]
   (let [k (:key msg-payload)
-        ts (:ts msg-payload)
-        new-state (if (contains? (k current-state) ts)
-                    (update-in current-state [k] disj ts)
-                    (update-in current-state [k] conj ts))]
+        timestamp (:timestamp msg-payload)
+        new-state (if (contains? (k current-state) timestamp)
+                    (update-in current-state [k] disj timestamp)
+                    (update-in current-state [k] conj timestamp))]
     {:new-state new-state}))
 
 (defn update-temp-entry
   "Handler function, receivs updated/modified entry and stores it in :temp-entries
   of the application state under the timestamp key."
   [{:keys [current-state msg-payload]}]
-  (let [{:keys [ts updated]} msg-payload
-        new-state (assoc-in current-state [:temp-entries ts] updated)]
+  (let [{:keys [timestamp updated]} msg-payload
+        new-state (assoc-in current-state [:temp-entries timestamp] updated)]
     {:new-state new-state}))
 
 (defn cmp-map

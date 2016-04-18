@@ -26,15 +26,17 @@
   [entry temp-entry put-fn show-map? editable? show-all-maps? show-tags?]
   (let [ts (:timestamp entry)
         map? (:latitude entry)
-        toggle-map #(put-fn [:cmd/toggle {:ts ts :key :show-maps-for}])
-        toggle-edit #(put-fn [:cmd/toggle {:ts ts :key :show-edit-for}])]
+        toggle-map #(put-fn [:cmd/toggle {:timestamp ts :key :show-maps-for}])
+        toggle-edit #(put-fn [:cmd/toggle {:timestamp ts :key :show-edit-for}])
+        trash-entry #(put-fn [:cmd/trash {:timestamp ts}])]
     [:div.entry
      [:div.entry-header
       [:span.timestamp (.format (js/moment ts) "MMMM Do YYYY, h:mm:ss a")]
       (when map? [:span.fa.fa-map-o.toggle {:on-click toggle-map}])
       [:span.fa.fa-pencil-square-o.toggle {:on-click toggle-edit}]
       (when (and temp-entry (not= entry temp-entry))
-        [:span.not-saved [:span.fa.fa-exclamation-triangle] " not saved"])]
+        [:span.not-saved [:span.fa.fa-exclamation-triangle] " not saved"])
+      [:span.fa.fa-trash-o.toggle {:on-click trash-entry}]]
      [hashtags-list (or temp-entry entry)]
      [l/leaflet-map entry (or show-map? show-all-maps?)]
      [m/md-render entry put-fn editable? show-tags?]

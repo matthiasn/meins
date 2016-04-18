@@ -77,3 +77,10 @@
       (update-in [:graph] add-timeline-tree entry)
       (update-in [:sorted-entries] conj ts)))
 
+(defn remove-node
+  "Removes node from graph and sorted set."
+  [current-state ts]
+  (-> current-state
+      (update-in [:graph] #(uber/remove-nodes % ts))
+      (update-in [:sorted-entries] disj ts)))
+

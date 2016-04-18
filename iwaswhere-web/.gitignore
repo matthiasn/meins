@@ -1,6 +1,7 @@
 data/*.edn
 data/.gitignore
 data/images
+data/trash
 data/image-import
 data-test/
 /target

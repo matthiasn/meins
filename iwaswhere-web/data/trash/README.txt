@@ -1,0 +1,1 @@
+Entries that are trashed will be moved here. Note that currently, only the EDN files are moved here, not images.
