@@ -22,3 +22,12 @@
   (set! (.-imagePath js/L.Icon.Default) "bower_components/leaflet/dist/images/")
   (rc/create-class {:component-did-mount (leaflet-did-mount props)
                     :reagent-render      (fn [props] [:div.map {:id (:id props)}])}))
+
+(defn leaflet-map
+  "Helper for showing map when exists and desired."
+  [entry show?]
+  (when show?
+    (when-let [lat (:latitude entry)]
+      [leaflet-component {:id  (str "map" (:timestamp entry))
+                          :lat lat
+                          :lon (:longitude entry)}])))

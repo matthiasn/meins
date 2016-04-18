@@ -1,6 +1,7 @@
 (ns iwaswhere-web.markdown
   (:require [markdown.core :as md]
             [iwaswhere-web.helpers :as h]
+            [matthiasn.systems-toolbox-ui.helpers :as uh]
             [clojure.string :as s]
             [cljsjs.moment]
             [cljs.pprint :as pp]))
@@ -35,16 +36,21 @@
       [:div {:dangerouslySetInnerHTML {:__html (md/md->html formatted-md)}}])))
 
 (defn editable-md-render
-  "Renders a markdown div using :dangerouslySetInnerHTML. Not that dangerous here since
-  application is only running locally, so in doubt we could only harm ourselves.
-  Returns nil when entry does not contain markdown text."
+  "Renders markdown in a pre>code element, with editable content. Sends update message to store
+  component on any change to the component. The save button sends updated entry to the backend."
   [entry put-fn]
   (let [md-string (or (:md entry) "edit here and then save")
-        get-content #(aget (.. % -target -parentElement -parentElement -firstChild -firstChild) "innerText")]
+        ts (:timestamp entry)
+        get-content #(aget (.. % -target -parentElement -parentElement -firstChild -firstChild) "innerText")
+        update-temp-fn (fn [ev] (let [updated (merge entry (h/parse-entry (get-content ev)))]
+                                  (put-fn [:update/temp-entry {:ts ts :updated updated}])))
+        save-fn (fn [ev] (put-fn [:text-entry/persist (merge entry (h/parse-entry (get-content ev)))]))]
     [:div.edit-md
-     [:pre [:code {:content-editable true} md-string]]
-     [:button.pure-button.pure-button-primary
-      {:on-click (fn [ev]
-                   (let [updated (merge entry (h/parse-entry (get-content ev)))]
-                     (put-fn [:text-entry/persist updated])))}
-      [:span.fa.fa-floppy-o] " save"]]))
+     [:pre [:code {:content-editable true :on-input update-temp-fn} md-string]]
+     [:button.pure-button.pure-button-primary {:on-click save-fn} [:span.fa.fa-floppy-o] " save"]]))
+
+(defn md-render
+  "Helper for conditionally either showing rendered output or editable markdown."
+  [entry put-fn editable? show-hashtags?]
+  (if editable? (editable-md-render entry put-fn)
+                (markdown-render entry show-hashtags?)))
