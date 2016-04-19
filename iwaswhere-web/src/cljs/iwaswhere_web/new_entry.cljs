@@ -38,13 +38,17 @@
     #_(h/pp-div @local)
     [:div.entry-footer
      [:div
-      [:button.pure-button.pure-button-primary
+      [:button.pure-button.pure-button-primary.button-xsmall
+       {:on-click #(let [entry (merge (h/parse-entry "...") {:timestamp (st/now)})]
+                    (put-fn [:text-entry/persist entry])
+                    (send-w-geolocation entry put-fn))} [:span.fa.fa-plus-square] " new"]
+      [:button.pure-button.pure-button-primary.button-xsmall
        {:on-click #(let [entry (:entry @local)]
                     (put-fn [:text-entry/persist entry])
                     (send-w-geolocation entry put-fn))} [:span.fa.fa-floppy-o] " save"]
-      [:button.pure-button {:on-click #(put-fn [:import/photos])} [:span.fa.fa-camera-retro] " import"]
-      [:button.pure-button {:on-click #(put-fn [:import/geo])} [:span.fa.fa-map-o ] " import"]
-      [:button.pure-button {:on-click #(put-fn [:import/phone])} [:span.fa.fa-mobile-phone ] " import"]]
+      [:button.pure-button.button-xsmall {:on-click #(put-fn [:import/photos])} [:span.fa.fa-camera-retro] " import"]
+      [:button.pure-button.button-xsmall {:on-click #(put-fn [:import/geo])} [:span.fa.fa-map-o ] " import"]
+      [:button.pure-button.button-xsmall {:on-click #(put-fn [:import/phone])} [:span.fa.fa-mobile-phone ] " import"]]
      (let [tags (:tags (:entry @local))]
        (when (seq tags)
          [:div.hashtags

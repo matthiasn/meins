@@ -34,9 +34,9 @@
       [:span.timestamp (.format (js/moment ts) "MMMM Do YYYY, h:mm:ss a")]
       (when map? [:span.fa.fa-map-o.toggle {:on-click toggle-map}])
       [:span.fa.fa-pencil-square-o.toggle {:on-click toggle-edit}]
+      [:span.fa.fa-trash-o.toggle {:on-click trash-entry}]
       (when (and temp-entry (not= entry temp-entry))
-        [:span.not-saved [:span.fa.fa-exclamation-triangle] " not saved"])
-      [:span.fa.fa-trash-o.toggle {:on-click trash-entry}]]
+        [:span.not-saved [:span.fa.fa-exclamation-triangle] " not saved"])]
      [hashtags-list (or temp-entry entry)]
      [l/leaflet-map entry (or show-map? show-all-maps?)]
      [m/md-render entry put-fn editable? show-tags?]

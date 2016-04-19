@@ -307,6 +307,10 @@ button {
     padding: 0.2em 0.5em 0.3em 0.5em !important;
 }
 
+.button-xsmall {
+    font-size: 70%;
+}
+
 .edit-md pre {
     margin: 0.3em 0 0.7em 0;
 }

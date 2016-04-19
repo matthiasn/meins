@@ -47,7 +47,7 @@
         save-fn (fn [ev] (put-fn [:text-entry/persist (merge entry (h/parse-entry (get-content ev)))]))]
     [:div.edit-md
      [:pre [:code {:content-editable true :on-input update-temp-fn} md-string]]
-     [:button.pure-button.pure-button-primary {:on-click save-fn} [:span.fa.fa-floppy-o] " save"]]))
+     [:button.pure-button.button-xsmall.pure-button-primary {:on-click save-fn} [:span.fa.fa-floppy-o] " save"]]))
 
 (defn md-render
   "Helper for conditionally either showing rendered output or editable markdown."
