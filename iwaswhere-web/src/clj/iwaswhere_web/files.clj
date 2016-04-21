@@ -13,11 +13,24 @@
   "Handler function for persisting new journal entry."
   [{:keys [current-state msg-payload]}]
   (let [entry-ts (:timestamp msg-payload)
-        new-state (g/add-node current-state entry-ts msg-payload)
+        new-state (-> current-state
+                      (g/add-node entry-ts msg-payload)
+                      (assoc-in [:last-filter] msg-payload))
         filename (str "./data/" entry-ts ".edn")]
     (spit filename (with-out-str (pp/pprint msg-payload)))
     {:new-state new-state
      :emit-msg  [:state/new (g/get-filtered-results new-state msg-payload)]}))
+
+(defn geo-entry-update-fn
+  "Handler function for updating new journal entry."
+  [{:keys [current-state msg-payload]}]
+  (let [entry-ts (:timestamp msg-payload)
+        last-filter (:last-filter current-state)
+        new-state (g/add-node current-state entry-ts msg-payload)
+        filename (str "./data/" entry-ts ".edn")]
+    (spit filename (with-out-str (pp/pprint msg-payload)))
+    {:new-state new-state
+     :emit-msg  [:state/new (g/get-filtered-results new-state last-filter)]}))
 
 (defn trash-entry-fn
   "Handler function for deleting journal entry."

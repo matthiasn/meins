@@ -20,7 +20,8 @@
   (fn
     [_put-fn]
     (let [state (atom {:sorted-entries (sorted-set-by >)
-                       :graph          (uber/graph)})
+                       :graph          (uber/graph)
+                       :last-filter    {}})
           files (file-seq (clojure.java.io/file path))]
       (doseq [f (f/filter-by-name files #"\d{13}.edn")]
         (let [parsed (clojure.edn/read-string (slurp f))
@@ -34,5 +35,6 @@
    :state-fn    (state-fn "./data")
    :handler-map {:geo-entry/persist  f/geo-entry-persist-fn
                  :text-entry/persist f/geo-entry-persist-fn
+                 :text-entry/update  f/geo-entry-update-fn
                  :cmd/trash          f/trash-entry-fn
                  :state/get          state-get-fn}})

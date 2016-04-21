@@ -26,3 +26,22 @@ By default, the webserver exposed by the systems-toolbox library listens on port
 
     $ HOST="0.0.0.0" PORT=8010 lein run
 
+
+## REPL
+
+Inspecting the store component:
+
+    (use 'iwaswhere-web.core)
+    (restart!)
+    (def store (:cmp-state (:server/store-cmp (:components @(:cmp-state switchboard)))))
+    (def g (:graph @store))
+    
+    (require '[ubergraph.core :as uber])
+    (uber/has-node? g :hashtags)
+    
+    ; find all hashtags
+    (def hashtags (map #(-> % :dest :tag) (uber/find-edges g {:src :hashtags})))
+    
+    (pprint (sort (map clojure.string/lower-case hashtags)))
+
+
