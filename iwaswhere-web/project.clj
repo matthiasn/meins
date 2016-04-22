@@ -28,6 +28,7 @@
   :source-paths ["src/clj/"]
 
   :clean-targets ^{:protect false} ["resources/public/js/build/" "target/"]
+  :auto-clean false
 
   :main iwaswhere-web.core
 

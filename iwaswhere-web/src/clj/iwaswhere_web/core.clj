@@ -1,4 +1,5 @@
 (ns iwaswhere-web.core
+  (:gen-class)
   (:require [matthiasn.systems-toolbox.switchboard :as sb]
             [matthiasn.systems-toolbox-sente.server :as sente]
             [iwaswhere-web.index :as index]
