@@ -4,6 +4,7 @@
             [iwaswhere-web.files :as f]
             [iwaswhere-web.migrations :as m]
             [clj-time.coerce :as c]
+            [clj-time.core :as t]
             [cheshire.core :as cc]
             [matthiasn.systems-toolbox.component :as st]
             [me.raynes.fs :as fs]
@@ -32,16 +33,38 @@
               (- dd)
               dd)))))))
 
-(defn extract-ts
+(defn add-filename-offset
+  "Add the last three digits of the filename to the timestamp in order to avoid collisions when
+  photos were taken in burst mode on the iPhone, as unfortunately the photo timestamp is only
+  precise to the second and the capture rate for iPhone 6s is 10fps."
+  [millis filename]
+  (let [filename-number (re-find #"\d{3}(?=\.)" filename)
+        offset (if filename-number (Integer. filename-number) 0)]
+    (+ millis offset)))
+
+(defn extract-gps-ts
   "Converts concatenated GPS timestamp strings into milliseconds since epoch.
   Example from iPhone 6s camera app:
     'GPS Date Stamp' '2016:03:30'
     'GPS Time-Stamp' '20:07:57.00 UTC'"
-  [ts]
+  [ts filename]
   (let [f (tf/formatter "yyyy:MM:dd HH:mm:ss.SS z")]
     (when (and (seq ts)
                (re-matches #"\d{4}:\d{2}:\d{2} \d{2}:\d{2}:\d{2}\.\d{2} [A-Z]{1,5}" ts))
-      (c/to-long (tf/parse f ts)))))
+      (add-filename-offset (c/to-long (tf/parse f ts)) filename))))
+
+(defn extract-ts
+  "Converts 'Date/Time' exif tag into milliseconds since epoch. Assumes local timezone at the time
+  of importing a photo, which may or may not be accurate. In case of iPhone, this is only relevant
+  for screenshots, media saved to local camera roll or when no GPS available, such as in the case
+  of being in an aircraft (airplane mode). This is unfortunate, why would they not just use UTC
+  all the time?"
+  [ts filename]
+  (let [dtz (t/default-time-zone)
+        f (tf/formatter "yyyy:MM:dd HH:mm:ss" dtz)]
+    (when (and (seq ts)
+               (re-matches #"\d{4}:\d{2}:\d{2} \d{2}:\d{2}:\d{2}" ts))
+      (add-filename-offset (c/to-long (tf/parse f ts)) filename))))
 
 (defn extract-from-tag
   "Creates map for a single Exif directory.
@@ -53,14 +76,15 @@
   "Takes an image file (as a java.io.InputStream or java.io.File) and extracts exif information into a map.
   Borrowed and modified from: https://github.com/joshuamiller/exif-processor"
   [file]
-  (let [metadata (ImageMetadataReader/readMetadata file)
+  (let [filename (.getName file)
+        metadata (ImageMetadataReader/readMetadata file)
         exif-directories (.getDirectories metadata)
         tags (map #(.getTags %) exif-directories)
         exif (into {} (map extract-from-tag tags))]
     {:raw-exif  exif
-     :timestamp (or (extract-ts (str (get exif "GPS Date Stamp") " " (get exif "GPS Time-Stamp")))
-                    (extract-ts (str (get exif "Date/Time") ".00 UTC"))
-                    (extract-ts (str (get exif "Date/Time Original") ".00 UTC"))
+     :timestamp (or (extract-gps-ts (str (get exif "GPS Date Stamp") " " (get exif "GPS Time-Stamp")) filename)
+                    (extract-ts (str (get exif "Date/Time")) filename)
+                    (extract-ts (str (get exif "Date/Time Original")) filename)
                     (st/now))
      :latitude  (dms-to-dd exif "GPS Latitude" "GPS Latitude Ref")
      :longitude (dms-to-dd exif "GPS Longitude" "GPS Longitude Ref")}))
