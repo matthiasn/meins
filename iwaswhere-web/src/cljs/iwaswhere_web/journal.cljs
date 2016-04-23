@@ -3,6 +3,8 @@
             [iwaswhere-web.leaflet :as l]
             [iwaswhere-web.markdown :as m]
             [iwaswhere-web.image :as i]
+            [clojure.set :as set]
+            [clojure.string :as s]
             [cljsjs.moment]))
 
 (defn hashtags-list
@@ -43,6 +45,14 @@
      [i/image-view entry]
      [:hr]]))
 
+(defn pvt-filter
+  "Filter for entries that I consider private."
+  [entry]
+  (let [tags (set (map s/lower-case (:tags entry)))
+        private-tags #{"#pvt" "#private" "#nsfw"}
+        matched (set/intersection tags private-tags)]
+    (empty? matched)))
+
 (defn journal-view
   "Renders journal div, one entry per item, with map if geo data exists in the entry."
   [{:keys [observed local put-fn]}]
@@ -51,24 +61,34 @@
         show-all-maps? (:show-all-maps local-snapshot)
         toggle-all-maps #(swap! local update-in [:show-all-maps] not)
         show-tags? (:show-hashtags local-snapshot)
-        toggle-tags #(swap! local update-in [:show-hashtags] not)]
+        toggle-tags #(swap! local update-in [:show-hashtags] not)
+        show-context? (:show-context local-snapshot)
+        toggle-context #(swap! local update-in [:show-context] not)
+        show-pvt? (:show-pvt local-snapshot)
+        toggle-pvt #(swap! local update-in [:show-pvt] not)]
     [:div.l-box-lrg.pure-g
      [:div.pure-u-1
       [:span.fa.toggle-map.pull-right {:class (if show-all-maps? "fa-map" "fa-map-o") :on-click toggle-all-maps}]
       [:span.fa.fa-hashtag.toggle-map.pull-right {:class (when-not show-tags? "inactive") :on-click toggle-tags}]
+      [:span.fa.fa-eye.toggle-map.pull-right {:class (when-not show-context? "inactive") :on-click toggle-context}]
+      [:span.fa.fa-user-secret.toggle-map.pull-right {:class (when-not show-pvt? "inactive") :on-click toggle-pvt}]
       [:hr]
-      (for [entry (:entries store-snapshot)]
-        (let [ts (:timestamp entry)
-              temp-entry (get-in store-snapshot [:temp-entries ts])
-              show-map? (contains? (:show-maps-for store-snapshot) ts)
-              editable? (contains? (:show-edit-for store-snapshot) ts)]
-          ^{:key (:timestamp entry)}
-          [journal-entry entry temp-entry put-fn show-map? editable? show-all-maps? show-tags?]))]]))
+      (when show-context?
+        (let [entries (:entries store-snapshot)]
+          (for [entry (if show-pvt? entries (filter pvt-filter entries))]
+            (let [ts (:timestamp entry)
+                  temp-entry (get-in store-snapshot [:temp-entries ts])
+                  show-map? (contains? (:show-maps-for store-snapshot) ts)
+                  editable? (contains? (:show-edit-for store-snapshot) ts)]
+              ^{:key (:timestamp entry)}
+              [journal-entry entry temp-entry put-fn show-map? editable? show-all-maps? show-tags?]))))]]))
 
 (defn cmp-map
   [cmp-id]
   (r/cmp-map {:cmp-id        cmp-id
               :initial-state {:show-all-maps false
-                              :show-hashtags true}
+                              :show-hashtags true
+                              :show-context  true
+                              :show-pvt      false}
               :view-fn       journal-view
               :dom-id        "journal"}))

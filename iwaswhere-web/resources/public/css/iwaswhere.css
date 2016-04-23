@@ -12,6 +12,7 @@ body {
     color: #576364;
     font-size: 13px;
     font-weight: 300;
+    overflow-y:scroll;
 }
 
 h1,
