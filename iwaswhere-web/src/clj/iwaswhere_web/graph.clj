@@ -33,11 +33,19 @@
                       (log/warn "Cannot find node: " n))))
                 (:sorted-entries current-state))))
 
+(defn find-all-hashtags
+  "Finds all hashtags used in entries by finding the edges that originate from the
+  :hashtags node."
+  [current-state]
+  (let [g (:graph current-state)]
+    (set (map #(-> % :dest :tag) (uber/find-edges g {:src :hashtags})))))
+
 (defn get-filtered-results
   [current-state msg-payload]
   (let [entries (take 50 (filter (entries-filter-fn msg-payload)
                                  (extract-sorted-entries current-state)))]
-    {:entries entries}))
+    {:entries  entries
+     :hashtags (find-all-hashtags current-state)}))
 
 (defn add-hashtags
   "Add hashtag edges to graph for a new entry. When a hashtag exists already, an edge to

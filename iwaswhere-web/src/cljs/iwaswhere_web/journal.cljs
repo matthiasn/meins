@@ -73,15 +73,18 @@
       [:span.fa.fa-eye.toggle-map.pull-right {:class (when-not show-context? "inactive") :on-click toggle-context}]
       [:span.fa.fa-user-secret.toggle-map.pull-right {:class (when-not show-pvt? "inactive") :on-click toggle-pvt}]
       [:hr]
-      (when show-context?
-        (let [entries (:entries store-snapshot)]
-          (for [entry (if show-pvt? entries (filter pvt-filter entries))]
-            (let [ts (:timestamp entry)
-                  temp-entry (get-in store-snapshot [:temp-entries ts])
-                  show-map? (contains? (:show-maps-for store-snapshot) ts)
-                  editable? (contains? (:show-edit-for store-snapshot) ts)]
+      (let [entries (:entries store-snapshot)]
+        (for [entry (if show-pvt? entries (filter pvt-filter entries))]
+          (let [ts (:timestamp entry)
+                temp-entry (get-in store-snapshot [:temp-entries ts])
+                show-map? (contains? (:show-maps-for store-snapshot) ts)
+                editable? (contains? (:show-edit-for store-snapshot) ts)]
+            (when (or editable? show-context?)
               ^{:key (:timestamp entry)}
-              [journal-entry entry temp-entry put-fn show-map? editable? show-all-maps? show-tags?]))))]]))
+              [journal-entry entry temp-entry put-fn show-map? editable? show-all-maps? show-tags?]))))]
+     [:div.pure-u-1
+      (for [tag (:hashtags store-snapshot)]
+        [:div tag])]]))
 
 (defn cmp-map
   [cmp-id]

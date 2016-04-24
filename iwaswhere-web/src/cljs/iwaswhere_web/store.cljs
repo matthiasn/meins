@@ -3,7 +3,9 @@
 (defn new-state-fn
   "Update client side state with list of journal entries received from backend."
   [{:keys [current-state msg-payload]}]
-  {:new-state (assoc-in current-state [:entries] (:entries msg-payload))})
+  {:new-state (-> current-state
+                  (assoc-in [:entries] (:entries msg-payload))
+                  (assoc-in [:hashtags] (:hashtags msg-payload)))})
 
 (defn initial-state-fn
   "Creates the initial component state atom. Holds a list of entries from the backend,
