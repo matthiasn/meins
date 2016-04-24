@@ -42,7 +42,7 @@
 
 (defn get-filtered-results
   [current-state msg-payload]
-  (let [entries (take 50 (filter (entries-filter-fn msg-payload)
+  (let [entries (take 100 (filter (entries-filter-fn msg-payload)
                                  (extract-sorted-entries current-state)))]
     {:entries  entries
      :hashtags (find-all-hashtags current-state)}))

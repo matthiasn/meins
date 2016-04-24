@@ -101,7 +101,7 @@
                    file-info (exif-for-file img)
                    target-filename (str (:timestamp file-info) "-" filename)
                    new-entry (merge file-info {:img-file target-filename
-                                               :tags     #{"#photo"}})]
+                                               :tags     #{"#photo" "#import"}})]
                (fs/rename rel-path (str "data/images/" target-filename))
                (put-fn (with-meta [:geo-entry/persist new-entry] msg-meta)))
              (catch Exception ex (log/error (str "Error while importing " filename) ex)))))))
@@ -128,7 +128,7 @@
                                                :md        (if (> dur 9999)
                                                             "No departure recorded #visit"
                                                             (str "Duration: " dur "m #visit"))
-                                               :tags #{"#visit"}})]
+                                               :tags #{"#visit" "#import"}})]
                    (put-fn (with-meta [:geo-entry/persist visit] msg-meta)))))
              (catch Exception ex (log/error (str "Error while importing " filename) ex)))))))
 
