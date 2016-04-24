@@ -4,7 +4,7 @@
   :license {:name "GNU GENERAL PUBLIC LICENSE"
             :url  "http://www.gnu.org/licenses/gpl-3.0.en.html"}
   :dependencies [[org.clojure/clojure "1.8.0"]
-                 [org.clojure/clojurescript "1.8.34"]
+                 [org.clojure/clojurescript "1.8.40"]
                  [org.clojure/core.async "0.2.374"]
                  [org.clojure/tools.logging "0.3.1"]
                  [org.clojure/tools.namespace "0.2.11"]
@@ -20,9 +20,9 @@
                  [com.drewnoakes/metadata-extractor "2.8.1"]
                  [ubergraph "0.2.1"]
                  [camel-snake-kebab "0.3.2"]
-                 [matthiasn/systems-toolbox "0.5.16"]
+                 [matthiasn/systems-toolbox "0.5.17"]
                  [matthiasn/systems-toolbox-ui "0.5.7"]
-                 [matthiasn/systems-toolbox-sente "0.5.14"]
+                 [matthiasn/systems-toolbox-sente "0.5.15"]
                  [clj-time "0.11.0"]]
 
   :source-paths ["src/clj/"]
