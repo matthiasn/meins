@@ -320,3 +320,7 @@ button {
     font-family: "Lato";
     outline: none;
 }
+
+.textentry {
+    padding-top: 14px;
+}
