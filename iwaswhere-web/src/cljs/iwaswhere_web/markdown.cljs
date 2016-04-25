@@ -54,13 +54,15 @@
              md (:md temp-entry)
              before-cursor (subs md 0 cursor-pos)
              current-tag (re-find (js/RegExp. "(?!^)#[\\w\\-\\u00C0-\\u017F]+$" "m") before-cursor)
-             tag-substr-filter (fn [tag] (when current-tag (re-find (re-pattern current-tag) tag)))]
-         (for [tag (filter tag-substr-filter hashtags)]
-           ^{:key (str ts tag)}
-           [:div
-            {:on-click #(let [updated (merge entry (h/parse-entry (s/replace md current-tag tag)))]
-                         (put-fn [:update/temp-entry {:timestamp ts :updated updated}]))}
-            [:span.hashtag tag]])))
+             current-tag-regex (js/RegExp. current-tag "i")
+             tag-substr-filter (fn [tag] (when current-tag (re-find current-tag-regex tag)))]
+         [:div.suggested-tags
+          (for [tag (filter tag-substr-filter hashtags)]
+            ^{:key (str ts tag)}
+            [:div
+             {:on-click #(let [updated (merge entry (h/parse-entry (s/replace md current-tag tag)))]
+                          (put-fn [:update/temp-entry {:timestamp ts :updated updated}]))}
+             [:span.hashtag tag]])]))
      [:button.pure-button.button-xsmall.pure-button-primary {:on-click save-fn} [:span.fa.fa-floppy-o] " save"]]))
 
 (defn md-render

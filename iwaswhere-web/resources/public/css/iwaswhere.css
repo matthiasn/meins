@@ -328,3 +328,7 @@ button {
 .textentry {
     padding-top: 14px;
 }
+
+.suggested-tags {
+    margin-bottom: 0.5em;
+}
