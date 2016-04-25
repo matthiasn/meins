@@ -16,7 +16,7 @@
        [:div.hashtags
         (for [hashtag tags]
           ^{:key (str "tag-" hashtag)}
-          [:span.hashtag hashtag])]])))
+          [:span.hashtag.float-left hashtag])]])))
 
 (defn journal-entry
   "Renders individual journal entry. Interaction with application state happens via
@@ -25,7 +25,7 @@
   used in edit mode also sends a modified entry to the store component, which is useful
   for displaying updated hashtags, or also for showing the warning that the entry is not
   saved yet."
-  [entry temp-entry put-fn show-map? editable? show-all-maps? show-tags?]
+  [entry temp-entry hashtags put-fn show-map? editable? show-all-maps? show-tags?]
   (let [ts (:timestamp entry)
         map? (:latitude entry)
         toggle-map #(put-fn [:cmd/toggle {:timestamp ts :key :show-maps-for}])
@@ -41,7 +41,7 @@
         [:span.not-saved [:span.fa.fa-exclamation-triangle] " not saved"])]
      [hashtags-list (or temp-entry entry)]
      [l/leaflet-map entry (or show-map? show-all-maps?)]
-     [m/md-render entry put-fn editable? show-tags?]
+     [m/md-render entry temp-entry hashtags put-fn editable? show-tags?]
      [i/image-view entry]
      [:hr]]))
 
@@ -58,6 +58,7 @@
   [{:keys [observed local put-fn]}]
   (let [local-snapshot @local
         store-snapshot @observed
+        hashtags (:hashtags store-snapshot)
         show-all-maps? (:show-all-maps local-snapshot)
         toggle-all-maps #(swap! local update-in [:show-all-maps] not)
         show-tags? (:show-hashtags local-snapshot)
@@ -81,10 +82,8 @@
                 editable? (contains? (:show-edit-for store-snapshot) ts)]
             (when (or editable? show-context?)
               ^{:key (:timestamp entry)}
-              [journal-entry entry temp-entry put-fn show-map? editable? show-all-maps? show-tags?]))))]
-     [:div.pure-u-1
-      (for [tag (:hashtags store-snapshot)]
-        [:div tag])]]))
+              [journal-entry entry temp-entry hashtags put-fn show-map? editable? show-all-maps? show-tags?]))))]]))
+
 
 (defn cmp-map
   [cmp-id]

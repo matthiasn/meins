@@ -142,7 +142,8 @@
         (log/info "Trying to import " filename)
         (try (let [lines (line-seq (clojure.java.io/reader file))]
                (doseq [line lines]
-                 (let [entry (m/add-tags-mentions (cc/parse-string line #(keyword (s/replace % "_" "-"))))]
+                 (let [entry (m/add-tags-mentions (cc/parse-string line #(keyword (s/replace % "_" "-"))))
+                       entry (update-in entry [:tags] conj "#import")]
                    (put-fn (with-meta [:geo-entry/persist entry] msg-meta)))))
              (catch Exception ex (log/error (str "Error while importing " filename) ex)))))))
 

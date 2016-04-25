@@ -264,6 +264,9 @@ textarea {
     color: white;
     font-size: 0.8em;
     background-color: rgb(66, 184, 221);
+}
+
+.float-left {
     float: left;
 }
 

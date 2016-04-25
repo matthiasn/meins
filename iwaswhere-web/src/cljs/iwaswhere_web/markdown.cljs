@@ -38,19 +38,33 @@
 (defn editable-md-render
   "Renders markdown in a pre>code element, with editable content. Sends update message to store
   component on any change to the component. The save button sends updated entry to the backend."
-  [entry put-fn]
-  (let [md-string (or (:md entry) "edit here and then save")
+  [entry temp-entry hashtags put-fn]
+  (let [md-string (or (:md temp-entry) (:md entry) "edit here")
         ts (:timestamp entry)
         get-content #(aget (.. % -target -parentElement -parentElement -firstChild -firstChild) "innerText")
-        update-temp-fn (fn [ev] (let [updated (merge entry (h/parse-entry (get-content ev)))]
-                                  (put-fn [:update/temp-entry {:timestamp ts :updated updated}])))
+        update-temp-fn (fn [ev]
+                         (let [cursor-pos {:cursor-pos (.-anchorOffset (.getSelection js/window))}
+                               updated (with-meta (merge entry (h/parse-entry (get-content ev))) cursor-pos)]
+                           (put-fn [:update/temp-entry {:timestamp ts :updated updated}])))
         save-fn (fn [ev] (put-fn [:text-entry/update (merge entry (h/parse-entry (get-content ev)))]))]
     [:div.edit-md
      [:pre [:code {:content-editable true :on-input update-temp-fn} md-string]]
+     (when temp-entry
+       (let [cursor-pos (:cursor-pos (meta temp-entry))
+             md (:md temp-entry)
+             before-cursor (subs md 0 cursor-pos)
+             current-tag (re-find (js/RegExp. "(?!^)#[\\w\\-\\u00C0-\\u017F]+$" "m") before-cursor)
+             tag-substr-filter (fn [tag] (when current-tag (re-find (re-pattern current-tag) tag)))]
+         (for [tag (filter tag-substr-filter hashtags)]
+           ^{:key (str ts tag)}
+           [:div
+            {:on-click #(let [updated (merge entry (h/parse-entry (s/replace md current-tag tag)))]
+                         (put-fn [:update/temp-entry {:timestamp ts :updated updated}]))}
+            [:span.hashtag tag]])))
      [:button.pure-button.button-xsmall.pure-button-primary {:on-click save-fn} [:span.fa.fa-floppy-o] " save"]]))
 
 (defn md-render
   "Helper for conditionally either showing rendered output or editable markdown."
-  [entry put-fn editable? show-hashtags?]
-  (if editable? (editable-md-render entry put-fn)
+  [entry temp-entry hashtags put-fn editable? show-hashtags?]
+  (if editable? (editable-md-render entry temp-entry hashtags put-fn)
                 (markdown-render entry show-hashtags?)))

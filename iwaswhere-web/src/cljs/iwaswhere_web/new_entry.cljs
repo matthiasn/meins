@@ -27,7 +27,7 @@
        (when (seq tags)
          (for [hashtag tags]
            ^{:key (str "tag-" hashtag)}
-           [:span.hashtag hashtag]))])
+           [:span.hashtag.float-left hashtag]))])
     [:div.textentry
      [:textarea#new-entry-textbox
       {:type      "text"
@@ -41,7 +41,7 @@
                           cursor-pos (.. target -selectionEnd)
                           new-tags (:tags new-state)]
                       (swap! local assoc-in [:entry] new-state)
-                      (put-fn [:text-entry/save new-state])
+                      (put-fn [:new-entry/tmp-save new-state])
                       (when (not= prev-tags new-tags)
                         (put-fn [:state/get {:tags new-tags}])
                         (swap! local assoc-in [:prev-tags] new-tags))))}]]
