@@ -24,16 +24,20 @@
                        :graph          (uber/graph)
                        :last-filter    {}})
           files (file-seq (clojure.java.io/file path))]
-      (doseq [f (f/filter-by-name files #"\d{13}.edn")]
-        (let [parsed (clojure.edn/read-string (slurp f))
-              ts (:timestamp parsed)]
-          (swap! state g/add-node ts parsed)))
+      (doseq [f (f/filter-by-name files #"\d{4}-\d{2}-\d{2}.jrn")]
+        (let [lines (line-seq (clojure.java.io/reader f))]
+          (doseq [line lines]
+            (let [parsed (clojure.edn/read-string line)
+                  ts (:timestamp parsed)]
+              (if (:deleted parsed)
+                (swap! state g/remove-node ts)
+                (swap! state g/add-node ts parsed))))))
       {:state state})))
 
 (defn cmp-map
   [cmp-id]
   {:cmp-id      cmp-id
-   :state-fn    (state-fn "./data")
+   :state-fn    (state-fn "./data/daily-logs")
    :handler-map {:geo-entry/persist  f/geo-entry-persist-fn
                  :text-entry/persist f/geo-entry-persist-fn
                  :text-entry/update  f/geo-entry-update-fn

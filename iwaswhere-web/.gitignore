@@ -1,6 +1,7 @@
 data/*.edn
 data/.gitignore
 data/images
+data/daily-logs
 data/trash
 data/image-import
 data-test/
@@ -21,3 +22,4 @@ resources/public/js/build/
 resources/public/bower_components/
 *.pid
 *.out
+*.zip

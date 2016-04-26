@@ -24,3 +24,12 @@
             filename (str "./data/" (:timestamp converted) ".edn")]
         (when converted
           (spit filename (with-out-str (pp/pprint converted))))))))
+
+(defn migrate-to-append-log
+  "Initial state function, creates state atom and then parses all files in
+  data directory into the component state."
+  []
+  (let [files (file-seq (clojure.java.io/file "./data"))]
+    (doseq [f (f/filter-by-name files #"\d{13}.edn")]
+      (let [parsed (clojure.edn/read-string (slurp f))]
+        (f/append-daily-log {:msg-payload parsed})))))

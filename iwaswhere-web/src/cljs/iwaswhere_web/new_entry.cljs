@@ -48,9 +48,10 @@
     #_(h/pp-div @local)
     [:div.entry-footer
       [:button.pure-button.pure-button-primary.button-xsmall
-       {:on-click #(let [entry (merge (h/parse-entry "...")
-                                      {:timestamp (st/now)})]
+       {:on-click #(let [ts (st/now)
+                         entry (merge (h/parse-entry "...") {:timestamp ts})]
                     (put-fn [:text-entry/persist entry])
+                    (put-fn [:cmd/toggle {:timestamp ts :key :show-edit-for}])
                     (send-w-geolocation entry put-fn))}
        [:span.fa.fa-plus-square] " new"]
       [:button.pure-button.pure-button-primary.button-xsmall
