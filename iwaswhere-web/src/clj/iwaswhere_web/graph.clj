@@ -40,12 +40,21 @@
   (let [g (:graph current-state)]
     (set (map #(-> % :dest :tag) (uber/find-edges g {:src :hashtags})))))
 
+(defn get-basic-stats
+  "Generate some very basic stats about the graph size for display in UI."
+  [current-state]
+  {:node-count (count (:node-map (:graph current-state)))
+   :edge-count (count (uber/find-edges (:graph current-state) {}))})
+
 (defn get-filtered-results
+  "Retrieve items to show in UI, also deliver all hashtags for autocomplete and
+  some basic stats."
   [current-state msg-payload]
   (let [entries (take 100 (filter (entries-filter-fn msg-payload)
                                  (extract-sorted-entries current-state)))]
     {:entries  entries
-     :hashtags (find-all-hashtags current-state)}))
+     :hashtags (find-all-hashtags current-state)
+     :stats    (get-basic-stats current-state)}))
 
 (defn add-hashtags
   "Add hashtag edges to graph for a new entry. When a hashtag exists already, an edge to

@@ -82,7 +82,9 @@
                 editable? (contains? (:show-edit-for store-snapshot) ts)]
             (when (or editable? show-context?)
               ^{:key (:timestamp entry)}
-              [journal-entry entry temp-entry hashtags put-fn show-map? editable? show-all-maps? show-tags?]))))]]))
+              [journal-entry entry temp-entry hashtags put-fn show-map? editable? show-all-maps? show-tags?]))))
+      (when-let [stats (:stats store-snapshot)]
+        [:div.pure-u-1 (:node-count stats) " nodes, " (:edge-count stats) " edges, " (count hashtags) " hashtags"])]]))
 
 
 (defn cmp-map

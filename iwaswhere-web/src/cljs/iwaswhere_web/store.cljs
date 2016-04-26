@@ -5,6 +5,7 @@
   [{:keys [current-state msg-payload]}]
   {:new-state (-> current-state
                   (assoc-in [:entries] (:entries msg-payload))
+                  (assoc-in [:stats] (:stats msg-payload))
                   (assoc-in [:hashtags] (:hashtags msg-payload)))})
 
 (defn initial-state-fn
