@@ -6,7 +6,8 @@
   {:new-state (-> current-state
                   (assoc-in [:entries] (:entries msg-payload))
                   (assoc-in [:stats] (:stats msg-payload))
-                  (assoc-in [:hashtags] (:hashtags msg-payload)))})
+                  (assoc-in [:hashtags] (:hashtags msg-payload))
+                  (assoc-in [:mentions] (:mentions msg-payload)))})
 
 (defn initial-state-fn
   "Creates the initial component state atom. Holds a list of entries from the backend,

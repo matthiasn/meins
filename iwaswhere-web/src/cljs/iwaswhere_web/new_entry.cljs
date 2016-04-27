@@ -21,13 +21,16 @@
   "Renders New Entry component."
   [{:keys [local put-fn]}]
   (let [on-change-fn #(let [prev-tags (or (:prev-tags @local) #{})
+                            prev-mentions (or (:prev-mentions @local) #{})
                             new-state (merge (h/parse-entry (.. % -target -value)) {:timestamp (st/now)})
-                            new-tags (:tags new-state)]
+                            new-tags (:tags new-state)
+                            new-mentions (:mentions new-state)]
                        (swap! local assoc-in [:entry] new-state)
                        (put-fn [:new-entry/tmp-save new-state])
-                       (when (not= prev-tags new-tags)
-                         (put-fn [:state/get {:tags new-tags}])
-                         (swap! local assoc-in [:prev-tags] new-tags)))
+                       (when (or (not= prev-tags new-tags) (not= prev-mentions new-mentions))
+                         (put-fn [:state/get new-state])
+                         (swap! local assoc-in [:prev-tags] new-tags)
+                         (swap! local assoc-in [:prev-mentions] new-mentions)))
         new-entry-fn #(let [ts (st/now)
                             entry (merge (h/parse-entry "...") {:timestamp ts})]
                        (put-fn [:text-entry/persist entry])

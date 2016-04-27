@@ -329,6 +329,15 @@ button {
     padding-top: 14px;
 }
 
-.suggested-tags {
+.suggestions {
     margin-bottom: 0.5em;
+    line-height: 1.4em;
+}
+
+.mention {
+    margin: 3px 5px 1px 0;
+    padding: 1px 5px;
+    color: white;
+    font-size: 0.8em;
+    background-color: rgb(55, 201, 154);
 }

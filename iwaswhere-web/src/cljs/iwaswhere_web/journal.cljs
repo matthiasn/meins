@@ -7,16 +7,19 @@
             [clojure.string :as s]
             [cljsjs.moment]))
 
-(defn hashtags-list
-  "Horizontally renders hashtags list."
+(defn hashtags-mentions-list
+  "Horizontally renders list with hashtags and mentions."
   [entry]
-  (let [tags (:tags entry)]
-    (when (seq tags)
-      [:div.pure-u-1
-       [:div.hashtags
-        (for [hashtag tags]
-          ^{:key (str "tag-" hashtag)}
-          [:span.hashtag.float-left hashtag])]])))
+  (let [tags (:tags entry)
+        mentions (:mentions entry)]
+    [:div.pure-u-1
+     [:div.hashtags
+      (for [mention mentions]
+        ^{:key (str "tag-" mention)}
+        [:span.mention.float-left mention])
+      (for [hashtag tags]
+        ^{:key (str "tag-" hashtag)}
+        [:span.hashtag.float-left hashtag])]]))
 
 (defn journal-entry
   "Renders individual journal entry. Interaction with application state happens via
@@ -25,7 +28,7 @@
   used in edit mode also sends a modified entry to the store component, which is useful
   for displaying updated hashtags, or also for showing the warning that the entry is not
   saved yet."
-  [entry temp-entry hashtags put-fn show-map? editable? show-all-maps? show-tags?]
+  [entry temp-entry hashtags mentions put-fn show-map? editable? show-all-maps? show-tags?]
   (let [ts (:timestamp entry)
         map? (:latitude entry)
         toggle-map #(put-fn [:cmd/toggle {:timestamp ts :key :show-maps-for}])
@@ -39,9 +42,9 @@
       [:span.fa.fa-trash-o.toggle {:on-click trash-entry}]
       (when (and temp-entry (not= entry temp-entry))
         [:span.not-saved [:span.fa.fa-exclamation-triangle] " not saved"])]
-     [hashtags-list (or temp-entry entry)]
+     [hashtags-mentions-list (or temp-entry entry)]
      [l/leaflet-map entry (or show-map? show-all-maps?)]
-     [m/md-render entry temp-entry hashtags put-fn editable? show-tags?]
+     [m/md-render entry temp-entry hashtags mentions put-fn editable? show-tags?]
      [i/image-view entry]
      [:hr]]))
 
@@ -59,6 +62,7 @@
   (let [local-snapshot @local
         store-snapshot @observed
         hashtags (:hashtags store-snapshot)
+        mentions (:mentions store-snapshot)
         show-all-maps? (:show-all-maps local-snapshot)
         toggle-all-maps #(swap! local update-in [:show-all-maps] not)
         show-tags? (:show-hashtags local-snapshot)
@@ -82,7 +86,7 @@
                 editable? (contains? (:show-edit-for store-snapshot) ts)]
             (when (or editable? show-context?)
               ^{:key (:timestamp entry)}
-              [journal-entry entry temp-entry hashtags put-fn show-map? editable? show-all-maps? show-tags?]))))
+              [journal-entry entry temp-entry hashtags mentions put-fn show-map? editable? show-all-maps? show-tags?]))))
       (when-let [stats (:stats store-snapshot)]
         [:div.pure-u-1 (:node-count stats) " nodes, " (:edge-count stats) " edges, " (count hashtags) " hashtags"])]]))
 

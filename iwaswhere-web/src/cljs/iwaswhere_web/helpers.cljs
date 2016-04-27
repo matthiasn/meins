@@ -18,7 +18,7 @@
           (seq (set/intersection new-entry-tags entry-tags))))))
 
 (defn parse-entry
-  "Parses entry for hastags and mentions. Either can consist of any of the word characters, dashes
+  "Parses entry for hashtags and mentions. Either can consist of any of the word characters, dashes
   and unicode characters that for example comprise German 'Umlaute'."
   [text]
   (let [tags (set (re-seq (js/RegExp. "(?!^)#[\\w\\-\\u00C0-\\u017F]+" "m") text))

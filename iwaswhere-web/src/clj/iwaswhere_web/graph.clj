@@ -15,9 +15,12 @@
   [q]
   (fn [entry]
     (let [entry-tags (set (map s/lower-case (:tags entry)))
-          new-entry-tags (set (map s/lower-case (:tags q)))
-          match? (or (empty? new-entry-tags)
-                     (seq (set/intersection new-entry-tags entry-tags)))]
+          q-tags (set (map s/lower-case (:tags q)))
+          entry-mentions (set (map s/lower-case (:mentions entry)))
+          q-mentions (set (map s/lower-case (:mentions q)))
+          match? (or (and (empty? q-tags) (empty? q-mentions))
+                     (seq (set/intersection q-tags entry-tags))
+                     (seq (set/intersection q-mentions entry-mentions)))]
       ;      (set/subset? new-entry-tags entry-tags)
       match?)))
 
@@ -40,6 +43,13 @@
   (let [g (:graph current-state)]
     (set (map #(-> % :dest :tag) (uber/find-edges g {:src :hashtags})))))
 
+(defn find-all-mentions
+  "Finds all hashtags used in entries by finding the edges that originate from the
+  :hashtags node."
+  [current-state]
+  (let [g (:graph current-state)]
+    (set (map #(-> % :dest :mention) (uber/find-edges g {:src :mentions})))))
+
 (defn get-basic-stats
   "Generate some very basic stats about the graph size for display in UI."
   [current-state]
@@ -54,6 +64,7 @@
                                  (extract-sorted-entries current-state)))]
     {:entries  entries
      :hashtags (find-all-hashtags current-state)
+     :mentions (find-all-mentions current-state)
      :stats    (get-basic-stats current-state)}))
 
 (defn add-hashtags
@@ -68,6 +79,19 @@
                                   [:hashtags {:tag tag} {:relationship :IS}])))
             graph
             tags)))
+
+(defn add-mentions
+  "Add mention edges to graph for a new entry. When a mentioned person exists already, an edge to
+  the existing node will be added, otherwise a new hashtag node will be created."
+  [graph entry]
+  (let [mentions (:mentions entry)]
+    (reduce (fn [acc mention]
+              (-> acc
+                  (uber/add-nodes :mentions {:mention mention})
+                  (uber/add-edges [{:mention mention} (:timestamp entry) {:relationship :CONTAINS}]
+                                  [:mentions {:mention mention} {:relationship :IS}])))
+            graph
+            mentions)))
 
 (defn add-timeline-tree
   "Adds graph nodes for year, month and day of entry and connects those if they don't exist.
@@ -91,6 +115,7 @@
   (-> current-state
       (update-in [:graph] #(uber/add-nodes-with-attrs % [ts entry]))
       (update-in [:graph] add-hashtags entry)
+      (update-in [:graph] add-mentions entry)
       (update-in [:graph] add-timeline-tree entry)
       (update-in [:sorted-entries] conj ts)))
 
