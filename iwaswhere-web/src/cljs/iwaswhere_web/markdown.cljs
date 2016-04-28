@@ -45,8 +45,7 @@
         update-temp-fn (fn [ev]
                          (let [cursor-pos {:cursor-pos (.-anchorOffset (.getSelection js/window))}
                                updated (with-meta (merge entry (h/parse-entry (get-content ev))) cursor-pos)]
-                           (put-fn [:update/temp-entry {:timestamp ts :updated updated}])))
-        save-fn (fn [ev] (put-fn [:text-entry/update (merge entry (h/parse-entry (get-content ev)))]))]
+                           (put-fn [:update/temp-entry {:timestamp ts :updated updated}])))]
     [:div.edit-md
      [:pre [:code {:content-editable true :on-input update-temp-fn} md-string]]
      (when temp-entry
@@ -76,8 +75,7 @@
             [:div
              {:on-click #(let [updated (merge entry (h/parse-entry (s/replace md current-mention mention)))]
                           (put-fn [:update/temp-entry {:timestamp ts :updated updated}]))}
-             [:span.mention mention]])]))
-     [:button.pure-button.button-xsmall.pure-button-primary {:on-click save-fn} [:span.fa.fa-floppy-o] " save"]]))
+             [:span.mention mention]])]))]))
 
 (defn md-render
   "Helper for conditionally either showing rendered output or editable markdown."

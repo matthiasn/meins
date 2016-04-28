@@ -5,7 +5,8 @@
             [iwaswhere-web.image :as i]
             [clojure.set :as set]
             [clojure.string :as s]
-            [cljsjs.moment]))
+            [cljsjs.moment]
+            [iwaswhere-web.helpers :as h]))
 
 (defn hashtags-mentions-list
   "Horizontally renders list with hashtags and mentions."
@@ -33,7 +34,8 @@
         map? (:latitude entry)
         toggle-map #(put-fn [:cmd/toggle {:timestamp ts :key :show-maps-for}])
         toggle-edit #(put-fn [:cmd/toggle {:timestamp ts :key :show-edit-for}])
-        trash-entry #(put-fn [:cmd/trash {:timestamp ts}])]
+        trash-entry #(put-fn [:cmd/trash {:timestamp ts}])
+        save-fn #(put-fn [:text-entry/update temp-entry])]
     [:div.entry
      [:div.entry-header
       [:span.timestamp (.format (js/moment ts) "MMMM Do YYYY, h:mm:ss a")]
@@ -41,7 +43,7 @@
       [:span.fa.fa-pencil-square-o.toggle {:on-click toggle-edit}]
       [:span.fa.fa-trash-o.toggle {:on-click trash-entry}]
       (when (and temp-entry (not= entry temp-entry))
-        [:span.not-saved [:span.fa.fa-exclamation-triangle] " not saved"])]
+        [:span.not-saved {:on-click save-fn} [:span.fa.fa-floppy-o] "  click to save"])]
      [hashtags-mentions-list (or temp-entry entry)]
      [l/leaflet-map entry (or show-map? show-all-maps?)]
      [m/md-render entry temp-entry hashtags mentions put-fn editable? show-tags?]
@@ -61,6 +63,7 @@
   [{:keys [observed local put-fn]}]
   (let [local-snapshot @local
         store-snapshot @observed
+        entries (:entries store-snapshot)
         hashtags (:hashtags store-snapshot)
         mentions (:mentions store-snapshot)
         show-all-maps? (:show-all-maps local-snapshot)
@@ -78,15 +81,14 @@
       [:span.fa.fa-eye.toggle-map.pull-right {:class (when-not show-context? "inactive") :on-click toggle-context}]
       [:span.fa.fa-user-secret.toggle-map.pull-right {:class (when-not show-pvt? "inactive") :on-click toggle-pvt}]
       [:hr]
-      (let [entries (:entries store-snapshot)]
-        (for [entry (if show-pvt? entries (filter pvt-filter entries))]
-          (let [ts (:timestamp entry)
-                temp-entry (get-in store-snapshot [:temp-entries ts])
-                show-map? (contains? (:show-maps-for store-snapshot) ts)
-                editable? (contains? (:show-edit-for store-snapshot) ts)]
-            (when (or editable? show-context?)
-              ^{:key (:timestamp entry)}
-              [journal-entry entry temp-entry hashtags mentions put-fn show-map? editable? show-all-maps? show-tags?]))))
+      (for [entry (if show-pvt? entries (filter pvt-filter entries))]
+        (let [ts (:timestamp entry)
+              temp-entry (get-in store-snapshot [:temp-entries ts])
+              show-map? (contains? (:show-maps-for store-snapshot) ts)
+              editable? (contains? (:show-edit-for store-snapshot) ts)]
+          (when (or editable? show-context?)
+            ^{:key (:timestamp entry)}
+            [journal-entry entry temp-entry hashtags mentions put-fn show-map? editable? show-all-maps? show-tags?])))
       (when-let [stats (:stats store-snapshot)]
         [:div.pure-u-1 (:node-count stats) " nodes, " (:edge-count stats) " edges, " (count hashtags) " hashtags, "
          (count mentions) " people"])]]))
