@@ -45,9 +45,18 @@
         update-temp-fn (fn [ev]
                          (let [cursor-pos {:cursor-pos (.-anchorOffset (.getSelection js/window))}
                                updated (with-meta (merge entry (h/parse-entry (get-content ev))) cursor-pos)]
-                           (put-fn [:update/temp-entry {:timestamp ts :updated updated}])))]
+                           (put-fn [:update/temp-entry {:timestamp ts :updated updated}])))
+        on-keydown-fn (fn [ev] (let [key-code (.. ev -keyCode)
+                                     meta-key (.. ev -metaKey)]
+                                 (when (and meta-key (= key-code 83))
+                                   (put-fn [:text-entry/update temp-entry])
+                                   (.preventDefault ev)))
+                        )]
     [:div.edit-md
-     [:pre [:code {:content-editable true :on-input update-temp-fn} md-string]]
+     [:pre [:code {:content-editable true
+                   :on-input         update-temp-fn
+                   :on-key-down      on-keydown-fn}
+            md-string]]
      (when temp-entry
        (let [cursor-pos (:cursor-pos (meta temp-entry))
              md (:md temp-entry)
