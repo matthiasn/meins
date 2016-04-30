@@ -103,7 +103,7 @@
                    new-entry (merge file-info {:img-file target-filename
                                                :tags     #{"#photo" "#import"}})]
                (fs/rename rel-path (str "data/images/" target-filename))
-               (put-fn (with-meta [:geo-entry/persist new-entry] msg-meta)))
+               (put-fn (with-meta [:geo-entry/import new-entry] msg-meta)))
              (catch Exception ex (log/error (str "Error while importing " filename) ex)))))))
 
 (defn import-geo
@@ -121,14 +121,14 @@
                        arrival-ts (:arrival-timestamp raw-visit)
                        departure-ts (:departure-timestamp raw-visit)
                        dur (-> (- departure-ts arrival-ts)
-                                    (/ 6000)
-                                    (Math/floor)
-                                    (/ 10))
+                               (/ 6000)
+                               (Math/floor)
+                               (/ 10))
                        visit (merge raw-visit {:timestamp arrival-ts
                                                :md        (if (> dur 9999)
                                                             "No departure recorded #visit"
                                                             (str "Duration: " dur "m #visit"))
-                                               :tags #{"#visit" "#import"}})]
+                                               :tags      #{"#visit" "#import"}})]
                    (put-fn (with-meta [:geo-entry/persist visit] msg-meta)))))
              (catch Exception ex (log/error (str "Error while importing " filename) ex)))))))
 

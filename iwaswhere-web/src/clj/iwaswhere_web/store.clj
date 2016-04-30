@@ -39,7 +39,7 @@
   {:cmp-id      cmp-id
    :state-fn    (state-fn "./data/daily-logs")
    :handler-map {:geo-entry/persist  f/geo-entry-persist-fn
-                 :text-entry/persist f/geo-entry-persist-fn
+                 :geo-entry/import   f/entry-import-fn
                  :text-entry/update  f/geo-entry-update-fn
                  :cmd/trash          f/trash-entry-fn
                  :state/get          state-get-fn}})

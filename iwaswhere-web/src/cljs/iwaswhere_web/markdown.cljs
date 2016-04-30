@@ -50,8 +50,7 @@
                                      meta-key (.. ev -metaKey)]
                                  (when (and meta-key (= key-code 83))
                                    (put-fn [:text-entry/update temp-entry])
-                                   (.preventDefault ev)))
-                        )]
+                                   (.preventDefault ev))))]
     [:div.edit-md
      [:pre [:code {:content-editable true
                    :on-input         update-temp-fn
