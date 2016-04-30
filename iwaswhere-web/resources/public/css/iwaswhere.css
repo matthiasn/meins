@@ -341,3 +341,14 @@ button {
     font-size: 0.8em;
     background-color: rgb(55, 201, 154);
 }
+
+.show-more {
+    padding: 20px 0;
+}
+
+.show-more-btn {
+    background-color: #1f8dd6;
+    color: whitesmoke;
+    font-size: 0.8em;
+    padding: 1px 5px;
+}

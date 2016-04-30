@@ -63,7 +63,8 @@
   [{:keys [observed local put-fn]}]
   (let [local-snapshot @local
         store-snapshot @observed
-        entries (:entries store-snapshot)
+        show-entries (:show-entries local-snapshot)
+        entries (take show-entries (:entries store-snapshot))
         hashtags (:hashtags store-snapshot)
         mentions (:mentions store-snapshot)
         show-all-maps? (:show-all-maps local-snapshot)
@@ -89,6 +90,10 @@
           (when (or editable? show-context?)
             ^{:key (:timestamp entry)}
             [journal-entry entry temp-entry hashtags mentions put-fn show-map? editable? show-all-maps? show-tags?])))
+      (when show-context?
+        (let [show-more #(swap! local update-in [:show-entries] + 20)]
+          [:div.pure-u-1.show-more {:on-click show-more :on-mouse-over show-more}
+           [:span.show-more-btn [:span.fa.fa-plus-square] " show more"]]))
       (when-let [stats (:stats store-snapshot)]
         [:div.pure-u-1 (:node-count stats) " nodes, " (:edge-count stats) " edges, " (count hashtags) " hashtags, "
          (count mentions) " people"])]]))
@@ -96,7 +101,8 @@
 (defn cmp-map
   [cmp-id]
   (r/cmp-map {:cmp-id        cmp-id
-              :initial-state {:show-all-maps false
+              :initial-state {:show-entries  20
+                              :show-all-maps false
                               :show-hashtags true
                               :show-context  true
                               :show-pvt      false}

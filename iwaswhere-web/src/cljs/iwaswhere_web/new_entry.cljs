@@ -33,11 +33,11 @@
                          (swap! local assoc-in [:prev-mentions] new-mentions)))
         new-entry-fn #(let [ts (st/now)
                             entry (merge (h/parse-entry "...") {:timestamp ts})]
-                       (put-fn [:text-entry/persist entry])
+                       (put-fn [:geo-entry/persist entry])
                        (put-fn [:cmd/toggle {:timestamp ts :key :show-edit-for}])
                        (send-w-geolocation entry put-fn))
         save-entry-fn #(let [entry (:entry @local)]
-                        (put-fn [:text-entry/persist entry])
+                        (put-fn [:geo-entry/persist entry])
                         (send-w-geolocation entry put-fn))]
     [:div.l-box-lrg.pure-g
      [:div.pure-u-1

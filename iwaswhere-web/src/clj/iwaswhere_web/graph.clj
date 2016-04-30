@@ -60,7 +60,7 @@
   "Retrieve items to show in UI, also deliver all hashtags for autocomplete and
   some basic stats."
   [current-state msg-payload]
-  (let [entries (take 100 (filter (entries-filter-fn msg-payload)
+  (let [entries (take 500 (filter (entries-filter-fn msg-payload)
                                  (extract-sorted-entries current-state)))]
     {:entries  entries
      :hashtags (find-all-hashtags current-state)
