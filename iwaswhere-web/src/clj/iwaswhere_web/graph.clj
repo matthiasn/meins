@@ -53,15 +53,16 @@
 (defn get-basic-stats
   "Generate some very basic stats about the graph size for display in UI."
   [current-state]
-  {:node-count (count (:node-map (:graph current-state)))
-   :edge-count (count (uber/find-edges (:graph current-state) {}))})
+  {:entry-count (count (:sorted-entries current-state))
+   :node-count  (count (:node-map (:graph current-state)))
+   :edge-count  (count (uber/find-edges (:graph current-state) {}))})
 
 (defn get-filtered-results
   "Retrieve items to show in UI, also deliver all hashtags for autocomplete and
   some basic stats."
   [current-state msg-payload]
   (let [entries (take 500 (filter (entries-filter-fn msg-payload)
-                                 (extract-sorted-entries current-state)))]
+                                  (extract-sorted-entries current-state)))]
     {:entries  entries
      :hashtags (find-all-hashtags current-state)
      :mentions (find-all-mentions current-state)

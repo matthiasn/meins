@@ -90,12 +90,12 @@
           (when (or editable? show-context?)
             ^{:key (:timestamp entry)}
             [journal-entry entry temp-entry hashtags mentions put-fn show-map? editable? show-all-maps? show-tags?])))
-      (when show-context?
+      (when (and show-context? (seq entries))
         (let [show-more #(swap! local update-in [:show-entries] + 20)]
           [:div.pure-u-1.show-more {:on-click show-more :on-mouse-over show-more}
            [:span.show-more-btn [:span.fa.fa-plus-square] " show more"]]))
       (when-let [stats (:stats store-snapshot)]
-        [:div.pure-u-1 (:node-count stats) " nodes, " (:edge-count stats) " edges, " (count hashtags) " hashtags, "
+        [:div.pure-u-1 (:entry-count stats) " entries, " (:node-count stats) " nodes, " (:edge-count stats) " edges, " (count hashtags) " hashtags, "
          (count mentions) " people"])]]))
 
 (defn cmp-map
