@@ -1,5 +1,6 @@
 (ns iwaswhere-web.journal
   (:require [matthiasn.systems-toolbox-ui.reagent :as r]
+            [matthiasn.systems-toolbox-ui.helpers :as uh]
             [iwaswhere-web.leaflet :as l]
             [iwaswhere-web.markdown :as m]
             [iwaswhere-web.image :as i]
@@ -49,6 +50,7 @@
      [l/leaflet-map entry (or show-map? show-all-maps?)]
      [m/md-render entry temp-entry hashtags mentions put-fn editable? show-tags?]
      [i/image-view entry]
+     [uh/pp-div (:comments entry)]
      [:hr]]))
 
 (defn pvt-filter

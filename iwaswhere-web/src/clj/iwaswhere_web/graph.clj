@@ -32,7 +32,12 @@
   (into [] (map (fn [n]
                   (let [g (:graph current-state)]
                     (if (uber/has-node? g n)
-                      (uber/attrs (:graph current-state) n)
+                      (let [attrs (uber/attrs g n)
+                            comment-edges (flatten (uber/find-edges g {:dest n :relationship :COMMENT}))
+                            comment-edges (filter #(not (:mirror? %)) comment-edges)
+                            comments (map #(uber/attrs g (:src %)) comment-edges)
+                            entry (merge attrs {:comments comments})]
+                        entry)
                       (log/warn "Cannot find node: " n))))
                 (:sorted-entries current-state))))
 
@@ -110,6 +115,13 @@
                         [month-node day-node]
                         [day-node (:timestamp entry) {:relationship :DATE}]))))
 
+(defn add-parent-ref
+  "Adds an edge to parent node when :comment-for key on the entry exists."
+  [graph entry]
+  (if-let [comment-for (:comment-for entry)]
+    (uber/add-edges graph [(:timestamp entry) comment-for {:relationship :COMMENT}])
+    graph))
+
 (defn add-node
   "Adds node to both graph and the sorted set, which maintains the entries sorted by timestamp."
   [current-state ts entry]
@@ -118,6 +130,7 @@
       (update-in [:graph] add-hashtags entry)
       (update-in [:graph] add-mentions entry)
       (update-in [:graph] add-timeline-tree entry)
+      (update-in [:graph] add-parent-ref entry)
       (update-in [:sorted-entries] conj ts)))
 
 (defn remove-node
