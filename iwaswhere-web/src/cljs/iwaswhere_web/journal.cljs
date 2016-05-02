@@ -41,6 +41,7 @@
       [:span.timestamp (.format (js/moment ts) "MMMM Do YYYY, h:mm:ss a")]
       (when map? [:span.fa.fa-map-o.toggle {:on-click toggle-map}])
       [:span.fa.fa-pencil-square-o.toggle {:on-click toggle-edit}]
+      [:span.fa.fa-comment-o.toggle {:on-click (h/new-entry-fn put-fn {:comment-for ts})}]
       [:span.fa.fa-trash-o.toggle {:on-click trash-entry}]
       (when (and temp-entry (not= entry temp-entry))
         [:span.not-saved {:on-click save-fn} [:span.fa.fa-floppy-o] "  click to save"])]
@@ -95,8 +96,8 @@
           [:div.pure-u-1.show-more {:on-click show-more :on-mouse-over show-more}
            [:span.show-more-btn [:span.fa.fa-plus-square] " show more"]]))
       (when-let [stats (:stats store-snapshot)]
-        [:div.pure-u-1 (:entry-count stats) " entries, " (:node-count stats) " nodes, " (:edge-count stats) " edges, " (count hashtags) " hashtags, "
-         (count mentions) " people"])]]))
+        [:div.pure-u-1 (:entry-count stats) " entries, " (:node-count stats) " nodes, " (:edge-count stats) " edges, "
+         (count hashtags) " hashtags, " (count mentions) " people"])]]))
 
 (defn cmp-map
   [cmp-id]

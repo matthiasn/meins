@@ -5,18 +5,6 @@
             [cljsjs.leaflet]
             [matthiasn.systems-toolbox.component :as st]))
 
-(defn send-w-geolocation
-  "Calls geolocation, sends entry enriched by geo information inside the
-  callback function"
-  [data put-fn]
-  (.getCurrentPosition
-    (.-geolocation js/navigator)
-    (fn [pos]
-      (let [coords (.-coords pos)]
-        (put-fn [:geo-entry/persist
-                 (merge data {:latitude  (.-latitude coords)
-                              :longitude (.-longitude coords)})])))))
-
 (defn new-entry-view
   "Renders New Entry component."
   [{:keys [local put-fn]}]
@@ -31,14 +19,9 @@
                          (put-fn [:state/get new-state])
                          (swap! local assoc-in [:prev-tags] new-tags)
                          (swap! local assoc-in [:prev-mentions] new-mentions)))
-        new-entry-fn #(let [ts (st/now)
-                            entry (merge (h/parse-entry "...") {:timestamp ts})]
-                       (put-fn [:geo-entry/persist entry])
-                       (put-fn [:cmd/toggle {:timestamp ts :key :show-edit-for}])
-                       (send-w-geolocation entry put-fn))
         save-entry-fn #(let [entry (:entry @local)]
                         (put-fn [:geo-entry/persist entry])
-                        (send-w-geolocation entry put-fn))]
+                        (h/send-w-geolocation entry put-fn))]
     [:div.l-box-lrg.pure-g
      [:div.pure-u-1
       (let [tags (:tags (:entry @local))]
@@ -52,7 +35,7 @@
                                      :value     (:md (:entry @local))
                                      :on-change on-change-fn}]]
       [:div.entry-footer
-       [:button.pure-button.pure-button-primary.button-xsmall {:on-click new-entry-fn}
+       [:button.pure-button.pure-button-primary.button-xsmall {:on-click (h/new-entry-fn put-fn {})}
         [:span.fa.fa-plus-square] " new"]
        [:button.pure-button.pure-button-primary.button-xsmall {:on-click save-entry-fn}
         [:span.fa.fa-floppy-o] " save"]

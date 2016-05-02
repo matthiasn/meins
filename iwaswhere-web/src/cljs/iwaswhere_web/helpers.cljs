@@ -4,6 +4,18 @@
             [cljsjs.moment]
             [matthiasn.systems-toolbox.component :as st]))
 
+(defn send-w-geolocation
+  "Calls geolocation, sends entry enriched by geo information inside the
+  callback function"
+  [data put-fn]
+  (.getCurrentPosition
+    (.-geolocation js/navigator)
+    (fn [pos]
+      (let [coords (.-coords pos)]
+        (put-fn [:geo-entry/persist
+                 (merge data {:latitude  (.-latitude coords)
+                              :longitude (.-longitude coords)})])))))
+
 (defn entries-filter-fn
   "Creates a filter function which ensures that all tags in the new entry are contained in
   the filtered entry. This filters entries so that only entries that are relevant to the new
@@ -26,3 +38,14 @@
     {:md        text
      :tags      tags
      :mentions  mentions}))
+
+(defn new-entry-fn
+  "Create a new, empty entry. The opts map is merged last with the generated entry, thus keys can
+  be overwritten here."
+  [put-fn opts]
+  (fn [_ev]
+    (let [ts (st/now)
+          entry (merge (parse-entry "...") {:timestamp ts} opts)]
+      (put-fn [:geo-entry/persist entry])
+      (put-fn [:cmd/toggle {:timestamp ts :key :show-edit-for}])
+      (send-w-geolocation entry put-fn))))
