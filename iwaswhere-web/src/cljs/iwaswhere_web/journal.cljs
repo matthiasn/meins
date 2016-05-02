@@ -30,9 +30,12 @@
   used in edit mode also sends a modified entry to the store component, which is useful
   for displaying updated hashtags, or also for showing the warning that the entry is not
   saved yet."
-  [entry temp-entry hashtags mentions put-fn show-map? editable? show-all-maps? show-tags?]
+  [entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags?]
   (let [ts (:timestamp entry)
         map? (:latitude entry)
+        temp-entry (get-in store-snapshot [:temp-entries ts])
+        show-map? (contains? (:show-maps-for store-snapshot) ts)
+        editable? (contains? (:show-edit-for store-snapshot) ts)
         toggle-map #(put-fn [:cmd/toggle {:timestamp ts :key :show-maps-for}])
         toggle-edit #(put-fn [:cmd/toggle {:timestamp ts :key :show-edit-for}])
         trash-entry #(put-fn [:cmd/trash {:timestamp ts}])
@@ -42,16 +45,30 @@
       [:span.timestamp (.format (js/moment ts) "MMMM Do YYYY, h:mm:ss a")]
       (when map? [:span.fa.fa-map-o.toggle {:on-click toggle-map}])
       [:span.fa.fa-pencil-square-o.toggle {:on-click toggle-edit}]
-      [:span.fa.fa-comment-o.toggle {:on-click (h/new-entry-fn put-fn {:comment-for ts})}]
+      (when-not (:comment-for entry)
+        [:span.fa.fa-comment-o.toggle {:on-click (h/new-entry-fn put-fn {:comment-for ts})}])
       [:span.fa.fa-trash-o.toggle {:on-click trash-entry}]
       (when (and temp-entry (not= entry temp-entry))
         [:span.not-saved {:on-click save-fn} [:span.fa.fa-floppy-o] "  click to save"])]
      [hashtags-mentions-list (or temp-entry entry)]
      [l/leaflet-map entry (or show-map? show-all-maps?)]
      [m/md-render entry temp-entry hashtags mentions put-fn editable? show-tags?]
-     [i/image-view entry]
-     [uh/pp-div (:comments entry)]
-     [:hr]]))
+     [i/image-view entry]]))
+
+(defn journal-entry2
+  "Renders individual journal entry. Interaction with application state happens via
+  messages that are sent to the store component, for example for toggling the display
+  of the edit mode or showing the map for an entry. The editable content component
+  used in edit mode also sends a modified entry to the store component, which is useful
+  for displaying updated hashtags, or also for showing the warning that the entry is not
+  saved yet."
+  [entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags?]
+  [:div
+   [journal-entry entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags?]
+   [:div.comments
+    (for [comment (:comments entry)]
+      ^{:key (str "c" (:timestamp comment))}
+      [journal-entry comment store-snapshot hashtags mentions put-fn show-all-maps? show-tags?])]])
 
 (defn pvt-filter
   "Filter for entries that I consider private."
@@ -87,12 +104,10 @@
       [:hr]
       (for [entry (if show-pvt? entries (filter pvt-filter entries))]
         (let [ts (:timestamp entry)
-              temp-entry (get-in store-snapshot [:temp-entries ts])
-              show-map? (contains? (:show-maps-for store-snapshot) ts)
               editable? (contains? (:show-edit-for store-snapshot) ts)]
-          (when (or editable? show-context?)
+          (when (and (not (:comment-for entry)) (or editable? show-context?))
             ^{:key (:timestamp entry)}
-            [journal-entry entry temp-entry hashtags mentions put-fn show-map? editable? show-all-maps? show-tags?])))
+            [journal-entry2 entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags?])))
       (when (and show-context? (seq entries))
         (let [show-more #(swap! local update-in [:show-entries] + 20)]
           [:div.pure-u-1.show-more {:on-click show-more :on-mouse-over show-more}
