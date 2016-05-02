@@ -49,7 +49,13 @@
         on-keydown-fn (fn [ev] (let [key-code (.. ev -keyCode)
                                      meta-key (.. ev -metaKey)]
                                  (when (and meta-key (= key-code 83))
-                                   (put-fn [:text-entry/update temp-entry])
+                                   (if (not= entry temp-entry) ; when no change, toggle edit mode
+                                     (put-fn [:text-entry/update temp-entry])
+                                     (put-fn [:cmd/toggle {:timestamp ts :key :show-edit-for}]))
+                                   (.preventDefault ev))
+                                 (when (= key-code 9)
+                                   ;(put-fn [:text-entry/update temp-entry])
+                                   (prn key-code)
                                    (.preventDefault ev))))]
     [:div.edit-md
      [:pre [:code {:content-editable true
