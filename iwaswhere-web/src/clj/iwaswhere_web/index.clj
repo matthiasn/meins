@@ -32,7 +32,9 @@
   is not used here but can be useful in scenarios when requests are supposed to be handled by a another
   component."
   [_put-fn]
-  [(r/files "/photos" {:root "data/images/"})])
+  [(r/files "/photos" {:root "data/images/"})
+   (r/files "/audio" {:root "data/audio/"})
+   (r/files "/videos" {:root "data/videos/"})])
 
 (def sente-map
   {:index-page-fn index-page

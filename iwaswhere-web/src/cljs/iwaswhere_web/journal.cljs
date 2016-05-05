@@ -2,8 +2,8 @@
   (:require [matthiasn.systems-toolbox-ui.reagent :as r]
             [matthiasn.systems-toolbox-ui.helpers :as uh]
             [iwaswhere-web.leaflet :as l]
-            [iwaswhere-web.markdown :as m]
-            [iwaswhere-web.image :as i]
+            [iwaswhere-web.markdown :as md]
+            [iwaswhere-web.media :as m]
             [clojure.set :as set]
             [clojure.string :as s]
             [cljsjs.moment]
@@ -52,8 +52,10 @@
         [:span.not-saved {:on-click save-fn} [:span.fa.fa-floppy-o] "  click to save"])]
      [hashtags-mentions-list (or temp-entry entry)]
      [l/leaflet-map entry (or show-map? show-all-maps?)]
-     [m/md-render entry temp-entry hashtags mentions put-fn editable? show-tags?]
-     [i/image-view entry]]))
+     [md/md-render entry temp-entry hashtags mentions put-fn editable? show-tags?]
+     [m/image-view entry]
+     [m/audioplayer-view entry]
+     [m/videoplayer-view entry]]))
 
 (defn journal-entry2
   "Renders individual journal entry. Interaction with application state happens via

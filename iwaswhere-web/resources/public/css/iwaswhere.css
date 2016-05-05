@@ -366,3 +366,7 @@ button {
 
 .comments .entry {
 }
+
+video {
+    width: 100%;
+}
