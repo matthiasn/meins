@@ -21,7 +21,12 @@
                          (swap! local assoc-in [:prev-mentions] new-mentions)))
         save-entry-fn #(let [entry (:entry @local)]
                         (put-fn [:geo-entry/persist entry])
-                        (h/send-w-geolocation entry put-fn))]
+                        (h/send-w-geolocation entry put-fn))
+        on-keydown-fn (fn [ev] (let [key-code (.. ev -keyCode)
+                                     meta-key (.. ev -metaKey)]
+                                 (when (and meta-key (= key-code 83))
+                                   (save-entry-fn)
+                                   (.preventDefault ev))))]
     [:div.l-box-lrg.pure-g
      [:div.pure-u-1
       (let [tags (:tags (:entry @local))]
@@ -33,7 +38,8 @@
       [:div.textentry
        [:textarea#new-entry-textbox {:type      "text"
                                      :value     (:md (:entry @local))
-                                     :on-change on-change-fn}]]
+                                     :on-change on-change-fn
+                                     :on-key-down on-keydown-fn}]]
       [:div.entry-footer
        [:button.pure-button.pure-button-primary.button-xsmall {:on-click (h/new-entry-fn put-fn {})}
         [:span.fa.fa-plus-square] " new"]

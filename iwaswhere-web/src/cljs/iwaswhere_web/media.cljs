@@ -18,5 +18,5 @@
   "Renders video player view."
   [entry]
   (when-let [video-file (:video-file entry)]
-    [:video {:controls true}
+    [:video {:controls true :preload "none"}
      [:source {:src (str "/videos/" video-file) :type "video/mp4"}]]))
