@@ -11,8 +11,7 @@
             [clj-time.format :as tf]
             [clojure.tools.logging :as log]
             [clojure.string :as s])
-  (:import [com.drew.imaging ImageMetadataReader]
-           (java.io BufferedReader)))
+  (:import [com.drew.imaging ImageMetadataReader]))
 
 (defn dms-to-dd
   "Converts DMS (degree, minute, second) to DD (decimal degree) format. Returns nil
@@ -72,38 +71,73 @@
   [tag]
   (into {} (map #(hash-map (.getTagName %) (.getDescription %)) tag)))
 
-(defn exif-for-file
+(defn import-image
   "Takes an image file (as a java.io.InputStream or java.io.File) and extracts exif information into a map.
   Borrowed and modified from: https://github.com/joshuamiller/exif-processor"
   [file]
   (let [filename (.getName file)
+        rel-path (.getPath file)
         metadata (ImageMetadataReader/readMetadata file)
         exif-directories (.getDirectories metadata)
         tags (map #(.getTags %) exif-directories)
-        exif (into {} (map extract-from-tag tags))]
+        exif (into {} (map extract-from-tag tags))
+        timestamp (or (extract-gps-ts (str (get exif "GPS Date Stamp") " " (get exif "GPS Time-Stamp")) filename)
+                      (extract-ts (str (get exif "Date/Time")) filename)
+                      (extract-ts (str (get exif "Date/Time Original")) filename)
+                      (st/now))
+        target-filename (str timestamp "-" filename)]
+    (fs/rename rel-path (str "data/images/" target-filename))
     {:raw-exif  exif
-     :timestamp (or (extract-gps-ts (str (get exif "GPS Date Stamp") " " (get exif "GPS Time-Stamp")) filename)
-                    (extract-ts (str (get exif "Date/Time")) filename)
-                    (extract-ts (str (get exif "Date/Time Original")) filename)
-                    (st/now))
+     :timestamp timestamp
      :latitude  (dms-to-dd exif "GPS Latitude" "GPS Latitude Ref")
-     :longitude (dms-to-dd exif "GPS Longitude" "GPS Longitude Ref")}))
+     :longitude (dms-to-dd exif "GPS Longitude" "GPS Longitude Ref")
+     :img-file  target-filename
+     :tags      #{"#photo" "#import"}}))
 
-(defn import-photos
+(defn import-video
+  "Takes an video file (as a java.io.InputStream or java.io.File) creates entry from it."
+  [file]
+  (let [filename (.getName file)
+        rel-path (.getPath file)
+        timestamp (.lastModified file)
+        target-filename (str timestamp "-" filename)]
+    (fs/rename rel-path (str "data/videos/" target-filename))
+    {:timestamp  timestamp
+     :video-file target-filename
+     :tags       #{"#video" "#import"}}))
+
+(defn import-audio
+  "Takes an audio file (as a java.io.InputStream or java.io.File) creates entry from it."
+  ; TODO: parse timestamp from file, as only last modified is available with java.io
+  ; java.nio does providing creation timestamp, but had issues getting it to work
+  ; better to start recording in app anyway, much preferable
+  [audio-file]
+  (let [filename (.getName audio-file)
+        rel-path (.getPath audio-file)
+        timestamp (.lastModified audio-file)
+        target-filename (str timestamp "-" filename)]
+    ;(fs/rename rel-path (str "data/audio/" target-filename))
+    ;(prn (.creationTime file))
+    (pp/pprint
+      {:timestamp  timestamp
+       :audio-file target-filename
+       :tags       #{"#audio" "#import"}})))
+
+(defn import-media
   "Imports photos from respective directory."
   [{:keys [put-fn msg-meta]}]
-  (let [files (file-seq (clojure.java.io/file "data/image-import"))]
-    (log/info "importing photos")
-    (doseq [img (f/filter-by-name files #"[A-Za-z0-9_]+.(jpg|JPG|PNG|png)")]
-      (let [filename (.getName img)]
+  (let [files (file-seq (clojure.java.io/file "data/import"))]
+    (log/info "importing media files")
+    (doseq [file (f/filter-by-name files #"[A-Za-z0-9_]+.(jpg|JPG|PNG|png|m4v|m4a)")]
+      (let [filename (.getName file)]
         (log/info "Trying to import " filename)
-        (try (let [rel-path (.getPath img)
-                   file-info (exif-for-file img)
-                   target-filename (str (:timestamp file-info) "-" filename)
-                   new-entry (merge file-info {:img-file target-filename
-                                               :tags     #{"#photo" "#import"}})]
-               (fs/rename rel-path (str "data/images/" target-filename))
-               (put-fn (with-meta [:geo-entry/import new-entry] msg-meta)))
+        (try (let [[_ file-type] (re-find #"^.*\.([a-z0-9]{3})$" filename)
+                   file-info (case file-type
+                               "m4v" (import-video file)
+                               "m4a" (import-audio file)
+                               (import-image file))]
+               (when file-info
+                 (put-fn (with-meta [:geo-entry/import file-info] msg-meta))))
              (catch Exception ex (log/error (str "Error while importing " filename) ex)))))))
 
 (defn import-geo
@@ -150,6 +184,6 @@
 (defn cmp-map
   [cmp-id]
   {:cmp-id      cmp-id
-   :handler-map {:import/photos import-photos
+   :handler-map {:import/photos import-media
                  :import/geo    import-geo
                  :import/phone  import-phone}})

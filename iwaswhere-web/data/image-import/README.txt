@@ -1,1 +1,0 @@
-Place photos you want to import here. Currently looks for file names such as those produced by an iPhone. Let me know if that doesn't suite your needs.

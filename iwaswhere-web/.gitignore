@@ -5,7 +5,7 @@ data/audio
 data/videos
 data/daily-logs
 data/trash
-data/image-import
+data/import
 data-test/
 /target
 /classes
