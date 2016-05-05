@@ -108,27 +108,24 @@
 
 (defn import-audio
   "Takes an audio file (as a java.io.InputStream or java.io.File) creates entry from it."
-  ; TODO: parse timestamp from file, as only last modified is available with java.io
-  ; java.nio does providing creation timestamp, but had issues getting it to work
-  ; better to start recording in app anyway, much preferable
   [audio-file]
   (let [filename (.getName audio-file)
-        rel-path (.getPath audio-file)
+        ts-str (subs filename 0 15)
+        f (tf/formatter "yyyyMMdd HHmmss")
         timestamp (.lastModified audio-file)
-        target-filename (str timestamp "-" filename)]
-    ;(fs/rename rel-path (str "data/audio/" target-filename))
-    ;(prn (.creationTime file))
-    (pp/pprint
-      {:timestamp  timestamp
-       :audio-file target-filename
-       :tags       #{"#audio" "#import"}})))
+        rel-path (.getPath audio-file)
+        target-filename (s/replace (str timestamp "-" filename) " " "_")]
+    (fs/rename rel-path (str "data/audio/" target-filename))
+    {:timestamp  (c/to-long (tf/parse f ts-str))
+     :audio-file target-filename
+     :tags       #{"#audio" "#import"}}))
 
 (defn import-media
   "Imports photos from respective directory."
   [{:keys [put-fn msg-meta]}]
   (let [files (file-seq (clojure.java.io/file "data/import"))]
     (log/info "importing media files")
-    (doseq [file (f/filter-by-name files #"[A-Za-z0-9_]+.(jpg|JPG|PNG|png|m4v|m4a)")]
+    (doseq [file (f/filter-by-name files #"[ A-Za-z0-9_]+.(jpg|JPG|PNG|png|m4v|m4a)")]
       (let [filename (.getName file)]
         (log/info "Trying to import " filename)
         (try (let [[_ file-type] (re-find #"^.*\.([a-z0-9]{3})$" filename)
