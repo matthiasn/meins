@@ -23,6 +23,14 @@
         ^{:key (str "tag-" hashtag)}
         [:span.hashtag.float-left hashtag])]]))
 
+(defn pvt-filter
+  "Filter for entries that I consider private."
+  [entry]
+  (let [tags (set (map s/lower-case (:tags entry)))
+        private-tags #{"#pvt" "#private" "#nsfw"}
+        matched (set/intersection tags private-tags)]
+    (empty? matched)))
+
 (defn journal-entry
   "Renders individual journal entry. Interaction with application state happens via
   messages that are sent to the store component, for example for toggling the display
@@ -64,21 +72,14 @@
   used in edit mode also sends a modified entry to the store component, which is useful
   for displaying updated hashtags, or also for showing the warning that the entry is not
   saved yet."
-  [entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags?]
+  [entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-pvt?]
   [:div
    [journal-entry entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags?]
    [:div.comments
-    (for [comment (:comments entry)]
-      ^{:key (str "c" (:timestamp comment))}
-      [journal-entry comment store-snapshot hashtags mentions put-fn show-all-maps? show-tags?])]])
-
-(defn pvt-filter
-  "Filter for entries that I consider private."
-  [entry]
-  (let [tags (set (map s/lower-case (:tags entry)))
-        private-tags #{"#pvt" "#private" "#nsfw"}
-        matched (set/intersection tags private-tags)]
-    (empty? matched)))
+    (let [comments (:comments entry)]
+      (for [comment (if show-pvt? comments (filter pvt-filter comments))]
+        ^{:key (str "c" (:timestamp comment))}
+        [journal-entry comment store-snapshot hashtags mentions put-fn show-all-maps? show-tags?]))]])
 
 (defn journal-view
   "Renders journal div, one entry per item, with map if geo data exists in the entry."
@@ -109,7 +110,7 @@
               editable? (contains? (:show-edit-for store-snapshot) ts)]
           (when (and (not (:comment-for entry)) (or editable? show-context?))
             ^{:key (:timestamp entry)}
-            [journal-entry2 entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags?])))
+            [journal-entry2 entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-pvt?])))
       (when (and show-context? (seq entries))
         (let [show-more #(swap! local update-in [:show-entries] + 20)]
           [:div.pure-u-1.show-more {:on-click show-more :on-mouse-over show-more}

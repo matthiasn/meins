@@ -8,8 +8,9 @@
 (defn state-get-fn
   "Handler function for retrieving current state."
   [{:keys [current-state msg-payload]}]
-  {:new-state (assoc-in current-state [:last-filter] msg-payload)
-   :emit-msg  [:state/new (g/get-filtered-results current-state msg-payload)]})
+  (let [new-state (assoc-in current-state [:last-filter] msg-payload)]
+    {:new-state new-state
+     :emit-msg  [:state/new (g/get-filtered-results new-state msg-payload)]}))
 
 (defn state-fn
   "Initial state function, creates state atom and then parses all files in
@@ -38,8 +39,8 @@
   [cmp-id]
   {:cmp-id      cmp-id
    :state-fn    (state-fn "./data/daily-logs")
-   :handler-map {:geo-entry/persist  f/geo-entry-persist-fn
-                 :geo-entry/import   f/entry-import-fn
-                 :text-entry/update  f/geo-entry-update-fn
-                 :cmd/trash          f/trash-entry-fn
-                 :state/get          state-get-fn}})
+   :handler-map {:geo-entry/persist f/geo-entry-persist-fn
+                 :geo-entry/import  f/entry-import-fn
+                 :text-entry/update f/geo-entry-persist-fn
+                 :cmd/trash         f/trash-entry-fn
+                 :state/get         state-get-fn}})
