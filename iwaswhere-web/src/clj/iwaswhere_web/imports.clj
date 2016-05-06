@@ -160,7 +160,7 @@
                                                             "No departure recorded #visit"
                                                             (str "Duration: " dur "m #visit"))
                                                :tags      #{"#visit" "#import"}})]
-                   (put-fn (with-meta [:geo-entry/persist visit] msg-meta)))))
+                   (put-fn (with-meta [:geo-entry/import visit] msg-meta)))))
              (catch Exception ex (log/error (str "Error while importing " filename) ex)))))))
 
 (defn import-phone
@@ -175,7 +175,7 @@
                (doseq [line lines]
                  (let [entry (m/add-tags-mentions (cc/parse-string line #(keyword (s/replace % "_" "-"))))
                        entry (update-in entry [:tags] conj "#import")]
-                   (put-fn (with-meta [:geo-entry/persist entry] msg-meta)))))
+                   (put-fn (with-meta [:geo-entry/import entry] msg-meta)))))
              (catch Exception ex (log/error (str "Error while importing " filename) ex)))))))
 
 (defn cmp-map

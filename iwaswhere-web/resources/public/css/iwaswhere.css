@@ -10,7 +10,7 @@
 */
 body {
     color: #576364;
-    background-color: #f8f8f8;
+    background-color: #f9f9fa;
     font-size: 13px;
     font-weight: 300;
     overflow-y:scroll;
@@ -120,7 +120,7 @@ label {
 .content-wrapper {
     /* These styles are required for the "scroll-over" effect */
     position: absolute;
-    top: 10%;
+    top: 50px;
     width: 100%;
     min-height: 12%;
 }

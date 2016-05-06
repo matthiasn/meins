@@ -23,13 +23,14 @@
   "Handler function for persisting an imported journal entry."
   [{:keys [current-state msg-payload]}]
   (let [entry-ts (:timestamp msg-payload)
+        last-filter (:last-filter current-state)
         exists? (uber/has-node? (:graph current-state) entry-ts)]
     (if exists?
       (log/warn "Entry exists, skipping" msg-payload)
       (let [new-state (g/add-node current-state entry-ts msg-payload)]
         (append-daily-log msg-payload)
         {:new-state new-state
-         :emit-msg  [:state/new (g/get-filtered-results new-state msg-payload)]}))))
+         :emit-msg  [:state/new (g/get-filtered-results new-state last-filter)]}))))
 
 (defn geo-entry-persist-fn
   "Handler function for persisting journal entry."
@@ -45,8 +46,9 @@
   "Handler function for deleting journal entry."
   [{:keys [current-state msg-payload]}]
   (let [entry-ts (:timestamp msg-payload)
+        last-filter (:last-filter current-state)
         new-state (g/remove-node current-state entry-ts)]
     (log/info "Entry" entry-ts "marked as deleted.")
     (append-daily-log (merge msg-payload {:deleted true}))
     {:new-state new-state
-     :emit-msg  [:state/new (g/get-filtered-results new-state {})]}))
+     :emit-msg  [:state/new (g/get-filtered-results new-state last-filter)]}))

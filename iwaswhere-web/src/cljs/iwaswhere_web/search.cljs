@@ -22,7 +22,6 @@
                        (put-fn [:state/get query]))]
     [:div.l-box-lrg.pure-g
      [:div.pure-u-1
-      [:hr]
       (let [tags (:tags (:entry @local))]
         [:div.hashtags
          (when (seq tags)
