@@ -8,20 +8,21 @@
             [clojure.tools.logging :as log]))
 
 (defn entries-filter-fn
-  "Creates a filter function which ensures that all tags in the new entry are contained in
-  the filtered entry. This filters entries so that only entries that are relevant to the new
-  entry are shown."
-  ; TODO: also enable OR filter
+  "Creates a filter function which ensures that all tags in the query are contained in
+  the filtered entry, and none of the not-tags."
   [q]
   (fn [entry]
     (let [entry-tags (set (map s/lower-case (:tags entry)))
+          entry-comments-tags (apply set/union (map #(:tags %) (:comments entry)))
+          entries-and-comments-tags (set/union entry-tags entry-comments-tags)
           q-tags (set (map s/lower-case (:tags q)))
           entry-mentions (set (map s/lower-case (:mentions entry)))
           q-mentions (set (map s/lower-case (:mentions q)))
           match? (or (and (empty? q-tags) (empty? q-mentions))
-                     (seq (set/intersection q-tags entry-tags))
+                     ; all tags are contained in entry or comment, and none of the not-tags
+                     (and (set/subset? q-tags entries-and-comments-tags)
+                          (empty? (set/intersection (:not-tags q) entries-and-comments-tags)))
                      (seq (set/intersection q-mentions entry-mentions)))]
-      ;      (set/subset? new-entry-tags entry-tags)
       match?)))
 
 (defn extract-sorted-entries

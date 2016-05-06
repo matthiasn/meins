@@ -1,6 +1,7 @@
 (ns iwaswhere-web.core
   (:require [iwaswhere-web.store :as store]
             [iwaswhere-web.new-entry :as ne]
+            [iwaswhere-web.search :as s]
             [iwaswhere-web.journal :as jrn]
             [matthiasn.systems-toolbox.switchboard :as sb]
             [matthiasn.systems-toolbox-sente.client :as sente]))
@@ -15,10 +16,11 @@
     switchboard
     [[:cmd/init-comp client-ws-cmp]                         ; WebSocket communication component
      [:cmd/init-comp (ne/cmp-map :client/new-entry-cmp)]    ; UI component for new journal entries
+     [:cmd/init-comp (s/cmp-map :client/search-cmp)]        ; UI component for new journal entries
      [:cmd/init-comp (jrn/cmp-map :client/journal-cmp)]     ; UI component for journal
      [:cmd/init-comp (store/cmp-map :client/store-cmp)]     ; Data store component
 
-     [:cmd/route-all {:from [:client/store-cmp :client/new-entry-cmp :client/journal-cmp]
+     [:cmd/route-all {:from [:client/store-cmp :client/new-entry-cmp :client/search-cmp :client/journal-cmp]
                       :to   :client/ws-cmp}]
 
      [:cmd/route {:from :client/ws-cmp

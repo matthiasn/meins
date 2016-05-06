@@ -266,6 +266,10 @@ textarea {
     background-color: rgb(66, 184, 221);
 }
 
+.not-tag {
+    background-color: rgb(221, 77, 55);
+}
+
 .float-left {
     float: left;
 }
