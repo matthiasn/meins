@@ -24,8 +24,13 @@
   [{:keys [current-state msg-payload]}]
   (let [entry-ts (:timestamp msg-payload)
         last-filter (:last-filter current-state)
-        exists? (uber/has-node? (:graph current-state) entry-ts)]
-    (if exists?
+        graph (:graph current-state)
+        exists? (uber/has-node? graph entry-ts)
+        existing (when exists? (uber/attrs graph entry-ts))]
+    ; Okay this is slightly too specific for my taste, but currently, the completion
+    ; of a visit is an update to a visit, and otherwise, the exists? logic would refuse
+    ; to import it.
+    (if (and exists? (not= (:md existing) "No departure recorded #visit"))
       (log/warn "Entry exists, skipping" msg-payload)
       (let [new-state (g/add-node current-state entry-ts msg-payload)]
         (append-daily-log msg-payload)
