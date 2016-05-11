@@ -20,7 +20,7 @@
                  [com.drewnoakes/metadata-extractor "2.8.1"]
                  [ubergraph "0.2.1"]
                  [camel-snake-kebab "0.3.2"]
-                 [matthiasn/systems-toolbox "0.5.17"]
+                 [matthiasn/systems-toolbox "0.5.18"]
                  [matthiasn/systems-toolbox-ui "0.5.7"]
                  [matthiasn/systems-toolbox-sente "0.5.15"]
                  [clj-time "0.11.0"]]

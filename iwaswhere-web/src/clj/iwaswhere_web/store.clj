@@ -5,12 +5,26 @@
             [ubergraph.core :as uber]
             [clojure.pprint :as pp]))
 
-(defn state-get-fn
-  "Handler function for retrieving current state."
+(defn publish-state-fn
+  "Publishes current state, as filtered by the respective clients. Sends to single connected client
+  with the latest filter when message payload contains :sente-uid, otherwise sends to all clients."
   [{:keys [current-state msg-payload]}]
-  (let [new-state (assoc-in current-state [:last-filter] msg-payload)]
+  (let [sente-uid (:sente-uid msg-payload)
+        sente-uids (if sente-uid [sente-uid] (keys (:last-filter current-state)))
+        state-emit-mapper (fn [sente-uid]
+                            (let [filter (get-in current-state [:last-filter sente-uid])]
+                              (with-meta [:state/new (g/get-filtered-results current-state filter)]
+                                         {:sente-uid sente-uid})))]
+    {:emit-msgs (map state-emit-mapper sente-uids)}))
+
+(defn state-get-fn
+  "Handler function for retrieving current state. Updates filter for connected client, and then
+  sends a message to self to publish state for this particular client."
+  [{:keys [current-state msg-payload msg-meta]}]
+  (let [sente-uid (:sente-uid msg-meta)
+        new-state (assoc-in current-state [:last-filter sente-uid] msg-payload)]
     {:new-state new-state
-     :emit-msg  [:state/new (g/get-filtered-results new-state msg-payload)]}))
+     :send-to-self [:state/publish-current {:sente-uid sente-uid}]}))
 
 (defn state-fn
   "Initial state function, creates state atom and then parses all files in
@@ -39,8 +53,9 @@
   [cmp-id]
   {:cmp-id      cmp-id
    :state-fn    (state-fn "./data/daily-logs")
-   :handler-map {:geo-entry/persist f/geo-entry-persist-fn
-                 :geo-entry/import  f/entry-import-fn
-                 :text-entry/update f/geo-entry-persist-fn
-                 :cmd/trash         f/trash-entry-fn
-                 :state/get         state-get-fn}})
+   :handler-map {:geo-entry/persist     f/geo-entry-persist-fn
+                 :geo-entry/import      f/entry-import-fn
+                 :text-entry/update     f/geo-entry-persist-fn
+                 :state/publish-current publish-state-fn
+                 :cmd/trash             f/trash-entry-fn
+                 :state/get             state-get-fn}})

@@ -34,8 +34,8 @@
       (log/warn "Entry exists, skipping" msg-payload)
       (let [new-state (g/add-node current-state entry-ts msg-payload)]
         (append-daily-log msg-payload)
-        {:new-state new-state
-         :emit-msg  [:state/new (g/get-filtered-results new-state last-filter)]}))))
+        {:new-state    new-state
+         :send-to-self [:state/publish-current {}]}))))
 
 (defn geo-entry-persist-fn
   "Handler function for persisting journal entry."
@@ -44,8 +44,8 @@
         last-filter (:last-filter current-state)
         new-state (g/add-node current-state entry-ts msg-payload)]
     (append-daily-log msg-payload)
-    {:new-state new-state
-     :emit-msg  [:state/new (g/get-filtered-results new-state last-filter)]}))
+    {:new-state    new-state
+     :send-to-self [:state/publish-current {}]}))
 
 (defn trash-entry-fn
   "Handler function for deleting journal entry."
@@ -55,5 +55,5 @@
         new-state (g/remove-node current-state entry-ts)]
     (log/info "Entry" entry-ts "marked as deleted.")
     (append-daily-log (merge msg-payload {:deleted true}))
-    {:new-state new-state
-     :emit-msg  [:state/new (g/get-filtered-results new-state last-filter)]}))
+    {:new-state    new-state
+     :send-to-self [:state/publish-current {}]}))
