@@ -241,9 +241,10 @@ textarea {
     font-family: "Lato";
 }
 
-a {
+a, a:visited {
     text-decoration: none;
     font-weight: 400;
+    color: #006c91;
 }
 
 hr {
@@ -367,6 +368,12 @@ button {
     padding: 5px;
     margin: 8px 0 4px 0;
     min-height: 60px;
+}
+
+.entry .mention-link {
+    font-style: italic;
+    color: #007d4e;
+    font-weight: bold;
 }
 
 .comments .entry {
