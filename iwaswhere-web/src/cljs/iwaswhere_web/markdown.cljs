@@ -1,18 +1,18 @@
 (ns iwaswhere-web.markdown
   (:require [markdown.core :as md]
             [iwaswhere-web.helpers :as h]
-            [matthiasn.systems-toolbox-ui.helpers :as uh]
             [clojure.string :as s]
-            [cljsjs.moment]
-            [cljs.pprint :as pp]))
+            [cljsjs.moment]))
 
 (defn hashtags-replacer
   "Replaces hashtags in entry text. Depending on show-hashtags? switch either displays
-  the hashtag or not."
+  the hashtag or not. Creates link for each hashtag, which opens iWasWhere in new tab,
+  with the filter set to the clicked hashtag."
   [show-hashtags?]
   (fn [acc hashtag]
-    (let [f-hashtag (if show-hashtags? hashtag (subs hashtag 1))]
-      (s/replace acc (re-pattern (str "[^*]" hashtag "(?!\\w)")) (str " **" f-hashtag "**")))))
+    (let [f-hashtag (if show-hashtags? hashtag (subs hashtag 1))
+          with-link (str " <a target='_blank' href='" "/#" hashtag "'>" f-hashtag "</a>")]
+      (s/replace acc (re-pattern (str "[^*]" hashtag "(?!\\w)")) with-link))))
 
 (defn mentions-replacer
   "Replaces mentions in entry text."

@@ -51,6 +51,7 @@
     {:new-state new-state}))
 
 (defn cmp-map
+  "Creates map for the component which holds the client-side application state."
   [cmp-id]
   {:cmp-id      cmp-id
    :state-fn    initial-state-fn

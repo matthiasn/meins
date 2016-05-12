@@ -366,6 +366,7 @@ button {
     background: white;
     padding: 5px;
     margin: 8px 0 4px 0;
+    min-height: 60px;
 }
 
 .comments .entry {
