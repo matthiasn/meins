@@ -1,4 +1,4 @@
-(ns iwaswhere-web.new-entry
+(ns iwaswhere-web.ui.new-entry
   (:require [matthiasn.systems-toolbox-ui.reagent :as r]
             [iwaswhere-web.helpers :as h]))
 

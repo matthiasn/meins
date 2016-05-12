@@ -1,4 +1,4 @@
-(ns iwaswhere-web.leaflet
+(ns iwaswhere-web.ui.leaflet
   (:require [reagent.core :as rc]
             [cljsjs.leaflet]))
 

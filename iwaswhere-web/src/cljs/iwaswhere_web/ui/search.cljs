@@ -1,4 +1,4 @@
-(ns iwaswhere-web.search
+(ns iwaswhere-web.ui.search
   (:require [iwaswhere-web.helpers :as h]
             [matthiasn.systems-toolbox-ui.reagent :as r]))
 

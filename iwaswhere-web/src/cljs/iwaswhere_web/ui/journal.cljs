@@ -1,9 +1,9 @@
-(ns iwaswhere-web.journal
+(ns iwaswhere-web.ui.journal
   (:require [matthiasn.systems-toolbox-ui.reagent :as r]
             [matthiasn.systems-toolbox-ui.helpers :as uh]
-            [iwaswhere-web.leaflet :as l]
-            [iwaswhere-web.markdown :as md]
-            [iwaswhere-web.media :as m]
+            [iwaswhere-web.ui.leaflet :as l]
+            [iwaswhere-web.ui.markdown :as md]
+            [iwaswhere-web.ui.media :as m]
             [clojure.set :as set]
             [clojure.string :as s]
             [cljsjs.moment]

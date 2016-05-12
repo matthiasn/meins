@@ -1,4 +1,4 @@
-(ns iwaswhere-web.markdown
+(ns iwaswhere-web.ui.markdown
   (:require [markdown.core :as md]
             [iwaswhere-web.helpers :as h]
             [clojure.string :as s]

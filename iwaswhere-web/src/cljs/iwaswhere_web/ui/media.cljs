@@ -1,4 +1,4 @@
-(ns iwaswhere-web.media)
+(ns iwaswhere-web.ui.media)
 
 (defn image-view
   "Renders image view."

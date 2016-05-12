@@ -1,8 +1,8 @@
 (ns iwaswhere-web.core
   (:require [iwaswhere-web.store :as store]
-            [iwaswhere-web.new-entry :as ne]
-            [iwaswhere-web.search :as s]
-            [iwaswhere-web.journal :as jrn]
+            [iwaswhere-web.ui.new-entry :as ne]
+            [iwaswhere-web.ui.search :as s]
+            [iwaswhere-web.ui.journal :as jrn]
             [matthiasn.systems-toolbox.switchboard :as sb]
             [matthiasn.systems-toolbox-sente.client :as sente]))
 
