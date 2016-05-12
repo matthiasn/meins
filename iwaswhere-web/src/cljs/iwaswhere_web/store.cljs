@@ -16,6 +16,7 @@
   contain information for which entries to show the map, or the edit mode."
   [put-fn]
   (let [current-query (h/query-from-search-hash)]
+    (aset js/window "onhashchange" #(put-fn [:state/get (h/query-from-search-hash)]))
     (put-fn [:state/get current-query])
     {:state (atom {:entries       []
                    :show-maps-for #{}
