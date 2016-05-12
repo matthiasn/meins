@@ -23,11 +23,10 @@
      [:cmd/route-all {:from [:client/store-cmp :client/new-entry-cmp :client/search-cmp :client/journal-cmp]
                       :to   :client/ws-cmp}]
 
-     [:cmd/route {:from :client/ws-cmp
-                  :to   :client/store-cmp}]
-     [:cmd/route {:from :client/search-cmp
-                  :to   :client/store-cmp}]
-     [:cmd/route {:from :client/journal-cmp
+     [:cmd/route {:from [:client/ws-cmp
+                         :client/new-entry-cmp
+                         :client/search-cmp
+                         :client/journal-cmp]
                   :to   :client/store-cmp}]
 
      [:cmd/observe-state {:from :client/store-cmp

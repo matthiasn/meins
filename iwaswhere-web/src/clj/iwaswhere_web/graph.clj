@@ -19,6 +19,7 @@
           entry-mentions (set (map s/lower-case (:mentions entry)))
           q-mentions (set (map s/lower-case (:mentions q)))
           match? (or (and (empty? q-tags) (empty? q-mentions))
+                     (set/subset? #{"#new-entry"} entries-and-comments-tags)
                      ; all tags are contained in entry or comment, and none of the not-tags
                      (and (set/subset? q-tags entries-and-comments-tags)
                           (empty? (set/intersection (:not-tags q) entries-and-comments-tags)))
