@@ -4,19 +4,19 @@
   :license {:name "GNU GENERAL PUBLIC LICENSE"
             :url  "http://www.gnu.org/licenses/gpl-3.0.en.html"}
   :dependencies [[org.clojure/clojure "1.8.0"]
-                 [org.clojure/clojurescript "1.8.40"]
+                 [org.clojure/clojurescript "1.8.51"]
                  [org.clojure/core.async "0.2.374"]
                  [org.clojure/tools.logging "0.3.1"]
                  [org.clojure/tools.namespace "0.2.11"]
-                 [ch.qos.logback/logback-classic "1.1.6"]
+                 [ch.qos.logback/logback-classic "1.1.7"]
                  [hiccup "1.0.5"]
                  [clj-pid "0.1.2"]
                  [clj-time "0.11.0"]
                  [me.raynes/fs "1.4.6"]
-                 [markdown-clj "0.9.86"]
-                 [cheshire "5.5.0"]
-                 [cljsjs/moment "2.10.6-3"]
-                 [cljsjs/leaflet "0.7.7-2"]
+                 [markdown-clj "0.9.89"]
+                 [cheshire "5.6.1"]
+                 [cljsjs/moment "2.10.6-4"]
+                 [cljsjs/leaflet "0.7.7-4"]
                  [com.drewnoakes/metadata-extractor "2.8.1"]
                  [ubergraph "0.2.1"]
                  [camel-snake-kebab "0.3.2"]
@@ -33,8 +33,8 @@
   :main iwaswhere-web.core
 
   :plugins [[lein-cljsbuild "1.1.3"]
-            [lein-figwheel "0.5.2"]
-            [lein-codox "0.9.4"]]
+            [lein-figwheel "0.5.3-1"]
+            [lein-codox "0.9.5"]]
 
   :figwheel {:server-port 3450
              :css-dirs    ["resources/public/css"]}

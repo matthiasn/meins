@@ -56,7 +56,7 @@
       (when-not (:comment-for entry)
         [:span.fa.fa-comment-o.toggle {:on-click (h/new-entry-fn put-fn {:comment-for ts})}])
       [:span.fa.fa-trash-o.toggle {:on-click trash-entry}]
-      (when (and temp-entry (not= entry temp-entry))
+      (when (and temp-entry (not= (dissoc entry :comments) (dissoc temp-entry :comments)))
         [:span.not-saved {:on-click save-fn} [:span.fa.fa-floppy-o] "  click to save"])]
      [hashtags-mentions-list (or temp-entry entry)]
      [l/leaflet-map entry (or show-map? show-all-maps?)]

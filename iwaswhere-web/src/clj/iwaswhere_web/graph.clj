@@ -13,7 +13,7 @@
   [q]
   (fn [entry]
     (let [entry-tags (set (map s/lower-case (:tags entry)))
-          entry-comments-tags (apply set/union (map #(:tags %) (:comments entry)))
+          entry-comments-tags (apply set/union (map :tags (:comments entry)))
           entries-and-comments-tags (set/union entry-tags entry-comments-tags)
           q-tags (set (map s/lower-case (:tags q)))
           entry-mentions (set (map s/lower-case (:mentions entry)))
@@ -30,17 +30,17 @@
   over the sorted set and extracting attributes for each node.
   Warns when node not in graph. (debugging, should never happen)"
   [current-state]
-  (into [] (map (fn [n]
-                  (let [g (:graph current-state)]
-                    (if (uber/has-node? g n)
-                      (let [attrs (uber/attrs g n)
-                            comment-edges (flatten (uber/find-edges g {:dest n :relationship :COMMENT}))
-                            comment-edges (filter #(not (:mirror? %)) comment-edges)
-                            comments (map #(uber/attrs g (:src %)) comment-edges)
-                            entry (merge attrs {:comments comments})]
-                        entry)
-                      (log/warn "Cannot find node: " n))))
-                (:sorted-entries current-state))))
+  (vec (map (fn [n]
+              (let [g (:graph current-state)]
+                (if (uber/has-node? g n)
+                  (let [attrs (uber/attrs g n)
+                        comment-edges (flatten (uber/find-edges g {:dest n :relationship :COMMENT}))
+                        comment-edges (remove :mirror? comment-edges)
+                        comments (map #(uber/attrs g (:src %)) comment-edges)
+                        entry (merge attrs {:comments comments})]
+                    entry)
+                  (log/warn "Cannot find node: " n))))
+            (:sorted-entries current-state))))
 
 (defn find-all-hashtags
   "Finds all hashtags used in entries by finding the edges that originate from the
