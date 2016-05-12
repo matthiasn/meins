@@ -1,9 +1,8 @@
 (ns iwaswhere-web.store
-  (:require [iwaswhere-web.imports :as i]
-            [iwaswhere-web.files :as f]
+  (:require [iwaswhere-web.files :as f]
             [iwaswhere-web.graph :as g]
             [ubergraph.core :as uber]
-            [clojure.pprint :as pp]))
+            [clojure.string :as s]))
 
 (defn publish-state-fn
   "Publishes current state, as filtered by the respective clients. Sends to single connected client
@@ -19,10 +18,13 @@
 
 (defn state-get-fn
   "Handler function for retrieving current state. Updates filter for connected client, and then
-  sends a message to self to publish state for this particular client."
+  sends a message to self to publish state for this particular client.
+  Removes '~' from the not-tags, which is the set of tags that shall not be contained
+  in matching entries or any of their comments."
   [{:keys [current-state msg-payload msg-meta]}]
   (let [sente-uid (:sente-uid msg-meta)
-        new-state (assoc-in current-state [:last-filter sente-uid] msg-payload)]
+        query (update-in msg-payload [:not-tags] (fn [not-tags] (set (map #(s/replace % #"~" "") not-tags))))
+        new-state (assoc-in current-state [:last-filter sente-uid] query)]
     {:new-state new-state
      :send-to-self [:state/publish-current {:sente-uid sente-uid}]}))
 

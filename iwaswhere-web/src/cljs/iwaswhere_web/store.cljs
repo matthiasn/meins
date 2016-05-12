@@ -1,4 +1,5 @@
-(ns iwaswhere-web.store)
+(ns iwaswhere-web.store
+  (:require [iwaswhere-web.helpers :as h]))
 
 (defn new-state-fn
   "Update client side state with list of journal entries received from backend."
@@ -14,12 +15,13 @@
   a map with temporary entries that are being edited but not saved yet, and sets that
   contain information for which entries to show the map, or the edit mode."
   [put-fn]
-  (put-fn [:state/get {}])
-  {:state (atom {:entries       []
-                 :show-maps-for #{}
-                 :show-edit-for #{}
-                 :new-entry-tmp {}
-                 :temp-entries  {}})})
+  (let [current-query (h/query-from-search-hash)]
+    (put-fn [:state/get current-query])
+    {:state (atom {:entries       []
+                   :show-maps-for #{}
+                   :show-edit-for #{}
+                   :current-query current-query
+                   :temp-entries  {}})}))
 
 (defn toggle-set
   "Toggles for example the visibility of a map or the edit mode for an individual
@@ -40,11 +42,12 @@
         new-state (assoc-in current-state [:temp-entries timestamp] updated)]
     {:new-state new-state}))
 
-(defn save-temp-entry
+(defn save-query
   "Handler function for storing new entry being written. Useful e.g. for filtering
   hashtags."
   [{:keys [current-state msg-payload]}]
-  (let [new-state (assoc-in current-state [:new-entry-tmp] msg-payload)]
+  (let [new-state (assoc-in current-state [:current-query] msg-payload)]
+    (aset js/window "location" "hash" (js/encodeURIComponent (:search-text msg-payload)))
     {:new-state new-state}))
 
 (defn cmp-map
@@ -53,5 +56,5 @@
    :state-fn    initial-state-fn
    :handler-map {:state/new          new-state-fn
                  :cmd/toggle         toggle-set
-                 :new-entry/tmp-save save-temp-entry
+                 :state/get          save-query
                  :update/temp-entry  update-temp-entry}})

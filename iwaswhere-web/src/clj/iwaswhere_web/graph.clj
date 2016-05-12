@@ -140,4 +140,3 @@
   (-> current-state
       (update-in [:graph] #(uber/remove-nodes % ts))
       (update-in [:sorted-entries] disj ts)))
-
