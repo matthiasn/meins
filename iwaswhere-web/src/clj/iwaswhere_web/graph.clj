@@ -1,6 +1,5 @@
 (ns iwaswhere-web.graph
   (:require [ubergraph.core :as uber]
-            [clojure.pprint :as pp]
             [clj-time.coerce :as ctc]
             [clj-time.core :as ct]
             [clojure.string :as s]
@@ -36,8 +35,10 @@
                 (if (uber/has-node? g n)
                   (let [attrs (uber/attrs g n)
                         comment-edges (flatten (uber/find-edges g {:dest n :relationship :COMMENT}))
-                        comment-edges (remove :mirror? comment-edges)
-                        comments (map #(uber/attrs g (:src %)) comment-edges)
+                        comments (->> comment-edges
+                                      (remove :mirror?)
+                                      (map #(uber/attrs g (:src %)))
+                                      (sort-by :timestamp))
                         entry (merge attrs {:comments comments})]
                     entry)
                   (log/warn "Cannot find node: " n))))
