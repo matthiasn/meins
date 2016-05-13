@@ -2,6 +2,15 @@
   (:require [iwaswhere-web.helpers :as h]
             [matthiasn.systems-toolbox-ui.reagent :as r]))
 
+(defn tags
+  "Renders horizontal list of tags."
+  [store-snapshot k css-class]
+  (let [tags (k (:current-query store-snapshot))]
+    [:div.hashtags (when (seq tags)
+                     (for [tag tags]
+                       ^{:key (str css-class "-" tag)}
+                       [:span.float-left {:class css-class} tag]))]))
+
 (defn search-view
   "Renders search component."
   [{:keys [observed put-fn]}]
@@ -9,21 +18,9 @@
         on-change-fn #(put-fn [:state/get (h/parse-search (.. % -target -value))])]
     [:div.l-box-lrg.pure-g
      [:div.pure-u-1
-      (let [tags (:tags (:current-query store-snapshot))]
-        [:div.hashtags (when (seq tags)
-                         (for [hashtag tags]
-                           ^{:key (str "tag-" hashtag)}
-                           [:span.hashtag.float-left hashtag]))])
-      (let [tags (:not-tags (:current-query store-snapshot))]
-        [:div.hashtags (when (seq tags)
-                         (for [hashtag tags]
-                           ^{:key (str "tag-" hashtag)}
-                           [:span.hashtag.float-left.not-tag hashtag]))])
-      (let [mentions (:mentions (:current-query store-snapshot))]
-        [:div.hashtags (when (seq mentions)
-                         (for [mention mentions]
-                           ^{:key (str "tag-" mention)}
-                           [:span.mention.float-left mention]))])
+      [tags store-snapshot :tags "hashtag"]
+      [tags store-snapshot :not-tags "hashtag not-tag"]
+      [tags store-snapshot :mentions "mention"]
       [:div.textentry
        [:textarea {:type      "text"
                    :on-change on-change-fn
