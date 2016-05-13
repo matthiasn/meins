@@ -4,27 +4,30 @@
 
 (defn search-view
   "Renders search component."
-  [{:keys [local observed put-fn]}]
+  [{:keys [observed put-fn]}]
   (let [store-snapshot @observed
-        on-change-fn #(let [query (h/parse-search (.. % -target -value))]
-                       (swap! local assoc-in [:entry] query)
-                       (put-fn [:state/get query]))]
+        on-change-fn #(put-fn [:state/get (h/parse-search (.. % -target -value))])]
     [:div.l-box-lrg.pure-g
      [:div.pure-u-1
-      (let [tags (:tags (:entry @local))]
+      (let [tags (:tags (:current-query store-snapshot))]
         [:div.hashtags (when (seq tags)
                          (for [hashtag tags]
                            ^{:key (str "tag-" hashtag)}
                            [:span.hashtag.float-left hashtag]))])
-      (let [tags (:not-tags (:entry @local))]
+      (let [tags (:not-tags (:current-query store-snapshot))]
         [:div.hashtags (when (seq tags)
                          (for [hashtag tags]
                            ^{:key (str "tag-" hashtag)}
                            [:span.hashtag.float-left.not-tag hashtag]))])
+      (let [mentions (:mentions (:current-query store-snapshot))]
+        [:div.hashtags (when (seq mentions)
+                         (for [mention mentions]
+                           ^{:key (str "tag-" mention)}
+                           [:span.mention.float-left mention]))])
       [:div.textentry
-       [:textarea {:type "text"
+       [:textarea {:type      "text"
                    :on-change on-change-fn
-                   :value (:search-text (:current-query store-snapshot))}]]]]))
+                   :value     (:search-text (:current-query store-snapshot))}]]]]))
 
 (defn cmp-map
   [cmp-id]
