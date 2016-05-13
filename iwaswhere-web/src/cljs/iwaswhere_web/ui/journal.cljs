@@ -4,6 +4,7 @@
             [iwaswhere-web.ui.leaflet :as l]
             [iwaswhere-web.ui.markdown :as md]
             [iwaswhere-web.ui.media :as m]
+            [reagent.core :as rc]
             [clojure.set :as set]
             [clojure.string :as s]
             [cljsjs.moment]
@@ -39,31 +40,29 @@
   for displaying updated hashtags, or also for showing the warning that the entry is not
   saved yet."
   [entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags?]
-  (let [ts (:timestamp entry)
-        map? (:latitude entry)
-        temp-entry (get-in store-snapshot [:temp-entries ts])
-        show-map? (contains? (:show-maps-for store-snapshot) ts)
-        editable? (contains? (:show-edit-for store-snapshot) ts)
-        toggle-map #(put-fn [:cmd/toggle {:timestamp ts :key :show-maps-for}])
-        toggle-edit #(put-fn [:cmd/toggle {:timestamp ts :key :show-edit-for}])
-        trash-entry #(put-fn [:cmd/trash {:timestamp ts}])
-        save-fn #(put-fn [:text-entry/update temp-entry])]
-    [:div.entry
-     [:div.entry-header
-      [:span.timestamp (.format (js/moment ts) "MMMM Do YYYY, h:mm:ss a")]
-      (when map? [:span.fa.fa-map-o.toggle {:on-click toggle-map}])
-      [:span.fa.fa-pencil-square-o.toggle {:on-click toggle-edit}]
-      (when-not (:comment-for entry)
-        [:span.fa.fa-comment-o.toggle {:on-click (h/new-entry-fn put-fn {:comment-for ts})}])
-      [:span.fa.fa-trash-o.toggle {:on-click trash-entry}]
-      (when (and temp-entry (not= (dissoc entry :comments) (dissoc temp-entry :comments)))
-        [:span.not-saved {:on-click save-fn} [:span.fa.fa-floppy-o] "  click to save"])]
-     [hashtags-mentions-list (or temp-entry entry)]
-     [l/leaflet-map entry (or show-map? show-all-maps?)]
-     [md/md-render entry temp-entry hashtags mentions put-fn editable? show-tags?]
-     [m/image-view entry]
-     [m/audioplayer-view entry]
-     [m/videoplayer-view entry]]))
+  (let [local (rc/atom {:edit-mode (contains? (:tags entry) "#new-entry")})]
+    (fn
+      [entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags?]
+      (let [ts (:timestamp entry)
+            map? (:latitude entry)
+            show-map? (contains? (:show-maps-for store-snapshot) ts)
+            toggle-map #(put-fn [:cmd/toggle {:timestamp ts :key :show-maps-for}])
+            toggle-edit #(swap! local update-in [:edit-mode] not)
+            trash-entry #(put-fn [:cmd/trash {:timestamp ts}])]
+        [:div.entry
+         [:div.entry-header
+          [:span.timestamp (.format (js/moment ts) "MMMM Do YYYY, h:mm:ss a")]
+          (when map? [:span.fa.fa-map-o.toggle {:on-click toggle-map}])
+          [:span.fa.fa-pencil-square-o.toggle {:on-click toggle-edit}]
+          (when-not (:comment-for entry)
+            [:span.fa.fa-comment-o.toggle {:on-click (h/new-entry-fn put-fn {:comment-for ts})}])
+          [:span.fa.fa-trash-o.toggle {:on-click trash-entry}]]
+         [hashtags-mentions-list entry]
+         [l/leaflet-map entry (or show-map? show-all-maps?)]
+         [md/md-render entry hashtags mentions put-fn (:edit-mode @local) toggle-edit show-tags?]
+         [m/image-view entry]
+         [m/audioplayer-view entry]
+         [m/videoplayer-view entry]]))))
 
 (defn journal-entry2
   "Renders individual journal entry. Interaction with application state happens via
@@ -106,8 +105,7 @@
       [:span.fa.fa-user-secret.toggle-map.pull-right {:class (when-not show-pvt? "inactive") :on-click toggle-pvt}]
       [:hr]
       (for [entry (if show-pvt? entries (filter pvt-filter entries))]
-        (let [ts (:timestamp entry)
-              editable? (contains? (:show-edit-for store-snapshot) ts)]
+        (let [editable? (contains? (:tags entry) "#new-entry")]
           (when (and (not (:comment-for entry)) (or editable? show-context?))
             ^{:key (:timestamp entry)}
             [journal-entry2 entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-pvt?])))

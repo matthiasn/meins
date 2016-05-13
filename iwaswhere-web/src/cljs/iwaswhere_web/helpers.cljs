@@ -32,7 +32,6 @@
     (let [ts (st/now)
           entry (merge (parse-entry "...") {:timestamp ts :tags #{"#new-entry"}} opts)]
       (put-fn [:geo-entry/persist entry])
-      (put-fn [:cmd/toggle {:timestamp ts :key :show-edit-for}])
       (send-w-geolocation entry put-fn))))
 
 (defn parse-search

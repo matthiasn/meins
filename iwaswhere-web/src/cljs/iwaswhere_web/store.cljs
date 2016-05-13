@@ -17,7 +17,6 @@
   [_put-fn]
   {:state (atom {:entries       []
                  :show-maps-for #{}
-                 :show-edit-for #{}
                  :temp-entries  {}})})
 
 (defn toggle-set
@@ -31,19 +30,10 @@
                     (update-in current-state [k] conj timestamp))]
     {:new-state new-state}))
 
-(defn update-temp-entry
-  "Handler function, receives updated/modified entry and stores it in :temp-entries
-  of the application state under the timestamp key."
-  [{:keys [current-state msg-payload]}]
-  (let [{:keys [timestamp updated]} msg-payload
-        new-state (assoc-in current-state [:temp-entries timestamp] updated)]
-    {:new-state new-state}))
-
 (defn cmp-map
   "Creates map for the component which holds the client-side application state."
   [cmp-id]
   {:cmp-id      cmp-id
    :state-fn    initial-state-fn
    :handler-map {:state/new          new-state-fn
-                 :cmd/toggle         toggle-set
-                 :update/temp-entry  update-temp-entry}})
+                 :cmd/toggle         toggle-set}})
