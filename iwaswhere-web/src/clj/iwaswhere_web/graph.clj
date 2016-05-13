@@ -1,4 +1,6 @@
 (ns iwaswhere-web.graph
+  "this namespace manages interactions with the graph data structure, which
+  holds all entries and their connections."
   (:require [ubergraph.core :as uber]
             [clj-time.coerce :as ctc]
             [clj-time.core :as ct]

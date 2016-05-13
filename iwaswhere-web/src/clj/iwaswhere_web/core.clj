@@ -1,4 +1,6 @@
 (ns iwaswhere-web.core
+  "In this namespace, the individual components are initialized and wired
+  together to form the backend system."
   (:gen-class)
   (:require [matthiasn.systems-toolbox.switchboard :as sb]
             [matthiasn.systems-toolbox-sente.server :as sente]

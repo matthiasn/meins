@@ -1,4 +1,6 @@
 (ns iwaswhere-web.index
+  "This namespace takes care of rendering the static HTML into which the React / Reagent
+  components are mounted on the client side at runtime."
   (:require [hiccup.core :refer [html]]
             [compojure.route :as r]))
 
@@ -38,5 +40,6 @@
    (r/files "/videos" {:root "data/videos/"})])
 
 (def sente-map
+  "Configuration map for sente-cmp."
   {:index-page-fn index-page
    :routes-fn     routes-fn})

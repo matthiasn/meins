@@ -1,4 +1,5 @@
 (ns iwaswhere-web.keepalive
+  "This namespace is concerned with the server side of the connection keepalive mechanism."
   (:require [matthiasn.systems-toolbox.scheduler :as sched]
             [matthiasn.systems-toolbox.switchboard :as sb]))
 

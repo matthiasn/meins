@@ -1,4 +1,9 @@
 (ns iwaswhere-web.files
+  "This namespace takes care of persisting new entries to the log files.
+  All changes to the graph data structure are appended to a daily log.
+  Then later on application startup, all these state changes can be
+  replayed to recreate the application state. This mechanism is inspired
+  by Event Sourcing (http://martinfowler.com/eaaDev/EventSourcing.html)."
   (:require [iwaswhere-web.graph :as g]
             [clj-time.core :as time]
             [clj-time.format :as timef]

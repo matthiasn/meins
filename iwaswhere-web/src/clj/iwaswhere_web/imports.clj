@@ -179,6 +179,7 @@
              (catch Exception ex (log/error (str "Error while importing " filename) ex)))))))
 
 (defn cmp-map
+  "Generates component map for imports-cmp."
   [cmp-id]
   {:cmp-id      cmp-id
    :handler-map {:import/photos import-media

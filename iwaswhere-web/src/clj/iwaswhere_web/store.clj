@@ -1,4 +1,6 @@
 (ns iwaswhere-web.store
+  "This namespace contains the functions necessary to instantiate the store-cmp,
+  which then holds the server side application state."
   (:require [iwaswhere-web.files :as f]
             [iwaswhere-web.graph :as g]
             [ubergraph.core :as uber]
@@ -56,6 +58,7 @@
       {:state state})))
 
 (defn cmp-map
+  "Generates component map for state-cmp."
   [cmp-id]
   {:cmp-id      cmp-id
    :state-fn    (state-fn "./data/daily-logs")
