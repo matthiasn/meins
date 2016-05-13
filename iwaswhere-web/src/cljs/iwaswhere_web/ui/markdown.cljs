@@ -52,10 +52,7 @@
             md-string (or (:md @local-display-entry) "edit here")
             ts (:timestamp entry)
             get-content #(aget (.. % -target -parentElement -parentElement -firstChild -firstChild) "innerText")
-            update-temp-fn (fn [ev]
-                             (let [cursor-pos {:cursor-pos (.-anchorOffset (.getSelection js/window))}
-                                   updated (with-meta (merge latest-entry (h/parse-entry (get-content ev))) cursor-pos)]
-                               (reset! local-saved-entry updated)))
+            update-temp-fn #(reset! local-saved-entry (merge latest-entry (h/parse-entry (get-content %))))
             save-fn #(put-fn [:text-entry/update @local-saved-entry])
             on-keydown-fn (fn [ev] (let [key-code (.. ev -keyCode)
                                          meta-key (.. ev -metaKey)]
@@ -74,9 +71,12 @@
                        :on-input         update-temp-fn
                        :on-key-down      on-keydown-fn}
                 md-string]]
-         (let [cursor-pos (.-anchorOffset (.getSelection js/window))
+         (let [selection (.getSelection js/window)
+               cursor-pos (.-anchorOffset selection)
+               anchor-node (aget selection "anchorNode")
+               node-value (str (when anchor-node (aget anchor-node "nodeValue")) "")
                md (:md @local-saved-entry)
-               before-cursor (subs md 0 cursor-pos)
+               before-cursor (subs node-value 0 cursor-pos)
                current-tag (re-find (js/RegExp. "(?!^)#[\\w\\-\\u00C0-\\u017F]+$" "m") before-cursor)
                current-tag-regex (js/RegExp. current-tag "i")
                tag-substr-filter (fn [tag] (when current-tag (re-find current-tag-regex tag)))
