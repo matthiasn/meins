@@ -2,8 +2,8 @@
   (:gen-class)
   (:require [matthiasn.systems-toolbox.switchboard :as sb]
             [matthiasn.systems-toolbox-sente.server :as sente]
-            [matthiasn.systems-toolbox.scheduler :as sched]
             [iwaswhere-web.index :as index]
+            [iwaswhere-web.keepalive :as ka]
             [clojure.tools.logging :as log]
             [clj-pid.core :as pid]
             [io.aviso.logging :as pretty]
@@ -22,23 +22,16 @@
   Then, routes messages to the store and imports components for which those have a
   handler function. Also route messages from imports to store component.
   Finally, send all messages from store component to client via the ws component."
-  []
+  [switchboard]
   (sb/send-mult-cmd
     switchboard
     [[:cmd/init-comp (sente/cmp-map :server/ws-cmp index/sente-map)]
      [:cmd/init-comp (i/cmp-map :server/imports-cmp)]
      [:cmd/init-comp (st/cmp-map :server/store-cmp)]
-     [:cmd/init-comp (sched/cmp-map :server/scheduler-cmp)]
      [:cmd/route {:from :server/ws-cmp :to :server/store-cmp}]
      [:cmd/route {:from :server/ws-cmp :to :server/imports-cmp}]
      [:cmd/route {:from :server/imports-cmp :to :server/store-cmp}]
-     [:cmd/route-all {:from [:server/store-cmp] :to :server/ws-cmp}]
-     [:cmd/send {:to  :server/scheduler-cmp
-                 :msg [:cmd/schedule-new {:timeout 5000
-                                          :message [:cmd/query-gc]
-                                          :repeat true
-                                          :initial true}]}]
-     [:cmd/route {:from :server/scheduler-cmp :to :server/store-cmp}]]))
+     [:cmd/route-all {:from [:server/store-cmp] :to :server/ws-cmp}]]))
 
 (defn -main
   "Starts the application from command line, saves and logs process ID. The system that is fired up when
@@ -48,5 +41,6 @@
   (pid/save "iwaswhere.pid")
   (pid/delete-on-shutdown! "iwaswhere.pid")
   (log/info "Application started, PID" (pid/current))
-  (restart!)
+  (restart! switchboard)
+  (ka/restart-keepalive! switchboard)
   (Thread/sleep Long/MAX_VALUE))
