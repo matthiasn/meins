@@ -9,22 +9,27 @@
             [clojure.tools.logging :as log]))
 
 (defn entries-filter-fn
-  "Creates a filter function which ensures that all tags in the query are contained in
-  the filtered entry, and none of the not-tags."
+  "Creates a filter function which ensures that all tags and mentions in the query are
+  contained in the filtered entry or any of it's comments, and none of the not-tags."
   [q]
   (fn [entry]
-    (let [entry-tags (set (map s/lower-case (:tags entry)))
-          entry-comments-tags (apply set/union (map :tags (:comments entry)))
-          entries-and-comments-tags (set/union entry-tags entry-comments-tags)
-          q-tags (set (map s/lower-case (:tags q)))
-          entry-mentions (set (map s/lower-case (:mentions entry)))
+    (let [q-tags (set (map s/lower-case (:tags q)))
+          q-not-tags (set (map s/lower-case (:not-tags q)))
           q-mentions (set (map s/lower-case (:mentions q)))
-          match? (or (and (empty? q-tags) (empty? q-mentions))
-                     (set/subset? #{"#new-entry"} entries-and-comments-tags)
-                     ; all tags are contained in entry or comment, and none of the not-tags
-                     (and (set/subset? q-tags entries-and-comments-tags)
-                          (empty? (set/intersection (:not-tags q) entries-and-comments-tags)))
-                     (seq (set/intersection q-mentions entry-mentions)))]
+
+          entry-tags (set (map s/lower-case (:tags entry)))
+          entry-comments-tags (apply set/union (map :tags (:comments entry)))
+          tags (set (map s/lower-case (set/union entry-tags entry-comments-tags)))
+
+          entry-mentions (set (map s/lower-case (:mentions entry)))
+          entry-comments-mentions (apply set/union (map :mentions (:comments entry)))
+          mentions (set (map s/lower-case (set/union entry-mentions entry-comments-mentions)))
+
+          match? (or (set/subset? #{"#new-entry"} tags)
+                     (and (set/subset? q-tags tags)
+                          (empty? (set/intersection q-not-tags tags))
+                          (or (empty? q-mentions)
+                              (seq (set/intersection q-mentions mentions)))))]
       match?)))
 
 (defn extract-sorted-entries
