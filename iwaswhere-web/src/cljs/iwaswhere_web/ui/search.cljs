@@ -34,9 +34,10 @@
   "Initializes listener for location hash changes, which alters local component state with
   the latest query on change, plus sends query to backend."
   [{:keys [local put-fn]}]
-  (let [hash-change-fn #(let [current-query (h/query-from-search-hash)]
-                         (swap! local assoc-in [:current-query] current-query)
-                         (put-fn [:state/get current-query]))]
+  (let [hash-change-fn #(let [new-query (h/query-from-search-hash)]
+                         (when (not= new-query (:current-query @local))
+                           (swap! local assoc-in [:current-query] new-query)
+                           (put-fn [:state/get new-query])))]
     (aset js/window "onhashchange" hash-change-fn)
     (hash-change-fn)))
 

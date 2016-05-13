@@ -28,6 +28,6 @@
   [{:keys [current-state]}]
   (let [last-filters (:last-filter current-state)
         last-acceptable-ts (- (System/currentTimeMillis) 10000)
-        alive-filters (into {} (filter (fn [[k v]] (> (:last-seen v) last-acceptable-ts)) last-filters))
+        alive-filters (into {} (filter (fn [[_k v]] (> (:last-seen v) last-acceptable-ts)) last-filters))
         new-state (assoc-in current-state [:last-filter] alive-filters)]
     {:new-state new-state}))

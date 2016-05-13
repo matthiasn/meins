@@ -24,7 +24,9 @@
   in matching entries or any of their comments."
   [{:keys [current-state msg-payload msg-meta]}]
   (let [sente-uid (:sente-uid msg-meta)
-        query (update-in msg-payload [:not-tags] (fn [not-tags] (set (map #(s/replace % #"~" "") not-tags))))
+        query (-> msg-payload
+                  (update-in [:not-tags] (fn [not-tags] (set (map #(s/replace % #"~" "") not-tags))))
+                  (assoc-in [:last-seen] (System/currentTimeMillis)))
         new-state (assoc-in current-state [:last-filter sente-uid] query)]
     {:new-state new-state
      :send-to-self [:state/publish-current {:sente-uid sente-uid}]}))

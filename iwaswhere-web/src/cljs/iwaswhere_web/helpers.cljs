@@ -46,8 +46,7 @@
     {:search-text text
      :tags        tags
      :not-tags    not-tags
-     :mentions    mentions
-     :last-seen   (st/now)}))
+     :mentions    mentions}))
 
 (defn query-from-search-hash
   "Get query from location hash for current page."
