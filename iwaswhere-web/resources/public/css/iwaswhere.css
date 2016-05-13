@@ -369,6 +369,10 @@ button {
     min-height: 60px;
 }
 
+.entry pre {
+    min-height: 22px;
+}
+
 .entry .mention-link {
     font-style: italic;
     color: #007d4e;
