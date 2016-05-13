@@ -14,17 +14,11 @@
   "Creates the initial component state atom. Holds a list of entries from the backend,
   a map with temporary entries that are being edited but not saved yet, and sets that
   contain information for which entries to show the map, or the edit mode."
-  [put-fn]
-  (let [initial-state {:state (atom {:entries       []
-                                     :show-maps-for #{}
-                                     :show-edit-for #{}
-                                     :temp-entries  {}})}
-        hash-change-fn #(let [current-query (h/query-from-search-hash)]
-                         (swap! (:state initial-state) assoc-in [:current-query] current-query)
-                         (put-fn [:state/get current-query]))]
-    (aset js/window "onhashchange" hash-change-fn)
-    (hash-change-fn)
-    initial-state))
+  [_put-fn]
+  {:state (atom {:entries       []
+                 :show-maps-for #{}
+                 :show-edit-for #{}
+                 :temp-entries  {}})})
 
 (defn toggle-set
   "Toggles for example the visibility of a map or the edit mode for an individual
@@ -45,14 +39,6 @@
         new-state (assoc-in current-state [:temp-entries timestamp] updated)]
     {:new-state new-state}))
 
-(defn save-query
-  "Handler function for storing new entry being written. Useful e.g. for filtering
-  hashtags."
-  [{:keys [current-state msg-payload]}]
-  (let [new-state (assoc-in current-state [:current-query] msg-payload)]
-    (aset js/window "location" "hash" (js/encodeURIComponent (:search-text msg-payload)))
-    {:new-state new-state}))
-
 (defn cmp-map
   "Creates map for the component which holds the client-side application state."
   [cmp-id]
@@ -60,5 +46,4 @@
    :state-fn    initial-state-fn
    :handler-map {:state/new          new-state-fn
                  :cmd/toggle         toggle-set
-                 :state/get          save-query
                  :update/temp-entry  update-temp-entry}})

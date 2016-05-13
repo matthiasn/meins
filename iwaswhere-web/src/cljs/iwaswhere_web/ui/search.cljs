@@ -4,8 +4,8 @@
 
 (defn tags
   "Renders horizontal list of tags."
-  [store-snapshot k css-class]
-  (let [tags (k (:current-query store-snapshot))]
+  [state-snapshot k css-class]
+  (let [tags (k (:current-query state-snapshot))]
     [:div.hashtags (when (seq tags)
                      (for [tag tags]
                        ^{:key (str css-class "-" tag)}
@@ -13,21 +13,36 @@
 
 (defn search-view
   "Renders search component."
-  [{:keys [observed put-fn]}]
+  [{:keys [observed local put-fn]}]
   (let [store-snapshot @observed
-        on-change-fn #(put-fn [:state/get (h/parse-search (.. % -target -value))])]
+        local-snapshot @local
+        on-change-fn #(let [new-search (h/parse-search (.. % -target -value))]
+                       (swap! local assoc-in [:current-query] new-search)
+                       (aset js/window "location" "hash" (js/encodeURIComponent (:search-text new-search)))
+                       (put-fn [:state/get new-search]))]
     [:div.l-box-lrg.pure-g
      [:div.pure-u-1
-      [tags store-snapshot :tags "hashtag"]
-      [tags store-snapshot :not-tags "hashtag not-tag"]
-      [tags store-snapshot :mentions "mention"]
+      [tags local-snapshot :tags "hashtag"]
+      [tags local-snapshot :not-tags "hashtag not-tag"]
+      [tags local-snapshot :mentions "mention"]
       [:div.textentry
        [:textarea {:type      "text"
                    :on-change on-change-fn
-                   :value     (:search-text (:current-query store-snapshot))}]]]]))
+                   :value     (:search-text (:current-query local-snapshot))}]]]]))
+
+(defn init-fn
+  "Initializes listener for location hash changes, which alters local component state with
+  the latest query on change, plus sends query to backend."
+  [{:keys [local put-fn]}]
+  (let [hash-change-fn #(let [current-query (h/query-from-search-hash)]
+                         (swap! local assoc-in [:current-query] current-query)
+                         (put-fn [:state/get current-query]))]
+    (aset js/window "onhashchange" hash-change-fn)
+    (hash-change-fn)))
 
 (defn cmp-map
   [cmp-id]
   (r/cmp-map {:cmp-id  cmp-id
+              :init-fn init-fn
               :view-fn search-view
               :dom-id  "search"}))
