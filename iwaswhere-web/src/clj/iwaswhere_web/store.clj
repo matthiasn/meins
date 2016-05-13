@@ -28,6 +28,22 @@
     {:new-state new-state
      :send-to-self [:state/publish-current {:sente-uid sente-uid}]}))
 
+(defn keepalive-fn
+  "Mark client in the stored queries as recently seen to prevent it from garbage collection."
+  [{:keys [current-state msg-meta]}]
+  (let [sente-uid (:sente-uid msg-meta)
+        new-state (assoc-in current-state [:last-filter sente-uid :last-seen] (System/currentTimeMillis))]
+    {:new-state new-state}))
+
+(defn query-gc-fn
+  "Garbage collect queries whose corresponding client has not recently sent a keepalive message."
+  [{:keys [current-state]}]
+  (let [last-filters (:last-filter current-state)
+        last-acceptable-ts (- (System/currentTimeMillis) 10000)
+        alive-filters (into {} (filter (fn [[k v]] (> (:last-seen v) last-acceptable-ts)) last-filters))
+        new-state (assoc-in current-state [:last-filter] alive-filters)]
+    {:new-state new-state}))
+
 (defn state-fn
   "Initial state function, creates state atom and then parses all files in
   data directory into the component state.
@@ -60,4 +76,6 @@
                  :text-entry/update     f/geo-entry-persist-fn
                  :state/publish-current publish-state-fn
                  :cmd/trash             f/trash-entry-fn
-                 :state/get             state-get-fn}})
+                 :state/get             state-get-fn
+                 :cmd/keep-alive        keepalive-fn
+                 :cmd/query-gc          query-gc-fn}})

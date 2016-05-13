@@ -4,7 +4,8 @@
             [iwaswhere-web.ui.search :as s]
             [iwaswhere-web.ui.journal :as jrn]
             [matthiasn.systems-toolbox.switchboard :as sb]
-            [matthiasn.systems-toolbox-sente.client :as sente]))
+            [matthiasn.systems-toolbox-sente.client :as sente]
+            [matthiasn.systems-toolbox.scheduler :as sched]))
 
 (enable-console-print!)
 
@@ -31,6 +32,15 @@
 
      [:cmd/observe-state {:from :client/store-cmp
                           :to   [:client/journal-cmp
-                                 :client/search-cmp]}]]))
+                                 :client/search-cmp]}]
+
+     [:cmd/init-comp (sched/cmp-map :client/scheduler-cmp)]  ; Scheduler component
+     [:cmd/send {:to  :client/scheduler-cmp
+                 :msg [:cmd/schedule-new {:timeout 5000
+                                          :message [:cmd/keep-alive]
+                                          :repeat true
+                                          :initial true}]}]
+     [:cmd/route-all {:from :client/scheduler-cmp
+                      :to   :client/ws-cmp}]]))
 
 (init (sente/cmp-map :client/ws-cmp))

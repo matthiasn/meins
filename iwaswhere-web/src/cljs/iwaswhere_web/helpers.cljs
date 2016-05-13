@@ -44,9 +44,10 @@
         not-tags (re-seq (js/RegExp. "#~[\\w\\-\\u00C0-\\u017F]+" "m") text)
         mentions (set (re-seq (js/RegExp. "@[\\w\\-\\u00C0-\\u017F]+" "m") text))]
     {:search-text text
-     :tags     tags
-     :not-tags not-tags
-     :mentions mentions}))
+     :tags        tags
+     :not-tags    not-tags
+     :mentions    mentions
+     :last-seen   (st/now)}))
 
 (defn query-from-search-hash
   "Get query from location hash for current page."

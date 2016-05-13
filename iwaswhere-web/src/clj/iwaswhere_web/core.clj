@@ -2,6 +2,7 @@
   (:gen-class)
   (:require [matthiasn.systems-toolbox.switchboard :as sb]
             [matthiasn.systems-toolbox-sente.server :as sente]
+            [matthiasn.systems-toolbox.scheduler :as sched]
             [iwaswhere-web.index :as index]
             [clojure.tools.logging :as log]
             [clj-pid.core :as pid]
@@ -27,10 +28,17 @@
     [[:cmd/init-comp (sente/cmp-map :server/ws-cmp index/sente-map)]
      [:cmd/init-comp (i/cmp-map :server/imports-cmp)]
      [:cmd/init-comp (st/cmp-map :server/store-cmp)]
+     [:cmd/init-comp (sched/cmp-map :server/scheduler-cmp)]
      [:cmd/route {:from :server/ws-cmp :to :server/store-cmp}]
      [:cmd/route {:from :server/ws-cmp :to :server/imports-cmp}]
      [:cmd/route {:from :server/imports-cmp :to :server/store-cmp}]
-     [:cmd/route-all {:from [:server/store-cmp] :to :server/ws-cmp}]]))
+     [:cmd/route-all {:from [:server/store-cmp] :to :server/ws-cmp}]
+     [:cmd/send {:to  :server/scheduler-cmp
+                 :msg [:cmd/schedule-new {:timeout 5000
+                                          :message [:cmd/query-gc]
+                                          :repeat true
+                                          :initial true}]}]
+     [:cmd/route {:from :server/scheduler-cmp :to :server/store-cmp}]]))
 
 (defn -main
   "Starts the application from command line, saves and logs process ID. The system that is fired up when
