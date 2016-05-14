@@ -65,7 +65,9 @@
                                        ;(put-fn [:text-entry/update temp-entry])
                                        (prn key-code)
                                        (.preventDefault ev))))]
-        (when-not (= @last-saved latest-entry) (reset! last-saved latest-entry))
+        (when-not (= @last-saved latest-entry) (reset! last-saved latest-entry)
+                                               (reset! local-display-entry latest-entry)
+                                               (reset! local-saved-entry latest-entry))
         [:div.edit-md
          [:pre [:code {:content-editable true
                        :on-input         update-temp-fn
