@@ -14,12 +14,14 @@
                  (merge data {:latitude  (.-latitude coords)
                               :longitude (.-longitude coords)})])))))
 
+(def tag-char-class "[\\w\\-\\u00C0-\\u017F]")
+
 (defn parse-entry
   "Parses entry for hashtags and mentions. Either can consist of any of the word characters, dashes
   and unicode characters that for example comprise German 'Umlaute'."
   [text]
-  (let [tags (set (re-seq (js/RegExp. "(?!^)#[\\w\\-\\u00C0-\\u017F]+" "m") text))
-        mentions (set (re-seq (js/RegExp. "@[\\w\\-\\u00C0-\\u017F]+" "m") text))]
+  (let [tags (set (re-seq (js/RegExp. (str "(?!^)#" tag-char-class "+") "m") text))
+        mentions (set (re-seq (js/RegExp. (str "@" tag-char-class "+") "m") text))]
     {:md        text
      :tags      tags
      :mentions  mentions}))
@@ -39,9 +41,9 @@
   Such hashtags can for now be marked like this: #~done. Finding tasks that are not done, which don't have #done
   in either the entry or any of its comments, can be found like this: #task #~done"
   [text]
-  (let [tags (set (re-seq (js/RegExp. "#[\\w\\-\\u00C0-\\u017F]+" "m") text))
-        not-tags (re-seq (js/RegExp. "#~[\\w\\-\\u00C0-\\u017F]+" "m") text)
-        mentions (set (re-seq (js/RegExp. "@[\\w\\-\\u00C0-\\u017F]+" "m") text))]
+  (let [tags (set (re-seq (js/RegExp. (str "#" tag-char-class "+") "m") text))
+        not-tags (re-seq (js/RegExp. (str "#~" tag-char-class "+") "m") text)
+        mentions (set (re-seq (js/RegExp. (str "@" tag-char-class "+") "m") text))]
     {:search-text text
      :tags        tags
      :not-tags    not-tags

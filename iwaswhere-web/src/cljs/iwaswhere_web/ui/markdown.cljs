@@ -79,17 +79,18 @@
                node-value (str (when anchor-node (aget anchor-node "nodeValue")) "")
                md (:md @local-saved-entry)
                before-cursor (subs node-value 0 cursor-pos)
-               current-tag (re-find (js/RegExp. "(?!^)#[\\w\\-\\u00C0-\\u017F]+$" "m") before-cursor)
+               current-tag (re-find (js/RegExp. (str "(?!^)#" h/tag-char-class "+$") "m") before-cursor)
                current-tag-regex (js/RegExp. current-tag "i")
                tag-substr-filter (fn [tag] (when current-tag (re-find current-tag-regex tag)))
-               current-mention (re-find (js/RegExp. "@[\\w\\-\\u00C0-\\u017F]+$" "m") before-cursor)
+               current-mention (re-find (js/RegExp. (str "@" h/tag-char-class  "+$") "m") before-cursor)
                current-mention-regex (js/RegExp. current-mention "i")
                mention-substr-filter (fn [mention] (when current-mention (re-find current-mention-regex mention)))]
            [:div.suggestions
             (for [tag (filter tag-substr-filter hashtags)]
               ^{:key (str ts tag)}
               [:div
-               {:on-click #(let [updated (merge entry (h/parse-entry (s/replace md current-tag tag)))]
+               {:on-click #(let [curr-tag-regex (js/RegExp (str current-tag "(?!" h/tag-char-class ")") "i")
+                                 updated (merge entry (h/parse-entry (s/replace md curr-tag-regex tag)))]
                             (reset! local-saved-entry updated)
                             (reset! local-display-entry updated))}
                [:span.hashtag tag]])
