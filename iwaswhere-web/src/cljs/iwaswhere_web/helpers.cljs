@@ -32,7 +32,7 @@
   [put-fn opts]
   (fn [_ev]
     (let [ts (st/now)
-          entry (merge (parse-entry " ") {:timestamp ts :tags #{"#new-entry"}} opts)]
+          entry (merge (parse-entry "") {:timestamp ts :tags #{"#new-entry"}} opts)]
       (put-fn [:geo-entry/persist entry])
       (send-w-geolocation entry put-fn))))
 

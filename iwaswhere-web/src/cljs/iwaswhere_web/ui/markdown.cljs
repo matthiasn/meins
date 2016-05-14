@@ -4,7 +4,8 @@
             [matthiasn.systems-toolbox-ui.helpers :as uh]
             [reagent.core :as r]
             [clojure.string :as s]
-            [cljsjs.moment]))
+            [cljsjs.moment]
+            [goog.dom.Range]))
 
 (defn hashtags-replacer
   "Replaces hashtags in entry text. Depending on show-hashtags? switch either displays
@@ -38,6 +39,19 @@
                            (reducer (:mentions entry) mentions-replacer))]
       [:div {:dangerouslySetInnerHTML {:__html (md/md->html formatted-md)}}])))
 
+(def initial-focus-wrapper
+  "Wrapper that automatically focuses on the provided element, and then places the caret in the last
+  position of the element's contents.
+  Inspired by:
+   - http://stackoverflow.com/questions/27602592/reagent-component-did-mount
+   - http://stackoverflow.com/questions/4233265/contenteditable-set-caret-at-the-end-of-the-text-cross-browser"
+  (with-meta identity
+             {:component-did-mount #(let [el (r/dom-node %)]
+                                     (.focus el)
+                                     (doto (.createFromNodeContents goog.dom.Range el)
+                                       (.collapse false)
+                                       .select))}))
+
 (defn editable-md-render
   "Renders markdown in a pre>code element, with editable content. Sends update message to store
   component on any change to the component. The save button sends updated entry to the backend."
@@ -69,10 +83,11 @@
                                                (reset! local-display-entry latest-entry)
                                                (reset! local-saved-entry latest-entry))
         [:div.edit-md
-         [:pre [:code {:content-editable true
-                       :on-input         update-temp-fn
-                       :on-key-down      on-keydown-fn}
-                md-string]]
+         [:pre [initial-focus-wrapper
+                [:code {:content-editable true
+                        :on-input         update-temp-fn
+                        :on-key-down      on-keydown-fn}
+                 md-string]]]
          (let [selection (.getSelection js/window)
                cursor-pos (.-anchorOffset selection)
                anchor-node (aget selection "anchorNode")
