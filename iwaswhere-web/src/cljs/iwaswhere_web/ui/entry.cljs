@@ -5,7 +5,8 @@
             [reagent.core :as rc]
             [cljsjs.moment]
             [iwaswhere-web.helpers :as h]
-            [iwaswhere-web.ui.utils :as u]))
+            [iwaswhere-web.ui.utils :as u]
+            [reagent.core :as r]))
 
 (defn hashtags-mentions-list
   "Horizontally renders list with hashtags and mentions."
@@ -28,10 +29,10 @@
   used in edit mode also sends a modified entry to the store component, which is useful
   for displaying updated hashtags, or also for showing the warning that the entry is not
   saved yet."
-  [entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags?]
+  [entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-comments?]
   (let [local (rc/atom {:edit-mode (contains? (:tags entry) "#new-entry")})]
     (fn
-      [entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags?]
+      [entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-comments?]
       (let [ts (:timestamp entry)
             map? (:latitude entry)
             show-map? (contains? (:show-maps-for store-snapshot) ts)
@@ -45,7 +46,10 @@
           [:span.fa.fa-pencil-square-o.toggle {:on-click toggle-edit}]
           (when-not (:comment-for entry)
             [:span.fa.fa-comment-o.toggle {:on-click (h/new-entry-fn put-fn {:comment-for ts})}])
-          [:span.fa.fa-trash-o.toggle {:on-click trash-entry}]]
+          [:span.fa.fa-trash-o.toggle {:on-click trash-entry}]
+          (when (seq (:comments entry))
+            [:span.fa.fa-comments.toggle {:class    (when-not @show-comments? "hidden-comments")
+                                          :on-click #(swap! show-comments? not)}])]
          [hashtags-mentions-list entry]
          [l/leaflet-map entry (or show-map? show-all-maps?)]
          [md/md-render entry hashtags mentions put-fn (:edit-mode @local) toggle-edit show-tags?]
@@ -61,10 +65,13 @@
   for displaying updated hashtags, or also for showing the warning that the entry is not
   saved yet."
   [entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-pvt?]
-  [:div
-   [journal-entry entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags?]
-   [:div.comments
-    (let [comments (:comments entry)]
-      (for [comment (if show-pvt? comments (filter u/pvt-filter comments))]
-        ^{:key (str "c" (:timestamp comment))}
-        [journal-entry comment store-snapshot hashtags mentions put-fn show-all-maps? show-tags?]))]])
+  (let [show-comments? (r/atom true)]
+    (fn [entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-pvt?]
+      [:div
+       [journal-entry entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-comments?]
+       (when @show-comments?
+         [:div.comments
+          (let [comments (:comments entry)]
+            (for [comment (if show-pvt? comments (filter u/pvt-filter comments))]
+              ^{:key (str "c" (:timestamp comment))}
+              [journal-entry comment store-snapshot hashtags mentions put-fn show-all-maps? show-tags?]))])])))

@@ -385,3 +385,7 @@ button {
 video {
     width: 100%;
 }
+
+.hidden-comments {
+    color: red;
+}
