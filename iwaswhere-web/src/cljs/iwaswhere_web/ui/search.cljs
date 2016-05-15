@@ -17,7 +17,6 @@
   [{:keys [local put-fn]}]
   (let [local-snapshot @local
         on-change-fn #(let [new-search (h/parse-search (.. % -target -value))]
-                       (pp/pprint new-search)
                        (swap! local assoc-in [:current-query] new-search)
                        (aset js/window "location" "hash" (js/encodeURIComponent (:search-text new-search)))
                        (put-fn [:state/get new-search]))]

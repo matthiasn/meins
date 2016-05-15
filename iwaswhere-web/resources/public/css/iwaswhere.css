@@ -296,6 +296,7 @@ textarea {
 
 .toggle {
     margin-left: 7px;
+    cursor: pointer;
 }
 
 .inactive {
@@ -388,4 +389,8 @@ video {
 
 .hidden-comments {
     color: red;
+}
+
+a .toggle {
+    color: #576364;
 }

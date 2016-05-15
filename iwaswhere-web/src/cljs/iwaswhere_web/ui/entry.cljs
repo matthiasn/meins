@@ -50,7 +50,10 @@
           [:span.fa.fa-trash-o.toggle {:on-click trash-entry}]
           (when (seq (:comments entry))
             [:span.fa.fa-comments.toggle {:class    (when-not @show-comments? "hidden-comments")
-                                          :on-click #(swap! show-comments? not)}])]
+                                          :on-click #(swap! show-comments? not)}])
+          (when-not (:comment-for entry)
+            [:a {:href  (str "/#" ts) :target "_blank"}
+             [:span.fa.fa-external-link.toggle]])]
          [hashtags-mentions-list entry]
          [l/leaflet-map entry (or show-map? show-all-maps?)]
          (if (:edit-mode @local)

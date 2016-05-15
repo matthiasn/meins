@@ -45,7 +45,8 @@
    :tags        (set (re-seq (js/RegExp. (str "#" tag-char-class "+") "m") text))
    :not-tags    (set (re-seq (js/RegExp. (str "#~" tag-char-class "+") "m") text))
    :mentions    (set (re-seq (js/RegExp. (str "@" tag-char-class "+") "m") text))
-   :date-string (re-find #"[0-9]{4}-[0-9]{2}-[0-9]{2}" text)})
+   :date-string (re-find #"[0-9]{4}-[0-9]{2}-[0-9]{2}" text)
+   :timestamp   (re-find #"[0-9]{13}" text)})
 
 (defn query-from-search-hash
   "Get query from location hash for current page."

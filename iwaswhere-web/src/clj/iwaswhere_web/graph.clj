@@ -4,7 +4,6 @@
   (:require [ubergraph.core :as uber]
             [clj-time.coerce :as ctc]
             [clj-time.core :as ct]
-            [clj-time.local :as lt]
             [clojure.string :as s]
             [clojure.set :as set]
             [clojure.tools.logging :as log]
@@ -20,6 +19,9 @@
           entry-day (timef/unparse local-fmt (ctc/from-long (:timestamp entry)))
           q-day (:date-string q)
           day-match? (= q-day entry-day)
+
+          q-timestamp (:timestamp q)
+          q-ts-match? (= q-timestamp (str (:timestamp entry)))
 
           q-tags (set (map s/lower-case (:tags q)))
           q-not-tags (set (map s/lower-case (:not-tags q)))
@@ -38,7 +40,8 @@
                           (empty? (set/intersection q-not-tags tags))
                           (or (empty? q-mentions)
                               (seq (set/intersection q-mentions mentions)))
-                          (or day-match? (empty? q-day))))]
+                          (or day-match? (empty? q-day))
+                          (or q-ts-match? (empty? q-timestamp))))]
       match?)))
 
 (defn extract-sorted-entries
