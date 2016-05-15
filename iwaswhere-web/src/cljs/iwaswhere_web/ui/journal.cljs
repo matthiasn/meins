@@ -19,9 +19,13 @@
         show-context? (:show-context local-snapshot)
         toggle-context #(swap! local update-in [:show-context] not)
         show-pvt? (:show-pvt local-snapshot)
-        toggle-pvt #(swap! local update-in [:show-pvt] not)]
+        toggle-pvt #(swap! local update-in [:show-pvt] not)
+        show-comments? (:show-comments local-snapshot)
+        toggle-comments #(swap! local update-in [:show-comments] not)]
     [:div.l-box-lrg.pure-g
      [:div.pure-u-1
+      [:span.fa.fa-comments.toggle-map.pull-right
+       {:class (when-not show-comments? "hidden-comments") :on-click toggle-comments}]
       [:span.fa.toggle-map.pull-right {:class (if show-all-maps? "fa-map" "fa-map-o") :on-click toggle-all-maps}]
       [:span.fa.fa-hashtag.toggle-map.pull-right {:class (when-not show-tags? "inactive") :on-click toggle-tags}]
       [:span.fa.fa-eye.toggle-map.pull-right {:class (when-not show-context? "inactive") :on-click toggle-context}]
@@ -31,7 +35,8 @@
         (let [editable? (contains? (:tags entry) "#new-entry")]
           (when (and (not (:comment-for entry)) (or editable? show-context?))
             ^{:key (:timestamp entry)}
-            [e/entry-with-comments entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-pvt?])))
+            [e/entry-with-comments
+             entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-pvt? show-comments?])))
       (when (and show-context? (seq entries))
         (let [show-more #(swap! local update-in [:show-entries] + 20)]
           [:div.pure-u-1.show-more {:on-click show-more :on-mouse-over show-more}
@@ -47,6 +52,7 @@
                               :show-all-maps false
                               :show-hashtags true
                               :show-context  true
-                              :show-pvt      false}
+                              :show-pvt      false
+                              :show-comments true}
               :view-fn       journal-view
               :dom-id        "journal"}))

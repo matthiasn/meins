@@ -71,12 +71,12 @@
   used in edit mode also sends a modified entry to the store component, which is useful
   for displaying updated hashtags, or also for showing the warning that the entry is not
   saved yet."
-  [entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-pvt?]
+  [entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-pvt? show-all-comments?]
   (let [show-comments? (r/atom true)]
-    (fn [entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-pvt?]
+    (fn [entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-pvt? show-all-comments?]
       [:div
        [journal-entry entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-comments?]
-       (when @show-comments?
+       (when (and @show-comments? show-all-comments?)
          [:div.comments
           (let [comments (:comments entry)]
             (for [comment (if show-pvt? comments (filter u/pvt-filter comments))]
