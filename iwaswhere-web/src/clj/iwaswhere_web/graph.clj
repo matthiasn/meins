@@ -4,16 +4,24 @@
   (:require [ubergraph.core :as uber]
             [clj-time.coerce :as ctc]
             [clj-time.core :as ct]
+            [clj-time.local :as lt]
             [clojure.string :as s]
             [clojure.set :as set]
-            [clojure.tools.logging :as log]))
+            [clojure.tools.logging :as log]
+            [clj-time.format :as timef]))
 
 (defn entries-filter-fn
   "Creates a filter function which ensures that all tags and mentions in the query are
-  contained in the filtered entry or any of it's comments, and none of the not-tags."
+  contained in the filtered entry or any of it's comments, and none of the not-tags.
+  Also allows filtering per day."
   [q]
   (fn [entry]
-    (let [q-tags (set (map s/lower-case (:tags q)))
+    (let [local-fmt (timef/with-zone (timef/formatters :year-month-day) (ct/default-time-zone))
+          entry-day (timef/unparse local-fmt (ctc/from-long (:timestamp entry)))
+          q-day (:date-string q)
+          day-match? (= q-day entry-day)
+
+          q-tags (set (map s/lower-case (:tags q)))
           q-not-tags (set (map s/lower-case (:not-tags q)))
           q-mentions (set (map s/lower-case (:mentions q)))
 
@@ -29,7 +37,8 @@
                      (and (set/subset? q-tags tags)
                           (empty? (set/intersection q-not-tags tags))
                           (or (empty? q-mentions)
-                              (seq (set/intersection q-mentions mentions)))))]
+                              (seq (set/intersection q-mentions mentions)))
+                          (or day-match? (empty? q-day))))]
       match?)))
 
 (defn extract-sorted-entries

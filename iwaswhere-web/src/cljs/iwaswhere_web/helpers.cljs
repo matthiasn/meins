@@ -41,13 +41,11 @@
   Such hashtags can for now be marked like this: #~done. Finding tasks that are not done, which don't have #done
   in either the entry or any of its comments, can be found like this: #task #~done"
   [text]
-  (let [tags (set (re-seq (js/RegExp. (str "#" tag-char-class "+") "m") text))
-        not-tags (re-seq (js/RegExp. (str "#~" tag-char-class "+") "m") text)
-        mentions (set (re-seq (js/RegExp. (str "@" tag-char-class "+") "m") text))]
-    {:search-text text
-     :tags        tags
-     :not-tags    not-tags
-     :mentions    mentions}))
+  {:search-text text
+   :tags        (set (re-seq (js/RegExp. (str "#" tag-char-class "+") "m") text))
+   :not-tags    (set (re-seq (js/RegExp. (str "#~" tag-char-class "+") "m") text))
+   :mentions    (set (re-seq (js/RegExp. (str "@" tag-char-class "+") "m") text))
+   :date-string (re-find #"[0-9]{4}-[0-9]{2}-[0-9]{2}" text)})
 
 (defn query-from-search-hash
   "Get query from location hash for current page."

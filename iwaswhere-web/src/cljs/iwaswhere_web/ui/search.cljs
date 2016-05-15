@@ -1,6 +1,7 @@
 (ns iwaswhere-web.ui.search
   (:require [iwaswhere-web.helpers :as h]
-            [matthiasn.systems-toolbox-ui.reagent :as r]))
+            [matthiasn.systems-toolbox-ui.reagent :as r]
+            [cljs.pprint :as pp]))
 
 (defn tags
   "Renders horizontal list of tags."
@@ -13,10 +14,10 @@
 
 (defn search-view
   "Renders search component."
-  [{:keys [observed local put-fn]}]
-  (let [store-snapshot @observed
-        local-snapshot @local
+  [{:keys [local put-fn]}]
+  (let [local-snapshot @local
         on-change-fn #(let [new-search (h/parse-search (.. % -target -value))]
+                       (pp/pprint new-search)
                        (swap! local assoc-in [:current-query] new-search)
                        (aset js/window "location" "hash" (js/encodeURIComponent (:search-text new-search)))
                        (put-fn [:state/get new-search]))]
