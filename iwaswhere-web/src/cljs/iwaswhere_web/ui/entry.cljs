@@ -1,6 +1,7 @@
 (ns iwaswhere-web.ui.entry
   (:require [iwaswhere-web.ui.leaflet :as l]
             [iwaswhere-web.ui.markdown :as md]
+            [iwaswhere-web.ui.edit :as e]
             [iwaswhere-web.ui.media :as m]
             [reagent.core :as rc]
             [cljsjs.moment]
@@ -52,7 +53,9 @@
                                           :on-click #(swap! show-comments? not)}])]
          [hashtags-mentions-list entry]
          [l/leaflet-map entry (or show-map? show-all-maps?)]
-         [md/md-render entry hashtags mentions put-fn (:edit-mode @local) toggle-edit show-tags?]
+         (if (:edit-mode @local)
+           [e/editable-md-render entry hashtags mentions put-fn toggle-edit]
+           [md/markdown-render entry show-tags?])
          [m/image-view entry]
          [m/audioplayer-view entry]
          [m/videoplayer-view entry]]))))
