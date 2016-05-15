@@ -20,8 +20,8 @@
   "Parses entry for hashtags and mentions. Either can consist of any of the word characters, dashes
   and unicode characters that for example comprise German 'Umlaute'."
   [text]
-  (let [tags (set (re-seq (js/RegExp. (str "(?!^)#" tag-char-class "+ ") "m") text))
-        mentions (set (re-seq (js/RegExp. (str "@" tag-char-class "+ ") "m") text))]
+  (let [tags (set (re-seq (js/RegExp. (str "(?!^)#" tag-char-class "+(?!" tag-char-class ")") "m") text))
+        mentions (set (re-seq (js/RegExp. (str "@" tag-char-class "+(?!" tag-char-class ")") "m") text))]
     {:md        text
      :tags      tags
      :mentions  mentions}))
