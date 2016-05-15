@@ -1,7 +1,8 @@
 (ns iwaswhere-web.ui.utils
   (:require [reagent.core :as r]
             [clojure.string :as s]
-            [goog.dom.Range]))
+            [goog.dom.Range]
+            [clojure.set :as set]))
 
 (defn hashtags-replacer
   "Replaces hashtags in entry text. Depending on show-hashtags? switch either displays
@@ -31,3 +32,11 @@
   (doto (.createFromNodeContents goog.dom.Range el)
     (.collapse false)
     .select))
+
+(defn pvt-filter
+  "Filter for entries that I consider private."
+  [entry]
+  (let [tags (set (map s/lower-case (:tags entry)))
+        private-tags #{"#pvt" "#private" "#nsfw"}
+        matched (set/intersection tags private-tags)]
+    (empty? matched)))
