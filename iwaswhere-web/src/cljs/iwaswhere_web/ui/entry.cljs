@@ -42,7 +42,9 @@
             trash-entry #(put-fn [:cmd/trash {:timestamp ts}])]
         [:div.entry
          [:div.entry-header
-          [:span.timestamp (.format (js/moment ts) "MMMM Do YYYY, h:mm:ss a")]
+          [:a {:href (str "/#" (.format (js/moment ts) "YYYY-MM-DD")) :target "_blank"}
+           [:span.timestamp (.format (js/moment ts) "dddd, MMMM Do YYYY")]]
+          [:span.timestamp (.format (js/moment ts) ", h:mm a")]
           (when map? [:span.fa.fa-map-o.toggle {:on-click toggle-map}])
           [:span.fa.fa-pencil-square-o.toggle {:on-click toggle-edit}]
           (when-not (:comment-for entry)
@@ -52,8 +54,7 @@
             [:span.fa.fa-comments.toggle {:class    (when-not @show-comments? "hidden-comments")
                                           :on-click #(swap! show-comments? not)}])
           (when-not (:comment-for entry)
-            [:a {:href  (str "/#" ts) :target "_blank"}
-             [:span.fa.fa-external-link.toggle]])]
+            [:a {:href  (str "/#" ts) :target "_blank"} [:span.fa.fa-external-link.toggle]])]
          [hashtags-mentions-list entry]
          [l/leaflet-map entry (or show-map? show-all-maps?)]
          (if (:edit-mode @local)
