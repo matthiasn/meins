@@ -25,7 +25,7 @@
   and of that substring. For these, auto-suggestions are displayed, which are entities that begin
   with the tag fragment before the caret position. When any of the suggestions are clicked, the
   fragment will be replaced with the clicked item."
-  [entry hashtags mentions local-saved-entry local-display-entry]
+  [entry hashtags mentions local-saved-entry local-display-entry edit-elem-atom]
   (let [ts (:ts entry)
         selection (.getSelection js/window)
         cursor-pos (.-anchorOffset selection)
@@ -45,17 +45,31 @@
                     [:div
                      {:on-click #(let [updated (merge entry (h/parse-entry (s/replace md curr-tag-regex tag)))]
                                   (reset! local-saved-entry updated)
-                                  (reset! local-display-entry updated))}
+                                  (reset! local-display-entry updated)
+                                  (.setTimeout js/window (fn [] (u/focus-on-end @edit-elem-atom)) 100))}
                      [:span.hashtag tag]]))]
     [:div.suggestions
      (tags-fn tag-substr-filter (js/RegExp (str current-tag "(?!" h/tag-char-class ")") "i") hashtags)
      (tags-fn mention-substr-filter current-mention mentions)]))
+
+(defn editable-code-elem
+  [md-string update-temp-fn on-keydown-fn edit-elem-atom]
+  (r/create-class
+    {:component-did-mount #(let [el (r/dom-node %)]
+                            (reset! edit-elem-atom el)
+                            (u/focus-on-end el))
+     :reagent-render      (fn [md-string update-temp-fn on-keydown-fn edit-elem-atom]
+                            [:code {:content-editable true
+                                    :on-input         update-temp-fn
+                                    :on-key-down      on-keydown-fn}
+                             md-string])}))
 
 (defn editable-md-render
   "Renders markdown in a pre>code element, with editable content. Sends update message to store
   component on any change to the component. The save button sends updated entry to the backend."
   [entry hashtags mentions put-fn toggle-edit]
   (let [entry (dissoc entry :comments)
+        edit-elem-atom (atom {})
         last-saved (r/atom entry)
         local-saved-entry (r/atom entry)
         local-display-entry (r/atom entry)]
@@ -80,12 +94,8 @@
                                                (reset! local-display-entry latest-entry)
                                                (reset! local-saved-entry latest-entry))
         [:div.edit-md
-         [:pre [u/initial-focus-wrapper
-                [:code {:content-editable true
-                        :on-input         update-temp-fn
-                        :on-key-down      on-keydown-fn}
-                 md-string]]]
-         [suggestions entry hashtags mentions local-saved-entry local-display-entry]
+         [:pre [editable-code-elem md-string update-temp-fn on-keydown-fn edit-elem-atom]]
+         [suggestions entry hashtags mentions local-saved-entry local-display-entry edit-elem-atom]
          (when (not= @last-saved @local-saved-entry)
            [:span.not-saved {:on-click save-fn} [:span.fa.fa-floppy-o] "  click to save"])]))))
 

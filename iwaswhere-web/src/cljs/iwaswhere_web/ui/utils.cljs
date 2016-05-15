@@ -24,15 +24,10 @@
   [text coll fun]
   (reduce fun text coll))
 
-(def initial-focus-wrapper
-  "Wrapper that automatically focuses on the provided element, and then places the caret in the last
-  position of the element's contents.
-  Inspired by:
-   - http://stackoverflow.com/questions/27602592/reagent-component-did-mount
-   - http://stackoverflow.com/questions/4233265/contenteditable-set-caret-at-the-end-of-the-text-cross-browser"
-  (with-meta identity
-             {:component-did-mount #(let [el (r/dom-node %)]
-                                     (.focus el)
-                                     (doto (.createFromNodeContents goog.dom.Range el)
-                                       (.collapse false)
-                                       .select))}))
+(defn focus-on-end
+  "Focus on the provided element, and then places the caret in the last position of the element's contents"
+  [el]
+  (.focus el)
+  (doto (.createFromNodeContents goog.dom.Range el)
+    (.collapse false)
+    .select))
