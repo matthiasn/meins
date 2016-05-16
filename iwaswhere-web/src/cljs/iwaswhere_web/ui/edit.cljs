@@ -41,7 +41,7 @@
                              md-string])}))
 
 (defn autocomplete-tags
-  ""
+  "Render autocomplete option for the partial tag (or mention) before the cursor."
   [before-cursor regex-prefix tags]
   (let [current-tag (re-find (js/RegExp. (str regex-prefix h/tag-char-class "+$") "m") before-cursor)
         current-tag-regex (js/RegExp. current-tag "i")
@@ -104,10 +104,10 @@
                                 (when (and curr-mention (seq f-mentions))
                                   (tag-replace-fn curr-mention (first f-mentions)))
                                 (.preventDefault ev))))]
-
-        (when-not (= @last-saved latest-entry) (reset! last-saved latest-entry)
-                                               (reset! local-display-entry latest-entry)
-                                               (reset! local-saved-entry latest-entry))
+        (when (and (not new-entry?) (not= @last-saved latest-entry))
+          (reset! last-saved latest-entry)
+          (reset! local-display-entry latest-entry)
+          (reset! local-saved-entry latest-entry))
         [:div.edit-md
          [:pre [editable-code-elem md-string update-temp-fn on-keydown-fn edit-elem-atom]]
          [suggestions entry f-tags curr-tag tag-replace-fn "hashtag"]
