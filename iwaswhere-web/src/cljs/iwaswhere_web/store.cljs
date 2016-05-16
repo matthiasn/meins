@@ -5,18 +5,14 @@
 (defn new-state-fn
   "Update client side state with list of journal entries received from backend."
   [{:keys [current-state msg-payload]}]
-  {:new-state (-> current-state
-                  (assoc-in [:entries] (:entries msg-payload))
-                  (assoc-in [:stats] (:stats msg-payload))
-                  (assoc-in [:hashtags] (:hashtags msg-payload))
-                  (assoc-in [:mentions] (:mentions msg-payload)))})
+  {:new-state (merge current-state msg-payload)})
 
 (defonce new-entries-ls (local-storage (atom {}) "iWasWhere_new_entries"))
 
 (defn update-local-storage
+  "Updates local-storage with the provided new-entries."
   [new-entries]
-  (reset! new-entries-ls (:new-entries new-entries))
-  #_(prn @new-entries-ls))
+  (reset! new-entries-ls (:new-entries new-entries)))
 
 (defn initial-state-fn
   "Creates the initial component state atom. Holds a list of entries from the backend,

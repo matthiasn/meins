@@ -5,7 +5,8 @@
             [iwaswhere-web.graph :as g]
             [ubergraph.core :as uber]
             [clojure.string :as s]
-            [iwaswhere-web.keepalive :as ka]))
+            [iwaswhere-web.keepalive :as ka]
+            [clojure.tools.logging :as log]))
 
 (defn publish-state-fn
   "Publishes current state, as filtered by the respective clients. Sends to single connected client
@@ -14,10 +15,14 @@
   (let [sente-uid (:sente-uid msg-payload)
         sente-uids (if sente-uid [sente-uid] (keys (:last-filter current-state)))
         state-emit-mapper (fn [sente-uid]
-                            (let [filter (get-in current-state [:last-filter sente-uid])]
-                              (with-meta [:state/new (g/get-filtered-results current-state filter)]
-                                         {:sente-uid sente-uid})))]
-    {:emit-msgs (map state-emit-mapper sente-uids)}))
+                            (let [start-ts (System/currentTimeMillis)
+                                  filter (get-in current-state [:last-filter sente-uid])
+                                  res (do (g/get-filtered-results current-state filter))
+                                  duration-ms (- (System/currentTimeMillis) start-ts)]
+                              (log/info "Query" sente-uid "took" duration-ms "ms")
+                              (with-meta [:state/new (merge res {:duration-ms duration-ms})] {:sente-uid sente-uid})))
+        state-msgs (vec (map state-emit-mapper sente-uids))]
+    {:emit-msgs state-msgs}))
 
 (defn state-get-fn
   "Handler function for retrieving current state. Updates filter for connected client, and then

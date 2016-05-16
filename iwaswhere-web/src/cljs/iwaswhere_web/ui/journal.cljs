@@ -48,7 +48,9 @@
            [:span.show-more-btn [:span.fa.fa-plus-square] " show more"]]))
       (when-let [stats (:stats store-snapshot)]
         [:div.pure-u-1 (:entry-count stats) " entries, " (:node-count stats) " nodes, " (:edge-count stats) " edges, "
-         (count hashtags) " hashtags, " (count mentions) " people"])]]))
+         (count hashtags) " hashtags, " (count mentions) " people"])
+      (when-let [ms (:duration-ms store-snapshot)]
+        [:div.pure-u-1 (str "Query completed in " ms "ms")])]]))
 
 (defn cmp-map
   [cmp-id]
