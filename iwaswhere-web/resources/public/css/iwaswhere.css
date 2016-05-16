@@ -394,3 +394,12 @@ video {
 a .toggle {
     color: #576364;
 }
+
+.delete-warn {
+    margin-left: 25px;
+    padding: 1px 5px;
+    color: white;
+    font-size: 0.8em;
+    cursor: pointer;
+    background-color: rgb(202, 60, 60);
+}

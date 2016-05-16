@@ -23,6 +23,20 @@
         ^{:key (str "tag-" hashtag)}
         [:span.hashtag.float-left hashtag])]]))
 
+(defn trash-icon
+  "Renders a trash icon, which transforms into a warning button that needs to be clicked
+  again for actual deletion. This label is a little to the right, so it can't be clicked
+  accidentally, and disappears again within 5 seconds."
+  [trash-fn]
+  (let [clicked (r/atom false)
+        guarded-trash-fn (fn [_ev]
+                           (swap! clicked not)
+                           (.setTimeout js/window #(reset! clicked false) 5000))]
+    (fn [trash-entry]
+      (if @clicked
+        [:span.delete-warn {:on-click trash-fn} [:span.fa.fa-trash] "  confirm delete?"]
+        [:span.fa.fa-trash-o.toggle.trash {:on-click guarded-trash-fn}]))))
+
 (defn journal-entry
   "Renders individual journal entry. Interaction with application state happens via
   messages that are sent to the store component, for example for toggling the display
@@ -49,12 +63,12 @@
           [:span.fa.fa-pencil-square-o.toggle {:on-click toggle-edit}]
           (when-not (:comment-for entry)
             [:span.fa.fa-comment-o.toggle {:on-click (h/new-entry-fn put-fn {:comment-for ts})}])
-          [:span.fa.fa-trash-o.toggle {:on-click trash-entry}]
           (when (seq (:comments entry))
             [:span.fa.fa-comments.toggle {:class    (when-not @show-comments? "hidden-comments")
                                           :on-click #(swap! show-comments? not)}])
           (when-not (:comment-for entry)
-            [:a {:href  (str "/#" ts) :target "_blank"} [:span.fa.fa-external-link.toggle]])]
+            [:a {:href  (str "/#" ts) :target "_blank"} [:span.fa.fa-external-link.toggle]])
+          [trash-icon trash-entry]]
          [hashtags-mentions-list entry]
          [l/leaflet-map entry (or show-map? show-all-maps?)]
          (if (:edit-mode @local)
