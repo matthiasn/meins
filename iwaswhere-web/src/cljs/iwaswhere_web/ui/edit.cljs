@@ -41,6 +41,7 @@
                              md-string])}))
 
 (defn autocomplete-tags
+  ""
   [before-cursor regex-prefix tags]
   (let [current-tag (re-find (js/RegExp. (str regex-prefix h/tag-char-class "+$") "m") before-cursor)
         current-tag-regex (js/RegExp. current-tag "i")
@@ -55,17 +56,19 @@
   Keeps track of current cursor position and potential incomplete tags or mentions before the
   cursor, which can then be completed by clicking on an empty in the autosuggested list, or by
   using the tab key for selecting the first one."
-  [entry hashtags mentions put-fn toggle-edit]
+  [entry hashtags mentions put-fn toggle-edit new-entry?]
   (let [entry (dissoc entry :comments)
         edit-elem-atom (atom {})
         last-saved (r/atom entry)
         local-saved-entry (r/atom entry)
         local-display-entry (r/atom entry)]
-    (fn [entry hashtags mentions put-fn toggle-edit]
+    (fn [entry hashtags mentions put-fn toggle-edit new-entry?]
       (let [latest-entry (dissoc entry :comments)
             md-string (or (:md @local-display-entry) "edit here")
             get-content #(aget (.. % -target -parentElement -parentElement -firstChild -firstChild) "innerText")
-            update-temp-fn #(reset! local-saved-entry (merge latest-entry (h/parse-entry (get-content %))))
+            update-temp-fn #(let [updated-entry (merge latest-entry (h/parse-entry (get-content %)))]
+                             (put-fn [:entry/update-local updated-entry])
+                             (reset! local-saved-entry updated-entry))
             save-fn #(put-fn [:text-entry/update @local-saved-entry])
 
             ;determine cursor position
@@ -91,9 +94,9 @@
                             (let [key-code (.. ev -keyCode)
                                   meta-key (.. ev -metaKey)]
                               (when (and meta-key (= key-code 83))
-                                (if (not= @last-saved @local-saved-entry) ; when no change, toggle edit mode
+                                (if (or new-entry? (not= @last-saved @local-saved-entry))
                                   (save-fn)
-                                  (toggle-edit))
+                                  (toggle-edit)) ; when no change, toggle edit mode
                                 (.preventDefault ev))
                               (when (= key-code 9)          ; TAB key pressed
                                 (when (and curr-tag (seq f-tags))
@@ -109,5 +112,5 @@
          [:pre [editable-code-elem md-string update-temp-fn on-keydown-fn edit-elem-atom]]
          [suggestions entry f-tags curr-tag tag-replace-fn "hashtag"]
          [suggestions entry f-mentions curr-mention tag-replace-fn "mention"]
-         (when (not= @last-saved @local-saved-entry)
+         (when (or (not= @last-saved @local-saved-entry) new-entry?)
            [:span.not-saved {:on-click save-fn} [:span.fa.fa-floppy-o] "  click to save"])]))))

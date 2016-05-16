@@ -10,6 +10,7 @@
         store-snapshot @observed
         show-entries (:show-entries local-snapshot)
         entries (take show-entries (:entries store-snapshot))
+        new-entries (vals (:new-entries store-snapshot))
         hashtags (:hashtags store-snapshot)
         mentions (:mentions store-snapshot)
         show-all-maps? (:show-all-maps local-snapshot)
@@ -31,12 +32,16 @@
       [:span.fa.fa-eye.toggle-map.pull-right {:class (when-not show-context? "inactive") :on-click toggle-context}]
       [:span.fa.fa-user-secret.toggle-map.pull-right {:class (when-not show-pvt? "inactive") :on-click toggle-pvt}]
       [:hr]
+      (for [entry (filter #(not (:comment-for %)) new-entries)]
+        ^{:key (:timestamp entry)}
+        [e/entry-with-comments
+         entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-pvt? show-comments? true])
       (for [entry (if show-pvt? entries (filter u/pvt-filter entries))]
         (let [editable? (contains? (:tags entry) "#new-entry")]
           (when (and (not (:comment-for entry)) (or editable? show-context?))
             ^{:key (:timestamp entry)}
             [e/entry-with-comments
-             entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-pvt? show-comments?])))
+             entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-pvt? show-comments? false])))
       (when (and show-context? (seq entries))
         (let [show-more #(swap! local update-in [:show-entries] + 20)]
           [:div.pure-u-1.show-more {:on-click show-more :on-mouse-over show-more}

@@ -10,7 +10,7 @@
     (.-geolocation js/navigator)
     (fn [pos]
       (let [coords (.-coords pos)]
-        (put-fn [:geo-entry/persist
+        (put-fn [:entry/geo-enrich
                  (merge data {:latitude  (.-latitude coords)
                               :longitude (.-longitude coords)})])))))
 
@@ -35,7 +35,7 @@
   (fn [_ev]
     (let [ts (st/now)
           entry (merge (parse-entry "") {:timestamp ts :tags #{"#new-entry"}} opts)]
-      (put-fn [:geo-entry/persist entry])
+      (put-fn [:entry/new entry])
       (send-w-geolocation entry put-fn))))
 
 (defn parse-search

@@ -280,6 +280,7 @@ textarea {
     color: white;
     font-size: 0.8em;
     background-color: rgb(202, 60, 60);
+    cursor: pointer;
 }
 
 .hashtags {

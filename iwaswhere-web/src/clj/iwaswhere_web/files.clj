@@ -45,6 +45,7 @@
         new-state (g/add-node current-state entry-ts msg-payload)]
     (append-daily-log msg-payload)
     {:new-state    new-state
+     :emit-msg     [:entry/saved msg-payload]
      :send-to-self [:state/publish-current {}]}))
 
 (defn trash-entry-fn
