@@ -404,3 +404,7 @@ a .toggle {
     cursor: pointer;
     background-color: rgb(202, 60, 60);
 }
+
+a {
+    outline: none!important;
+}
