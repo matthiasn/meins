@@ -18,10 +18,12 @@
 
 (defn parse-entry
   "Parses entry for hashtags and mentions. Either can consist of any of the word characters, dashes
-  and unicode characters that for example comprise German 'Umlaute'."
+  and unicode characters that for example comprise German 'Umlaute'.
+  The negative lookahead (?!`) makes sure that tags and mentions are not found and processed
+  when they are quoted as code with backticks."
   [text]
-  (let [tags (set (re-seq (js/RegExp. (str "(?!^)#" tag-char-class "+(?!" tag-char-class ")") "m") text))
-        mentions (set (re-seq (js/RegExp. (str "@" tag-char-class "+(?!" tag-char-class ")") "m") text))]
+  (let [tags (set (re-seq (js/RegExp. (str "(?!^)#" tag-char-class "+(?!" tag-char-class ")(?!`)") "m") text))
+        mentions (set (re-seq (js/RegExp. (str "@" tag-char-class "+(?!" tag-char-class ")(?!`)") "m") text))]
     {:md        text
      :tags      tags
      :mentions  mentions}))
@@ -42,8 +44,8 @@
   in either the entry or any of its comments, can be found like this: #task #~done"
   [text]
   {:search-text text
-   :tags        (set (re-seq (js/RegExp. (str "#" tag-char-class "+") "m") text))
-   :not-tags    (set (re-seq (js/RegExp. (str "#~" tag-char-class "+") "m") text))
+   :tags        (set (map second (re-seq (js/RegExp. (str "(?:^|[^~])(#" tag-char-class "+)") "m") text)))
+   :not-tags    (set (re-seq (js/RegExp. (str "~#" tag-char-class "+") "m") text))
    :mentions    (set (re-seq (js/RegExp. (str "@" tag-char-class "+") "m") text))
    :date-string (re-find #"[0-9]{4}-[0-9]{2}-[0-9]{2}" text)
    :timestamp   (re-find #"[0-9]{13}" text)})
