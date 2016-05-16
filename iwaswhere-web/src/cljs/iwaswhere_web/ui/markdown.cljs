@@ -18,9 +18,11 @@
 
 (defn mentions-replacer
   "Replaces mentions in entry text."
-  [acc mention]
-  (let [with-link (str " <a class='mention-link' href='/#" mention "'>" mention "</a>")]
-    (s/replace acc mention with-link)))
+  [show-hashtags?]
+  (fn [acc mention]
+    (let [f-mention (if show-hashtags? mention (subs mention 1))
+          with-link (str " <a class='mention-link' href='/#" mention "'>" f-mention "</a>")]
+      (s/replace acc mention with-link))))
 
 (defn- reducer
   "Generic reducer, allows calling specified function for each item in the collection."
@@ -35,5 +37,5 @@
   (when-let [md-string (:md entry)]
     (let [formatted-md (-> md-string
                            (reducer (:tags entry) (hashtags-replacer show-hashtags?))
-                           (reducer (:mentions entry) mentions-replacer))]
+                           (reducer (:mentions entry) (mentions-replacer show-hashtags?)))]
       [:div {:dangerouslySetInnerHTML {:__html (md/md->html formatted-md)}}])))
