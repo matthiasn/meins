@@ -13,25 +13,13 @@
         new-entries (vals (:new-entries store-snapshot))
         hashtags (:hashtags store-snapshot)
         mentions (:mentions store-snapshot)
-        show-all-maps? (:show-all-maps local-snapshot)
-        toggle-all-maps #(swap! local update-in [:show-all-maps] not)
-        show-tags? (:show-hashtags local-snapshot)
-        toggle-tags #(swap! local update-in [:show-hashtags] not)
-        show-context? (:show-context local-snapshot)
-        toggle-context #(swap! local update-in [:show-context] not)
-        show-pvt? (:show-pvt local-snapshot)
-        toggle-pvt #(swap! local update-in [:show-pvt] not)
-        show-comments? (:show-comments local-snapshot)
-        toggle-comments #(swap! local update-in [:show-comments] not)]
+        show-all-maps? (:show-all-maps store-snapshot)
+        show-tags? (:show-hashtags store-snapshot)
+        show-context? (:show-context store-snapshot)
+        show-pvt? (:show-pvt store-snapshot)
+        show-comments? (:show-comments store-snapshot)]
     [:div.l-box-lrg.pure-g.journal
      [:div.pure-u-1
-      [:span.fa.fa-comments.toggle-map.pull-right
-       {:class (when-not show-comments? "hidden-comments") :on-click toggle-comments}]
-      [:span.fa.toggle-map.pull-right {:class (if show-all-maps? "fa-map" "fa-map-o") :on-click toggle-all-maps}]
-      [:span.fa.fa-hashtag.toggle-map.pull-right {:class (when-not show-tags? "inactive") :on-click toggle-tags}]
-      [:span.fa.fa-eye.toggle-map.pull-right {:class (when-not show-context? "inactive") :on-click toggle-context}]
-      [:span.fa.fa-user-secret.toggle-map.pull-right {:class (when-not show-pvt? "inactive") :on-click toggle-pvt}]
-      [:hr]
       (for [entry (filter #(not (:comment-for %)) new-entries)]
         ^{:key (:timestamp entry)}
         [e/entry-with-comments
@@ -55,11 +43,6 @@
 (defn cmp-map
   [cmp-id]
   (r/cmp-map {:cmp-id        cmp-id
-              :initial-state {:show-entries  20
-                              :show-all-maps false
-                              :show-hashtags true
-                              :show-context  true
-                              :show-pvt      false
-                              :show-comments true}
+              :initial-state {:show-entries 20}
               :view-fn       journal-view
               :dom-id        "journal"}))

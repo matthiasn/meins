@@ -21,9 +21,14 @@
   [_put-fn]
   {:state (atom {:entries       []
                  :show-maps-for #{}
-                 :new-entries   @new-entries-ls})})
+                 :new-entries   @new-entries-ls
+                 :show-all-maps false
+                 :show-hashtags true
+                 :show-context  true
+                 :show-pvt      false
+                 :show-comments true})})
 
-(defn toggle-set
+(defn toggle-set-fn
   "Toggles for example the visibility of a map or the edit mode for an individual
   journal entry. Requires the key to exist on the application state as a set."
   [{:keys [current-state msg-payload]}]
@@ -33,6 +38,12 @@
                     (update-in current-state [k] disj timestamp)
                     (update-in current-state [k] conj timestamp))]
     {:new-state new-state}))
+
+(defn toggle-key-fn
+  "Toggles config key."
+  [{:keys [current-state msg-payload]}]
+  (let [k (:key msg-payload)]
+    {:new-state (update-in current-state [k] not)}))
 
 (defn new-entry-fn
   "Create locally stored new entry for further edit."
@@ -86,4 +97,5 @@
                  :entry/update-local update-local-fn
                  :entry/remove-local remove-local-fn
                  :entry/saved        entry-saved-fn
-                 :cmd/toggle         toggle-set}})
+                 :cmd/toggle         toggle-set-fn
+                 :cmd/toggle-key     toggle-key-fn}})

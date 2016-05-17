@@ -84,7 +84,7 @@ label {
 
 .home-menu.pure-menu-open {
     background: #2d3e50;
-    z-index: 1001; /* Oddly, Leaflet controls have the z-index fairly high */
+    z-index: 1002; /* Oddly, Leaflet controls have the z-index fairly high */
 }
 
 .pure-menu.pure-menu-open.pure-menu-fixed {
@@ -291,10 +291,6 @@ textarea {
     margin-top: 5px;
 }
 
-#new-entry-textbox {
-    min-height: 6em;
-}
-
 .toggle {
     margin-left: 7px;
     cursor: pointer;
@@ -410,22 +406,14 @@ a {
 
 .search-div {
     position: fixed;
-    width: 95%;
+    width: 100%;
     top: 0;
     padding-top: 50px;
+    padding-right: 30px;
     background-color: #f9f9fa;
-    z-index: 100;
-}
-
-.new-import {
-    position: fixed;
-    top: 0;
-    padding-top: 115px;
-    padding-bottom: 5px;
-    background-color: #f9f9fa;
-    width: 100%;
+    z-index: 1001;
 }
 
 .journal {
-    margin-top: 85px;
+    margin-top: 100px;
 }
