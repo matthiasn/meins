@@ -23,7 +23,7 @@
         toggle-pvt #(swap! local update-in [:show-pvt] not)
         show-comments? (:show-comments local-snapshot)
         toggle-comments #(swap! local update-in [:show-comments] not)]
-    [:div.l-box-lrg.pure-g
+    [:div.l-box-lrg.pure-g.journal
      [:div.pure-u-1
       [:span.fa.fa-comments.toggle-map.pull-right
        {:class (when-not show-comments? "hidden-comments") :on-click toggle-comments}]

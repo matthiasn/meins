@@ -407,3 +407,25 @@ a .toggle {
 a {
     outline: none!important;
 }
+
+.search-div {
+    position: fixed;
+    width: 95%;
+    top: 0;
+    padding-top: 50px;
+    background-color: #f9f9fa;
+    z-index: 100;
+}
+
+.new-import {
+    position: fixed;
+    top: 0;
+    padding-top: 115px;
+    padding-bottom: 5px;
+    background-color: #f9f9fa;
+    width: 100%;
+}
+
+.journal {
+    margin-top: 85px;
+}

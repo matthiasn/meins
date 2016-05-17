@@ -20,7 +20,7 @@
                        (swap! local assoc-in [:current-query] new-search)
                        (aset js/window "location" "hash" (js/encodeURIComponent (:search-text new-search)))
                        (put-fn [:state/get new-search]))]
-    [:div.l-box-lrg.pure-g
+    [:div.l-box-lrg.pure-g.search-div
      [:div.pure-u-1
       [tags local-snapshot :tags "hashtag"]
       [tags local-snapshot :not-tags "hashtag not-tag"]
@@ -28,7 +28,17 @@
       [:div.textentry
        [:textarea {:type      "text"
                    :on-change on-change-fn
-                   :value     (:search-text (:current-query local-snapshot))}]]]]))
+                   :value     (:search-text (:current-query local-snapshot))}]]]
+     [:div.pure-u-1
+      [:div.entry-footer
+       [:button.pure-button.pure-button-primary.button-xsmall {:on-click (h/new-entry-fn put-fn {})}
+        [:span.fa.fa-plus-square] " new"]
+       [:button.pure-button.button-xsmall {:on-click #(put-fn [:import/photos])}
+        [:span.fa.fa-camera-retro] " import"]
+       [:button.pure-button.button-xsmall {:on-click #(put-fn [:import/geo])}
+        [:span.fa.fa-map-o] " import"]
+       [:button.pure-button.button-xsmall {:on-click #(put-fn [:import/phone])}
+        [:span.fa.fa-mobile-phone] " import"]]]]))
 
 (defn init-fn
   "Initializes listener for location hash changes, which alters local component state with
