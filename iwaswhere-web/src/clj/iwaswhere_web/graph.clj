@@ -44,24 +44,36 @@
                           (or q-ts-match? (empty? q-timestamp))))]
       match?)))
 
+(defn compare-w-upvotes
+  "Sort comparator which considers upvotes first, and, if those are equal, the timestamp second."
+  [x y]
+  (let [upvotes-x (:upvotes x)
+        upvotes-y (:upvotes y)]
+    (if-not (= upvotes-x upvotes-y)
+      (. clojure.lang.Util (compare upvotes-y upvotes-x))
+      (. clojure.lang.Util (compare (:timestamp y) (:timestamp x))))))
+
 (defn extract-sorted-entries
   "Extracts nodes and their properties in descending timestamp order by looking for node by mapping
   over the sorted set and extracting attributes for each node.
   Warns when node not in graph. (debugging, should never happen)"
-  [current-state]
-  (map (fn [n]
-         (let [g (:graph current-state)]
-           (if (uber/has-node? g n)
-             (let [attrs (uber/attrs g n)
-                   comment-edges (flatten (uber/find-edges g {:dest n :relationship :COMMENT}))
-                   comments (->> comment-edges
-                                 (remove :mirror?)
-                                 (map #(uber/attrs g (:src %)))
-                                 (sort-by :timestamp))
-                   entry (merge attrs {:comments comments})]
-               entry)
-             (log/warn "Cannot find node: " n))))
-       (:sorted-entries current-state)))
+  [current-state query]
+  (let [mapper-fn (fn [n]
+                    (let [g (:graph current-state)]
+                      (if (uber/has-node? g n)
+                        (let [attrs (uber/attrs g n)
+                              comment-edges (flatten (uber/find-edges g {:dest n :relationship :COMMENT}))
+                              comments (->> comment-edges
+                                            (remove :mirror?)
+                                            (map #(uber/attrs g (:src %)))
+                                            (sort-by :timestamp))
+                              entry (merge attrs {:comments comments})]
+                          entry)
+                        (log/warn "Cannot find node: " n))))
+        entries (map mapper-fn (:sorted-entries current-state))]
+    (if (:sort-by-upvotes query)
+      (sort compare-w-upvotes entries)
+      entries)))
 
 (defn find-all-hashtags
   "Finds all hashtags used in entries by finding the edges that originate from the
@@ -87,9 +99,9 @@
 (defn get-filtered-results
   "Retrieve items to show in UI, also deliver all hashtags for autocomplete and
   some basic stats."
-  [current-state msg-payload]
-  (let [n (:n msg-payload)
-        entries (take n (filter (entries-filter-fn msg-payload) (extract-sorted-entries current-state)))]
+  [current-state query]
+  (let [n (:n query)
+        entries (take n (filter (entries-filter-fn query) (extract-sorted-entries current-state query)))]
     {:entries  entries
      :hashtags (find-all-hashtags current-state)
      :mentions (find-all-mentions current-state)

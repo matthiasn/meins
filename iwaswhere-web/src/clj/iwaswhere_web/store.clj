@@ -16,8 +16,8 @@
         sente-uids (if sente-uid [sente-uid] (keys (:last-filter current-state)))
         state-emit-mapper (fn [sente-uid]
                             (let [start-ts (System/currentTimeMillis)
-                                  filter (get-in current-state [:last-filter sente-uid])
-                                  res (do (g/get-filtered-results current-state filter))
+                                  query (get-in current-state [:last-filter sente-uid])
+                                  res (do (g/get-filtered-results current-state query))
                                   duration-ms (- (System/currentTimeMillis) start-ts)]
                               (log/info "Query" sente-uid "took" duration-ms "ms")
                               (with-meta [:state/new (merge res {:duration-ms duration-ms})] {:sente-uid sente-uid})))

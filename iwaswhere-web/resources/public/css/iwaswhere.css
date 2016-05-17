@@ -296,6 +296,10 @@ textarea {
     cursor: pointer;
 }
 
+.fa-thumbs-up {
+    color: #006C91;
+}
+
 .inactive {
     color: #AAA;
 }
@@ -416,4 +420,9 @@ a {
 
 .journal {
     margin-top: 100px;
+}
+
+.upvotes {
+    vertical-align: super;
+    font-size: 0.8em;
 }

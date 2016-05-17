@@ -61,6 +61,11 @@
           [:a {:href (str "/#" (.format (js/moment ts) "YYYY-MM-DD"))}
            [:span.timestamp (.format (js/moment ts) "dddd, MMMM Do YYYY")]]
           [:span.timestamp (.format (js/moment ts) ", h:mm a")]
+          (let [upvotes (:upvotes entry)]
+            [:span.fa.toggle
+             {:class    (if upvotes "fa-thumbs-up" "fa-thumbs-o-up")
+              :on-click #(put-fn [:text-entry/update (update-in entry [:upvotes] inc)])}
+             (when upvotes [:span.upvotes " " upvotes])])
           (when map? [:span.fa.fa-map-o.toggle {:on-click toggle-map}])
           [:span.fa.fa-pencil-square-o.toggle {:on-click toggle-edit}]
           (when-not (:comment-for entry)
