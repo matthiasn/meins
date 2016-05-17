@@ -49,19 +49,19 @@
   over the sorted set and extracting attributes for each node.
   Warns when node not in graph. (debugging, should never happen)"
   [current-state]
-  (vec (map (fn [n]
-              (let [g (:graph current-state)]
-                (if (uber/has-node? g n)
-                  (let [attrs (uber/attrs g n)
-                        comment-edges (flatten (uber/find-edges g {:dest n :relationship :COMMENT}))
-                        comments (->> comment-edges
-                                      (remove :mirror?)
-                                      (map #(uber/attrs g (:src %)))
-                                      (sort-by :timestamp))
-                        entry (merge attrs {:comments comments})]
-                    entry)
-                  (log/warn "Cannot find node: " n))))
-            (:sorted-entries current-state))))
+  (map (fn [n]
+         (let [g (:graph current-state)]
+           (if (uber/has-node? g n)
+             (let [attrs (uber/attrs g n)
+                   comment-edges (flatten (uber/find-edges g {:dest n :relationship :COMMENT}))
+                   comments (->> comment-edges
+                                 (remove :mirror?)
+                                 (map #(uber/attrs g (:src %)))
+                                 (sort-by :timestamp))
+                   entry (merge attrs {:comments comments})]
+               entry)
+             (log/warn "Cannot find node: " n))))
+       (:sorted-entries current-state)))
 
 (defn find-all-hashtags
   "Finds all hashtags used in entries by finding the edges that originate from the
@@ -88,8 +88,8 @@
   "Retrieve items to show in UI, also deliver all hashtags for autocomplete and
   some basic stats."
   [current-state msg-payload]
-  (let [entries (take 500 (filter (entries-filter-fn msg-payload)
-                                  (extract-sorted-entries current-state)))]
+  (let [n (:n msg-payload)
+        entries (take n (filter (entries-filter-fn msg-payload) (extract-sorted-entries current-state)))]
     {:entries  entries
      :hashtags (find-all-hashtags current-state)
      :mentions (find-all-mentions current-state)

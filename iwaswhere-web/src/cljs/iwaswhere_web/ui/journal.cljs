@@ -5,10 +5,9 @@
 
 (defn journal-view
   "Renders journal div, one entry per item, with map if geo data exists in the entry."
-  [{:keys [observed local put-fn]}]
-  (let [local-snapshot @local
-        store-snapshot @observed
-        show-entries (:show-entries local-snapshot)
+  [{:keys [observed put-fn]}]
+  (let [store-snapshot @observed
+        show-entries (or (:show-entries store-snapshot) 20)
         entries (take show-entries (:entries store-snapshot))
         new-entries (vals (:new-entries store-snapshot))
         hashtags (:hashtags store-snapshot)
@@ -31,7 +30,7 @@
             [e/entry-with-comments
              entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-pvt? show-comments? false])))
       (when (and show-context? (seq entries))
-        (let [show-more #(swap! local update-in [:show-entries] + 20)]
+        (let [show-more #(put-fn [:show/more {}])]
           [:div.pure-u-1.show-more {:on-click show-more :on-mouse-over show-more}
            [:span.show-more-btn [:span.fa.fa-plus-square] " show more"]]))
       (when-let [stats (:stats store-snapshot)]
@@ -42,7 +41,6 @@
 
 (defn cmp-map
   [cmp-id]
-  (r/cmp-map {:cmp-id        cmp-id
-              :initial-state {:show-entries 20}
-              :view-fn       journal-view
-              :dom-id        "journal"}))
+  (r/cmp-map {:cmp-id  cmp-id
+              :view-fn journal-view
+              :dom-id  "journal"}))

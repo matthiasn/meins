@@ -1,7 +1,6 @@
 (ns iwaswhere-web.ui.search
   (:require [iwaswhere-web.helpers :as h]
-            [matthiasn.systems-toolbox-ui.reagent :as r]
-            [cljs.pprint :as pp]))
+            [matthiasn.systems-toolbox-ui.reagent :as r]))
 
 (defn tags
   "Renders horizontal list of tags."

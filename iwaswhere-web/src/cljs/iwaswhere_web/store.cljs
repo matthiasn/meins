@@ -1,6 +1,5 @@
 (ns iwaswhere-web.store
-  (:require [iwaswhere-web.helpers :as h]
-            [alandipert.storage-atom :refer [local-storage]]))
+  (:require [alandipert.storage-atom :refer [local-storage]]))
 
 (defn new-state-fn
   "Update client side state with list of journal entries received from backend."
@@ -20,6 +19,7 @@
   contain information for which entries to show the map, or the edit mode."
   [_put-fn]
   (let [initial-state (atom {:entries       []
+                             :show-entries  20
                              :show-maps-for #{}
                              :new-entries   @new-entries-ls
                              :show-all-maps false
@@ -88,12 +88,32 @@
     (update-local-storage new-state)
     {:new-state new-state}))
 
+(defn assoc-in-store
+  "Sets the value under path-in-store in the app state with the path-in-msg in the msg-payload."
+  [path-in-store path-in-msg]
+  (fn [{:keys [current-state msg-payload]}]
+    (let [new-state (assoc-in current-state path-in-store (get-in msg-payload path-in-msg))]
+      {:new-state new-state})))
+
+(defn show-more-fn
+  "Runs previous query but with more results. Also updates the number to show in the UI."
+  [{:keys [current-state]}]
+  (let [current-query (:current-query current-state)
+        new-query (update-in current-query [:n] + 20)
+        new-state (-> current-state
+                      (assoc-in [:show-entries] (:n current-query))
+                      (assoc-in [:current-query] new-query))]
+    {:new-state new-state
+     :emit-msg [:state/get new-query]}))
+
 (defn cmp-map
   "Creates map for the component which holds the client-side application state."
   [cmp-id]
   {:cmp-id      cmp-id
    :state-fn    initial-state-fn
    :handler-map {:state/new          new-state-fn
+                 :state/get          (assoc-in-store [:current-query] [])
+                 :show/more          show-more-fn
                  :entry/new          new-entry-fn
                  :entry/geo-enrich   geo-enrich-fn
                  :entry/update-local update-local-fn
