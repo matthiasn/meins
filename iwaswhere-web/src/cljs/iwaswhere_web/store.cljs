@@ -19,14 +19,16 @@
   a map with temporary entries that are being edited but not saved yet, and sets that
   contain information for which entries to show the map, or the edit mode."
   [_put-fn]
-  {:state (atom {:entries       []
-                 :show-maps-for #{}
-                 :new-entries   @new-entries-ls
-                 :show-all-maps false
-                 :show-hashtags true
-                 :show-context  true
-                 :show-pvt      false
-                 :show-comments true})})
+  (let [initial-state (atom {:entries       []
+                             :show-maps-for #{}
+                             :new-entries   @new-entries-ls
+                             :show-all-maps false
+                             :show-hashtags true
+                             :show-context  true
+                             :show-pvt      false
+                             :show-comments true})]
+    (add-watch new-entries-ls :new (fn [_ _ _ v] (swap! initial-state assoc-in [:new-entries] v)))
+    {:state initial-state}))
 
 (defn toggle-set-fn
   "Toggles for example the visibility of a map or the edit mode for an individual
