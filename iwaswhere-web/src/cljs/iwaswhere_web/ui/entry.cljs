@@ -57,15 +57,23 @@
                           (put-fn [:entry/remove-local {:timestamp ts}])
                           (put-fn [:cmd/trash {:timestamp ts}]))
             upvotes (:upvotes entry)
-            upvote-fn (fn [op] #(put-fn [:text-entry/update (update-in entry [:upvotes] op)]))]
+            upvote-fn (fn [op] #(put-fn [:text-entry/update (update-in entry [:upvotes] op)]))
+
+            arrival-ts (:arrival-timestamp entry)
+            departure-ts (:departure-timestamp entry)
+            dur (when (and arrival-ts departure-ts)
+                  (-> (- departure-ts arrival-ts) (/ 60000) (Math/floor)))
+            formatted-duration (when (< dur 99999)
+                                 (let [minutes (rem dur 60)
+                                       hours (Math/floor (/ dur 60))]
+                                   (str ", " (when (pos? hours) (str hours "h "))
+                                        (when (pos? minutes) (str minutes "m")))))]
         [:div.entry
          [:div.entry-header
           [:a {:href (str "/#" (.format (js/moment ts) "YYYY-MM-DD"))}
            [:span.timestamp (.format (js/moment ts) "dddd, MMMM Do YYYY")]]
-          [:span.timestamp (.format (js/moment ts) ", h:mm a")]
+          [:span.timestamp (.format (js/moment ts) ", h:mm a") formatted-duration]
           [:span.fa.toggle.tooltip {:class (if (pos? upvotes) "fa-thumbs-up" "fa-thumbs-o-up") :on-click (upvote-fn inc)}
-           #_(when (pos? upvotes) [:span.upvotes " " upvotes]
-                                )
            [:span.tooltiptext "upvote"]]
           (when (pos? upvotes) [:span.upvotes " " upvotes])
           (when (pos? upvotes) [u/span-w-tooltip "fa-thumbs-down" "dislike" (upvote-fn dec)])
