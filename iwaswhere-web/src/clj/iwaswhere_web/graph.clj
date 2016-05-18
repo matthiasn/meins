@@ -47,11 +47,13 @@
 (defn compare-w-upvotes
   "Sort comparator which considers upvotes first, and, if those are equal, the timestamp second."
   [x y]
-  (let [upvotes-x (:upvotes x)
-        upvotes-y (:upvotes y)]
+  (let [upvotes-x (get x :upvotes 0)
+        upvotes-y (get y :upvotes 0)]
     (if-not (= upvotes-x upvotes-y)
       (. clojure.lang.Util (compare upvotes-y upvotes-x))
-      (. clojure.lang.Util (compare (:timestamp y) (:timestamp x))))))
+      (if (pos? upvotes-x)  ; when entries have upvotes, sort oldest on top
+        (. clojure.lang.Util (compare (:timestamp x) (:timestamp y)))
+        (. clojure.lang.Util (compare (:timestamp y) (:timestamp x)))))))
 
 (defn extract-sorted-entries
   "Extracts nodes and their properties in descending timestamp order by looking for node by mapping
