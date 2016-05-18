@@ -1,5 +1,6 @@
 (ns iwaswhere-web.ui.search
   (:require [iwaswhere-web.helpers :as h]
+            [iwaswhere-web.ui.utils :as u]
             [matthiasn.systems-toolbox-ui.reagent :as r]))
 
 (defn tags
@@ -28,16 +29,22 @@
                                                        {:sort-by-upvotes (not sort-by-upvotes?)})]))
         show-comments? (:show-comments store-snapshot)
         toggle-comments #(put-fn [:cmd/toggle-key {:key :show-comments}])]
-    [:div.pure-u-1
-      [:span.fa.fa-comments.toggle-map.pull-right
-       {:class (when-not show-comments? "hidden-comments") :on-click toggle-comments}]
-      [:span.fa.toggle-map.pull-right {:class (if show-all-maps? "fa-map" "fa-map-o") :on-click toggle-all-maps}]
-      [:span.fa.fa-hashtag.toggle-map.pull-right {:class (when-not show-tags? "inactive") :on-click toggle-tags}]
-      [:span.fa.fa-eye.toggle-map.pull-right {:class (when-not show-context? "inactive") :on-click toggle-context}]
-      [:span.fa.fa-user-secret.toggle-map.pull-right {:class (when-not show-pvt? "inactive") :on-click toggle-pvt}]
-      [:span.fa.fa-thumbs-up.toggle-map.pull-right
-       {:class (when-not sort-by-upvotes? "inactive") :on-click toggle-upvotes}]
-      [:hr]]))
+    [:div.pure-u-1.toggle-cmds
+     [:span.fa.fa-comments.toggle.pull-right.tooltip
+      {:class (when-not show-comments? "hidden-comments") :on-click toggle-comments}
+      [:span.tooltiptext "show comments"]]
+     [:span.fa.toggle.pull-right.tooltip {:class (if show-all-maps? "fa-map" "fa-map-o") :on-click toggle-all-maps}
+      [:span.tooltiptext "show all maps"]]
+     [:span.fa.fa-hashtag.toggle.pull-right.tooltip {:class (when-not show-tags? "inactive") :on-click toggle-tags}
+      [:span.tooltiptext "show hashtag symbol"]]
+     [:span.fa.fa-eye.toggle.pull-right.tooltip {:class (when-not show-context? "inactive") :on-click toggle-context}
+      [:span.tooltiptext "show query results"]]
+     [:span.fa.fa-user-secret.toggle.pull-right.tooltip {:class (when-not show-pvt? "inactive") :on-click toggle-pvt}
+      [:span.tooltiptext "show private entries"]]
+     [:span.fa.fa-thumbs-up.toggle.pull-right.tooltip
+      {:class (when-not sort-by-upvotes? "inactive") :on-click toggle-upvotes}
+      [:span.tooltiptext "sort by upvotes first"]]
+     [:hr]]))
 
 (defn search-view
   "Renders search component."
@@ -58,14 +65,10 @@
                    :value     (:search-text (:current-query local-snapshot))}]]]
      [:div.pure-u-1
       [:div.entry-footer
-       [:button.pure-button.pure-button-primary.button-xsmall {:on-click (h/new-entry-fn put-fn {})}
-        [:span.fa.fa-plus-square] " new"]
-       [:button.pure-button.button-xsmall {:on-click #(put-fn [:import/photos])}
-        [:span.fa.fa-camera-retro] " import"]
-       [:button.pure-button.button-xsmall {:on-click #(put-fn [:import/geo])}
-        [:span.fa.fa-map-o] " import"]
-       [:button.pure-button.button-xsmall {:on-click #(put-fn [:import/phone])}
-        [:span.fa.fa-mobile-phone] " import"]]]
+       [u/btn-w-tooltip "fa-plus-square" "new" "new entry" (h/new-entry-fn put-fn {}) "pure-button-primary"]
+       [u/btn-w-tooltip "fa-camera-retro" "import" "import photos" #(put-fn [:import/photos])]
+       [u/btn-w-tooltip "fa-map" "import" "import visits" #(put-fn [:import/geo])]
+       [u/btn-w-tooltip "fa-mobile-phone" "import" "import phone entries" #(put-fn [:import/phone])]]]
      [cfg-view local @observed put-fn]]))
 
 (defn init-fn

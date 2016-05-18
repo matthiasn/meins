@@ -32,6 +32,7 @@
   :auto-clean false
 
   :main iwaswhere-web.core
+  :jvm-opts ["-XX:-OmitStackTraceInFastThrow"]
 
   :plugins [[lein-cljsbuild "1.1.3"]
             [lein-figwheel "0.5.3-1"]
