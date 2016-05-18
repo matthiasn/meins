@@ -55,17 +55,17 @@
             toggle-edit #(swap! local update-in [:edit-mode] not)
             trash-entry #(if new-entry?
                           (put-fn [:entry/remove-local {:timestamp ts}])
-                          (put-fn [:cmd/trash {:timestamp ts}]))]
+                          (put-fn [:cmd/trash {:timestamp ts}]))
+            upvotes (:upvotes entry)
+            upvote-fn (fn [op] #(put-fn [:text-entry/update (update-in entry [:upvotes] op)]))]
         [:div.entry
          [:div.entry-header
           [:a {:href (str "/#" (.format (js/moment ts) "YYYY-MM-DD"))}
            [:span.timestamp (.format (js/moment ts) "dddd, MMMM Do YYYY")]]
           [:span.timestamp (.format (js/moment ts) ", h:mm a")]
-          (let [upvotes (:upvotes entry)]
-            [:span.fa.toggle
-             {:class    (if upvotes "fa-thumbs-up" "fa-thumbs-o-up")
-              :on-click #(put-fn [:text-entry/update (update-in entry [:upvotes] inc)])}
-             (when upvotes [:span.upvotes " " upvotes])])
+          [:span.fa.toggle {:class    (if (pos? upvotes) "fa-thumbs-up" "fa-thumbs-o-up") :on-click (upvote-fn inc)}
+           (when (pos? upvotes) [:span.upvotes " " upvotes])]
+          (when (pos? upvotes) [:span.fa.fa-thumbs-down.toggle {:on-click (upvote-fn dec)}])
           (when map? [:span.fa.fa-map-o.toggle {:on-click toggle-map}])
           [:span.fa.fa-pencil-square-o.toggle {:on-click toggle-edit}]
           (when-not (:comment-for entry)

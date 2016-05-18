@@ -296,7 +296,7 @@ textarea {
     cursor: pointer;
 }
 
-.fa-thumbs-up {
+.fa-thumbs-up, .fa-thumbs-down {
     color: #006C91;
 }
 
@@ -425,4 +425,9 @@ a {
 .upvotes {
     vertical-align: super;
     font-size: 0.8em;
+    font-weight: bold;
+    padding-right: 2px;
+    margin-left: 1px;
+    border: 1px solid #006C91;
+    border-radius: 2px;
 }
