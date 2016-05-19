@@ -5,8 +5,7 @@
   (:require [iwaswhere-web.helpers :as h]
             [iwaswhere-web.ui.utils :as u]
             [reagent.core :as r]
-            [clojure.string :as s]
-            [cljsjs.moment]))
+            [clojure.string :as s]))
 
 (defn suggestions
   "Renders suggestions for hashtags or mentions if either occurs before the current caret position.

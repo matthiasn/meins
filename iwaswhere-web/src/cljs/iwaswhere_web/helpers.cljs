@@ -1,6 +1,5 @@
 (ns iwaswhere-web.helpers
-  (:require [cljsjs.moment]
-            [matthiasn.systems-toolbox.component :as st]))
+  (:require [matthiasn.systems-toolbox.component :as st]))
 
 (defn send-w-geolocation
   "Calls geolocation, sends entry enriched by geo information inside the
@@ -30,11 +29,22 @@
 
 (defn new-entry-fn
   "Create a new, empty entry. The opts map is merged last with the generated entry, thus keys can
-  be overwritten here."
+  be overwritten here.
+  Caveat: the timezone detection currently only works in Chrome. My Firefox 46.0.1 strictly refused
+  to tell me a timezone when calling 'Intl.DateTimeFormat().resolvedOptions()', which would be
+  according to standards but unfortunately the timeZone is always undefined."
   [put-fn opts]
   (fn [_ev]
     (let [ts (st/now)
-          entry (merge (parse-entry "") {:timestamp ts :tags #{"#new-entry"}} opts)]
+          entry (merge (parse-entry "")
+                       {:timestamp  ts
+                        :tags       #{"#new-entry"}
+                        :timezone   (or (when-let [resolved (.-resolved (new js/Intl.DateTimeFormat))]
+                                          (.-timeZone resolved))
+                                        (when-let [resolved (.resolvedOptions (new js/Intl.DateTimeFormat))]
+                                          (.-timeZone resolved)))
+                        :utc-offset (.getTimezoneOffset (new js/Date))}
+                       opts)]
       (put-fn [:entry/new entry])
       (send-w-geolocation entry put-fn))))
 

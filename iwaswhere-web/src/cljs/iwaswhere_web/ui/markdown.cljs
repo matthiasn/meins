@@ -3,8 +3,7 @@
   This includes both a properly styled element for static content and the edit-mode view, with
   autosuggestions for tags and mentions."
   (:require [markdown.core :as md]
-            [clojure.string :as s]
-            [cljsjs.moment]))
+            [clojure.string :as s]))
 
 (defn hashtags-replacer
   "Replaces hashtags in entry text. Depending on show-hashtags? switch either displays
