@@ -55,25 +55,41 @@
         (. clojure.lang.Util (compare (:timestamp x) (:timestamp y)))
         (. clojure.lang.Util (compare (:timestamp y) (:timestamp x)))))))
 
+(defn get-comments
+  "Extract all comments for entry."
+  [entry g n]
+  (merge entry
+    {:comments (->> (flatten (uber/find-edges g {:dest n :relationship :COMMENT}))
+                    (remove :mirror?)
+                    (map #(uber/attrs g (:src %)))
+                    (sort-by :timestamp))}))
+
+(defn get-linked-entries
+  "Extract all linked entries for entry, including their comments."
+  [entry g n sort-by-upvotes?]
+  (let [linked (->> (flatten (uber/find-edges g {:src n :relationship :LINKED}))
+                            (remove :mirror?)
+                            (map #(uber/attrs g (:dest %)))
+                            (sort-by :timestamp)
+                            (map (fn [linked-entry]
+                                   (get-comments linked-entry g (:timestamp linked-entry)))))]
+    (merge entry {:linked-entries (if sort-by-upvotes? (sort compare-w-upvotes linked) linked)})))
+
 (defn extract-sorted-entries
   "Extracts nodes and their properties in descending timestamp order by looking for node by mapping
   over the sorted set and extracting attributes for each node.
   Warns when node not in graph. (debugging, should never happen)"
   [current-state query]
-  (let [mapper-fn (fn [n]
+  (let [sort-by-upvotes? (:sort-by-upvotes query)
+        mapper-fn (fn [n]
                     (let [g (:graph current-state)]
                       (if (uber/has-node? g n)
-                        (let [attrs (uber/attrs g n)
-                              comment-edges (flatten (uber/find-edges g {:dest n :relationship :COMMENT}))
-                              comments (->> comment-edges
-                                            (remove :mirror?)
-                                            (map #(uber/attrs g (:src %)))
-                                            (sort-by :timestamp))
-                              entry (merge attrs {:comments comments})]
-                          entry)
+                        (-> (uber/attrs g n)
+                            (get-comments g n)
+                            (get-linked-entries g n sort-by-upvotes?))
                         (log/warn "Cannot find node: " n))))
         entries (map mapper-fn (:sorted-entries current-state))]
-    (if (:sort-by-upvotes query)
+    (if sort-by-upvotes?
       (sort compare-w-upvotes entries)
       entries)))
 
@@ -158,6 +174,17 @@
     (uber/add-edges graph [(:timestamp entry) comment-for {:relationship :COMMENT}])
     graph))
 
+(defn add-linked
+  "Add mention edges to graph for a new entry. When a mentioned person exists already, an edge to
+  the existing node will be added, otherwise a new hashtag node will be created."
+  [graph entry]
+  (let [linked-entries (:linked-entries entry)]
+    (reduce (fn [acc linked-entry]
+              (-> acc
+                  (uber/add-edges [(:timestamp entry) linked-entry {:relationship :LINKED}])))
+            graph
+            linked-entries)))
+
 (defn add-node
   "Adds node to both graph and the sorted set, which maintains the entries sorted by timestamp."
   [current-state ts entry]
@@ -165,6 +192,7 @@
       (update-in [:graph] #(uber/add-nodes-with-attrs % [ts entry]))
       (update-in [:graph] add-hashtags entry)
       (update-in [:graph] add-mentions entry)
+      (update-in [:graph] add-linked entry)
       (update-in [:graph] add-timeline-tree entry)
       (update-in [:graph] add-parent-ref entry)
       (update-in [:sorted-entries] conj ts)))

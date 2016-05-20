@@ -27,7 +27,7 @@
         (let [editable? (contains? (:tags entry) "#new-entry")]
           (when (and (not (:comment-for entry)) (or editable? show-context?))
             ^{:key (:timestamp entry)}
-            [e/entry-with-comments
+            [e/entry-w-linked-entries
              entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-pvt? show-comments? false])))
       (when (and show-context? (seq entries))
         (let [show-more #(put-fn [:show/more {}])]

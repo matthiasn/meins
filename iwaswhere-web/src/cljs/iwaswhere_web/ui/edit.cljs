@@ -56,7 +56,7 @@
   cursor, which can then be completed by clicking on an empty in the autosuggested list, or by
   using the tab key for selecting the first one."
   [entry hashtags mentions put-fn toggle-edit new-entry?]
-  (let [entry (dissoc entry :comments)
+  (let [entry (-> entry (dissoc :comments) (dissoc :linked-entries))
         edit-elem-atom (atom {})
         last-saved (r/atom entry)
         local-saved-entry (r/atom entry)

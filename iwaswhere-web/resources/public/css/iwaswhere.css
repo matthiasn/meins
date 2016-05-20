@@ -480,3 +480,49 @@ a {
 .toggle-cmds {
     margin-right: 30px;
 }
+
+.entry-with-linked {
+    padding: 0 3px;
+    margin-top: 3px;
+    border-color: #63809c;
+    border-style: solid;
+    border-width: 1px;
+}
+
+.entry-with-comments {
+    margin: 4px 0;
+    border-color: #1f8dd6;
+    border-style: solid;
+    border-width: 1px;
+}
+
+/* Tooltip container */
+.new-link-btn {
+    position: relative;
+    display: inline-block;
+}
+
+.new-link-entry {
+    visibility: visible;
+    background-color: #999;
+    color: #fff;
+    text-align: center;
+    padding: 3px;
+
+    font-family: "Lato"!important;
+    font-weight: bold;
+    font-size: 0.7em;
+
+    /* Position the tooltip text - see examples below! */
+    position: absolute;
+    z-index: 1002;
+    bottom: 140%;
+    width: 180px;
+    left: 50%;
+    /*margin-left: -50%;*/
+    margin-left: -55px;
+}
+
+.new-link-entry input {
+    width: 100%;
+}
