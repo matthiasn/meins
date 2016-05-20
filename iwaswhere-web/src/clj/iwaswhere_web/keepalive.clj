@@ -18,11 +18,13 @@
      [:cmd/route {:from :server/scheduler-cmp :to :server/store-cmp}]]))
 
 (defn keepalive-fn
-  "Mark client in the stored queries as recently seen to prevent it from being garbage collected."
+  "Mark client in the stored queries as recently seen to prevent it from being garbage collected.
+  Only returns new state when the query already exists in current state."
   [{:keys [current-state msg-meta]}]
   (let [sente-uid (:sente-uid msg-meta)
         new-state (assoc-in current-state [:last-filter sente-uid :last-seen] (System/currentTimeMillis))]
-    {:new-state new-state}))
+    (when (contains? (:last-filter current-state) sente-uid)
+      {:new-state new-state})))
 
 (defn query-gc-fn
   "Garbage collect queries whose corresponding client has not recently sent a keepalive message."

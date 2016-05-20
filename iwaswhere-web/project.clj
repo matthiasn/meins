@@ -22,7 +22,7 @@
                  [camel-snake-kebab "0.3.2"]
                  [matthiasn/systems-toolbox "0.5.18"]
                  [matthiasn/systems-toolbox-ui "0.5.7"]
-                 [matthiasn/systems-toolbox-sente "0.5.15"]
+                 [matthiasn/systems-toolbox-sente "0.5.16"]
                  [alandipert/storage-atom "2.0.1"]
                  [clj-time "0.11.0"]]
 
