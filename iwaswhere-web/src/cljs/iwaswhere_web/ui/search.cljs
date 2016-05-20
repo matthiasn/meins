@@ -50,9 +50,14 @@
   "Renders search component."
   [{:keys [observed local put-fn]}]
   (let [local-snapshot @local
+        location-timeout-fn (fn [search-text]
+                              (.setTimeout js/window
+                                           #(aset js/window "location" "hash" (js/encodeURIComponent search-text))
+                                           5000))
         on-change-fn #(let [new-search (h/parse-search (.. % -target -value))]
                        (swap! local assoc-in [:current-query] new-search)
-                       (aset js/window "location" "hash" (js/encodeURIComponent (:search-text new-search)))
+                       (swap! local update-in [:set-location] (fn [prev] (when prev (.clearTimeout js/window prev))
+                                                                (location-timeout-fn (:search-text new-search))))
                        (put-fn [:state/get (merge new-search {:sort-by-upvotes (:sort-by-upvotes @observed)})]))]
     [:div.l-box-lrg.pure-g.search-div
      [:div.pure-u-1
