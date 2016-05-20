@@ -56,4 +56,4 @@
                         :compiler     {:main          "iwaswhere-web.core"
                                        :asset-path    "js/build"
                                        :output-to     "resources/public/js/build/iwaswhere.js"
-                                       :optimizations :simple}}]})
+                                       :optimizations :advanced}}]})

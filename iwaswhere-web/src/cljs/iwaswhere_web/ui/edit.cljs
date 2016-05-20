@@ -75,8 +75,9 @@
             cursor-pos (.-anchorOffset selection)
             anchor-node (aget selection "anchorNode")
             node-value (str (when anchor-node (aget anchor-node "nodeValue")) "")
-            before-cursor (subs node-value 0 cursor-pos)
-
+            before-cursor (if (not= -1 (.indexOf (:md @local-saved-entry) node-value))
+                            (subs node-value 0 cursor-pos)
+                            "")
             ; find incomplete tag and mention before cursor
             [curr-tag f-tags] (autocomplete-tags before-cursor "(?!^)#" hashtags)
             [curr-mention f-mentions] (autocomplete-tags before-cursor "@" mentions)
