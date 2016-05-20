@@ -42,7 +42,7 @@
 (defn autocomplete-tags
   "Render autocomplete option for the partial tag (or mention) before the cursor."
   [before-cursor regex-prefix tags]
-  (let [current-tag (re-find (js/RegExp. (str regex-prefix h/tag-char-class "+$") "m") before-cursor)
+  (let [current-tag (re-find (js/RegExp. (str regex-prefix h/tag-char-class "+$") "") before-cursor)
         current-tag-regex (js/RegExp. current-tag "i")
         tag-substr-filter (fn [tag] (when current-tag (re-find current-tag-regex tag)))
         f-tags (filter tag-substr-filter tags)]
