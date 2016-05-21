@@ -7,21 +7,6 @@
             [reagent.core :as r]
             [clojure.string :as s]))
 
-(defn suggestions
-  "Renders suggestions for hashtags or mentions if either occurs before the current caret position.
-  It does so by getting the selection from the DOM API, which can be used to determine the position
-  and a string before that position, then finding either a hashtag or mention fragment right at the
-  and of that substring. For these, auto-suggestions are displayed, which are entities that begin
-  with the tag fragment before the caret position. When any of the suggestions are clicked, the
-  fragment will be replaced with the clicked item."
-  [entry filtered-tags current-tag tag-replace-fn css-class]
-  (let [ts (:ts entry)]
-    [:div.suggestions
-     (for [tag filtered-tags]
-       ^{:key (str ts tag)}
-       [:div {:on-click #(tag-replace-fn current-tag tag)}
-        [:span {:class css-class} tag]])]))
-
 (defn editable-code-elem
   "Code element, with content editable. Takes md-string to render, update-temp-fn which is
   called with any input to the element, and the on-keydown-fn, which is called for each keystroke
@@ -39,15 +24,6 @@
                                     :on-key-down      on-keydown-fn}
                              md-string])}))
 
-(defn autocomplete-tags
-  "Render autocomplete option for the partial tag (or mention) before the cursor."
-  [before-cursor regex-prefix tags]
-  (let [current-tag (re-find (js/RegExp. (str regex-prefix h/tag-char-class "+$") "") before-cursor)
-        current-tag-regex (js/RegExp. current-tag "i")
-        tag-substr-filter (fn [tag] (when current-tag (re-find current-tag-regex tag)))
-        f-tags (filter tag-substr-filter tags)]
-    [current-tag f-tags]))
-
 (defn editable-md-render
   "Renders markdown in a pre>code element, with editable content. Sends update message to store
   component on any change to the component. The save button sends updated entry to the backend.
@@ -57,6 +33,7 @@
   using the tab key for selecting the first one."
   [entry hashtags mentions put-fn toggle-edit new-entry?]
   (let [entry (-> entry (dissoc :comments) (dissoc :linked-entries))
+        ts (:timestamp entry)
         edit-elem-atom (atom {})
         last-saved (r/atom entry)
         local-saved-entry (r/atom entry)
@@ -70,17 +47,10 @@
                              (reset! local-saved-entry updated-entry))
             save-fn #(put-fn [:text-entry/update (h/clean-entry @local-saved-entry)])
 
-            ;determine cursor position
-            selection (.getSelection js/window)
-            cursor-pos (.-anchorOffset selection)
-            anchor-node (aget selection "anchorNode")
-            node-value (str (when anchor-node (aget anchor-node "nodeValue")) "")
-            before-cursor (if (not= -1 (.indexOf (:md @local-saved-entry) node-value))
-                            (subs node-value 0 cursor-pos)
-                            "")
-            ; find incomplete tag and mention before cursor
-            [curr-tag f-tags] (autocomplete-tags before-cursor "(?!^)#" hashtags)
-            [curr-mention f-mentions] (autocomplete-tags before-cursor "@" mentions)
+            ; find incomplete tag or mention before cursor, show suggestions
+            before-cursor (h/string-before-cursor (:md @local-saved-entry))
+            [curr-tag f-tags] (h/autocomplete-tags before-cursor "(?!^)#" hashtags)
+            [curr-mention f-mentions] (h/autocomplete-tags before-cursor "@" mentions)
 
             tag-replace-fn (fn [curr-tag tag]
                              (let [curr-tag-regex (js/RegExp (str curr-tag "(?!" h/tag-char-class ")") "i")
@@ -110,7 +80,8 @@
           (reset! local-saved-entry latest-entry))
         [:div.edit-md
          [:pre [editable-code-elem md-string update-temp-fn on-keydown-fn edit-elem-atom]]
-         [suggestions entry f-tags curr-tag tag-replace-fn "hashtag"]
-         [suggestions entry f-mentions curr-mention tag-replace-fn "mention"]
+         [u/suggestions ts f-tags curr-tag tag-replace-fn "hashtag"]
+         [u/suggestions ts f-mentions curr-mention tag-replace-fn "mention"]
          (when (or (not= @last-saved @local-saved-entry) new-entry?)
-           [:span.not-saved {:on-click save-fn} [:span.fa.fa-floppy-o] "  click to save"])]))))
+           [:div
+            [:span.not-saved {:on-click save-fn} [:span.fa.fa-floppy-o] "  click to save"]])]))))

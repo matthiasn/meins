@@ -10,7 +10,7 @@
 */
 body {
     color: #576364;
-    background-color: #f9f9fa;
+    background-color: #f3f3f9;
     font-size: 13px;
     font-weight: 300;
     overflow-y:scroll;
@@ -263,6 +263,7 @@ textarea {
     color: white;
     font-size: 0.8em;
     background-color: rgb(66, 184, 221);
+    white-space: nowrap;
 }
 
 .not-tag {
@@ -322,7 +323,7 @@ button {
 }
 
 .edit-md pre {
-    margin: 0.3em 0 0.7em 0;
+    margin: 0.3em 0;
 }
 
 .edit-md pre code {
@@ -331,12 +332,26 @@ button {
 }
 
 .textentry {
-    padding-top: 14px;
+    margin: 4px 0;
+    padding: 4px;
+    background-color: white;
 }
 
 .suggestions {
     margin-bottom: 0.5em;
     line-height: 1.4em;
+    position: relative;
+    display: inline-block;
+}
+
+.suggestions-list {
+    position: absolute;
+    top: -4px;
+    background-color: white;
+    z-index: 1002;
+    padding: 2px 0 4px 4px;
+    text-wrap: none;
+    border: #BBB 1px solid;
 }
 
 .mention {
@@ -364,8 +379,8 @@ button {
 
 .entry {
     background: white;
-    padding: 5px;
-    margin: 8px 0 4px 0;
+    padding: 5px 5px 2px 5px;
+    margin-bottom: 4px;
     min-height: 60px;
 }
 
@@ -410,9 +425,9 @@ a {
     position: fixed;
     width: 100%;
     top: 0;
-    padding-top: 50px;
+    padding-top: 55px;
     padding-right: 30px;
-    background-color: #f9f9fa;
+    background-color: #f3f3f9;
     z-index: 1001;
 }
 
@@ -490,7 +505,7 @@ a {
 }
 
 .entry-with-comments {
-    margin: 4px 0;
+    margin: 3px 0;
     border-color: #1f8dd6;
     border-style: solid;
     border-width: 1px;

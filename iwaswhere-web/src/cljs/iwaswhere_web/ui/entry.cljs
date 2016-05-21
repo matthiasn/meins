@@ -50,10 +50,6 @@
                                     (let [link (re-find #"[0-9]{13}" (.-value (.-target ev)))
                                           entry-links (:linked-entries entry)
                                           linked-entries (conj entry-links (long link))
-                                          #_#_
-                                          new-entry (-> (merge entry {:linked-entries linked-entries})
-                                                        (dissoc :comments)
-                                                        (dissoc :linked-entries-list))
                                           new-entry (h/clean-entry (merge entry {:linked-entries linked-entries}))]
                                       (when link
                                         (put-fn [:text-entry/update new-entry])

@@ -32,3 +32,19 @@
   [icon-cls tooltip-text click-fn]
   [:span.fa.toggle.tooltip {:on-click click-fn :class icon-cls}
    [:span.tooltiptext tooltip-text]])
+
+(defn suggestions
+  "Renders suggestions for hashtags or mentions if either occurs before the current caret position.
+  It does so by getting the selection from the DOM API, which can be used to determine the position
+  and a string before that position, then finding either a hashtag or mention fragment right at the
+  and of that substring. For these, auto-suggestions are displayed, which are entities that begin
+  with the tag fragment before the caret position. When any of the suggestions are clicked, the
+  fragment will be replaced with the clicked item."
+  [key-prefix filtered-tags current-tag tag-replace-fn css-class]
+  [:div.suggestions
+   (when (seq filtered-tags)
+     [:div.suggestions-list
+      (for [tag filtered-tags]
+        ^{:key (str key-prefix tag)}
+        [:div {:on-click #(tag-replace-fn current-tag tag)}
+         [:span {:class css-class} tag]])])])

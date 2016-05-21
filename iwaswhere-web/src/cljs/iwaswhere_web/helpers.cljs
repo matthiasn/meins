@@ -72,3 +72,25 @@
   []
   (let [search-hash (subs (js/decodeURIComponent (aget js/window "location" "hash")) 1)]
     (parse-search search-hash)))
+
+(defn autocomplete-tags
+  "Determine autocomplete options for the partial tag (or mention) before the cursor."
+  [before-cursor regex-prefix tags]
+  (let [current-tag (re-find (js/RegExp. (str regex-prefix tag-char-class "+$") "") before-cursor)
+        current-tag-regex (js/RegExp. current-tag "i")
+        tag-substr-filter (fn [tag] (when current-tag (re-find current-tag-regex tag)))
+        f-tags (filter tag-substr-filter tags)]
+    [current-tag f-tags]))
+
+(defn string-before-cursor
+  "Determine the substring right before the cursor of the current selection. Only returns that
+  substring if it is from current node's text, as otherwise this would listen to selections
+  outside the element as well."
+  [comp-str]
+  (let [selection (.getSelection js/window)
+        cursor-pos (.-anchorOffset selection)
+        anchor-node (aget selection "anchorNode")
+        node-value (str (when anchor-node (aget anchor-node "nodeValue")) "")]
+    (if (not= -1 (.indexOf (str comp-str) node-value))
+      (subs node-value 0 cursor-pos)
+      "")))
