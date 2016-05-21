@@ -18,6 +18,7 @@
         show-pvt? (:show-pvt store-snapshot)
         show-comments? (:show-comments store-snapshot)]
     [:div.l-box-lrg.pure-g.journal
+     {:style {:margin-top (.-offsetHeight (.-firstChild (.getElementById js/document "search")))}}
      [:div.pure-u-1
       (for [entry (filter #(not (:comment-for %)) new-entries)]
         ^{:key (:timestamp entry)}

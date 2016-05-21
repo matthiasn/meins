@@ -121,7 +121,6 @@ label {
 .content-wrapper {
     /* These styles are required for the "scroll-over" effect */
     position: absolute;
-    top: 50px;
     width: 100%;
     min-height: 12%;
 }
@@ -429,10 +428,6 @@ a {
     padding-right: 30px;
     background-color: #f3f3f9;
     z-index: 1001;
-}
-
-.journal {
-    margin-top: 100px;
 }
 
 .upvotes {
