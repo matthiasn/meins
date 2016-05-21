@@ -48,11 +48,15 @@
                    :on-key-down (fn [ev]
                                   (when (= (.-keyCode ev) 13)
                                     (let [link (re-find #"[0-9]{13}" (.-value (.-target ev)))
-                                          entry-links (set (map #(:timestamp %) (:linked-entries entry)))
+                                          entry-links (:linked-entries entry)
                                           linked-entries (conj entry-links (long link))
-                                          new-entry (merge entry {:linked-entries linked-entries})]
+                                          #_#_
+                                          new-entry (-> (merge entry {:linked-entries linked-entries})
+                                                        (dissoc :comments)
+                                                        (dissoc :linked-entries-list))
+                                          new-entry (h/clean-entry (merge entry {:linked-entries linked-entries}))]
                                       (when link
-                                        (put-fn [:text-entry/update (dissoc new-entry :comments)])
+                                        (put-fn [:text-entry/update new-entry])
                                         (swap! visible not)))))}]])])))
 
 (defn journal-entry
@@ -148,7 +152,7 @@
   [:div.entry-with-linked
    [entry-with-comments entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-pvt?
     show-all-comments? new-entry? true]
-   (when-let [linked-entries (:linked-entries entry)]
+   (when-let [linked-entries (:linked-entries-list entry)]
      (when (seq linked-entries)
        [:div.linked-entries
         [:h6 "Linked entries"]

@@ -526,3 +526,7 @@ a {
 .new-link-entry input {
     width: 100%;
 }
+
+.linked-entries h6 {
+    margin-top: 8px;
+}

@@ -68,7 +68,7 @@
             update-temp-fn #(let [updated-entry (merge latest-entry (h/parse-entry (get-content %)))]
                              (put-fn [:entry/update-local updated-entry])
                              (reset! local-saved-entry updated-entry))
-            save-fn #(put-fn [:text-entry/update @local-saved-entry])
+            save-fn #(put-fn [:text-entry/update (h/clean-entry @local-saved-entry)])
 
             ;determine cursor position
             selection (.getSelection js/window)

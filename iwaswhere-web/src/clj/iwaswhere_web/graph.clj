@@ -73,7 +73,7 @@
                             (sort-by :timestamp)
                             (map (fn [linked-entry]
                                    (get-comments linked-entry g (:timestamp linked-entry)))))]
-    (merge entry {:linked-entries (if sort-by-upvotes? (sort compare-w-upvotes linked) linked)})))
+    (merge entry {:linked-entries-list (if sort-by-upvotes? (sort compare-w-upvotes linked) linked)})))
 
 (defn extract-sorted-entries
   "Extracts nodes and their properties in descending timestamp order by looking for node by mapping

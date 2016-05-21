@@ -61,6 +61,12 @@
    :timestamp   (re-find #"[0-9]{13}" text)
    :n           40})
 
+(defn clean-entry
+  [entry]
+  (-> entry
+      (dissoc :comments)
+      (dissoc :linked-entries-list)))
+
 (defn query-from-search-hash
   "Get query from location hash for current page."
   []
