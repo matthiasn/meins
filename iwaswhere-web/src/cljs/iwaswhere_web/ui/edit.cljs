@@ -45,7 +45,9 @@
             update-temp-fn #(let [updated-entry (merge latest-entry (h/parse-entry (get-content %)))]
                              (put-fn [:entry/update-local updated-entry])
                              (reset! local-saved-entry updated-entry))
-            save-fn #(put-fn [:text-entry/update (h/clean-entry @local-saved-entry)])
+            save-fn #(put-fn [:text-entry/update (if new-entry?
+                                                   (update-in (h/clean-entry @local-saved-entry) [:tags] conj "#new")
+                                                   (h/clean-entry @local-saved-entry))])
 
             ; find incomplete tag or mention before cursor, show suggestions
             before-cursor (h/string-before-cursor (:md @local-saved-entry))

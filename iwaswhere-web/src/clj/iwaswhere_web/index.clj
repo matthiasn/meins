@@ -26,7 +26,6 @@
         [:a.pure-menu-heading {:href ""} "iWasWhere?"]]]
       [:div.content-wrapper
        [:div.content [:div#search]]
-       [:div.content [:div#new-entry]]
        [:div.content [:div#journal]]]
       [:script {:src "/js/build/iwaswhere.js"}]]]))
 
