@@ -13,7 +13,7 @@
   (fn [acc hashtag]
     (let [f-hashtag (if show-hashtags? hashtag (subs hashtag 1))
           with-link (str " <a href='/#" hashtag "'>" f-hashtag "</a>")]
-      (s/replace acc (re-pattern (str "[^*]" hashtag "(?!\\w)")) with-link))))
+      (s/replace acc (re-pattern (str "[^*]" hashtag "(?!\\w)(?![`)])")) with-link))))
 
 (defn mentions-replacer
   "Replaces mentions in entry text."
