@@ -1,5 +1,6 @@
 (ns iwaswhere-web.store
-  (:require [alandipert.storage-atom :refer [local-storage]]))
+  (:require [alandipert.storage-atom :refer [local-storage]]
+            [iwaswhere-web.keepalive :as ka]))
 
 (defn new-state-fn
   "Update client side state with list of journal entries received from backend."
@@ -19,6 +20,7 @@
   contain information for which entries to show the map, or the edit mode."
   [_put-fn]
   (let [initial-state (atom {:entries         []
+                             :last-alive      (.now js/Date)
                              :show-entries    20
                              :show-maps-for   #{}
                              :new-entries     @new-entries-ls
@@ -121,4 +123,6 @@
                  :entry/remove-local remove-local-fn
                  :entry/saved        entry-saved-fn
                  :cmd/toggle         toggle-set-fn
-                 :cmd/toggle-key     toggle-key-fn}})
+                 :cmd/toggle-key     toggle-key-fn
+                 :cmd/keep-alive     ka/reset-fn
+                 :cmd/keep-alive-res ka/set-alive-fn}})

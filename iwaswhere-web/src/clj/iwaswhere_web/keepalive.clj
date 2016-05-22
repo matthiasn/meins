@@ -24,7 +24,8 @@
   (let [sente-uid (:sente-uid msg-meta)
         new-state (assoc-in current-state [:last-filter sente-uid :last-seen] (System/currentTimeMillis))]
     (when (contains? (:last-filter current-state) sente-uid)
-      {:new-state new-state})))
+      {:emit-msg  (with-meta [:cmd/keep-alive-res] msg-meta)
+       :new-state new-state})))
 
 (defn query-gc-fn
   "Garbage collect queries whose corresponding client has not recently sent a keepalive message."
