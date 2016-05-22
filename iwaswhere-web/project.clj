@@ -57,4 +57,4 @@
                                        :asset-path    "js/build"
                                        :externs       ["externs/misc.js"]
                                        :output-to     "resources/public/js/build/iwaswhere.js"
-                                       :optimizations :advanced}}]})
+                                       :optimizations :simple}}]})

@@ -62,10 +62,10 @@
   used in edit mode also sends a modified entry to the store component, which is useful
   for displaying updated hashtags, or also for showing the warning that the entry is not
   saved yet."
-  [entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-comments? new-entry? with-linked?]
+  [entry store-snapshot put-fn show-comments? new-entry? with-linked?]
   (let [local (rc/atom {:edit-mode (contains? (:tags entry) "#new-entry")})]
     (fn
-      [entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-comments? new-entry? with-linked?]
+      [entry store-snapshot put-fn show-comments? new-entry? with-linked?]
       (let [ts (:timestamp entry)
             map? (:latitude entry)
             show-map? (contains? (:show-maps-for store-snapshot) ts)
@@ -76,7 +76,8 @@
                           (put-fn [:cmd/trash {:timestamp ts}]))
             upvotes (:upvotes entry)
             upvote-fn (fn [op] #(put-fn [:text-entry/update (update-in entry [:upvotes] op)]))
-
+            hashtags (:hashtags store-snapshot)
+            mentions (:mentions store-snapshot)
             arrival-ts (:arrival-timestamp entry)
             departure-ts (:departure-timestamp entry)
             dur (when (and arrival-ts departure-ts)
@@ -114,10 +115,10 @@
                                :class    (when entry-active? "active-entry")}
                [:span.fa.fa-eye] (str " linked: " (count (:linked-entries-list entry)))]))]
          [hashtags-mentions-list entry]
-         [l/leaflet-map entry (or show-map? show-all-maps?)]
+         [l/leaflet-map entry (or show-map? (:show-all-maps store-snapshot))]
          (if (or new-entry? (:edit-mode @local))
            [e/editable-md-render entry hashtags mentions put-fn toggle-edit new-entry?]
-           [md/markdown-render entry show-tags?])
+           [md/markdown-render entry (:show-hashtags store-snapshot)])
          [m/image-view entry]
          [m/audioplayer-view entry]
          [m/videoplayer-view entry]]))))
@@ -129,26 +130,23 @@
   used in edit mode also sends a modified entry to the store component, which is useful
   for displaying updated hashtags, or also for showing the warning that the entry is not
   saved yet."
-  [entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-pvt? new-entry?]
+  [entry store-snapshot put-fn new-entry?]
   (let [show-comments? (r/atom false)]
-    (fn [entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-pvt? new-entry?]
+    (fn [entry store-snapshot put-fn new-entry?]
       (let [comments (:comments entry)]
         [:div.entry-with-comments
-         [journal-entry
-          entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-comments? new-entry? true]
+         [journal-entry entry store-snapshot put-fn show-comments? new-entry? true]
          (when (seq comments)
            (if @show-comments?
              [:div.comments
               (let [comments (:comments entry)]
-                (for [comment (if show-pvt? comments (filter u/pvt-filter comments))]
+                (for [comment (if (:show-pvt store-snapshot) comments (filter u/pvt-filter comments))]
                   ^{:key (str "c" (:timestamp comment))}
-                  [journal-entry comment store-snapshot hashtags mentions put-fn show-all-maps? show-tags?
-                   show-comments? false false]))]
+                  [journal-entry comment store-snapshot put-fn show-comments? false false]))]
              [:div.show-comments-div {:on-click #(swap! show-comments? not)}
               (let [n (count comments)]
                 [:span.show-comments (str "show " n " comment" (when (> n 1) "s"))])]))
          [:div.comments
           (for [comment (filter #(= (:comment-for %) (:timestamp entry)) (vals (:new-entries store-snapshot)))]
             ^{:key (str "c" (:timestamp comment))}
-            [journal-entry comment store-snapshot hashtags mentions put-fn show-all-maps? show-tags?
-             show-comments? true false])]]))))
+            [journal-entry comment store-snapshot put-fn show-comments? true false])]]))))
