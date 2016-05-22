@@ -23,7 +23,8 @@
      [:body
       [:div.header
        [:div.home-menu.pure-menu.pure-menu-open.pure-menu-horizontal.pure-menu-fixed
-        [:a.pure-menu-heading {:href ""} "iWasWhere?"]]]
+        [:a.pure-menu-heading {:href ""} "iWasWhere?"]
+        [:span#new-import]]]
       [:div.content-wrapper
        [:div.content [:div#search]]
        [:div.content [:div#journal]]]

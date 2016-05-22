@@ -95,12 +95,6 @@
        (:search-text (:current-query local-snapshot))]
       [u/suggestions "search" f-tags curr-tag tag-replace-fn "hashtag"]
       [u/suggestions "search" f-mentions curr-mention tag-replace-fn "mention"]]
-     [:div.pure-u-1
-      [:div.entry-footer
-       [u/btn-w-tooltip "fa-plus-square" "new" "new entry" (h/new-entry-fn put-fn {}) "pure-button-primary"]
-       [u/btn-w-tooltip "fa-camera-retro" "import" "import photos" #(put-fn [:import/photos])]
-       [u/btn-w-tooltip "fa-map" "import" "import visits" #(put-fn [:import/geo])]
-       [u/btn-w-tooltip "fa-mobile-phone" "import" "import phone entries" #(put-fn [:import/phone])]]]
      [cfg-view local @observed put-fn]]))
 
 (defn init-fn

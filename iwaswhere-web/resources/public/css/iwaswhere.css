@@ -467,6 +467,14 @@ a {
     z-index: 1001;
 }
 
+.new-import {
+    width: 100%;
+    top: 0;
+    padding-right: 30px;
+    z-index: 1001;
+}
+
+
 .upvotes {
     vertical-align: super;
     color: #006C91;
