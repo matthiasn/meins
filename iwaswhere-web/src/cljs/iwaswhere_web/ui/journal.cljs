@@ -17,7 +17,7 @@
         show-context? (:show-context store-snapshot)
         show-pvt? (:show-pvt store-snapshot)
         show-comments? (:show-comments store-snapshot)
-        active-entry (:active store-snapshot)]
+        active-entry (get (:entries-map store-snapshot) (:active store-snapshot))]
     [:div.l-box-lrg.pure-g.journal
      {:style {:margin-top (.-offsetHeight (.-firstChild (.getElementById js/document "search")))}}
      [:div.journal-entries

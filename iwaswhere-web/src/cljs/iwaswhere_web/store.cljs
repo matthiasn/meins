@@ -5,7 +5,9 @@
 (defn new-state-fn
   "Update client side state with list of journal entries received from backend."
   [{:keys [current-state msg-payload]}]
-  {:new-state (merge current-state msg-payload)})
+  (let [entries-map (into {} (map (fn [entry] [(:timestamp entry) entry]) (:entries msg-payload)))
+        new-state (merge current-state msg-payload {:entries-map entries-map})]
+    {:new-state new-state}))
 
 (defonce new-entries-ls (local-storage (atom {}) "iWasWhere_new_entries"))
 

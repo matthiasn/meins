@@ -110,7 +110,7 @@
           [trash-icon trash-entry]
           (when (seq (:linked-entries-list entry))
             (let [entry-active? (= (-> store-snapshot :active) entry)]
-              [:span.link-btn {:on-click #(put-fn [:cmd/set-active (if entry-active? nil entry)])
+              [:span.link-btn {:on-click #(put-fn [:cmd/set-active (if entry-active? nil (:timestamp entry))])
                                :class    (when entry-active? "active-entry")}
                [:span.fa.fa-eye] (str " linked: " (count (:linked-entries-list entry)))]))]
          [hashtags-mentions-list entry]
