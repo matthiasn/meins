@@ -91,7 +91,8 @@
           [:a {:href (str "/#" (.format (js/moment ts) "YYYY-MM-DD"))}
            [:span.timestamp (.format (js/moment ts) "dddd, MMMM Do YYYY")]]
           [:span.timestamp (.format (js/moment ts) ", h:mm a") formatted-duration]
-          [:span.fa.toggle.tooltip {:class (if (pos? upvotes) "fa-thumbs-up" "fa-thumbs-o-up") :on-click (upvote-fn inc)}
+          [:span.fa.toggle.tooltip {:class (if (pos? upvotes) "fa-thumbs-up" "fa-thumbs-o-up")
+                                    :on-click (upvote-fn inc)}
            [:span.tooltiptext "upvote"]]
           (when (pos? upvotes) [:span.upvotes " " upvotes])
           (when (pos? upvotes) [u/span-w-tooltip "fa-thumbs-down" "dislike" (upvote-fn dec)])
@@ -106,7 +107,12 @@
             [:a.tooltip {:href  (str "/#" ts) :target "_blank"} [:span.fa.fa-external-link.toggle]
              [:span.tooltiptext "open in external tab"]])
           (when with-linked? [new-link entry put-fn])
-          [trash-icon trash-entry]]
+          [trash-icon trash-entry]
+          (when (seq (:linked-entries-list entry))
+            (let [entry-active? (= (-> store-snapshot :active) entry)]
+              [:span.link-btn {:on-click #(put-fn [:cmd/set-active (if entry-active? nil entry)])
+                               :class    (when entry-active? "active-entry")}
+               [:span.fa.fa-eye] (str " linked: " (count (:linked-entries-list entry)))]))]
          [hashtags-mentions-list entry]
          [l/leaflet-map entry (or show-map? show-all-maps?)]
          (if (or new-entry? (:edit-mode @local))
@@ -123,36 +129,27 @@
   used in edit mode also sends a modified entry to the store component, which is useful
   for displaying updated hashtags, or also for showing the warning that the entry is not
   saved yet."
-  [entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-pvt? show-all-comments?
-   new-entry? with-linked?]
-  (let [show-comments? (r/atom true)]
+  [entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-pvt? show-all-comments? new-entry?]
+  (let [show-comments? (r/atom false)]
     (fn [entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-pvt? show-all-comments?
-         new-entry? with-linked?]
-      [:div.entry-with-comments
-       [journal-entry
-        entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-comments? new-entry? with-linked?]
-       (when (and @show-comments? show-all-comments?)
+         new-entry?]
+      (let [comments (:comments entry)]
+        [:div.entry-with-comments
+         [journal-entry
+          entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-comments? new-entry? true]
+         (when (seq comments)
+           (if @show-comments?
+             [:div.comments
+              (let [comments (:comments entry)]
+                (for [comment (if show-pvt? comments (filter u/pvt-filter comments))]
+                  ^{:key (str "c" (:timestamp comment))}
+                  [journal-entry comment store-snapshot hashtags mentions put-fn show-all-maps? show-tags?
+                   show-comments? false false]))]
+             [:div.show-comments-div {:on-click #(swap! show-comments? not)}
+              (let [n (count comments)]
+                [:span.show-comments (str "show " n " comment" (when (> n 1) "s"))])]))
          [:div.comments
-          (let [comments (:comments entry)]
-            (for [comment (if show-pvt? comments (filter u/pvt-filter comments))]
-              ^{:key (str "c" (:timestamp comment))}
-              [journal-entry
-               comment store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-comments? false false]))
           (for [comment (filter #(= (:comment-for %) (:timestamp entry)) (vals (:new-entries store-snapshot)))]
             ^{:key (str "c" (:timestamp comment))}
-            [journal-entry
-             comment store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-comments? true false])])])))
-
-(defn entry-w-linked-entries
-  [entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-pvt? show-all-comments? new-entry?]
-  [:div.entry-with-linked
-   [entry-with-comments entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-pvt?
-    show-all-comments? new-entry? true]
-   (when-let [linked-entries (:linked-entries-list entry)]
-     (when (seq linked-entries)
-       [:div.linked-entries
-        [:h6 "Linked entries"]
-        (for [linked-entry linked-entries]
-          ^{:key (str "c" (:timestamp linked-entry))}
-          [entry-with-comments linked-entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags?
-           show-pvt? show-all-comments? new-entry? false])]))])
+            [journal-entry comment store-snapshot hashtags mentions put-fn show-all-maps? show-tags?
+             show-comments? true false])]]))))

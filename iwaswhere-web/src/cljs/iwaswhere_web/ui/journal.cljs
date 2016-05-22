@@ -16,10 +16,12 @@
         show-tags? (:show-hashtags store-snapshot)
         show-context? (:show-context store-snapshot)
         show-pvt? (:show-pvt store-snapshot)
-        show-comments? (:show-comments store-snapshot)]
+        show-comments? (:show-comments store-snapshot)
+        active-entry (:active store-snapshot)]
     [:div.l-box-lrg.pure-g.journal
      {:style {:margin-top (.-offsetHeight (.-firstChild (.getElementById js/document "search")))}}
-     [:div.pure-u-1
+     [:div.journal-entries
+      {:class (if active-entry "pure-u-1-2" "pure-u-1")}
       (for [entry (filter #(not (:comment-for %)) new-entries)]
         ^{:key (:timestamp entry)}
         [e/entry-with-comments
@@ -28,8 +30,8 @@
         (let [editable? (contains? (:tags entry) "#new-entry")]
           (when (and (not (:comment-for entry)) (or editable? show-context?))
             ^{:key (:timestamp entry)}
-            [e/entry-w-linked-entries
-             entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-pvt? show-comments? false])))
+            [e/entry-with-comments entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-pvt?
+             show-comments? false])))
       (when (and show-context? (seq entries))
         (let [show-more #(put-fn [:show/more {}])]
           [:div.pure-u-1.show-more {:on-click show-more :on-mouse-over show-more}
@@ -38,7 +40,17 @@
         [:div.pure-u-1 (:entry-count stats) " entries, " (:node-count stats) " nodes, " (:edge-count stats) " edges, "
          (count hashtags) " hashtags, " (count mentions) " people"])
       (when-let [ms (:duration-ms store-snapshot)]
-        [:div.pure-u-1 (str "Query completed in " ms "ms")])]]))
+        [:div.pure-u-1 (str "Query completed in " ms "ms")])]
+
+     (when-let [linked-entries (:linked-entries-list active-entry)]
+       [:div.linked-entries
+        {:class (if active-entry "pure-u-1-2" "pure-u-1")}
+        (for [entry (if show-pvt? linked-entries (filter u/pvt-filter linked-entries))]
+          (let [editable? (contains? (:tags entry) "#new-entry")]
+            (when (and (not (:comment-for entry)) (or editable? show-context?))
+              ^{:key (:timestamp entry)}
+              [e/entry-with-comments entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-pvt?
+               show-comments? false])))])]))
 
 (defn cmp-map
   [cmp-id]

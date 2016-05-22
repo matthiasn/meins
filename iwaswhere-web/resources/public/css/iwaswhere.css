@@ -13,8 +13,10 @@ body {
     background-color: #f3f3f9;
     font-size: 13px;
     font-weight: 300;
-    overflow-y:scroll;
-    font-family: "Lato";
+    font-family: "Lato", sans-serif;
+    height: 100%;
+    width: 100%;
+    overflow: auto;
 }
 
 h1,
@@ -281,6 +283,41 @@ textarea {
     cursor: pointer;
 }
 
+.link-btn {
+    margin-left: 15px;
+    padding: 1px 5px;
+    color: white;
+    font-size: 0.8em;
+    background-color: rgb(60, 202, 60);
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.linked-entries {
+    overflow: auto;
+    height: 550px;
+}
+
+.show-comments-div {
+    margin-top: -5px;
+    height: 22px;
+    background-color: white;
+}
+
+.show-comments {
+    margin-left: 5px;
+    padding: 1px 5px;
+    color: white;
+    background-color: #999;
+    cursor: pointer;
+    font-size: 0.8em;
+}
+
+.journal-entries {
+    overflow: auto;
+    height: 550px;
+}
+
 .hashtags {
     overflow-wrap: normal;
 }
@@ -500,10 +537,16 @@ a {
 }
 
 .entry-with-comments {
-    margin: 3px 0;
+    margin: 3px 5px 3px 0;
     border-color: #1f8dd6;
     border-style: solid;
     border-width: 1px;
+}
+
+.active-entry {
+    border-color: green;
+    border-style: solid;
+    border-width: 2px;
 }
 
 /* Tooltip container */

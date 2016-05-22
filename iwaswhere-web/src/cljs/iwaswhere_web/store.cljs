@@ -109,6 +109,12 @@
     {:new-state new-state
      :emit-msg [:state/get new-query]}))
 
+(defn set-active-fn
+  "Sets entry in payload as the active entry for which to show linked entries."
+  [{:keys [current-state msg-payload]}]
+  (prn "active" (:timestamp msg-payload))
+  {:new-state (assoc-in current-state [:active] msg-payload)})
+
 (defn cmp-map
   "Creates map for the component which holds the client-side application state."
   [cmp-id]
@@ -122,6 +128,7 @@
                  :entry/update-local update-local-fn
                  :entry/remove-local remove-local-fn
                  :entry/saved        entry-saved-fn
+                 :cmd/set-active     set-active-fn
                  :cmd/toggle         toggle-set-fn
                  :cmd/toggle-key     toggle-key-fn
                  :cmd/keep-alive     ka/reset-fn
