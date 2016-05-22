@@ -13,35 +13,6 @@
                        ^{:key (str css-class "-" tag)}
                        [:span.float-left {:class css-class} tag]))]))
 
-(defn cfg-view
-  "Renders component for toggling display of maps, comments, ..."
-  [local store-snapshot put-fn]
-  (let [show-all-maps? (:show-all-maps store-snapshot)
-        toggle-all-maps #(put-fn [:cmd/toggle-key {:key :show-all-maps}])
-        show-tags? (:show-hashtags store-snapshot)
-        toggle-tags #(put-fn [:cmd/toggle-key {:key :show-hashtags}])
-        show-context? (:show-context store-snapshot)
-        toggle-context #(put-fn [:cmd/toggle-key {:key :show-context}])
-        show-pvt? (:show-pvt store-snapshot)
-        toggle-pvt #(put-fn [:cmd/toggle-key {:key :show-pvt}])
-        sort-by-upvotes? (:sort-by-upvotes store-snapshot)
-        toggle-upvotes #(do (put-fn [:cmd/toggle-key {:key :sort-by-upvotes}])
-                            (put-fn [:state/get (merge (:current-query @local)
-                                                       {:sort-by-upvotes (not sort-by-upvotes?)})]))]
-    [:div.pure-u-1.toggle-cmds
-     [:span.fa.toggle.pull-right.tooltip {:class (if show-all-maps? "fa-map" "fa-map-o") :on-click toggle-all-maps}
-      [:span.tooltiptext "show all maps"]]
-     [:span.fa.fa-hashtag.toggle.pull-right.tooltip {:class (when-not show-tags? "inactive") :on-click toggle-tags}
-      [:span.tooltiptext "show hashtag symbol"]]
-     [:span.fa.fa-eye.toggle.pull-right.tooltip {:class (when-not show-context? "inactive") :on-click toggle-context}
-      [:span.tooltiptext "show query results"]]
-     [:span.fa.fa-user-secret.toggle.pull-right.tooltip {:class (when-not show-pvt? "inactive") :on-click toggle-pvt}
-      [:span.tooltiptext "show private entries"]]
-     [:span.fa.fa-thumbs-up.toggle.pull-right.tooltip
-      {:class (when-not sort-by-upvotes? "inactive") :on-click toggle-upvotes}
-      [:span.tooltiptext "sort by upvotes first"]]
-     [:hr]]))
-
 (defn search-view
   "Renders search component."
   [{:keys [observed local put-fn]}]
@@ -88,14 +59,13 @@
          ^{:key (str "search-n" tag)} [:span.hashtag.not-tag.float-left tag])
        (for [tag (get-tags :mentions)]
          ^{:key (str "search-" tag)} [:span.mention.float-left tag])]]
-     [:div.pure-u-1
+     [:div.pure-u-1.search-text
       [:div.textentry {:content-editable true
                        :on-input on-input-fn
                        :on-key-down on-keydown-fn}
        (:search-text (:current-query local-snapshot))]
       [u/suggestions "search" f-tags curr-tag tag-replace-fn "hashtag"]
-      [u/suggestions "search" f-mentions curr-mention tag-replace-fn "mention"]]
-     [cfg-view local @observed put-fn]]))
+      [u/suggestions "search" f-mentions curr-mention tag-replace-fn "mention"]]]))
 
 (defn init-fn
   "Initializes listener for location hash changes, which alters local component state with

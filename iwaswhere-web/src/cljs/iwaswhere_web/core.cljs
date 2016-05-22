@@ -22,11 +22,19 @@
      [:cmd/init-comp (n/cmp-map :client/new-import-cmp)]    ; UI component for new, import
      [:cmd/init-comp (jrn/cmp-map :client/journal-cmp)]     ; UI component for journal
      [:cmd/init-comp (store/cmp-map :client/store-cmp)]     ; Data store component
-     [:cmd/route-all {:from [:client/store-cmp :client/search-cmp :client/journal-cmp :client/new-import-cmp]
+     [:cmd/route-all {:from [:client/store-cmp
+                             :client/search-cmp
+                             :client/journal-cmp
+                             :client/new-import-cmp]
                       :to   :client/ws-cmp}]
-     [:cmd/route {:from [:client/ws-cmp :client/search-cmp :client/journal-cmp :client/new-import-cmp]
+     [:cmd/route {:from [:client/ws-cmp
+                         :client/search-cmp
+                         :client/journal-cmp
+                         :client/new-import-cmp]
                   :to   :client/store-cmp}]
-     [:cmd/observe-state {:from :client/store-cmp :to [:client/journal-cmp :client/search-cmp]}]])
+     [:cmd/observe-state {:from :client/store-cmp :to [:client/journal-cmp
+                                                       :client/search-cmp
+                                                       :client/new-import-cmp]}]])
   (ka/init-keepalive! switchboard))
 
 (init! (sente/cmp-map :client/ws-cmp))

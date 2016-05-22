@@ -41,10 +41,10 @@
   with the tag fragment before the caret position. When any of the suggestions are clicked, the
   fragment will be replaced with the clicked item."
   [key-prefix filtered-tags current-tag tag-replace-fn css-class]
-  [:div.suggestions
-   (when (seq filtered-tags)
+  (when (seq filtered-tags)
+    [:div.suggestions
      [:div.suggestions-list
       (for [tag filtered-tags]
         ^{:key (str key-prefix tag)}
         [:div {:on-click #(tag-replace-fn current-tag tag)}
-         [:span {:class css-class} tag]])])])
+         [:span {:class css-class} tag]])]]))

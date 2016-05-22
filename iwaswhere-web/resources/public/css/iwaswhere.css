@@ -477,7 +477,6 @@ a {
     z-index: 1001;
 }
 
-
 .upvotes {
     vertical-align: super;
     color: #006C91;
@@ -593,4 +592,8 @@ a {
 
 .linked-entries h6 {
     margin-top: 8px;
+}
+
+.cfg {
+    margin-top: 1em;
 }
