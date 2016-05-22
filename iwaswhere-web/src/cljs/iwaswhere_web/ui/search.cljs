@@ -27,13 +27,8 @@
         sort-by-upvotes? (:sort-by-upvotes store-snapshot)
         toggle-upvotes #(do (put-fn [:cmd/toggle-key {:key :sort-by-upvotes}])
                             (put-fn [:state/get (merge (:current-query @local)
-                                                       {:sort-by-upvotes (not sort-by-upvotes?)})]))
-        show-comments? (:show-comments store-snapshot)
-        toggle-comments #(put-fn [:cmd/toggle-key {:key :show-comments}])]
+                                                       {:sort-by-upvotes (not sort-by-upvotes?)})]))]
     [:div.pure-u-1.toggle-cmds
-     [:span.fa.fa-comments.toggle.pull-right.tooltip
-      {:class (when-not show-comments? "hidden-comments") :on-click toggle-comments}
-      [:span.tooltiptext "show comments"]]
      [:span.fa.toggle.pull-right.tooltip {:class (if show-all-maps? "fa-map" "fa-map-o") :on-click toggle-all-maps}
       [:span.tooltiptext "show all maps"]]
      [:span.fa.fa-hashtag.toggle.pull-right.tooltip {:class (when-not show-tags? "inactive") :on-click toggle-tags}

@@ -16,7 +16,6 @@
         show-tags? (:show-hashtags store-snapshot)
         show-context? (:show-context store-snapshot)
         show-pvt? (:show-pvt store-snapshot)
-        show-comments? (:show-comments store-snapshot)
         active-entry (get (:entries-map store-snapshot) (:active store-snapshot))]
     [:div.l-box-lrg.pure-g.journal
      {:style {:margin-top (.-offsetHeight (.-firstChild (.getElementById js/document "search")))}}
@@ -25,13 +24,13 @@
       (for [entry (filter #(not (:comment-for %)) new-entries)]
         ^{:key (:timestamp entry)}
         [e/entry-with-comments
-         entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-pvt? show-comments? true])
+         entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-pvt? true])
       (for [entry (if show-pvt? entries (filter u/pvt-filter entries))]
         (let [editable? (contains? (:tags entry) "#new-entry")]
           (when (and (not (:comment-for entry)) (or editable? show-context?))
             ^{:key (:timestamp entry)}
             [e/entry-with-comments entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-pvt?
-             show-comments? false])))
+             false])))
       (when (and show-context? (seq entries))
         (let [show-more #(put-fn [:show/more {}])]
           [:div.pure-u-1.show-more {:on-click show-more :on-mouse-over show-more}
@@ -50,7 +49,7 @@
             (when (and (not (:comment-for entry)) (or editable? show-context?))
               ^{:key (:timestamp entry)}
               [e/entry-with-comments entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-pvt?
-               show-comments? false])))])]))
+               false])))])]))
 
 (defn cmp-map
   [cmp-id]

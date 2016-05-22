@@ -30,8 +30,7 @@
                              :show-all-maps   false
                              :show-hashtags   true
                              :show-context    true
-                             :show-pvt        false
-                             :show-comments   true})]
+                             :show-pvt        false})]
     (add-watch new-entries-ls :new (fn [_ _ _ v] (swap! initial-state assoc-in [:new-entries] v)))
     {:state initial-state}))
 

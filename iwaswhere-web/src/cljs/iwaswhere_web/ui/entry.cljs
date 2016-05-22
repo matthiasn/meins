@@ -109,7 +109,7 @@
           (when with-linked? [new-link entry put-fn])
           [trash-icon trash-entry]
           (when (seq (:linked-entries-list entry))
-            (let [entry-active? (= (-> store-snapshot :active) entry)]
+            (let [entry-active? (= (-> store-snapshot :active) (:timestamp entry))]
               [:span.link-btn {:on-click #(put-fn [:cmd/set-active (if entry-active? nil (:timestamp entry))])
                                :class    (when entry-active? "active-entry")}
                [:span.fa.fa-eye] (str " linked: " (count (:linked-entries-list entry)))]))]
@@ -129,10 +129,9 @@
   used in edit mode also sends a modified entry to the store component, which is useful
   for displaying updated hashtags, or also for showing the warning that the entry is not
   saved yet."
-  [entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-pvt? show-all-comments? new-entry?]
+  [entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-pvt? new-entry?]
   (let [show-comments? (r/atom false)]
-    (fn [entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-pvt? show-all-comments?
-         new-entry?]
+    (fn [entry store-snapshot hashtags mentions put-fn show-all-maps? show-tags? show-pvt? new-entry?]
       (let [comments (:comments entry)]
         [:div.entry-with-comments
          [journal-entry
