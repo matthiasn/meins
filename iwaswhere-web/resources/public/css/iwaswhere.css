@@ -342,6 +342,7 @@ textarea {
 img{
     height: auto;
     width: 100%;
+    max-width: 500px;
 }
 
 .entry-header {
@@ -434,6 +435,8 @@ button {
 
 video {
     width: 100%;
+    max-width: 500px;
+    background-color: black;
 }
 
 .hidden-comments {

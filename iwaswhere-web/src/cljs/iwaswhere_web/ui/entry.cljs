@@ -100,7 +100,8 @@
           (when map? [u/span-w-tooltip "fa-map-o" "show map" toggle-map])
           [u/span-w-tooltip "fa-pencil-square-o" "edit entry" toggle-edit]
           (when-not (:comment-for entry)
-            [u/span-w-tooltip "fa-comment-o" "new comment" (h/new-entry-fn put-fn {:comment-for ts})])
+            [u/span-w-tooltip "fa-comment-o" "new comment" #(do ((h/new-entry-fn put-fn {:comment-for ts}))
+                                                                (reset! show-comments? true))])
           (when (seq (:comments entry))
             [u/span-w-tooltip (str "fa-comments " (when-not @show-comments? "hidden-comments"))
              "show comments" #(swap! show-comments? not)])
