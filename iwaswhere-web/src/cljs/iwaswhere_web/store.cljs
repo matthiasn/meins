@@ -92,12 +92,13 @@
     (update-local-storage new-state)
     {:new-state new-state}))
 
-(defn assoc-in-store
-  "Sets the value under path-in-store in the app state with the path-in-msg in the msg-payload."
-  [path-in-store path-in-msg]
-  (fn [{:keys [current-state msg-payload]}]
-    (let [new-state (assoc-in current-state path-in-store (get-in msg-payload path-in-msg))]
-      {:new-state new-state})))
+(defn update-query-fn
+  "Update query in client state, with resetting the active entry in the linked entries view."
+  [{:keys [current-state msg-payload]}]
+  (let [new-state (-> current-state
+                    (assoc-in [:current-query] msg-payload)
+                    (assoc-in [:active] nil))]
+    {:new-state new-state}))
 
 (defn show-more-fn
   "Runs previous query but with more results. Also updates the number to show in the UI."
@@ -122,7 +123,7 @@
   {:cmp-id      cmp-id
    :state-fn    initial-state-fn
    :handler-map {:state/new          new-state-fn
-                 :state/get          (assoc-in-store [:current-query] [])
+                 :state/get          update-query-fn
                  :show/more          show-more-fn
                  :entry/new          new-entry-fn
                  :entry/geo-enrich   geo-enrich-fn
