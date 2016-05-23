@@ -1,0 +1,42 @@
+.hashtags {
+  overflow-wrap: normal;
+}
+
+.hashtag {
+  margin: 3px 5px 1px 0;
+  padding: 1px 5px;
+  color: white;
+  font-size: 0.8em;
+  background-color: rgb(66, 184, 221);
+  white-space: nowrap;
+}
+
+.not-tag {
+  background-color: rgb(221, 77, 55);
+}
+
+.suggestions {
+  margin-bottom: 0.5em;
+  line-height: 1.4em;
+  position: relative;
+  display: inline-block;
+}
+
+.suggestions-list {
+  position: absolute;
+  top: -4px;
+  background-color: white;
+  z-index: 1002;
+  padding: 2px 0 4px 4px;
+  text-wrap: none;
+  border: #BBB 1px solid;
+}
+
+.mention {
+  margin: 3px 5px 1px 0;
+  padding: 1px 5px;
+  color: white;
+  font-size: 0.8em;
+  background-color: rgb(55, 201, 154);
+}
+

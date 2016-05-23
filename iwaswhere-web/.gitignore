@@ -20,8 +20,9 @@ pom.xml.asc
 *.iml
 .DS_Store
 
-resources/public/js/build/
-resources/public/bower_components/
+resources/
 *.pid
 *.out
 *.zip
+
+.sass-cache/

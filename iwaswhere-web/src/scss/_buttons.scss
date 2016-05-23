@@ -1,0 +1,51 @@
+.not-saved {
+  padding: 1px 5px;
+  color: white;
+  font-size: 0.8em;
+  background-color: rgb(202, 60, 60);
+  cursor: pointer;
+}
+
+.link-btn {
+  margin-left: 15px;
+  padding: 1px 5px;
+  color: white;
+  font-size: 0.8em;
+  background-color: rgb(60, 202, 60);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.linked-entries {
+  overflow: auto;
+  height: 550px;
+}
+
+button {
+  margin-right: 5px;
+  padding: 0.2em 0.5em 0.3em 0.5em !important;
+}
+
+.button-xsmall {
+  font-size: 70%;
+}
+
+.show-more-btn {
+  background-color: #1f8dd6;
+  color: whitesmoke;
+  font-size: 0.8em;
+  padding: 1px 5px;
+}
+
+.delete-warn {
+  margin-left: 25px;
+  padding: 1px 5px;
+  color: white;
+  font-size: 0.8em;
+  cursor: pointer;
+  background-color: rgb(202, 60, 60);
+}
+
+.show-more {
+  padding: 20px 0;
+}

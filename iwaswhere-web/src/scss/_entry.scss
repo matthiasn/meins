@@ -1,0 +1,84 @@
+.entry-with-linked {
+  padding: 0 3px;
+  margin-top: 3px;
+  border-color: #63809c;
+  border-style: solid;
+  border-width: 1px;
+}
+
+.entry-with-comments {
+  margin: 3px 5px 3px 0;
+  border-color: #1f8dd6;
+  border-style: solid;
+  border-width: 1px;
+}
+
+.active-entry {
+  border-color: green;
+  border-style: solid;
+  border-width: 2px;
+}
+
+.entry {
+  background: white;
+  padding: 5px 5px 2px 5px;
+  margin-bottom: 4px;
+  min-height: 60px;
+}
+
+.entry pre {
+  min-height: 22px;
+}
+
+.entry .mention-link {
+  color: #007d4e;
+  font-weight: bold;
+}
+
+.textentry {
+  margin: 4px 0;
+  padding: 4px;
+  background-color: white;
+}
+
+.entry-header {
+  line-height: 1.4em;
+  overflow-wrap: normal;
+}
+
+.edit-md pre {
+  margin: 0.3em 0;
+}
+
+.edit-md pre code {
+  font-family: "Lato";
+  outline: none;
+}
+
+.show-comments-div {
+  margin-top: -5px;
+  height: 22px;
+  background-color: white;
+}
+
+.show-comments {
+  margin-left: 5px;
+  padding: 1px 5px;
+  color: white;
+  background-color: #999;
+  cursor: pointer;
+  font-size: 0.8em;
+}
+
+.journal-entries {
+  overflow: auto;
+  height: 550px;
+}
+
+.entry-footer {
+  margin-top: 5px;
+}
+
+.comments {
+  margin-left: 20px;
+}

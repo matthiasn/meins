@@ -36,7 +36,11 @@
 
   :plugins [[lein-cljsbuild "1.1.3"]
             [lein-figwheel "0.5.3-1"]
+            [lein-sassy "1.0.7"]
             [lein-codox "0.9.5"]]
+
+  :sass {:src "src/scss/"
+         :dst "resources/public/css/"}
 
   :figwheel {:server-port 3450
              :css-dirs    ["resources/public/css"]}
