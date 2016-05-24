@@ -1,0 +1,15 @@
+#journal {
+  margin-top: 5px;
+  display: flex;
+}
+
+.journal {
+  display: flex;
+  padding-left: 1em;
+}
+
+.journal-entries {
+  padding: 0 0.5em 1em 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}

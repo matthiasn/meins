@@ -1,5 +1,8 @@
 .hashtags {
-  overflow-wrap: normal;
+  padding: 4px 0 1px 0;
+  display: flex;
+  flex-flow: row;
+  flex-wrap: wrap;
 }
 
 .hashtag {
@@ -39,4 +42,3 @@
   font-size: 0.8em;
   background-color: rgb(55, 201, 154);
 }
-

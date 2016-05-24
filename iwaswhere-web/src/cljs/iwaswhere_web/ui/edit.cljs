@@ -80,7 +80,7 @@
           (reset! last-saved latest-entry)
           (reset! local-display-entry latest-entry)
           (reset! local-saved-entry latest-entry))
-        [:div.edit-md
+        [:div
          [:pre [editable-code-elem md-string update-temp-fn on-keydown-fn edit-elem-atom]]
          [u/suggestions ts f-tags curr-tag tag-replace-fn "hashtag"]
          [u/suggestions ts f-mentions curr-mention tag-replace-fn "mention"]

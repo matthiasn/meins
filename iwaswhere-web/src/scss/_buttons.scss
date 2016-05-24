@@ -16,14 +16,13 @@
   white-space: nowrap;
 }
 
-.linked-entries {
-  overflow: auto;
-  height: 550px;
-}
-
 button {
   margin-right: 5px;
   padding: 0.2em 0.5em 0.3em 0.5em !important;
+}
+
+.button-primary {
+  background-color: #0078e7;
 }
 
 .button-xsmall {
@@ -48,4 +47,47 @@ button {
 
 .show-more {
   padding: 20px 0;
+}
+
+a, a:visited {
+  text-decoration: none;
+  font-weight: 400;
+  color: #006c91;
+  outline: none!important;
+}
+
+.toggle {
+  margin-left: 7px;
+  cursor: pointer;
+}
+
+.fa-thumbs-up, .fa-thumbs-down {
+  color: #006C91;
+}
+
+.inactive {
+  color: #AAA;
+}
+
+.hidden-comments {
+  color: red;
+}
+
+a .toggle {
+  color: #576364;
+}
+
+.upvotes {
+  vertical-align: super;
+  color: #006C91;
+  font-size: 0.7em;
+  font-weight: bold;
+  padding-right: 2px;
+  margin-left: 1px;
+  border: 1px solid #006C91;
+  border-radius: 2px;
+}
+
+.toggle-cmds {
+  margin-right: 30px;
 }

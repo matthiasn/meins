@@ -1,0 +1,15 @@
+#search {
+  flex: 0 0 auto;
+}
+
+.search {
+  padding: 5px 1em 0.5em 1em;
+  flex-flow: column;
+  display: flex;
+}
+
+.search-field {
+  margin: 4px 0;
+  padding: 4px;
+  background-color: white;
+}

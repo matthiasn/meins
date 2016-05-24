@@ -18,35 +18,37 @@
         toggle-upvotes #(do (put-fn [:cmd/toggle-key {:key :sort-by-upvotes}])
                             (put-fn [:state/get (merge (:current-query store-snapshot)
                                                        {:sort-by-upvotes (not sort-by-upvotes?)})]))]
-    [:span
-     [:span.fa.toggle.pull-right.tooltip.cfg
-      {:class (if show-all-maps? "fa-map" "fa-map-o") :on-click toggle-all-maps}
-      [:span.tooltiptext "show all maps"]]
-     [:span.fa.fa-hashtag.toggle.pull-right.tooltip.cfg
-      {:class (when-not show-tags? "inactive") :on-click toggle-tags}
-      [:span.tooltiptext "show hashtag symbol"]]
-     [:span.fa.fa-eye.toggle.pull-right.tooltip.cfg
-      {:class (when-not show-context? "inactive") :on-click toggle-context}
-      [:span.tooltiptext "show query results"]]
-     [:span.fa.fa-user-secret.toggle.pull-right.tooltip.cfg
+    [:div
+     [:span.fa.fa-thumbs-up.toggle.tooltip
+      {:class (when-not sort-by-upvotes? "inactive") :on-click toggle-upvotes}
+      [:span.tooltiptext "sort by upvotes first"]]
+     [:span.fa.fa-user-secret.toggle.tooltip
       {:class (when-not show-pvt? "inactive") :on-click toggle-pvt}
       [:span.tooltiptext "show private entries"]]
-     [:span.fa.fa-thumbs-up.toggle.pull-right.tooltip.cfg
-      {:class (when-not sort-by-upvotes? "inactive") :on-click toggle-upvotes}
-      [:span.tooltiptext "sort by upvotes first"]]]))
+     [:span.fa.fa-eye.toggle.tooltip
+      {:class (when-not show-context? "inactive") :on-click toggle-context}
+      [:span.tooltiptext "show query results"]]
+     [:span.fa.fa-hashtag.toggle.tooltip
+      {:class (when-not show-tags? "inactive") :on-click toggle-tags}
+      [:span.tooltiptext "show hashtag symbol"]]
+     [:span.fa.toggle.tooltip
+      {:class (if show-all-maps? "fa-map" "fa-map-o") :on-click toggle-all-maps}
+      [:span.tooltiptext "show all maps"]]]))
 
 (defn new-import-view
   "Renders component for rendering new and import buttons."
   [{:keys [observed put-fn]}]
-  [:span.new-import
-   [u/btn-w-tooltip "fa-plus-square" "new" "new entry" (h/new-entry-fn put-fn {}) "pure-button-primary"]
-   [u/btn-w-tooltip "fa-map" "import" "import" #(do (put-fn [:import/photos])
-                                                    (put-fn [:import/geo])
-                                                    (put-fn [:import/phone]))]
+  [:div.menu-header
+   [:div
+    [u/btn-w-tooltip "fa-plus-square" "new" "new entry" (h/new-entry-fn put-fn {})]
+    [u/btn-w-tooltip "fa-map" "import" "import" #(do (put-fn [:import/photos])
+                                                     (put-fn [:import/geo])
+                                                     (put-fn [:import/phone]))]]
+   [:h1 "iWasWhere?"]
    [cfg-view @observed put-fn]])
 
 (defn cmp-map
   [cmp-id]
   (r/cmp-map {:cmp-id  cmp-id
               :view-fn new-import-view
-              :dom-id  "new-import"}))
+              :dom-id  "header"}))

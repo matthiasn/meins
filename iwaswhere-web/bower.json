@@ -17,9 +17,9 @@
     "tests"
   ],
   "dependencies": {
-    "pure": "~0.5.0",
     "lato": "^0.3.0",
     "leaflet": "^0.7.7",
-    "font-awesome": "^4.5.0"
+    "font-awesome": "^4.5.0",
+    "normalize-css": "normalize.css#^4.1.1"
   }
 }

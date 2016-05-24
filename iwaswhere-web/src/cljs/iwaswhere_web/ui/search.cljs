@@ -4,15 +4,6 @@
             [matthiasn.systems-toolbox-ui.reagent :as r]
             [clojure.string :as s]))
 
-(defn tags
-  "Renders horizontal list of tags."
-  [state-snapshot k css-class]
-  (let [tags (k (:current-query state-snapshot))]
-    [:div.hashtags (when (seq tags)
-                     (for [tag tags]
-                       ^{:key (str css-class "-" tag)}
-                       [:span.float-left {:class css-class} tag]))]))
-
 (defn search-view
   "Renders search component."
   [{:keys [observed local put-fn]}]
@@ -50,22 +41,20 @@
                               (tag-replace-fn curr-mention (first f-mentions)))
                             (.setTimeout js/window (fn [] (u/focus-on-end (.-target ev))) 0)
                             (.preventDefault ev))))]
-    [:div.l-box-lrg.pure-g.search-div
-     [:div.pure-u-1
-      [:div.hashtags
-       (for [tag (get-tags :tags)]
-         ^{:key (str "search-" tag)} [:span.hashtag.float-left tag])
-       (for [tag (get-tags :not-tags)]
-         ^{:key (str "search-n" tag)} [:span.hashtag.not-tag.float-left tag])
-       (for [tag (get-tags :mentions)]
-         ^{:key (str "search-" tag)} [:span.mention.float-left tag])]]
-     [:div.pure-u-1.search-text
-      [:div.textentry {:content-editable true
-                       :on-input on-input-fn
-                       :on-key-down on-keydown-fn}
-       (:search-text (:current-query local-snapshot))]
-      [u/suggestions "search" f-tags curr-tag tag-replace-fn "hashtag"]
-      [u/suggestions "search" f-mentions curr-mention tag-replace-fn "mention"]]]))
+    [:div.search
+     [:div.hashtags
+      (for [tag (get-tags :tags)]
+        ^{:key (str "search-" tag)} [:span.hashtag tag])
+      (for [tag (get-tags :not-tags)]
+        ^{:key (str "search-n" tag)} [:span.hashtag.not-tag tag])
+      (for [tag (get-tags :mentions)]
+        ^{:key (str "search-" tag)} [:span.mention tag])]
+     [:div.search-field {:content-editable true
+                         :on-input         on-input-fn
+                         :on-key-down      on-keydown-fn}
+      (:search-text (:current-query local-snapshot))]
+     [u/suggestions "search" f-tags curr-tag tag-replace-fn "hashtag"]
+     [u/suggestions "search" f-mentions curr-mention tag-replace-fn "mention"]]))
 
 (defn init-fn
   "Initializes listener for location hash changes, which alters local component state with

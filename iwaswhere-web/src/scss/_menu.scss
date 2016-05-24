@@ -1,0 +1,21 @@
+#header {
+  width: 100%;
+  flex: 0 0 auto;
+
+}
+
+.menu-header {
+  display: flex;
+  z-index: 1004;
+  flex-flow: row;
+  align-items: center;
+  justify-content: space-between;
+
+  background-color: #2d3e50;
+  padding: 0 20px;
+
+  h1 {
+    color:white;
+    font-size: 1.5em;
+  }
+}

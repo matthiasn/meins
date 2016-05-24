@@ -23,7 +23,7 @@
   "Render button with tooltip on top."
   [icon-cls text tooltip-text click-fn btn-cls]
   [:span.tooltip
-   [:button.pure-button.button-xsmall.tooltip {:on-click click-fn :class btn-cls}
+   [:button.button-xsmall.tooltip {:on-click click-fn :class btn-cls}
     [:span.fa {:class icon-cls}] (str " " text)]
    [:span.tooltiptext tooltip-text]])
 
