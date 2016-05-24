@@ -1,15 +1,21 @@
 #journal {
   margin-top: 5px;
   display: flex;
+  flex-flow: column;
+  min-height: 0;
 }
 
 .journal {
   display: flex;
+  flex-flow: row;
   padding-left: 1em;
+  min-height: 0;
 }
 
 .journal-entries {
+  flex: 1;
+  height: inherit;
   padding: 0 0.5em 1em 0;
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: scroll;
 }
