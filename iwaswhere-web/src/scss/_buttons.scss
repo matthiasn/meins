@@ -81,9 +81,11 @@ a .toggle {
   vertical-align: super;
   color: #006C91;
   font-size: 0.7em;
+  line-height: 1.2em;
   font-weight: bold;
-  padding-right: 2px;
+  padding: 0 2px 0 1px;
   margin-left: 1px;
+  margin-bottom: 3px;
   border: 1px solid #006C91;
   border-radius: 2px;
 }
