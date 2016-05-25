@@ -35,8 +35,7 @@
           entry-comments-mentions (apply set/union (map :mentions (:comments entry)))
           mentions (set (map s/lower-case (set/union entry-mentions entry-comments-mentions)))
 
-          match? (or (set/subset? #{"#new-entry"} tags)
-                     (and (set/subset? q-tags tags)
+          match? (or (and (set/subset? q-tags tags)
                           (empty? (set/intersection q-not-tags tags))
                           (or (empty? q-mentions)
                               (seq (set/intersection q-mentions mentions)))
