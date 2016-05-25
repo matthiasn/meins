@@ -81,7 +81,7 @@
             departure-ts (:departure-timestamp entry)
             dur (when (and arrival-ts departure-ts)
                   (-> (- departure-ts arrival-ts) (/ 60000) (Math/floor)))
-            formatted-duration (when (< dur 99999)
+            formatted-duration (when (and dur (< dur 99999))
                                  (let [minutes (rem dur 60)
                                        hours (Math/floor (/ dur 60))]
                                    (str ", " (when (pos? hours) (str hours "h "))
