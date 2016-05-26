@@ -61,12 +61,13 @@
   used in edit mode also sends a modified entry to the store component, which is useful
   for displaying updated hashtags, or also for showing the warning that the entry is not
   saved yet."
-  [entry store-snapshot put-fn show-comments? new-entry? with-linked?]
-  (let [local (rc/atom {:edit-mode (contains? (:tags entry) "#new-entry")})]
+  [entry store-snapshot put-fn show-comments?]
+  (let [local (rc/atom {:edit-mode (:new-entry entry)})]
     (fn
-      [entry store-snapshot put-fn show-comments? new-entry? with-linked?]
+      [entry store-snapshot put-fn show-comments?]
       (let [ts (:timestamp entry)
             map? (:latitude entry)
+            new-entry? (:new-entry entry)
             show-map? (contains? (:show-maps-for store-snapshot) ts)
             toggle-map #(put-fn [:cmd/toggle {:timestamp ts :key :show-maps-for}])
             toggle-edit #(swap! local update-in [:edit-mode] not)
@@ -109,7 +110,7 @@
            (when-not (:comment-for entry)
              [:a.tooltip {:href (str "/#" ts) :target "_blank"} [:span.fa.fa-external-link.toggle]
               [:span.tooltiptext "open in external tab"]])
-           (when with-linked? [new-link entry put-fn])
+           (when-not (:comment-for entry) [new-link entry put-fn])
            [trash-icon trash-entry]
            (when (seq (:linked-entries-list entry))
              (let [entry-active? (= (-> store-snapshot :active) (:timestamp entry))]
@@ -119,7 +120,7 @@
          [hashtags-mentions-list entry]
          [l/leaflet-map entry (or show-map? (:show-all-maps store-snapshot))]
          (if (or new-entry? (:edit-mode @local))
-           [e/editable-md-render entry hashtags mentions put-fn toggle-edit new-entry?]
+           [e/editable-md-render entry hashtags mentions put-fn toggle-edit]
            [md/markdown-render entry (:show-hashtags store-snapshot)])
          [m/image-view entry]
          [m/audioplayer-view entry]
@@ -132,23 +133,23 @@
   used in edit mode also sends a modified entry to the store component, which is useful
   for displaying updated hashtags, or also for showing the warning that the entry is not
   saved yet."
-  [entry store-snapshot put-fn new-entry?]
+  [entry store-snapshot put-fn]
   (let [show-comments? (r/atom false)]
-    (fn [entry store-snapshot put-fn new-entry?]
+    (fn [entry store-snapshot put-fn]
       (let [comments (:comments entry)]
         [:div.entry-with-comments
-         [journal-entry entry store-snapshot put-fn show-comments? new-entry? true]
+         [journal-entry entry store-snapshot put-fn show-comments?]
          (when (seq comments)
            (if @show-comments?
              [:div.comments
               (let [comments (:comments entry)]
                 (for [comment (if (:show-pvt store-snapshot) comments (filter u/pvt-filter comments))]
                   ^{:key (str "c" (:timestamp comment))}
-                  [journal-entry comment store-snapshot put-fn show-comments? false false]))]
+                  [journal-entry comment store-snapshot put-fn show-comments?]))]
              [:div.show-comments {:on-click #(swap! show-comments? not)}
               (let [n (count comments)]
                 [:span (str "show " n " comment" (when (> n 1) "s"))])]))
          [:div.comments
           (for [comment (filter #(= (:comment-for %) (:timestamp entry)) (vals (:new-entries store-snapshot)))]
             ^{:key (str "c" (:timestamp comment))}
-            [journal-entry comment store-snapshot put-fn show-comments? true false])]]))))
+            [journal-entry comment store-snapshot put-fn show-comments?])]]))))

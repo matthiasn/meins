@@ -17,12 +17,11 @@
      [:div.journal-entries
       (for [entry (filter #(not (:comment-for %)) new-entries)]
         ^{:key (:timestamp entry)}
-        [e/entry-with-comments entry store-snapshot put-fn true])
+        [e/entry-with-comments entry store-snapshot put-fn])
       (for [entry (if show-pvt? entries (filter u/pvt-filter entries))]
-        (let [editable? (contains? (:tags entry) "#new-entry")]
-          (when (and (not (:comment-for entry)) (or editable? show-context?))
-            ^{:key (:timestamp entry)}
-            [e/entry-with-comments entry store-snapshot put-fn false])))
+        (when (and (not (:comment-for entry)) (or (:new-entry entry) show-context?))
+          ^{:key (:timestamp entry)}
+          [e/entry-with-comments entry store-snapshot put-fn]))
       (when (and show-context? (seq entries))
         (let [show-more #(put-fn [:show/more {}])]
           [:div.show-more {:on-click show-more :on-mouse-over show-more}
@@ -35,10 +34,9 @@
      (when-let [linked-entries (:linked-entries-list active-entry)]
        [:div.journal-entries
         (for [entry (if show-pvt? linked-entries (filter u/pvt-filter linked-entries))]
-          (let [editable? (contains? (:tags entry) "#new-entry")]
-            (when (and (not (:comment-for entry)) (or editable? show-context?))
-              ^{:key (:timestamp entry)}
-              [e/entry-with-comments entry store-snapshot put-fn false])))])]))
+          (when (and (not (:comment-for entry)) (or (:new-entry entry) show-context?))
+            ^{:key (:timestamp entry)}
+            [e/entry-with-comments entry store-snapshot put-fn]))])]))
 
 (defn cmp-map
   [cmp-id]

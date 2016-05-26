@@ -38,7 +38,7 @@
     (let [ts (st/now)
           entry (merge (parse-entry "")
                        {:timestamp  ts
-                        :tags       #{"#new-entry"}
+                        :new-entry  true
                         :timezone   (or (when-let [resolved (.-resolved (new js/Intl.DateTimeFormat))]
                                           (.-timeZone resolved))
                                         (when-let [resolved (.resolvedOptions (new js/Intl.DateTimeFormat))]
@@ -65,6 +65,7 @@
   [entry]
   (-> entry
       (dissoc :comments)
+      (dissoc :new-entry)
       (dissoc :linked-entries-list)))
 
 (defn query-from-search-hash

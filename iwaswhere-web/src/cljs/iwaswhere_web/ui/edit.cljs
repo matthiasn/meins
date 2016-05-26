@@ -31,15 +31,16 @@
   Keeps track of current cursor position and potential incomplete tags or mentions before the
   cursor, which can then be completed by clicking on an empty in the autosuggested list, or by
   using the tab key for selecting the first one."
-  [entry hashtags mentions put-fn toggle-edit new-entry?]
+  [entry hashtags mentions put-fn toggle-edit]
   (let [entry (-> entry (dissoc :comments) (dissoc :linked-entries))
         ts (:timestamp entry)
         edit-elem-atom (atom {})
         last-saved (r/atom entry)
         local-saved-entry (r/atom entry)
         local-display-entry (r/atom entry)]
-    (fn [entry hashtags mentions put-fn toggle-edit new-entry?]
+    (fn [entry hashtags mentions put-fn toggle-edit]
       (let [latest-entry (dissoc entry :comments)
+            new-entry? (:new-entry entry)
             md-string (or (:md @local-display-entry) "edit here")
             get-content #(aget (.. % -target -parentElement -parentElement -firstChild -firstChild) "innerText")
             update-temp-fn #(let [updated-entry (merge latest-entry (h/parse-entry (get-content %)))]

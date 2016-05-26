@@ -1,4 +1,4 @@
-(ns iwaswhere-web.ui.new-import
+(ns iwaswhere-web.ui.menu
   (:require [iwaswhere-web.helpers :as h]
             [iwaswhere-web.ui.utils :as u]
             [matthiasn.systems-toolbox-ui.reagent :as r]))
