@@ -6,6 +6,7 @@ data/videos
 data/daily-logs
 data/trash
 data/import
+data/geo-import/
 data-test/
 /target
 /classes

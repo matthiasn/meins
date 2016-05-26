@@ -3,7 +3,8 @@
   This includes both a properly styled element for static content and the edit-mode view, with
   autosuggestions for tags and mentions."
   (:require [markdown.core :as md]
-            [clojure.string :as s]))
+            [clojure.string :as s]
+            [iwaswhere-web.helpers :as h]))
 
 (defn hashtags-replacer
   "Replaces hashtags in entry text. Depending on show-hashtags? switch either displays
@@ -13,7 +14,7 @@
   (fn [acc hashtag]
     (let [f-hashtag (if show-hashtags? hashtag (subs hashtag 1))
           with-link (str " <a href='/#" hashtag "'>" f-hashtag "</a>")]
-      (s/replace acc (re-pattern (str "[^*]" hashtag "(?!\\w)(?![`)])")) with-link))))
+      (s/replace acc (re-pattern (str "[^*]" hashtag "(?!" h/tag-char-class ")(?![`)])")) with-link))))
 
 (defn mentions-replacer
   "Replaces mentions in entry text."
@@ -21,7 +22,7 @@
   (fn [acc mention]
     (let [f-mention (if show-hashtags? mention (subs mention 1))
           with-link (str " <a class='mention-link' href='/#" mention "'>" f-mention "</a>")]
-      (s/replace acc mention with-link))))
+      (s/replace acc (re-pattern (str mention "(?!" h/tag-char-class ")")) with-link))))
 
 (defn- reducer
   "Generic reducer, allows calling specified function for each item in the collection."
