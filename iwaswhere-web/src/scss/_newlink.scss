@@ -1,29 +1,21 @@
 .new-link-btn {
   position: relative;
   display: inline-block;
-}
 
-.new-link-entry {
-  visibility: visible;
-  background-color: #999;
-  color: #fff;
-  text-align: center;
-  padding: 3px;
+  input {
+    visibility: visible;
+    text-align: center;
+    padding: 1px;
 
-  font-family: "Lato"!important;
-  font-weight: bold;
-  font-size: 0.7em;
+    font-family: "Lato", sans-serif !important ;
+    font-weight: bold;
+    font-size: 0.7em;
 
-  /* Position the tooltip text - see examples below! */
-  position: absolute;
-  z-index: 1002;
-  bottom: 140%;
-  width: 180px;
-  left: 50%;
-  /*margin-left: -50%;*/
-  margin-left: -55px;
-}
+    position: absolute;
+    z-index: 1002;
+    top: 140%;
+    width: 140px;
+    margin-left: -140px;
+  }
 
-.new-link-entry input {
-  width: 100%;
 }

@@ -43,10 +43,15 @@
     }
 
     div:nth-child(2) {
-      flex-grow: 2;
+      flex: 0;
+    }
+
+    div:nth-child(3) {
+      flex-grow: 1;
       display: flex;
       justify-content: flex-end;
       align-items: flex-end;
+      flex-wrap: wrap;
     }
   }
 

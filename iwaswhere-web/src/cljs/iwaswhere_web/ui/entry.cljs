@@ -37,22 +37,22 @@
         [u/span-w-tooltip "fa-trash-o" "delete entry" guarded-trash-fn]))))
 
 (defn new-link
+  "Renders input for adding link entry."
   [entry put-fn]
   (let [visible (r/atom false)]
     (fn [entry put-fn]
       [:span.fa.fa-link.toggle.new-link-btn {:on-click #(swap! visible not)}
        (when @visible
-         [:span.new-link-entry
-          [:input {:on-click    #(.stopPropagation %)
-                   :on-key-down (fn [ev]
-                                  (when (= (.-keyCode ev) 13)
-                                    (let [link (re-find #"[0-9]{13}" (.-value (.-target ev)))
-                                          entry-links (:linked-entries entry)
-                                          linked-entries (conj entry-links (long link))
-                                          new-entry (h/clean-entry (merge entry {:linked-entries linked-entries}))]
-                                      (when link
-                                        (put-fn [:text-entry/update new-entry])
-                                        (swap! visible not)))))}]])])))
+         [:input {:on-click    #(.stopPropagation %)
+                  :on-key-down (fn [ev]
+                                 (when (= (.-keyCode ev) 13)
+                                   (let [link (re-find #"[0-9]{13}" (.-value (.-target ev)))
+                                         entry-links (:linked-entries entry)
+                                         linked-entries (conj entry-links (long link))
+                                         new-entry (h/clean-entry (merge entry {:linked-entries linked-entries}))]
+                                     (when link
+                                       (put-fn [:text-entry/update new-entry])
+                                       (swap! visible not)))))}])])))
 
 (defn journal-entry
   "Renders individual journal entry. Interaction with application state happens via
@@ -94,6 +94,12 @@
             [:time (.format (js/moment ts) "ddd, MMMM Do YYYY")]]
            [:time (.format (js/moment ts) ", h:mm a") formatted-duration]]
           [:div
+           (when (seq (:linked-entries-list entry))
+             (let [entry-active? (= (-> store-snapshot :active) (:timestamp entry))]
+               [:span.link-btn {:on-click #(put-fn [:cmd/set-active (if entry-active? nil (:timestamp entry))])
+                                :class    (when entry-active? "active")}
+                (str " linked: " (count (:linked-entries-list entry)))]))]
+          [:div
            [:span.fa.toggle.tooltip {:class    (if (pos? upvotes) "fa-thumbs-up" "fa-thumbs-o-up")
                                      :on-click (upvote-fn inc)}
             [:span.tooltiptext "upvote"]]
@@ -111,12 +117,7 @@
              [:a.tooltip {:href (str "/#" ts) :target "_blank"} [:span.fa.fa-external-link.toggle]
               [:span.tooltiptext "open in external tab"]])
            (when-not (:comment-for entry) [new-link entry put-fn])
-           [trash-icon trash-entry]
-           (when (seq (:linked-entries-list entry))
-             (let [entry-active? (= (-> store-snapshot :active) (:timestamp entry))]
-               [:span.link-btn {:on-click #(put-fn [:cmd/set-active (if entry-active? nil (:timestamp entry))])
-                                :class    (when entry-active? "active")}
-                (str " linked: " (count (:linked-entries-list entry)))]))]]
+           [trash-icon trash-entry]]]
          [hashtags-mentions-list entry]
          [l/leaflet-map entry (or show-map? (:show-all-maps store-snapshot))]
          (if (or new-entry? (:edit-mode @local))
