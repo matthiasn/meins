@@ -34,7 +34,7 @@
     (fn [trash-entry]
       (if @clicked
         [:span.delete-warn {:on-click trash-fn} [:span.fa.fa-trash] "  confirm delete?"]
-        [u/span-w-tooltip "fa-trash-o" "delete entry" guarded-trash-fn]))))
+        [:span.fa.fa-trash-o.toggle {:on-click guarded-trash-fn}]))))
 
 (defn new-link
   "Renders input for adding link entry."
@@ -100,22 +100,19 @@
                                 :class    (when entry-active? "active")}
                 (str " linked: " (count (:linked-entries-list entry)))]))]
           [:div
-           [:span.fa.toggle.tooltip {:class    (if (pos? upvotes) "fa-thumbs-up" "fa-thumbs-o-up")
-                                     :on-click (upvote-fn inc)}
-            [:span.tooltiptext "upvote"]]
+           [:span.fa.toggle {:on-click (upvote-fn inc) :class (if (pos? upvotes) "fa-thumbs-up" "fa-thumbs-o-up")}]
            (when (pos? upvotes) [:span.upvotes " " upvotes])
-           (when (pos? upvotes) [u/span-w-tooltip "fa-thumbs-down" "dislike" (upvote-fn dec)])
-           (when map? [u/span-w-tooltip "fa-map-o" "show map" toggle-map])
-           [u/span-w-tooltip "fa-pencil-square-o" "edit entry" toggle-edit]
+           (when (pos? upvotes) [:span.fa.fa-thumbs-down.toggle {:on-click (upvote-fn dec)}])
+           (when map? [:span.fa.fa-map-o.toggle {:on-click toggle-map}])
+           [:span.fa.fa-pencil-square-o.toggle {:on-click toggle-edit}]
            (when-not (:comment-for entry)
-             [u/span-w-tooltip "fa-comment-o" "new comment" #(do ((h/new-entry-fn put-fn {:comment-for ts}))
-                                                                 (reset! show-comments? true))])
+             [:span.fa.fa-comment-o.toggle {:on-click #(do ((h/new-entry-fn put-fn {:comment-for ts}))
+                                                           (reset! show-comments? true))}])
            (when (seq (:comments entry))
-             [u/span-w-tooltip (str "fa-comments " (when-not @show-comments? "hidden-comments"))
-              "show comments" #(swap! show-comments? not)])
+             [:span.fa.fa-comments.toggle {:on-click #(swap! show-comments? not)
+                                           :class    (when-not @show-comments? "hidden-comments")}])
            (when-not (:comment-for entry)
-             [:a.tooltip {:href (str "/#" ts) :target "_blank"} [:span.fa.fa-external-link.toggle]
-              [:span.tooltiptext "open in external tab"]])
+             [:a {:href (str "/#" ts) :target "_blank"} [:span.fa.fa-external-link.toggle]])
            (when-not (:comment-for entry) [new-link entry put-fn])
            [trash-icon trash-entry]]]
          [hashtags-mentions-list entry]

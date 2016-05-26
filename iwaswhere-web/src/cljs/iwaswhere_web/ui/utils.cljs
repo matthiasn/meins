@@ -19,20 +19,6 @@
         matched (set/intersection tags private-tags)]
     (empty? matched)))
 
-(defn btn-w-tooltip
-  "Render button with tooltip on top."
-  [icon-cls text tooltip-text click-fn btn-cls]
-  [:span.tooltip
-   [:button.button-xsmall.tooltip {:on-click click-fn :class btn-cls}
-    [:span.fa {:class icon-cls}] (str " " text)]
-   [:span.tooltiptext tooltip-text]])
-
-(defn span-w-tooltip
-  "Render button with tooltip on top."
-  [icon-cls tooltip-text click-fn]
-  [:span.fa.toggle.tooltip {:on-click click-fn :class icon-cls}
-   [:span.tooltiptext tooltip-text]])
-
 (defn suggestions
   "Renders suggestions for hashtags or mentions if either occurs before the current caret position.
   It does so by getting the selection from the DOM API, which can be used to determine the position

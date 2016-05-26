@@ -1,5 +1,6 @@
 $font-color: #576364;
 $body-background-color: #f3f3f9;
+$green: #4CAF50;
 
 body {
   color: $font-color;
@@ -17,7 +18,6 @@ body {
 }
 
 @import "buttons.scss";
-@import "tooltip.scss";
 @import "journal.scss";
 @import "entry.scss";
 @import "tags.scss";

@@ -1,7 +1,6 @@
 #header {
   width: 100%;
   flex: 0 0 auto;
-
 }
 
 .menu-header {
@@ -17,5 +16,10 @@
   h1 {
     color:white;
     font-size: 1.5em;
+  }
+
+  button {
+    font-size: 0.8em;
+    margin-right: 5px;
   }
 }

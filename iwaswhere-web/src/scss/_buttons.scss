@@ -11,22 +11,25 @@
   padding: 1px 5px;
   color: white;
   font-size: 0.8em;
-  background-color: rgb(60, 202, 60);
+  background-color: $green;
   cursor: pointer;
   white-space: nowrap;
 }
 
 button {
-  margin-right: 5px;
-  padding: 0.2em 0.5em 0.3em 0.5em !important;
+  background-color: $green;
+  border: none;
+  color: white;
+  padding: 4px 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  cursor: pointer;
 }
 
 .button-primary {
   background-color: #0078e7;
-}
-
-.button-xsmall {
-  font-size: 70%;
 }
 
 .show-more-btn {
@@ -37,7 +40,7 @@ button {
 }
 
 .delete-warn {
-  margin-left: 25px;
+  margin: 0 15px 0 5px;
   padding: 1px 5px;
   color: white;
   font-size: 0.8em;
