@@ -27,3 +27,4 @@ resources/
 *.zip
 
 .sass-cache/
+figwheel_server.log

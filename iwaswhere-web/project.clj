@@ -35,7 +35,7 @@
   :jvm-opts ["-XX:-OmitStackTraceInFastThrow"]
 
   :plugins [[lein-cljsbuild "1.1.3"]
-            [lein-figwheel "0.5.3-1"]
+            [lein-figwheel "0.5.3-2"]
             [lein-sassy "1.0.7"]
             [lein-codox "0.9.5"]]
 
