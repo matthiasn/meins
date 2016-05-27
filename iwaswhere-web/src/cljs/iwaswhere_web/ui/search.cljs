@@ -9,8 +9,8 @@
   [{:keys [observed local put-fn]}]
   (let [local-snapshot @local
         store-snapshot @observed
-        hashtags (:hashtags store-snapshot)
-        mentions (:mentions store-snapshot)
+        hashtags (:hashtags (:cfg store-snapshot))
+        mentions (:mentions (:cfg store-snapshot))
         location-timeout-fn (fn [search-text]
                               (.setTimeout js/window
                                            #(aset js/window "location" "hash" (js/encodeURIComponent search-text))

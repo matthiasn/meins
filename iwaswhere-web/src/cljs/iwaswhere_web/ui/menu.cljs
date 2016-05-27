@@ -5,16 +5,17 @@
 (defn cfg-view
   "Renders component for toggling display of maps, comments, ..."
   [store-snapshot put-fn]
-  (let [show-all-maps? (:show-all-maps store-snapshot)
-        toggle-all-maps #(put-fn [:cmd/toggle-key {:key :show-all-maps}])
-        show-tags? (:show-hashtags store-snapshot)
-        toggle-tags #(put-fn [:cmd/toggle-key {:key :show-hashtags}])
-        show-context? (:show-context store-snapshot)
-        toggle-context #(put-fn [:cmd/toggle-key {:key :show-context}])
-        show-pvt? (:show-pvt store-snapshot)
-        toggle-pvt #(put-fn [:cmd/toggle-key {:key :show-pvt}])
-        sort-by-upvotes? (:sort-by-upvotes store-snapshot)
-        toggle-upvotes #(do (put-fn [:cmd/toggle-key {:key :sort-by-upvotes}])
+  (let [cfg (:cfg store-snapshot)
+        show-all-maps? (:show-all-maps cfg)
+        toggle-all-maps #(put-fn [:cmd/toggle-key {:path [:cfg :show-all-maps]}])
+        show-tags? (:show-hashtags cfg)
+        toggle-tags #(put-fn [:cmd/toggle-key {:path [:cfg :show-hashtags]}])
+        show-context? (:show-context cfg)
+        toggle-context #(put-fn [:cmd/toggle-key {:path [:cfg :show-context]}])
+        show-pvt? (:show-pvt cfg)
+        toggle-pvt #(put-fn [:cmd/toggle-key {:path [:cfg :show-pvt]}])
+        sort-by-upvotes? (:sort-by-upvotes cfg)
+        toggle-upvotes #(do (put-fn [:cmd/toggle-key {:path [:cfg :sort-by-upvotes]}])
                             (put-fn [:state/get (merge (:current-query store-snapshot)
                                                        {:sort-by-upvotes (not sort-by-upvotes?)})]))]
     [:div

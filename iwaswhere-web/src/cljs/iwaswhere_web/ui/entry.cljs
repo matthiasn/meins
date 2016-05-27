@@ -69,7 +69,7 @@
             map? (:latitude entry)
             new-entry? (:new-entry entry)
             show-map? (contains? (:show-maps-for store-snapshot) ts)
-            toggle-map #(put-fn [:cmd/toggle {:timestamp ts :key :show-maps-for}])
+            toggle-map #(put-fn [:cmd/toggle {:timestamp ts :path [:cfg :show-maps-for]}])
             toggle-edit #(swap! local update-in [:edit-mode] not)
             trash-entry #(if new-entry?
                           (put-fn [:entry/remove-local {:timestamp ts}])
@@ -131,23 +131,23 @@
   used in edit mode also sends a modified entry to the store component, which is useful
   for displaying updated hashtags, or also for showing the warning that the entry is not
   saved yet."
-  [entry store-snapshot put-fn]
+  [entry cfg new-entries put-fn]
   (let [show-comments? (r/atom false)]
-    (fn [entry store-snapshot put-fn]
+    (fn [entry cfg new-entries put-fn]
       (let [comments (:comments entry)]
         [:div.entry-with-comments
-         [journal-entry entry store-snapshot put-fn show-comments?]
+         [journal-entry entry cfg put-fn show-comments?]
          (when (seq comments)
            (if @show-comments?
              [:div.comments
               (let [comments (:comments entry)]
-                (for [comment (if (:show-pvt store-snapshot) comments (filter u/pvt-filter comments))]
+                (for [comment (if (:show-pvt cfg) comments (filter u/pvt-filter comments))]
                   ^{:key (str "c" (:timestamp comment))}
-                  [journal-entry comment store-snapshot put-fn show-comments?]))]
+                  [journal-entry comment cfg put-fn show-comments?]))]
              [:div.show-comments {:on-click #(swap! show-comments? not)}
               (let [n (count comments)]
                 [:span (str "show " n " comment" (when (> n 1) "s"))])]))
          [:div.comments
-          (for [comment (filter #(= (:comment-for %) (:timestamp entry)) (vals (:new-entries store-snapshot)))]
+          (for [comment (filter #(= (:comment-for %) (:timestamp entry)) new-entries)]
             ^{:key (str "c" (:timestamp comment))}
-            [journal-entry comment store-snapshot put-fn show-comments?])]]))))
+            [journal-entry comment cfg put-fn show-comments?])]]))))

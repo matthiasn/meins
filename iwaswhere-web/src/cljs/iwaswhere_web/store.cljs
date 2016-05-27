@@ -6,7 +6,11 @@
   "Update client side state with list of journal entries received from backend."
   [{:keys [current-state msg-payload]}]
   (let [entries-map (into {} (map (fn [entry] [(:timestamp entry) entry]) (:entries msg-payload)))
-        new-state (merge current-state msg-payload {:entries-map entries-map})]
+        new-state (-> current-state
+                      (assoc-in [:entries] (:entries msg-payload))
+                      (assoc-in [:entries-map] entries-map)
+                      (assoc-in [:cfg :hashtags] (:hashtags msg-payload))
+                      (assoc-in [:cfg :mentions] (:mentions msg-payload)))]
     {:new-state new-state}))
 
 (defonce new-entries-ls (local-storage (atom {}) "iWasWhere_new_entries"))
@@ -24,32 +28,31 @@
   (let [initial-state (atom {:entries         []
                              :last-alive      (.now js/Date)
                              :show-entries    20
-                             :show-maps-for   #{}
                              :new-entries     @new-entries-ls
-                             :sort-by-upvotes false
-                             :show-all-maps   false
-                             :show-hashtags   true
-                             :show-context    true
-                             :show-pvt        false})]
-    (add-watch new-entries-ls :new (fn [_ _ _ v] (swap! initial-state assoc-in [:new-entries] v)))
+                             :cfg {:show-maps-for   #{}
+                                   :sort-by-upvotes false
+                                   :show-all-maps   false
+                                   :show-hashtags   true
+                                   :show-context    true
+                                   :show-pvt        false}})]
     {:state initial-state}))
 
 (defn toggle-set-fn
   "Toggles for example the visibility of a map or the edit mode for an individual
   journal entry. Requires the key to exist on the application state as a set."
   [{:keys [current-state msg-payload]}]
-  (let [k (:key msg-payload)
+  (let [path (:path msg-payload)
         timestamp (:timestamp msg-payload)
-        new-state (if (contains? (k current-state) timestamp)
-                    (update-in current-state [k] disj timestamp)
-                    (update-in current-state [k] conj timestamp))]
+        new-state (if (contains? (get-in current-state path) timestamp)
+                    (update-in current-state path disj timestamp)
+                    (update-in current-state path conj timestamp))]
     {:new-state new-state}))
 
 (defn toggle-key-fn
   "Toggles config key."
   [{:keys [current-state msg-payload]}]
-  (let [k (:key msg-payload)]
-    {:new-state (update-in current-state [k] not)}))
+  (let [path (:path msg-payload)]
+    {:new-state (update-in current-state path not)}))
 
 (defn new-entry-fn
   "Create locally stored new entry for further edit."
@@ -114,24 +117,24 @@
 (defn set-active-fn
   "Sets entry in payload as the active entry for which to show linked entries."
   [{:keys [current-state msg-payload]}]
-  (prn "active" (:timestamp msg-payload))
   {:new-state (assoc-in current-state [:active] msg-payload)})
 
 (defn cmp-map
   "Creates map for the component which holds the client-side application state."
   [cmp-id]
-  {:cmp-id      cmp-id
-   :state-fn    initial-state-fn
-   :handler-map {:state/new          new-state-fn
-                 :state/get          update-query-fn
-                 :show/more          show-more-fn
-                 :entry/new          new-entry-fn
-                 :entry/geo-enrich   geo-enrich-fn
-                 :entry/update-local update-local-fn
-                 :entry/remove-local remove-local-fn
-                 :entry/saved        entry-saved-fn
-                 :cmd/set-active     set-active-fn
-                 :cmd/toggle         toggle-set-fn
-                 :cmd/toggle-key     toggle-key-fn
-                 :cmd/keep-alive     ka/reset-fn
-                 :cmd/keep-alive-res ka/set-alive-fn}})
+  {:cmp-id            cmp-id
+   :state-fn          initial-state-fn
+   :snapshot-xform-fn #(dissoc % :last-alive)
+   :handler-map       {:state/new          new-state-fn
+                       :state/get          update-query-fn
+                       :show/more          show-more-fn
+                       :entry/new          new-entry-fn
+                       :entry/geo-enrich   geo-enrich-fn
+                       :entry/update-local update-local-fn
+                       :entry/remove-local remove-local-fn
+                       :entry/saved        entry-saved-fn
+                       :cmd/set-active     set-active-fn
+                       :cmd/toggle         toggle-set-fn
+                       :cmd/toggle-key     toggle-key-fn
+                       :cmd/keep-alive     ka/reset-fn
+                       :cmd/keep-alive-res ka/set-alive-fn}})
