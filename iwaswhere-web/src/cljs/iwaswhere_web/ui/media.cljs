@@ -14,6 +14,12 @@
     [:audio {:controls true :preload "none"}
      [:source {:src (str "/audio/" audio-file) :type "audio/mp4"}]]))
 
+(defn audioplayer
+  "Renders automatically starting audio player."
+  [audio-file autoplay loop id]
+  [:audio {:autoPlay autoplay :loop loop :id id}
+   [:source {:src audio-file :type "audio/mp4"}]])
+
 (defn videoplayer-view
   "Renders video player view."
   [entry]

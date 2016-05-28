@@ -18,12 +18,15 @@
   pre {
     min-height: 22px;
     margin: 0.3em 0 1em 0;
+
+    code {
+      white-space: pre-wrap;
+    }
   }
 
   .edit-md pre code {
     font-family: "Lato", sans-serif;
     outline: none;
-    white-space: pre-wrap;
   }
 
   .entry .mention-link {
@@ -51,6 +54,17 @@
       justify-content: flex-end;
       align-items: flex-end;
       flex-wrap: wrap;
+    }
+  }
+
+  .pomodoro {
+    padding-bottom: 0.2rem;
+
+    .start {
+      background-color: $green;
+    }
+    .stop {
+      background-color: $red;
     }
   }
 

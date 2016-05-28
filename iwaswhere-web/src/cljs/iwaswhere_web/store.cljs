@@ -81,8 +81,9 @@
   "Update locally stored new entry changes from edit element."
   [{:keys [current-state msg-payload]}]
   (let [ts (:timestamp msg-payload)
-        new-state (if (get-in current-state [:new-entries ts])
-                    (assoc-in current-state [:new-entries ts] msg-payload)
+        saved-entry (get-in current-state [:new-entries ts])
+        new-state (if saved-entry
+                    (assoc-in current-state [:new-entries ts] (merge saved-entry msg-payload))
                     current-state)]
     (update-local-storage new-state)
     {:new-state new-state}))

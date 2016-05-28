@@ -3,6 +3,7 @@
             [iwaswhere-web.ui.markdown :as md]
             [iwaswhere-web.ui.edit :as e]
             [iwaswhere-web.ui.media :as m]
+            [iwaswhere-web.ui.pomodoro :as p]
             [reagent.core :as rc]
             [cljsjs.moment]
             [iwaswhere-web.helpers :as h]
@@ -106,6 +107,8 @@
            (when map? [:span.fa.fa-map-o.toggle {:on-click toggle-map}])
            [:span.fa.fa-pencil-square-o.toggle {:on-click toggle-edit}]
            (when-not (:comment-for entry)
+             [:span.fa.fa-clock-o.toggle {:on-click (h/new-entry-fn put-fn (p/pomodoro-defaults ts))}])
+           (when-not (:comment-for entry)
              [:span.fa.fa-comment-o.toggle {:on-click #(do ((h/new-entry-fn put-fn {:comment-for ts}))
                                                            (reset! show-comments? true))}])
            (when (seq (:comments entry))
@@ -115,6 +118,7 @@
              [:a {:href (str "/#" ts) :target "_blank"} [:span.fa.fa-external-link.toggle]])
            (when-not (:comment-for entry) [new-link entry put-fn])
            [trash-icon trash-entry]]]
+         (when (= :pomodoro (:entry-type entry)) [p/pomodoro-header entry put-fn])
          [hashtags-mentions-list entry]
          [l/leaflet-map entry (or show-map? (:show-all-maps store-snapshot))]
          (if (or new-entry? (:edit-mode @local))
