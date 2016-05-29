@@ -10,6 +10,7 @@
                       (assoc-in [:entries] (:entries msg-payload))
                       (assoc-in [:entries-map] entries-map)
                       (assoc-in [:cfg :hashtags] (:hashtags msg-payload))
+                      (assoc-in [:stats] (:stats msg-payload))
                       (assoc-in [:cfg :mentions] (:mentions msg-payload)))]
     {:new-state new-state}))
 
