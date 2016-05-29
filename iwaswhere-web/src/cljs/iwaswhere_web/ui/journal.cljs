@@ -10,13 +10,13 @@
         cfg (:cfg store-snapshot)
         show-entries (or (:show-entries store-snapshot) 20)
         entries (take show-entries (:entries store-snapshot))
-        new-entries (vals (:new-entries store-snapshot))
+        new-entries (:new-entries store-snapshot)
         show-context? (:show-context cfg)
         show-pvt? (:show-pvt cfg)
         active-entry (get (:entries-map store-snapshot) (:active store-snapshot))]
     [:div.journal
      [:div.journal-entries
-      (for [entry (filter #(not (:comment-for %)) new-entries)]
+      (for [entry (filter #(not (:comment-for %)) (vals new-entries))]
         ^{:key (:timestamp entry)}
         [e/entry-with-comments entry cfg new-entries put-fn])
       (for [entry (if show-pvt? entries (filter u/pvt-filter entries))]

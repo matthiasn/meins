@@ -82,9 +82,7 @@
   [{:keys [current-state msg-payload]}]
   (let [ts (:timestamp msg-payload)
         saved-entry (get-in current-state [:new-entries ts])
-        new-state (if saved-entry
-                    (assoc-in current-state [:new-entries ts] (merge saved-entry msg-payload))
-                    current-state)]
+        new-state (assoc-in current-state [:new-entries ts] (merge saved-entry msg-payload))]
     (update-local-storage new-state)
     {:new-state new-state}))
 

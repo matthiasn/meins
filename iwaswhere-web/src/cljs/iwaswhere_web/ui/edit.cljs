@@ -35,8 +35,6 @@
   (let [entry (-> entry (dissoc :comments) (dissoc :linked-entries))
         ts (:timestamp entry)
         edit-elem-atom (atom {})
-        last-saved (r/atom entry)
-        local-saved-entry (r/atom entry)
         local-display-entry (r/atom entry)]
     (fn [entry hashtags mentions put-fn toggle-edit]
       (let [latest-entry (dissoc entry :comments)
@@ -44,22 +42,21 @@
             md-string (or (:md @local-display-entry) "edit here")
             get-content #(aget (.. % -target -parentElement -parentElement -firstChild -firstChild) "innerText")
             update-temp-fn #(let [updated-entry (merge latest-entry (h/parse-entry (get-content %)))]
-                             (put-fn [:entry/update-local updated-entry])
-                             (reset! local-saved-entry updated-entry))
-            save-fn #(put-fn [:text-entry/update (if (and new-entry? (not (:comment-for entry)))
-                                                   (update-in (h/clean-entry @local-saved-entry) [:tags] conj "#new")
-                                                   (h/clean-entry @local-saved-entry))])
+                             (put-fn [:entry/update-local updated-entry]))
+            save-fn #(do (put-fn [:text-entry/update (if (and new-entry? (not (:comment-for entry)))
+                                                       (update-in (h/clean-entry latest-entry) [:tags] conj "#new")
+                                                       (h/clean-entry latest-entry))])
+                         (toggle-edit))
 
             ; find incomplete tag or mention before cursor, show suggestions
-            before-cursor (h/string-before-cursor (:md @local-saved-entry))
+            before-cursor (h/string-before-cursor (:md latest-entry))
             [curr-tag f-tags] (h/autocomplete-tags before-cursor "(?!^)#" hashtags)
             [curr-mention f-mentions] (h/autocomplete-tags before-cursor "@" mentions)
 
             tag-replace-fn (fn [curr-tag tag]
                              (let [curr-tag-regex (js/RegExp (str curr-tag "(?!" h/tag-char-class ")") "i")
-                                   md (:md @local-saved-entry)
+                                   md (:md latest-entry)
                                    updated (merge entry (h/parse-entry (s/replace md curr-tag-regex tag)))]
-                               (reset! local-saved-entry updated)
                                (reset! local-display-entry updated)
                                (.setTimeout js/window (fn [] (u/focus-on-end @edit-elem-atom)) 100)))
 
@@ -67,9 +64,8 @@
                             (let [key-code (.. ev -keyCode)
                                   meta-key (.. ev -metaKey)]
                               (when (and meta-key (= key-code 83))
-                                (if (or new-entry? (not= @last-saved @local-saved-entry))
-                                  (save-fn)
-                                  (toggle-edit)) ; when no change, toggle edit mode
+                                (when (not= (dissoc @local-display-entry :comments) (dissoc latest-entry :new-entry))
+                                  (save-fn))
                                 (.preventDefault ev))
                               (when (= key-code 9)          ; TAB key pressed
                                 (when (and curr-tag (seq f-tags))
@@ -77,14 +73,11 @@
                                 (when (and curr-mention (seq f-mentions))
                                   (tag-replace-fn curr-mention (first f-mentions)))
                                 (.preventDefault ev))))]
-        (when (and (not new-entry?) (not= @last-saved latest-entry))
-          (reset! last-saved latest-entry)
-          (reset! local-display-entry latest-entry)
-          (reset! local-saved-entry latest-entry))
         [:div.edit-md
          [:pre [editable-code-elem md-string update-temp-fn on-keydown-fn edit-elem-atom]]
          [u/suggestions ts f-tags curr-tag tag-replace-fn "hashtag"]
          [u/suggestions ts f-mentions curr-mention tag-replace-fn "mention"]
-         (when (or (not= @last-saved @local-saved-entry) new-entry?)
+         (when
+           (not= (dissoc @local-display-entry :comments) (dissoc latest-entry :new-entry))
            [:div
             [:span.not-saved {:on-click save-fn} [:span.fa.fa-floppy-o] "  click to save"]])]))))

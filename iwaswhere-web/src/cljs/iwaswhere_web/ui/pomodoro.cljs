@@ -30,10 +30,12 @@
                              (reset! timeout nil))
             interval-fn (fn []
                           (if (time-left? @cached-entry)
-                            (put-fn [:entry/update-local {:timestamp      (:timestamp entry)
-                                                          :completed-time (inc (:completed-time @cached-entry))}])
-                            (do (clear-clock)
-                                (.play (.getElementById js/document ringer-id)))))
+                            (put-fn [:entry/update-local (update-in @cached-entry [:completed-time] inc)])
+                            (do (.play (.getElementById js/document ringer-id))
+                                (clear-clock)
+                                (.setTimeout js/window
+                                            #(put-fn [:text-entry/update (h/clean-entry @cached-entry)])
+                                            5000))))
             start-stop-fn (fn [_ev] (if @timeout (clear-clock)
                                                  (reset! timeout (.setInterval js/window interval-fn 1000))))]
         [:div.pomodoro

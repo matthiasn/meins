@@ -71,7 +71,10 @@
             new-entry? (:new-entry entry)
             show-map? (contains? (:show-maps-for store-snapshot) ts)
             toggle-map #(put-fn [:cmd/toggle {:timestamp ts :path [:cfg :show-maps-for]}])
-            toggle-edit #(swap! local update-in [:edit-mode] not)
+            toggle-edit #(do (if (:edit-mode @local)
+                               (put-fn [:entry/remove-local entry])
+                               (put-fn [:entry/update-local (merge {:new-entry true} entry)]))
+                             (swap! local update-in [:edit-mode] not))
             trash-entry #(if new-entry?
                           (put-fn [:entry/remove-local {:timestamp ts}])
                           (put-fn [:cmd/trash {:timestamp ts}]))
@@ -138,20 +141,19 @@
   [entry cfg new-entries put-fn]
   (let [show-comments? (r/atom false)]
     (fn [entry cfg new-entries put-fn]
-      (let [comments (:comments entry)]
+      (let [comments (:comments entry)
+            comments (if (:show-pvt cfg) comments (filter u/pvt-filter comments))
+            comments-map (into {} (map (fn [c] [(:timestamp c) c])) comments)
+            local-comments (into {} (filter (fn [[_ts c]] (= (:comment-for c) (:timestamp entry))) new-entries))
+            all-comments (sort-by :timestamp (vals (merge comments-map local-comments)))]
         [:div.entry-with-comments
          [journal-entry entry cfg put-fn show-comments?]
-         (when (seq comments)
-           (if @show-comments?
+         (when (seq all-comments)
+           (if (or @show-comments? (seq local-comments))
              [:div.comments
-              (let [comments (:comments entry)]
-                (for [comment (if (:show-pvt cfg) comments (filter u/pvt-filter comments))]
-                  ^{:key (str "c" (:timestamp comment))}
-                  [journal-entry comment cfg put-fn show-comments?]))]
+              (for [comment all-comments]
+                ^{:key (str "c" (:timestamp comment))}
+                [journal-entry comment cfg put-fn show-comments?])]
              [:div.show-comments {:on-click #(swap! show-comments? not)}
               (let [n (count comments)]
-                [:span (str "show " n " comment" (when (> n 1) "s"))])]))
-         [:div.comments
-          (for [comment (filter #(= (:comment-for %) (:timestamp entry)) new-entries)]
-            ^{:key (str "c" (:timestamp comment))}
-            [journal-entry comment cfg put-fn show-comments?])]]))))
+                [:span (str "show " n " comment" (when (> n 1) "s"))])]))]))))
