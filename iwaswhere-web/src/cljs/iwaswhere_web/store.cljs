@@ -30,12 +30,13 @@
                              :last-alive      (.now js/Date)
                              :show-entries    20
                              :new-entries     @new-entries-ls
-                             :cfg {:show-maps-for   #{}
-                                   :sort-by-upvotes false
-                                   :show-all-maps   false
-                                   :show-hashtags   true
-                                   :show-context    true
-                                   :show-pvt        false}})]
+                             :cfg {:show-maps-for      #{}
+                                   :sort-by-upvotes    false
+                                   :show-all-maps      false
+                                   :show-hashtags      true
+                                   :comments-w-entries true
+                                   :show-context       true
+                                   :show-pvt           false}})]
     {:state initial-state}))
 
 (defn toggle-set-fn

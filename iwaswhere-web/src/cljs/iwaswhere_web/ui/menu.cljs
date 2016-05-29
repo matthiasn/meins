@@ -12,6 +12,8 @@
         toggle-tags #(put-fn [:cmd/toggle-key {:path [:cfg :show-hashtags]}])
         show-context? (:show-context cfg)
         toggle-context #(put-fn [:cmd/toggle-key {:path [:cfg :show-context]}])
+        comments-w-entries? (:comments-w-entries cfg)
+        toggle-comments-w-entries #(put-fn [:cmd/toggle-key {:path [:cfg :comments-w-entries]}])
         show-pvt? (:show-pvt cfg)
         toggle-pvt #(put-fn [:cmd/toggle-key {:path [:cfg :show-pvt]}])
         sort-by-upvotes? (:sort-by-upvotes cfg)
@@ -22,6 +24,8 @@
      [:span.fa.fa-thumbs-up.toggle {:class (when-not sort-by-upvotes? "inactive") :on-click toggle-upvotes}]
      [:span.fa.fa-user-secret.toggle {:class (when-not show-pvt? "inactive") :on-click toggle-pvt}]
      [:span.fa.fa-eye.toggle {:class (when-not show-context? "inactive") :on-click toggle-context}]
+     [:span.fa.fa-comments.toggle {:class (when-not comments-w-entries? "inactive")
+                                   :on-click toggle-comments-w-entries}]
      [:span.fa.fa-hashtag.toggle {:class (when-not show-tags? "inactive") :on-click toggle-tags}]
      [:span.fa.toggle {:class (if show-all-maps? "fa-map" "fa-map-o") :on-click toggle-all-maps}]]))
 

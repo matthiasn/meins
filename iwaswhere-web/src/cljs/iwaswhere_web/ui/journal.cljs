@@ -12,6 +12,10 @@
         entries (take show-entries (:entries store-snapshot))
         new-entries (:new-entries store-snapshot)
         show-context? (:show-context cfg)
+        comments-w-entries? (:comments-w-entries cfg)
+        with-comments? (fn [entry] (and (or (and comments-w-entries? (not (:comment-for entry)))
+                                            (not comments-w-entries?))
+                                        (or (:new-entry entry) show-context?)))
         show-pvt? (:show-pvt cfg)
         active-entry (get (:entries-map store-snapshot) (:active store-snapshot))]
     [:div.journal
@@ -20,7 +24,7 @@
         ^{:key (:timestamp entry)}
         [e/entry-with-comments entry cfg new-entries put-fn])
       (for [entry (if show-pvt? entries (filter u/pvt-filter entries))]
-        (when (and (not (:comment-for entry)) (or (:new-entry entry) show-context?))
+        (when (with-comments? entry)
           ^{:key (:timestamp entry)}
           [e/entry-with-comments entry cfg new-entries put-fn]))
       (when (and show-context? (seq entries))
