@@ -1,7 +1,8 @@
 (ns iwaswhere-web.ui.journal
   (:require [matthiasn.systems-toolbox-ui.reagent :as r]
             [iwaswhere-web.ui.utils :as u]
-            [iwaswhere-web.ui.entry :as e]))
+            [iwaswhere-web.ui.entry :as e]
+            [iwaswhere-web.ui.pomodoro :as p]))
 
 (defn journal-view
   "Renders journal div, one entry per item, with map if geo data exists in the entry."
@@ -10,20 +11,21 @@
         cfg (:cfg store-snapshot)
         show-entries (or (:show-entries store-snapshot) 20)
         entries (take show-entries (:entries store-snapshot))
+        show-pvt? (:show-pvt cfg)
+        filtered-entries (if show-pvt? entries (filter u/pvt-filter entries))
         new-entries (:new-entries store-snapshot)
         show-context? (:show-context cfg)
         comments-w-entries? (:comments-w-entries cfg)
         with-comments? (fn [entry] (and (or (and comments-w-entries? (not (:comment-for entry)))
                                             (not comments-w-entries?))
                                         (or (:new-entry entry) show-context?)))
-        show-pvt? (:show-pvt cfg)
         active-entry (get (:entries-map store-snapshot) (:active store-snapshot))]
     [:div.journal
      [:div.journal-entries
       (for [entry (filter #(not (:comment-for %)) (vals new-entries))]
         ^{:key (:timestamp entry)}
         [e/entry-with-comments entry cfg new-entries put-fn])
-      (for [entry (if show-pvt? entries (filter u/pvt-filter entries))]
+      (for [entry filtered-entries]
         (when (with-comments? entry)
           ^{:key (:timestamp entry)}
           [e/entry-with-comments entry cfg new-entries put-fn]))
@@ -34,6 +36,7 @@
       (when-let [stats (:stats store-snapshot)]
         [:div (:entry-count stats) " entries, " (:node-count stats) " nodes, " (:edge-count stats) " edges, "
          (count (:hashtags store-snapshot)) " hashtags, " (count (:mentions store-snapshot)) " people"])
+      [p/pomodoro-stats-view filtered-entries]
       (when-let [ms (:duration-ms store-snapshot)]
         [:div.stats (str "Query completed in " ms "ms")])]
      (when-let [linked-entries (:linked-entries-list active-entry)]

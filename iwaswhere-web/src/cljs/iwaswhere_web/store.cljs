@@ -28,7 +28,7 @@
   [_put-fn]
   (let [initial-state (atom {:entries         []
                              :last-alive      (.now js/Date)
-                             :show-entries    20
+                             :show-entries    100
                              :new-entries     @new-entries-ls
                              :cfg {:show-maps-for      #{}
                                    :sort-by-upvotes    false

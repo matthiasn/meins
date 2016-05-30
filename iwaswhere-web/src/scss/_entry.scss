@@ -60,6 +60,10 @@
   .pomodoro {
     padding-bottom: 0.2rem;
 
+    .dur {
+      margin-right: 1rem;
+    }
+
     .start {
       background-color: $green;
     }
