@@ -50,8 +50,8 @@
 
             ; find incomplete tag or mention before cursor, show suggestions
             before-cursor (h/string-before-cursor (:md latest-entry))
-            [curr-tag f-tags] (h/autocomplete-tags before-cursor "(?!^)#" hashtags)
-            [curr-mention f-mentions] (h/autocomplete-tags before-cursor "@" mentions)
+            [curr-tag f-tags] (h/autocomplete-tags before-cursor "(?!^) ?#" hashtags)
+            [curr-mention f-mentions] (h/autocomplete-tags before-cursor " ?@" mentions)
 
             tag-replace-fn (fn [curr-tag tag]
                              (let [curr-tag-regex (js/RegExp (str curr-tag "(?!" h/tag-char-class ")") "i")

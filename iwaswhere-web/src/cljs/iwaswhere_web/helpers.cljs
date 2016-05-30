@@ -1,5 +1,6 @@
 (ns iwaswhere-web.helpers
-  (:require [matthiasn.systems-toolbox.component :as st]))
+  (:require [matthiasn.systems-toolbox.component :as st]
+            [clojure.string :as s]))
 
 (defn send-w-geolocation
   "Calls geolocation, sends entry enriched by geo information inside the
@@ -21,8 +22,10 @@
   The negative lookahead (?!`) makes sure that tags and mentions are not found and processed
   when they are quoted as code with backticks."
   [text]
-  (let [tags (set (re-seq (js/RegExp. (str "(?!^)#" tag-char-class "+(?!" tag-char-class ")(?![`)])") "m") text))
-        mentions (set (re-seq (js/RegExp. (str "@" tag-char-class "+(?!" tag-char-class ")(?![`)])") "m") text))]
+  (let [tags (set (map s/trim (re-seq (js/RegExp. (str "(?!^)[ ]#" tag-char-class "+(?!"
+                                                       tag-char-class ")(?![`)])") "m") text)))
+        mentions (set (map s/trim (re-seq (js/RegExp. (str "[ ^]@" tag-char-class
+                                                           "+(?!" tag-char-class ")(?![`)])") "m") text)))]
     {:md        text
      :tags      tags
      :mentions  mentions}))
@@ -77,9 +80,9 @@
 (defn autocomplete-tags
   "Determine autocomplete options for the partial tag (or mention) before the cursor."
   [before-cursor regex-prefix tags]
-  (let [current-tag (re-find (js/RegExp. (str regex-prefix tag-char-class "+$") "") before-cursor)
+  (let [current-tag (s/trim (str (re-find (js/RegExp. (str regex-prefix tag-char-class "+$") "") before-cursor)))
         current-tag-regex (js/RegExp. current-tag "i")
-        tag-substr-filter (fn [tag] (when current-tag (re-find current-tag-regex tag)))
+        tag-substr-filter (fn [tag] (when (seq current-tag) (re-find current-tag-regex tag)))
         f-tags (filter tag-substr-filter tags)]
     [current-tag f-tags]))
 
