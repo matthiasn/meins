@@ -35,7 +35,7 @@
            [:span.show-more-btn [:span.fa.fa-plus-square] " show more"]]))
       (when-let [stats (:stats store-snapshot)]
         [:div (:entry-count stats) " entries, " (:node-count stats) " nodes, " (:edge-count stats) " edges, "
-         (count (:hashtags store-snapshot)) " hashtags, " (count (:mentions store-snapshot)) " people"])
+         (count (:hashtags cfg)) " hashtags, " (count (:mentions cfg)) " people"])
       [p/pomodoro-stats-view filtered-entries]
       (when-let [ms (:duration-ms store-snapshot)]
         [:div.stats (str "Query completed in " ms "ms")])]
