@@ -66,7 +66,7 @@
   "Generates component map for state-cmp."
   [cmp-id]
   {:cmp-id      cmp-id
-   :state-fn    (state-fn "./data/daily-logs")
+   :state-fn    (state-fn f/daily-logs-path)
    :handler-map {:geo-entry/persist     f/geo-entry-persist-fn
                  :geo-entry/import      f/entry-import-fn
                  :text-entry/update     f/geo-entry-persist-fn
