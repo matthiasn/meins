@@ -50,7 +50,7 @@
         upvotes-y (get y :upvotes 0)]
     (if-not (= upvotes-x upvotes-y)
       (. clojure.lang.Util (compare upvotes-y upvotes-x))
-      (if (pos? upvotes-x)  ; when entries have upvotes, sort oldest on top
+      (if (pos? upvotes-x)                                  ; when entries have upvotes, sort oldest on top
         (. clojure.lang.Util (compare (:timestamp x) (:timestamp y)))
         (. clojure.lang.Util (compare (:timestamp y) (:timestamp x)))))))
 
@@ -58,20 +58,20 @@
   "Extract all comments for entry."
   [entry g n]
   (merge entry
-    {:comments (->> (flatten (uber/find-edges g {:dest n :relationship :COMMENT}))
-                    (remove :mirror?)
-                    (map #(uber/attrs g (:src %)))
-                    (sort-by :timestamp))}))
+         {:comments (->> (flatten (uber/find-edges g {:dest n :relationship :COMMENT}))
+                         (remove :mirror?)
+                         (map #(uber/attrs g (:src %)))
+                         (sort-by :timestamp))}))
 
 (defn get-linked-entries
   "Extract all linked entries for entry, including their comments."
   [entry g n sort-by-upvotes?]
   (let [linked (->> (flatten (uber/find-edges g {:src n :relationship :LINKED}))
-                            (remove :mirror?)
-                            (map #(uber/attrs g (:dest %)))
-                            (sort-by :timestamp)
-                            (map (fn [linked-entry]
-                                   (get-comments linked-entry g (:timestamp linked-entry)))))]
+                    (remove :mirror?)
+                    (map #(uber/attrs g (:dest %)))
+                    (sort-by :timestamp)
+                    (map (fn [linked-entry]
+                           (get-comments linked-entry g (:timestamp linked-entry)))))]
     (merge entry {:linked-entries-list (if sort-by-upvotes? (sort compare-w-upvotes linked) linked)})))
 
 (defn extract-sorted-entries
@@ -196,9 +196,28 @@
       (update-in [:graph] add-parent-ref entry)
       (update-in [:sorted-entries] conj ts)))
 
+(defn remove-unused-tags
+  "Checks for orphan tags and removes them. Orphan tags would occur when deleting the last entry
+  that contains a specific tag. Takes the state, a list of tags, and the tag type, such as :tags
+  or :mentions."
+  [state tags k]
+  (reduce (fn [state t]
+            (if (empty? (uber/find-edges (:graph state) {:src {k t} :relationship :CONTAINS}))
+              (update-in state [:graph] #(uber/remove-nodes % {k t}))
+              state))
+          state
+          tags))
+
 (defn remove-node
   "Removes node from graph and sorted set."
   [current-state ts]
-  (-> current-state
-      (update-in [:graph] #(uber/remove-nodes % ts))
-      (update-in [:sorted-entries] disj ts)))
+  (let [g (:graph current-state)]
+    (if (uber/has-node? g ts)
+      (let [entry (uber/attrs g ts)]
+        (-> current-state
+            (update-in [:graph] #(uber/remove-nodes % ts))
+            (update-in [:sorted-entries] disj ts)
+            (remove-unused-tags (:mentions entry) :mention)
+            (remove-unused-tags (:tags entry) :tag)))
+      (do (log/warn "Cannot find node: " ts)
+          current-state))))
