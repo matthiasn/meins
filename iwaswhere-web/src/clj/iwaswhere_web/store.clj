@@ -13,10 +13,10 @@
   with the latest filter when message payload contains :sente-uid, otherwise sends to all clients."
   [{:keys [current-state msg-payload]}]
   (let [sente-uid (:sente-uid msg-payload)
-        sente-uids (if sente-uid [sente-uid] (keys (:last-filter current-state)))
+        sente-uids (if sente-uid [sente-uid] (keys (:client-queries current-state)))
         state-emit-mapper (fn [sente-uid]
                             (let [start-ts (System/currentTimeMillis)
-                                  query (get-in current-state [:last-filter sente-uid])
+                                  query (get-in current-state [:client-queries sente-uid])
                                   res (do (g/get-filtered-results current-state query))
                                   duration-ms (- (System/currentTimeMillis) start-ts)]
                               (log/info "Query" sente-uid "took" duration-ms "ms")
@@ -34,7 +34,7 @@
         query (-> msg-payload
                   (update-in [:not-tags] (fn [not-tags] (set (map #(s/replace % #"~" "") not-tags))))
                   (assoc-in [:last-seen] (System/currentTimeMillis)))
-        new-state (assoc-in current-state [:last-filter sente-uid] query)]
+        new-state (assoc-in current-state [:client-queries sente-uid] query)]
     {:new-state new-state
      :send-to-self [:state/publish-current {:sente-uid sente-uid}]}))
 
@@ -49,7 +49,7 @@
     [_put-fn]
     (let [state (atom {:sorted-entries (sorted-set-by >)
                        :graph          (uber/graph)
-                       :last-filter    {}})
+                       :client-queries {}})
           files (file-seq (clojure.java.io/file path))]
       (doseq [f (f/filter-by-name files #"\d{4}-\d{2}-\d{2}.jrn")]
         (with-open [reader (clojure.java.io/reader f)]

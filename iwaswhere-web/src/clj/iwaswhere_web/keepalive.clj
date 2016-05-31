@@ -22,16 +22,18 @@
   Only returns new state when the query already exists in current state."
   [{:keys [current-state msg-meta]}]
   (let [sente-uid (:sente-uid msg-meta)
-        new-state (assoc-in current-state [:last-filter sente-uid :last-seen] (System/currentTimeMillis))]
-    (when (contains? (:last-filter current-state) sente-uid)
+        new-state (assoc-in current-state [:client-queries sente-uid :last-seen] (System/currentTimeMillis))]
+    (when (contains? (:client-queries current-state) sente-uid)
       {:emit-msg  (with-meta [:cmd/keep-alive-res] msg-meta)
        :new-state new-state})))
+
+(def max-age 10000)
 
 (defn query-gc-fn
   "Garbage collect queries whose corresponding client has not recently sent a keepalive message."
   [{:keys [current-state]}]
-  (let [last-filters (:last-filter current-state)
-        last-acceptable-ts (- (System/currentTimeMillis) 10000)
-        alive-filters (into {} (filter (fn [[_k v]] (> (:last-seen v) last-acceptable-ts)) last-filters))
-        new-state (assoc-in current-state [:last-filter] alive-filters)]
+  (let [client-queries (:client-queries current-state)
+        last-acceptable-ts (- (System/currentTimeMillis) max-age)
+        alive-filters (into {} (filter (fn [[_k v]] (> (:last-seen v) last-acceptable-ts)) client-queries))
+        new-state (assoc-in current-state [:client-queries] alive-filters)]
     {:new-state new-state}))
