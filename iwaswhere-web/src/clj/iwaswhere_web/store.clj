@@ -9,7 +9,7 @@
             [clojure.tools.logging :as log]))
 
 (defn publish-state-fn
-  "Publishes current state, as filtered by the respective clients. Sends to single connected client
+  "Publishes current state, as filtered for the respective clients. Sends to single connected client
   with the latest filter when message payload contains :sente-uid, otherwise sends to all clients."
   [{:keys [current-state msg-payload]}]
   (let [sente-uid (:sente-uid msg-payload)
