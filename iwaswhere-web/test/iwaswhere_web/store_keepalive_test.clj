@@ -25,7 +25,7 @@
         {:keys [new-state emit-msg]} (k/keepalive-fn {:current-state w-query
                                                       :msg-meta      {:sente-uid sente-uid}})]
     (testing "component state has recent last-seen timestamp for query"
-      (is (< (- (get-in new-state [:client-queries sente-uid :last-seen]) test-ts) 10)))
+      (is (< (- (get-in new-state [:client-queries sente-uid :last-seen]) test-ts) 1000)))
     (testing "handler emits keep-live-res message, with connection UUID"
       (is (= emit-msg [:cmd/keep-alive-res]))
       (is (= (:sente-uid (meta emit-msg)) sente-uid)))
