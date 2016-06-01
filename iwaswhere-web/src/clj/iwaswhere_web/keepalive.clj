@@ -34,6 +34,8 @@
   [{:keys [current-state]}]
   (let [client-queries (:client-queries current-state)
         last-acceptable-ts (- (System/currentTimeMillis) max-age)
-        alive-filters (into {} (filter (fn [[_k v]] (> (:last-seen v) last-acceptable-ts)) client-queries))
+        alive-filters (into {} (filter (fn [[_k v]]
+                                         (when-let [last-seen (:last-seen v)] (> last-seen last-acceptable-ts)))
+                                       client-queries))
         new-state (assoc-in current-state [:client-queries] alive-filters)]
     {:new-state new-state}))

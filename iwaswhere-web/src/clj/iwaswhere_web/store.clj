@@ -31,9 +31,7 @@
   in matching entries or any of their comments."
   [{:keys [current-state msg-payload msg-meta]}]
   (let [sente-uid (:sente-uid msg-meta)
-        query (-> msg-payload
-                  (update-in [:not-tags] (fn [not-tags] (set (map #(s/replace % #"~" "") not-tags))))
-                  (assoc-in [:last-seen] (System/currentTimeMillis)))
+        query (update-in msg-payload [:not-tags] (fn [not-tags] (set (map #(s/replace % #"~" "") not-tags))))
         new-state (assoc-in current-state [:client-queries sente-uid] query)]
     {:new-state new-state
      :send-to-self [:state/publish-current {:sente-uid sente-uid}]}))
