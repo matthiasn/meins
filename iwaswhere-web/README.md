@@ -24,7 +24,9 @@ You can also use **[Figwheel](https://github.com/bhauman/lein-figwheel)** to aut
 
 By default, the webserver exposed by the systems-toolbox library listens on port 8888 and only binds to the localhost interface. You can use environment variables to change this behavior, for example:
 
-    $ HOST="0.0.0.0" PORT=8010 lein run
+    $ HOST="0.0.0.0" PORT=8888 lein run
+    
+The styling is maintained via SASS in a bunch of `.scss` files. 
 
 
 ## REPL
