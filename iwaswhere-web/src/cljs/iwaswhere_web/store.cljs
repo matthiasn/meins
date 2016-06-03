@@ -80,6 +80,13 @@
     (update-local-storage new-state)
     {:new-state new-state}))
 
+(defn pomodoro-inc-fn
+  "Update locally stored new entry changes from edit element."
+  [{:keys [current-state msg-payload]}]
+  (let [new-state (update-in current-state [:new-entries (:timestamp msg-payload) :completed-time] inc)]
+    (update-local-storage new-state)
+    {:new-state new-state}))
+
 (defn update-local-fn
   "Update locally stored new entry changes from edit element."
   [{:keys [current-state msg-payload]}]
@@ -136,6 +143,7 @@
                        :entry/remove-local remove-local-fn
                        :entry/saved        entry-saved-fn
                        :cmd/set-active     set-active-fn
+                       :cmd/pomodoro-inc   pomodoro-inc-fn
                        :cmd/toggle         toggle-set-fn
                        :cmd/toggle-key     toggle-key-fn
                        :cmd/keep-alive     ka/reset-fn

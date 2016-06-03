@@ -37,7 +37,7 @@
                              (reset! timeout nil))
             interval-fn (fn []
                           (if (time-left? @cached-entry)
-                            (put-fn [:entry/update-local (update-in @cached-entry [:completed-time] inc)])
+                            (put-fn [:cmd/pomodoro-inc entry])
                             (do (.play (.getElementById js/document ringer-id))
                                 (clear-clock)
                                 (.setTimeout js/window

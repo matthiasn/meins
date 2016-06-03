@@ -26,7 +26,18 @@ By default, the webserver exposed by the systems-toolbox library listens on port
 
     $ HOST="0.0.0.0" PORT=8888 lein run
     
-The styling is maintained via SASS in a bunch of `.scss` files. 
+The styling is maintained via SASS in a bunch of `.scss` files. Automatic conversion to CSS can be started with:
+
+    $ lein sass watch
+
+
+## Tests
+
+There a **unit-tests** for the handler functions on the server side. It's useful to start them in refresh mode so that they get run again on each code change:
+
+    $lein test-refresh
+
+This mechanism is also very fast. While the initial startup takes like 10 seconds, each subsequent run currently takes around 100ms.
 
 
 ## REPL
