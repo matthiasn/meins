@@ -60,6 +60,6 @@
                         :figwheel     true
                         :compiler     {:main          "iwaswhere-web.core"
                                        :asset-path    "js/build"
-                                       :externs       ["externs/misc.js"]
+                                       :externs       ["externs/misc.js" "externs/leaflet.ext.js"]
                                        :output-to     "resources/public/js/build/iwaswhere.js"
-                                       :optimizations :simple}}]})
+                                       :optimizations :advanced}}]})
