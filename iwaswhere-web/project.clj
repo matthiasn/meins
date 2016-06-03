@@ -3,8 +3,8 @@
   :url "https://github.com/matthiasn/systems-toolbox"
   :license {:name "GNU GENERAL PUBLIC LICENSE"
             :url  "http://www.gnu.org/licenses/gpl-3.0.en.html"}
-  :dependencies [[org.clojure/clojure "1.8.0"]
-                 [org.clojure/clojurescript "1.8.51"]
+  :dependencies [[org.clojure/clojure "1.9.0-alpha3"]
+                 [org.clojure/clojurescript "1.9.14"]
                  [org.clojure/core.async "0.2.374"]
                  [org.clojure/tools.logging "0.3.1"]
                  [org.clojure/tools.namespace "0.2.11"]
@@ -18,11 +18,11 @@
                  [cljsjs/moment "2.10.6-4"]
                  [cljsjs/leaflet "0.7.7-4"]
                  [com.drewnoakes/metadata-extractor "2.8.1"]
-                 [ubergraph "0.2.1"]
-                 [camel-snake-kebab "0.3.2"]
-                 [matthiasn/systems-toolbox "0.5.19"]
-                 [matthiasn/systems-toolbox-ui "0.5.8"]
-                 [matthiasn/systems-toolbox-sente "0.5.16"]
+                 [ubergraph "0.2.2"]
+                 [camel-snake-kebab "0.4.0"]
+                 [matthiasn/systems-toolbox "0.5.20"]
+                 [matthiasn/systems-toolbox-ui "0.5.9"]
+                 [matthiasn/systems-toolbox-sente "0.5.17"]
                  [alandipert/storage-atom "2.0.1"]
                  [clj-time "0.11.0"]]
 
