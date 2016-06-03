@@ -22,10 +22,10 @@
   The negative lookahead (?!`) makes sure that tags and mentions are not found and processed
   when they are quoted as code with backticks."
   [text]
-  (let [tags (set (map s/trim (re-seq (js/RegExp. (str "(?!^)[ ]#" tag-char-class "+(?!"
-                                                       tag-char-class ")(?![`)])") "m") text)))
-        mentions (set (map s/trim (re-seq (js/RegExp. (str "[ ^]@" tag-char-class
-                                                           "+(?!" tag-char-class ")(?![`)])") "m") text)))]
+  (let [tag-regex (str "(?!^) ?#" tag-char-class "+(?!" tag-char-class ")(?![`)])")
+        tags (set (map s/trim (re-seq (js/RegExp. tag-regex "m") text)))
+        mention-regex (str " ?@" tag-char-class "+(?!" tag-char-class ")(?![`)])")
+        mentions (set (map s/trim (re-seq (js/RegExp. mention-regex "m") text)))]
     {:md        text
      :tags      tags
      :mentions  mentions}))

@@ -141,7 +141,8 @@
   [entry cfg new-entries put-fn]
   (let [show-comments? (r/atom false)]
     (fn [entry cfg new-entries put-fn]
-      (let [comments (:comments entry)
+      (let [entry (or (get new-entries (:timestamp entry)) entry)
+            comments (:comments entry)
             comments (if (:show-pvt cfg) comments (filter u/pvt-filter comments))
             comments-map (into {} (map (fn [c] [(:timestamp c) c])) comments)
             local-comments (into {} (filter (fn [[_ts c]] (= (:comment-for c) (:timestamp entry))) new-entries))

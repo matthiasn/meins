@@ -22,7 +22,9 @@
         active-entry (get (:entries-map store-snapshot) (:active store-snapshot))]
     [:div.journal
      [:div.journal-entries
-      (for [entry (filter #(not (:comment-for %)) (vals new-entries))]
+      (for [entry (filter #(and (not (:comment-for %))
+                                (not (contains? (:entries-map store-snapshot) (:timestamp %))))
+                          (vals new-entries))]
         ^{:key (:timestamp entry)}
         [e/entry-with-comments entry cfg new-entries put-fn])
       (for [entry filtered-entries]
