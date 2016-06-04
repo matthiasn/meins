@@ -4,7 +4,7 @@
   :license {:name "GNU GENERAL PUBLIC LICENSE"
             :url  "http://www.gnu.org/licenses/gpl-3.0.en.html"}
   :dependencies [[org.clojure/clojure "1.9.0-alpha3"]
-                 [org.clojure/clojurescript "1.9.14"]
+                 [org.clojure/clojurescript "1.9.36"]
                  [org.clojure/core.async "0.2.374"]
                  [org.clojure/tools.logging "0.3.1"]
                  [org.clojure/tools.namespace "0.2.11"]
@@ -34,11 +34,11 @@
   :main iwaswhere-web.core
   :jvm-opts ["-XX:-OmitStackTraceInFastThrow"]
 
-  :plugins [[lein-cljsbuild "1.1.3"]
-            [lein-figwheel "0.5.3-2"]
-            [lein-sassy "1.0.7"]
+  :plugins [[lein-cljsbuild "1.1.3" :exclusions [org.apache.commons/commons-compress]]
+            [lein-figwheel "0.5.3-2" :exclusions [org.clojure/clojure]]
+            [lein-sassy "1.0.7" :exclusions [org.clojure/clojure org.codehaus.plexus/plexus-utils]]
             [com.jakemccrary/lein-test-refresh "0.15.0"]
-            [lein-codox "0.9.5"]]
+            [lein-codox "0.9.5" :exclusions [org.clojure/clojure]]]
 
   :sass {:src "src/scss/"
          :dst "resources/public/css/"}
