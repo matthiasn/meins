@@ -26,7 +26,7 @@
                  [alandipert/storage-atom "2.0.1"]
                  [clj-time "0.11.0"]]
 
-  :source-paths ["src/clj/"]
+  :source-paths ["src/cljc" "src/clj/"]
 
   :clean-targets ^{:protect false} ["resources/public/js/build/" "target/"]
   :auto-clean false
@@ -47,7 +47,7 @@
              :css-dirs    ["resources/public/css"]}
 
   :cljsbuild {:builds [{:id           "dev"
-                        :source-paths ["src/cljs" "env/dev/cljs"]
+                        :source-paths ["src/cljc" "src/cljs" "env/dev/cljs"]
                         :figwheel     true
                         :compiler     {:main          "iwaswhere-web.dev"
                                        :asset-path    "js/build"
@@ -56,7 +56,7 @@
                                        :output-to     "resources/public/js/build/iwaswhere.js"
                                        :source-map    true}}
                        {:id           "release"
-                        :source-paths ["src/cljs"]
+                        :source-paths ["src/cljc" "src/cljs"]
                         :figwheel     true
                         :compiler     {:main          "iwaswhere-web.core"
                                        :asset-path    "js/build"

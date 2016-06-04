@@ -1,8 +1,9 @@
 (ns iwaswhere-web.keepalive
-  "This namespace is concerned with the server side of the connection keepalive mechanism."
-  (:require [matthiasn.systems-toolbox.scheduler :as sched]
-            [matthiasn.systems-toolbox.switchboard :as sb]))
+  (:require [matthiasn.systems-toolbox.switchboard :as sb]
+            [matthiasn.systems-toolbox.component :as st]
+            [matthiasn.systems-toolbox.scheduler :as sched]))
 
+;; Server side
 (defn restart-keepalive!
   "Starts or restarts connection-gc part of system. Here, messages to start garbage collecting
   queries from clients that have not been seen in a while are sent to the store-cmp."
@@ -22,7 +23,7 @@
   Only returns new state when the query already exists in current state."
   [{:keys [current-state msg-meta]}]
   (let [sente-uid (:sente-uid msg-meta)
-        new-state (assoc-in current-state [:client-queries sente-uid :last-seen] (System/currentTimeMillis))]
+        new-state (assoc-in current-state [:client-queries sente-uid :last-seen] (st/now))]
     (when (contains? (:client-queries current-state) sente-uid)
       {:emit-msg  (with-meta [:cmd/keep-alive-res] msg-meta)
        :new-state new-state})))
@@ -33,9 +34,36 @@
   "Garbage collect queries whose corresponding client has not recently sent a keepalive message."
   [{:keys [current-state]}]
   (let [client-queries (:client-queries current-state)
-        last-acceptable-ts (- (System/currentTimeMillis) max-age)
+        last-acceptable-ts (- (st/now) max-age)
         alive-filters (into {} (filter (fn [[_k v]]
                                          (when-let [last-seen (:last-seen v)] (> last-seen last-acceptable-ts)))
                                        client-queries))
         new-state (assoc-in current-state [:client-queries] alive-filters)]
     {:new-state new-state}))
+
+
+;; Client side
+(defn init-keepalive!
+  "Here, messages to keep the connection alive are sent to the backend every second."
+  [switchboard]
+  (sb/send-mult-cmd
+    switchboard
+    [[:cmd/init-comp (sched/cmp-map :client/scheduler-cmp)]  ; Scheduler component
+     [:cmd/send {:to  :client/scheduler-cmp
+                 :msg [:cmd/schedule-new {:timeout 1000
+                                          :message [:cmd/keep-alive]
+                                          :repeat true
+                                          :initial false}]}]
+     [:cmd/route-all {:from :client/scheduler-cmp :to :client/ws-cmp}]
+     [:cmd/route {:from :client/scheduler-cmp :to :client/store-cmp}]]))
+
+(defn set-alive-fn
+  "Set :last-alive key whenever a keepalive response message was received by the backend."
+  [{:keys [current-state]}]
+  {:new-state (assoc-in current-state [:last-alive] (st/now))})
+
+(defn reset-fn
+  "Reset local state when last message from backend was seen more than 2 seconds ago."
+  [{:keys [current-state]}]
+  (when (> (- (st/now) (:last-alive current-state)) 5000)
+    {:new-state {}}))

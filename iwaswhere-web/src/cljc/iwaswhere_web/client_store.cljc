@@ -1,5 +1,6 @@
-(ns iwaswhere-web.store
-  (:require [alandipert.storage-atom :refer [local-storage]]
+(ns iwaswhere-web.client-store
+  (:require #?(:cljs [alandipert.storage-atom :refer [local-storage]])
+            [matthiasn.systems-toolbox.component :as st]
             [iwaswhere-web.keepalive :as ka]))
 
 (defn new-state-fn
@@ -15,7 +16,8 @@
                       (assoc-in [:cfg :mentions] (:mentions msg-payload)))]
     {:new-state new-state}))
 
-(defonce new-entries-ls (local-storage (atom {}) "iWasWhere_new_entries"))
+#?(:clj  (defonce new-entries-ls (atom {}))
+   :cljs (defonce new-entries-ls (local-storage (atom {}) "iWasWhere_new_entries")))
 
 (defn update-local-storage
   "Updates local-storage with the provided new-entries."
@@ -28,7 +30,7 @@
   contain information for which entries to show the map, or the edit mode."
   [_put-fn]
   (let [initial-state (atom {:entries         []
-                             :last-alive      (.now js/Date)
+                             :last-alive      (st/now)
                              :show-entries    100
                              :new-entries     @new-entries-ls
                              :cfg {:show-maps-for      #{}

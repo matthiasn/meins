@@ -1,5 +1,5 @@
 (ns iwaswhere-web.core
-  (:require [iwaswhere-web.store :as store]
+  (:require [iwaswhere-web.client-store :as store]
             [iwaswhere-web.ui.search :as s]
             [iwaswhere-web.ui.menu :as m]
             [iwaswhere-web.ui.journal :as jrn]
