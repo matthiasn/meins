@@ -43,7 +43,7 @@
   "Create test state by calling the component's state function and returning a state snapshot"
   [test-ts]
   (let [test-daily-logs-path (str "./test-data/daily-logs/" test-ts "/")]
-    (fs/mkdir test-daily-logs-path)
+    (fs/mkdirs test-daily-logs-path)
     {:current-state @(:state ((s/state-fn test-daily-logs-path) #()))
      :logs-path     test-daily-logs-path}))
 

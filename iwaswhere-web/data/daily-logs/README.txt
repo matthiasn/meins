@@ -1,1 +1,0 @@
-Here, one file per day is stored. Each new entry is appended to the file, as are changes.

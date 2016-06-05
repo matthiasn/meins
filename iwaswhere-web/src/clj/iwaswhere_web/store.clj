@@ -6,7 +6,8 @@
             [ubergraph.core :as uber]
             [clojure.string :as s]
             [iwaswhere-web.keepalive :as ka]
-            [clojure.tools.logging :as log]))
+            [clojure.tools.logging :as log]
+            [me.raynes.fs :as fs]))
 
 (defn publish-state-fn
   "Publishes current state, as filtered for the respective clients. Sends to single connected client
@@ -45,6 +46,7 @@
   [path]
   (fn
     [_put-fn]
+    (fs/mkdirs f/daily-logs-path)
     (let [state (atom {:sorted-entries (sorted-set-by >)
                        :graph          (uber/graph)
                        :client-queries {}})
