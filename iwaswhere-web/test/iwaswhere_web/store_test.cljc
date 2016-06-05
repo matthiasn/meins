@@ -28,11 +28,11 @@
    :longitude  9.9999
    :latitude   53.112233
    :timestamp  test-ts
-   :md         "Some #test #entry @myself #new #blah @someone" })
+   :md         "Some #test #entry @myself #new #blah @someone"})
 
 (def simple-query
   {:search-text ""
-   :tags #{}
+   :tags        #{}
    :not-tags    #{}
    :mentions    #{}
    :date-string nil
@@ -92,8 +92,8 @@
     (is (contains? (:sorted-entries state) (:timestamp test-entry)))
     ;; graph query also contains lists of comments and linked entries, which would be empty here
     (is (= test-entry (-> (first (:entries res))
-                                  (dissoc :comments)
-                                  (dissoc :linked-entries-list)))))
+                          (dissoc :comments)
+                          (dissoc :linked-entries-list)))))
 
   (testing "hashtag was created for entry"
     (is (= (:tags test-entry) (:hashtags res))))
@@ -107,8 +107,8 @@
   (let [test-ts (System/currentTimeMillis)
         {:keys [current-state logs-path]} (mk-test-state test-ts)
         test-entry (mk-test-entry test-ts)
-        updated-test-entry (merge test-entry {:tags #{"#testing" "#new" "#entry"}
-                                              :md "Some #testing #entry @me #new"
+        updated-test-entry (merge test-entry {:tags     #{"#testing" "#new" "#entry"}
+                                              :md       "Some #testing #entry @me #new"
                                               :mentions #{"@me"}})]
     (with-redefs [f/daily-logs-path logs-path]
       (let [{:keys [new-state]} (f/geo-entry-persist-fn {:current-state current-state
