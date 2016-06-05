@@ -31,7 +31,6 @@
   [_put-fn]
   (let [initial-state (atom {:entries         []
                              :last-alive      (st/now)
-                             :show-entries    100
                              :new-entries     @new-entries-ls
                              :cfg {:show-maps-for      #{}
                                    :sort-by-upvotes    false
@@ -119,9 +118,7 @@
   [{:keys [current-state]}]
   (let [current-query (:current-query current-state)
         new-query (update-in current-query [:n] + 20)
-        new-state (-> current-state
-                      (assoc-in [:show-entries] (:n current-query))
-                      (assoc-in [:current-query] new-query))]
+        new-state (assoc-in current-state[:current-query] new-query)]
     {:new-state new-state
      :emit-msg [:state/get new-query]}))
 

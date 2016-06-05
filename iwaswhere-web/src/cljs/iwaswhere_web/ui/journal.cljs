@@ -9,8 +9,7 @@
   [{:keys [observed put-fn]}]
   (let [store-snapshot @observed
         cfg (:cfg store-snapshot)
-        show-entries (or (:show-entries store-snapshot) 20)
-        entries (take show-entries (:entries store-snapshot))
+        entries (:entries store-snapshot)
         show-pvt? (:show-pvt cfg)
         filtered-entries (if show-pvt? entries (filter u/pvt-filter entries))
         new-entries (:new-entries store-snapshot)

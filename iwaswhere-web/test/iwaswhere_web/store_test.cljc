@@ -80,6 +80,7 @@
                 (is (= parsed test-entry))))))
 
         (testing "handler emits saved message"
+          (is (= :entry/saved (first emit-msg)))
           (is (= test-entry (second emit-msg))))))))
 
 
@@ -130,6 +131,7 @@
                 (is (= parsed updated-test-entry))))))
 
         (testing "handler emits updated message"
+          (is (= :entry/saved (first emit-msg)))
           (is (= updated-test-entry (second emit-msg))))
 
         ;; test with graph reconstructed from disk
