@@ -63,7 +63,7 @@
   {:new-state (assoc-in current-state [:last-alive] (st/now))})
 
 (defn reset-fn
-  "Reset local state when last message from backend was seen more than 2 seconds ago."
+  "Reset local state when last message from backend was seen more than 10 seconds ago."
   [{:keys [current-state]}]
-  (when (> (- (st/now) (:last-alive current-state)) 5000)
+  (when (> (- (st/now) (:last-alive current-state)) max-age)
     {:new-state {}}))
