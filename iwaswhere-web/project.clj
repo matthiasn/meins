@@ -38,6 +38,7 @@
             [lein-figwheel "0.5.3-2" :exclusions [org.clojure/clojure]]
             [lein-sassy "1.0.7" :exclusions [org.clojure/clojure org.codehaus.plexus/plexus-utils]]
             [com.jakemccrary/lein-test-refresh "0.15.0"]
+            [test2junit "1.2.2"]
             [lein-codox "0.9.5" :exclusions [org.clojure/clojure]]]
 
   :sass {:src "src/scss/"

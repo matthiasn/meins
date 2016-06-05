@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites>
+  <testsuite errors="0" failures="0" id="0" name="client-store-test" package="iwaswhere-web" tests="12" time="0.0562" timestamp="2016-06-05_13:50:37+0200">
+        <testcase classname="iwaswhere-web.client-store-test" name="update-query-test" time="0.0083">
+    </testcase>
+
+        <testcase classname="iwaswhere-web.client-store-test" name="show-more-test" time="0.0015">
+    </testcase>
+
+        <testcase classname="iwaswhere-web.client-store-test" name="update-local-test" time="0.0042">
+    </testcase>
+
+        <testcase classname="iwaswhere-web.client-store-test" name="geo-enrich-test" time="0.0035">
+    </testcase>
+
+        <testcase classname="iwaswhere-web.client-store-test" name="new-entry-test" time="0.0046">
+    </testcase>
+
+        <testcase classname="iwaswhere-web.client-store-test" name="remove-local-test" time="0.0035">
+    </testcase>
+
+        <testcase classname="iwaswhere-web.client-store-test" name="set-active-test" time="0.0004">
+    </testcase>
+
+        <testcase classname="iwaswhere-web.client-store-test" name="toggle-key-test" time="0.0016">
+    </testcase>
+
+        <testcase classname="iwaswhere-web.client-store-test" name="pomodoro-inc-test" time="0.0033">
+    </testcase>
+
+        <testcase classname="iwaswhere-web.client-store-test" name="new-state-test" time="0.0050">
+    </testcase>
+
+        <testcase classname="iwaswhere-web.client-store-test" name="entry-saved-test" time="0.0032">
+    </testcase>
+
+        <testcase classname="iwaswhere-web.client-store-test" name="toggle-set-test" time="0.0013">
+    </testcase>
+
+  </testsuite>
+  <testsuite errors="0" failures="0" id="1" name="store-keepalive-test" package="iwaswhere-web" tests="2" time="0.0219" timestamp="2016-06-05_13:50:37+0200">
+        <testcase classname="iwaswhere-web.store-keepalive-test" name="frontend-keepalive-test" time="0.0016">
+    </testcase>
+
+        <testcase classname="iwaswhere-web.store-keepalive-test" name="backend-keepalive-test" time="0.0189">
+    </testcase>
+
+  </testsuite>
+  <testsuite errors="0" failures="0" id="2" name="store-query-test" package="iwaswhere-web" tests="1" time="0.3715" timestamp="2016-06-05_13:50:37+0200">
+        <testcase classname="iwaswhere-web.store-query-test" name="query-test" time="0.3704">
+    </testcase>
+
+  </testsuite>
+  <testsuite errors="0" failures="0" id="3" name="store-test" package="iwaswhere-web" tests="3" time="0.0426" timestamp="2016-06-05_13:50:37+0200">
+        <testcase classname="iwaswhere-web.store-test" name="trash-entry-test" time="0.0231">
+    </testcase>
+
+        <testcase classname="iwaswhere-web.store-test" name="geo-entry-update-test" time="0.0118">
+    </testcase>
+
+        <testcase classname="iwaswhere-web.store-test" name="geo-entry-persist-test" time="0.0061">
+    </testcase>
+
+  </testsuite>
+</testsuites>

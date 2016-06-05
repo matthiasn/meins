@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="iwaswhere-web.client-store-test" errors="0" failures="0" tests="12" time="0.0562" timestamp="2016-06-05_13:50:37+0200">
+    <testcase name="update-query-test" classname="iwaswhere-web.client-store-test" time="0.0083">
+    </testcase>
+    <testcase name="show-more-test" classname="iwaswhere-web.client-store-test" time="0.0015">
+    </testcase>
+    <testcase name="update-local-test" classname="iwaswhere-web.client-store-test" time="0.0042">
+    </testcase>
+    <testcase name="geo-enrich-test" classname="iwaswhere-web.client-store-test" time="0.0035">
+    </testcase>
+    <testcase name="new-entry-test" classname="iwaswhere-web.client-store-test" time="0.0046">
+    </testcase>
+    <testcase name="remove-local-test" classname="iwaswhere-web.client-store-test" time="0.0035">
+    </testcase>
+    <testcase name="set-active-test" classname="iwaswhere-web.client-store-test" time="0.0004">
+    </testcase>
+    <testcase name="toggle-key-test" classname="iwaswhere-web.client-store-test" time="0.0016">
+    </testcase>
+    <testcase name="pomodoro-inc-test" classname="iwaswhere-web.client-store-test" time="0.0033">
+    </testcase>
+    <testcase name="new-state-test" classname="iwaswhere-web.client-store-test" time="0.0050">
+    </testcase>
+    <testcase name="entry-saved-test" classname="iwaswhere-web.client-store-test" time="0.0032">
+    </testcase>
+    <testcase name="toggle-set-test" classname="iwaswhere-web.client-store-test" time="0.0013">
+    </testcase>
+</testsuite>

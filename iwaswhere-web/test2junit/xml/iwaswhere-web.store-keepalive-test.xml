@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="iwaswhere-web.store-keepalive-test" errors="0" failures="0" tests="2" time="0.0219" timestamp="2016-06-05_13:50:37+0200">
+    <testcase name="frontend-keepalive-test" classname="iwaswhere-web.store-keepalive-test" time="0.0016">
+    </testcase>
+    <testcase name="backend-keepalive-test" classname="iwaswhere-web.store-keepalive-test" time="0.0189">
+    </testcase>
+</testsuite>

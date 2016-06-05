@@ -1,0 +1,7 @@
+general:
+  build_dir: iwaswhere-web
+test:
+  override:
+    - lein test2junit
+  post:
+    - ant
