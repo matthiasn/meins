@@ -81,12 +81,21 @@
     (update-local-storage new-state)
     {:new-state new-state}))
 
+#?(:clj  (defn play-audio [id])
+   :cljs (defn play-audio [id] (.play (.getElementById js/document id))))
+
 (defn pomodoro-inc-fn
   "Update locally stored new entry changes from edit element."
   [{:keys [current-state msg-payload]}]
-  (let [new-state (update-in current-state [:new-entries (:timestamp msg-payload) :completed-time] inc)]
-    (update-local-storage new-state)
-    {:new-state new-state}))
+  (let [ts (:timestamp msg-payload)
+        new-state (update-in current-state [:new-entries ts :completed-time] inc)]
+    (when (get-in current-state [:new-entries ts])
+      (let [new-entry (get-in new-state [:new-entries ts])
+            done? (= (:planned-dur new-entry) (:completed-time new-entry))]
+        (if done? (play-audio "ringer")
+                  (play-audio "ticking-clock"))
+        (update-local-storage new-state)
+        {:new-state new-state}))))
 
 (defn update-local-fn
   "Update locally stored new entry changes from edit element."

@@ -24,6 +24,12 @@
        [:div#header]
        [:div#search]
        [:div#journal]]
+      ;; Currently, sounds from http://www.orangefreesounds.com/old-clock-ringing-short/
+      ;; TODO: record own alarm clock
+      [:audio#ringer {:autoPlay false :loop false}
+       [:source {:src "/mp3/old-clock-ringing-short.mp3" :type "audio/mp4"}]]
+      [:audio#ticking-clock {:autoPlay false :loop false}
+       [:source {:src "/mp3/tick.ogg" :type "audio/ogg"}]]
       [:script {:src "/js/build/iwaswhere.js"}]]]))
 
 (defn routes-fn

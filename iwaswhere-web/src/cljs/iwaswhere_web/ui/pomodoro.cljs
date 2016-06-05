@@ -10,7 +10,7 @@
   [ts]
   {:comment-for    ts
    :entry-type     :pomodoro
-   :planned-dur    1500 ; 25 min
+   :planned-dur    15 ; 25 min
    :completed-time 0
    :interruptions  0})
 
@@ -32,14 +32,12 @@
     (fn [entry put-fn]
       (reset! cached-entry entry)
       (let [time-left? #(> (:planned-dur %) (:completed-time %))
-            ringer-id (str "ring-" (:timestamp entry))
             clear-clock #(do (.clearTimeout js/window @timeout)
                              (reset! timeout nil))
             interval-fn (fn []
                           (if (time-left? @cached-entry)
                             (put-fn [:cmd/pomodoro-inc entry])
-                            (do (.play (.getElementById js/document ringer-id))
-                                (clear-clock)
+                            (do (clear-clock)
                                 (.setTimeout js/window
                                             #(put-fn [:text-entry/update (h/clean-entry @cached-entry)])
                                             5000))))
@@ -49,10 +47,6 @@
                                   (put-fn [:entry/update-local (update-in @cached-entry [:interruptions] inc)]))
                               (reset! timeout (.setInterval js/window interval-fn 1000))))]
         [:div.pomodoro
-         ;; Currently, sounds from http://www.orangefreesounds.com/old-clock-ringing-short/
-         ;; TODO: record own alarm clock
-         [m/audioplayer "/mp3/old-clock-ringing-short.mp3" false false ringer-id]
-         (when @timeout [m/audioplayer "/mp3/ticking-clock-sound.mp3" true true])
          [:strong (if (time-left? entry) "Pomodoro: " "Pomodoro completed: ")]
          [:span.dur (duration-string (:completed-time entry))]
          (when (and (time-left? entry) (:new-entry entry))
