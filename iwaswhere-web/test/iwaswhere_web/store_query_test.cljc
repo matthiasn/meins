@@ -1,6 +1,7 @@
 (ns iwaswhere-web.store-query-test
   "Here, we test the handler functions of the server side store component."
   (:require [clojure.test :refer [deftest testing is]]
+            [matthiasn.systems-toolbox.component :as stc]
             [iwaswhere-web.files :as f]
             [iwaswhere-web.store-test :as st]
             [iwaswhere-web.store :as s]))
@@ -89,12 +90,12 @@
   (let [test-ts (System/currentTimeMillis)
         {:keys [current-state logs-path]} (st/mk-test-state test-ts)]
     (with-redefs [f/daily-logs-path logs-path]
-      (let [simple-query-uid (str (java.util.UUID/randomUUID))
-            simple-query2-uid (str (java.util.UUID/randomUUID))
-            no-results-query-uid (str (java.util.UUID/randomUUID))
-            tasks-query-uid (str (java.util.UUID/randomUUID))
-            tasks-done-query-uid (str (java.util.UUID/randomUUID))
-            tasks-not-done-query-uid (str (java.util.UUID/randomUUID))
+      (let [simple-query-uid (stc/make-uuid)
+            simple-query2-uid (stc/make-uuid)
+            no-results-query-uid (stc/make-uuid)
+            tasks-query-uid (stc/make-uuid)
+            tasks-done-query-uid (stc/make-uuid)
+            tasks-not-done-query-uid (stc/make-uuid)
 
             new-state (reduce persist-reducer current-state test-entries)
             new-state (reduce persist-reducer new-state (map st/mk-test-entry (range 100)))
