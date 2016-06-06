@@ -83,7 +83,6 @@
           (is (= :entry/saved (first emit-msg)))
           (is (= test-entry (second emit-msg))))))))
 
-
 (defn geo-entry-update-assertions
   "Common assertions in geo-entry-update-test, can be used with both the initial in-memory graph
   and the same but reconstructed from log files."

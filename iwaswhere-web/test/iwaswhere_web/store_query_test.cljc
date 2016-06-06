@@ -73,7 +73,7 @@
   [current-state client-id]
   (-> (s/publish-state-fn {:current-state current-state
                            :msg-payload   {:sente-uid client-id}})
-      :emit-msgs  ; get published messages
+      :emit-msg   ; get published messages
       first       ; first msg
       second      ; msg-payload
       :entries))
@@ -138,7 +138,7 @@
         (testing "stats show expected numbers"
           (let [res (-> (s/publish-state-fn {:current-state new-state
                                              :msg-payload {:sente-uid simple-query-uid}})
-                        :emit-msgs
+                        :emit-msg
                         first
                         second)
                 stats (:stats res)]
@@ -148,7 +148,7 @@
         (testing "hashtags and mentions in results"
           (let [res (-> (s/publish-state-fn {:current-state new-state
                                              :msg-payload   {:sente-uid simple-query-uid}})
-                        :emit-msgs
+                        :emit-msg
                         first
                         second)]
             (is (= (:hashtags res) #{"#task" "#entry" "#test" "#done" "#completed" "#blah" "#new"}))

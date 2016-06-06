@@ -23,7 +23,7 @@
                               (log/info "Query" sente-uid "took" duration-ms "ms")
                               (with-meta [:state/new (merge res {:duration-ms duration-ms})] {:sente-uid sente-uid})))
         state-msgs (vec (map state-emit-mapper sente-uids))]
-    {:emit-msgs state-msgs}))
+    {:emit-msg state-msgs}))
 
 (defn state-get-fn
   "Handler function for retrieving current state. Updates filter for connected client, and then
@@ -34,8 +34,9 @@
   (let [sente-uid (:sente-uid msg-meta)
         query (update-in msg-payload [:not-tags] (fn [not-tags] (set (map #(s/replace % #"~" "") not-tags))))
         new-state (update-in current-state [:client-queries sente-uid] merge query)]
-    {:new-state new-state
-     :send-to-self [:state/publish-current {:sente-uid sente-uid}]}))
+    {:new-state    new-state
+     :send-to-self [[:state/publish-current {:sente-uid sente-uid}]
+                    (with-meta [:cmd/keep-alive] msg-meta)]}))
 
 (defn state-fn
   "Initial state function, creates state atom and then parses all files in
