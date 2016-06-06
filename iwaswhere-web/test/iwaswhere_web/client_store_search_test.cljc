@@ -1,6 +1,7 @@
 (ns iwaswhere-web.client-store-search-test
-  "Here, we test the search-related handler functions of the server side store component."
-  (:require [clojure.test :refer [deftest testing is]]
+  "Here, we test the search-related handler functions of the client side store component."
+  (:require #?(:clj  [clojure.test :refer [deftest testing is]]
+               :cljs [cljs.test :refer-macros [deftest testing is]])
             [iwaswhere-web.client-store :as store]
             [iwaswhere-web.client-store-search :as search]
             [iwaswhere-web.client-store-test :as st]))

@@ -28,3 +28,4 @@ resources/
 
 .sass-cache/
 figwheel_server.log
+out/

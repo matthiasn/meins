@@ -39,6 +39,7 @@
             [lein-sassy "1.0.7" :exclusions [org.clojure/clojure org.codehaus.plexus/plexus-utils]]
             [com.jakemccrary/lein-test-refresh "0.15.0"]
             [test2junit "1.2.2"]
+            [lein-doo "0.1.6"]
             [lein-codox "0.9.5" :exclusions [org.clojure/clojure]]]
 
   :sass {:src "src/scss/"
@@ -66,4 +67,10 @@
                                        :asset-path    "js/build"
                                        :externs       ["externs/misc.js" "externs/leaflet.ext.js"]
                                        :output-to     "resources/public/js/build/iwaswhere.js"
+                                       :optimizations :advanced}}
+
+                       {:id           "cljs-test"
+                        :source-paths ["src" "test"]
+                        :compiler     {:output-to     "out/testable.js"
+                                       :main          iwaswhere-web.runner
                                        :optimizations :advanced}}]})

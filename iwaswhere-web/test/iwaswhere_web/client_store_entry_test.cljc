@@ -1,6 +1,7 @@
 (ns iwaswhere-web.client-store-entry-test
   "Here, we test the handler functions of the server side store component."
-  (:require [clojure.test :refer [deftest testing is]]
+  (:require #?(:clj  [clojure.test :refer [deftest testing is]]
+               :cljs [cljs.test :refer-macros [deftest testing is]])
             [iwaswhere-web.client-store :as store]
             [iwaswhere-web.client-store-entry :as cse]))
 
@@ -123,7 +124,8 @@
 
 (deftest pomodoro-start-test
   "Tests that the pomodoro-start handler properly sets the entry status to started and and stopped."
-  (with-redefs [cse/new-entries-ls (atom {})]
+  (with-redefs [cse/new-entries-ls (atom {})
+                cse/play-audio (fn [_id])]
     (let [current-state @(:state (store/initial-state-fn #()))
           new-state (:new-state (cse/update-local-fn {:current-state current-state :msg-payload test-entry}))
           new-state1 (:new-state (cse/pomodoro-start-fn {:current-state new-state :msg-payload test-entry}))

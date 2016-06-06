@@ -1,7 +1,7 @@
 (ns iwaswhere-web.client-store-test
   "Here, we test the handler functions of the server side store component."
-  (:require [clojure.test :refer [deftest testing is]]
-            [iwaswhere-web.store-test :as st]
+  (:require #?(:clj  [clojure.test :refer [deftest testing is]]
+               :cljs [cljs.test :refer-macros [deftest testing is]])
             [iwaswhere-web.client-store :as store]
             [iwaswhere-web.client-store-search :as search]))
 
@@ -37,7 +37,7 @@
    :md             "Moving to #cljc"})
 
 (def state-from-backend
-  {:entries [test-entry st/some-test-entry]
+  {:entries [test-entry test-entry]
    :linked-entries-list []
    :hashtags            #{"#drama" "#hashtag" "#blah"}
    :mentions            #{"@myself" "@me" "@I"}

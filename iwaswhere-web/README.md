@@ -41,6 +41,11 @@ This mechanism is also very fast. While the initial startup takes like 10 second
 
     $ lein test-refresh :growl
 
+You can also run the platform-independent tests in the browser using `lein doo`, like this:
+
+    $ lein doo firefox cljs-test once
+    $ lein doo firefox cljs-test auto
+
 
 ## REPL
 
