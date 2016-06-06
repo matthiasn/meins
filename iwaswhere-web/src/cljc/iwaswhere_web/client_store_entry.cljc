@@ -50,8 +50,10 @@
     (update-local-storage new-state)
     {:new-state new-state}))
 
-#?(:clj  (defn play-audio [id])
-   :cljs (defn play-audio [id] (.play (.getElementById js/document id))))
+(defn play-audio
+  "Start playing audio element with provided DOM id."
+  [id]
+  #?(:cljs (.play (.getElementById js/document id))))
 
 (defn pomodoro-inc-fn
   "Increments completed time of entry. Plays next tick sound and schedules a new increment

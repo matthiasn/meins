@@ -2,7 +2,8 @@
   (:require #?(:cljs [alandipert.storage-atom :refer [local-storage]])
     [matthiasn.systems-toolbox.component :as st]
     [iwaswhere-web.keepalive :as ka]
-    [iwaswhere-web.client-store-entry :as cse]))
+    [iwaswhere-web.client-store-entry :as cse]
+    [iwaswhere-web.client-store-search :as s]))
 
 (defn new-state-fn
   "Update client side state with list of journal entries received from backend."
@@ -25,6 +26,7 @@
   (let [initial-state (atom {:entries     []
                              :last-alive  (st/now)
                              :new-entries @cse/new-entries-ls
+                             :temp-query  {}
                              :cfg         {:show-maps-for      #{}
                                            :sort-by-upvotes    false
                                            :show-all-maps      false
@@ -51,14 +53,6 @@
   (let [path (:path msg-payload)]
     {:new-state (update-in current-state path not)}))
 
-(defn update-query-fn
-  "Update query in client state, with resetting the active entry in the linked entries view."
-  [{:keys [current-state msg-payload]}]
-  (let [new-state (-> current-state
-                      (assoc-in [:current-query] msg-payload)
-                      (assoc-in [:active] nil))]
-    {:new-state new-state}))
-
 (defn show-more-fn
   "Runs previous query but with more results. Also updates the number to show in the UI."
   [{:keys [current-state]}]
@@ -80,8 +74,8 @@
    :state-fn          initial-state-fn
    :snapshot-xform-fn #(dissoc % :last-alive)
    :handler-map       (merge cse/entry-handler-map
+                             s/search-handler-map
                              {:state/new          new-state-fn
-                              :state/get          update-query-fn
                               :show/more          show-more-fn
                               :cmd/set-active     set-active-fn
                               :cmd/toggle         toggle-set-fn

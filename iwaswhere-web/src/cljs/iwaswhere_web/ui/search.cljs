@@ -11,28 +11,18 @@
         store-snapshot @observed
         hashtags (:hashtags (:cfg store-snapshot))
         mentions (:mentions (:cfg store-snapshot))
-        location-timeout-fn (fn [search-text]
-                              (.setTimeout js/window
-                                           #(aset js/window "location" "hash" (js/encodeURIComponent search-text))
-                                           5000))
-        update-search-fn (fn [new-search]
-                           (swap! local assoc-in [:temp-query] new-search)
-                           (swap! local update-in [:set-location]
-                                  (fn [prev] (when prev (.clearTimeout js/window prev))
-                                    (location-timeout-fn (:search-text new-search))))
-                           (put-fn [:state/get (merge new-search {:sort-by-upvotes (:sort-by-upvotes @observed)})]))
-        on-input-fn #(update-search-fn (h/parse-search (.. % -target -innerText)))
+        on-input-fn #(put-fn [:search/update (h/parse-search (.. % -target -innerText))])
 
         ; find incomplete tag or mention before cursor, show suggestions
-        before-cursor (h/string-before-cursor (:search-text (:temp-query @local)))
+        before-cursor (h/string-before-cursor (:search-text (:current-query @observed)))
         [curr-tag f-tags] (h/autocomplete-tags before-cursor "#" hashtags)
         [curr-mention f-mentions] (h/autocomplete-tags before-cursor "@" mentions)
         tag-replace-fn (fn [curr-tag tag]
                          (let [curr-tag-regex (js/RegExp (str curr-tag "(?!" h/tag-char-class ")") "i")
-                               search-text (:search-text (:temp-query @local))
+                               search-text (:search-text (:current-query @observed))
                                new-search (h/parse-search (s/replace search-text curr-tag-regex tag))]
                            (swap! local assoc-in [:current-query] new-search)
-                           (update-search-fn new-search)))
+                           (put-fn [:search/update new-search])))
         get-tags #(% (:current-query @local))
         on-keydown-fn (fn [ev]
                         (let [key-code (.. ev -keyCode)]
@@ -61,11 +51,11 @@
 (defn init-fn
   "Initializes listener for location hash changes, which alters local component state with
   the latest query on change, plus sends query to backend."
-  [{:keys [local put-fn]}]
-  (let [hash-change-fn #(let [new-query (h/query-from-search-hash)]
-                         (when (not= new-query (:temp-query @local))
-                           (swap! local assoc-in [:current-query] new-query)
-                           (put-fn [:state/get new-query])))]
+  [{:keys [local observed put-fn]}]
+  (let [hash-change-fn #(let [new-search (h/query-from-search-hash)]
+                         (when (not= new-search (:current-query @observed))
+                           (swap! local assoc-in [:current-query] new-search)
+                           (put-fn [:search/update new-search])))]
     (aset js/window "onhashchange" hash-change-fn)
     (hash-change-fn)))
 

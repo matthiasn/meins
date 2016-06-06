@@ -2,7 +2,8 @@
   "Here, we test the handler functions of the server side store component."
   (:require [clojure.test :refer [deftest testing is]]
             [iwaswhere-web.store-test :as st]
-            [iwaswhere-web.client-store :as store]))
+            [iwaswhere-web.client-store :as store]
+            [iwaswhere-web.client-store-search :as search]))
 
 (def empty-query
   {:search-text ""
@@ -84,30 +85,10 @@
     (testing "active entry is set"
       (is (= test-entry (:active new-state))))))
 
-(deftest update-query-test
-  "Test that new query is updated properly in store component state"
-  (let [current-state @(:state (store/initial-state-fn #()))
-        new-state (:new-state (store/update-query-fn {:current-state current-state
-                                                      :msg-payload   empty-query}))
-        new-state1 (:new-state (store/set-active-fn {:current-state new-state
-                                                     :msg-payload   test-entry}))
-        new-state2 (:new-state (store/update-query-fn {:current-state new-state1
-                                                       :msg-payload   open-tasks-query}))]
-    (testing "query is set locally"
-      (is (= empty-query (:current-query new-state))))
-    (testing "active entry not set"
-      (is (not (:active new-state))))
-    (testing "active entry is set in base state for subseqent test"
-      (is (= test-entry (:active new-state1))))
-    (testing "query is updated"
-      (is (= open-tasks-query (:current-query new-state2))))
-    (testing "active entry not set after updating query"
-      (is (not (:active new-state2))))))
-
 (deftest show-more-test
   "Ensure that query is properly updated when more results are desired."
   (let [current-state @(:state (store/initial-state-fn #()))
-        new-state (:new-state (store/update-query-fn {:current-state current-state
+        new-state (:new-state (search/update-query-fn {:current-state current-state
                                                       :msg-payload   open-tasks-query}))
         {:keys [:new-state emit-msg]} (store/show-more-fn {:current-state new-state})
         updated-query (update-in open-tasks-query [:n] + 20)]
