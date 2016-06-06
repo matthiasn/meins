@@ -137,5 +137,7 @@
         (is (= 1 (get-in new-state2 [:new-entries 1465059173965 :completed-time]))))
       (testing "pomodoro set to not running"
         (is (not (:pomodoro-running (get-in new-state3 [:new-entries 1465059173965])))))
+      (testing "one interruption recorded"
+        (is (= 1 (get-in new-state3 [:new-entries 1465059173965 :interruptions]))))
       (testing "new entries atom properly updated - this would be backed by localstorage on client"
         (is (= (:new-entries new-state3) @cse/new-entries-ls))))))

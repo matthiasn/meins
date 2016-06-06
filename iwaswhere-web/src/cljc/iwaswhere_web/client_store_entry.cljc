@@ -78,7 +78,10 @@
   and schedule an initial increment message."
   [{:keys [current-state msg-payload]}]
   (let [ts (:timestamp msg-payload)
-        new-state (update-in current-state [:new-entries ts :pomodoro-running] not)]
+        new-state (if (get-in current-state [:new-entries ts :pomodoro-running])
+                    (update-in current-state [:new-entries ts :interruptions] inc)
+                    current-state)
+        new-state (update-in new-state [:new-entries ts :pomodoro-running] not)]
     (when (get-in current-state [:new-entries ts])
       (update-local-storage new-state)
       {:new-state new-state

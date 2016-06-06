@@ -49,7 +49,7 @@
 (deftest set-location-test
   "Test that location has is changed after set-location-handler was called."
   (let [location-hash (atom "")]
-    (with-redefs [search/set-location-hash (fn [text] (prn "blah") (reset! location-hash text))]
+    (with-redefs [search/set-location-hash (fn [text] (reset! location-hash text))]
       (let [current-state @(:state (store/initial-state-fn #()))
             new-state (:new-state (search/update-query-fn {:current-state current-state
                                                            :msg-payload st/open-tasks-query}))]
