@@ -61,7 +61,7 @@
   used in edit mode also sends a modified entry to the store component, which is useful
   for displaying updated hashtags, or also for showing the warning that the entry is not
   saved yet."
-  [entry cfg put-fn edit-mode?]
+  [entry cfg put-fn edit-mode? info]
   (let [ts (:timestamp entry)
         map? (:latitude entry)
         show-map? (contains? (:show-maps-for cfg) ts)
@@ -93,6 +93,7 @@
        [:a {:href (str "/#" (.format (js/moment ts) "YYYY-MM-DD"))}
         [:time (.format (js/moment ts) "ddd, MMMM Do YYYY")]]
        [:time (.format (js/moment ts) ", h:mm a") formatted-duration]]
+      [:div info]
       [:div
        (when (seq (:linked-entries-list entry))
          (let [entry-active? (= (-> cfg :active) (:timestamp entry))
@@ -140,7 +141,7 @@
         local-comments (into {} (filter (fn [[_ts c]] (= (:comment-for c) (:timestamp entry))) new-entries))
         all-comments (sort-by :timestamp (vals (merge comments-map local-comments)))]
     [:div.entry-with-comments
-     [journal-entry entry cfg put-fn (contains? new-entries ts)]
+     [journal-entry entry cfg put-fn (contains? new-entries ts) (p/pomodoro-stats-view all-comments)]
      (when (seq all-comments)
        (if (or (contains? (:show-comments-for cfg) ts) (seq local-comments))
          [:div.comments

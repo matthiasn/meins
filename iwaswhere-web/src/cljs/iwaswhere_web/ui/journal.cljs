@@ -37,7 +37,7 @@
       (when-let [stats (:stats store-snapshot)]
         [:div (:entry-count stats) " entries, " (:node-count stats) " nodes, " (:edge-count stats) " edges, "
          (count (:hashtags cfg)) " hashtags, " (count (:mentions cfg)) " people"])
-      [p/pomodoro-stats-view filtered-entries]
+      [:div (p/pomodoro-stats-str filtered-entries)]
       (when-let [ms (:duration-ms store-snapshot)]
         [:div.stats (str "Query completed in " ms "ms")])]
      (when-let [linked-entries (:linked-entries-list active-entry)]

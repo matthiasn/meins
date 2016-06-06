@@ -52,4 +52,3 @@
       (with-redefs [k/max-age -1]
         (let [new-state (:new-state (k/reset-fn {:current-state new-state}))]
           (is (empty? new-state)))))))
-

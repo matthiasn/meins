@@ -39,7 +39,7 @@
         [:span.fa {:class (if running? "fa-pause-circle-o" "fa-play-circle-o")}]
         (if running? " pause" " start")])]))
 
-(defn pomodoro-stats-view
+(defn pomodoro-stats-str
   "Shows some information about the number of pomodoros created and completed on any given day, where
   completion is achieved when the :completed-time equals the planned duration :planned-dur.
   Also, the total time logged via pomodoros is shown."
@@ -47,7 +47,27 @@
   (let [pomodoros (filter #(= :pomodoro (:entry-type %)) entries)
         completed-pomodoros (filter #(= (:planned-dur %) (:completed-time %)) pomodoros)
         total-time (reduce + (map :completed-time pomodoros))
-        interruptions (reduce + (map :interruptions pomodoros))]
+        interruptions (reduce + (map :interruptions pomodoros))
+        interruptions-str (when (pos? interruptions) (str ". Interruptions: " interruptions))]
     (when (seq pomodoros)
-      [:div (str "In result: " (count completed-pomodoros) " out of " (count pomodoros) " pomodoros completed, "
-                 (duration-string total-time) " logged. Interruptions: " interruptions)])))
+      (if (= pomodoros completed-pomodoros)
+        (str "Pomodoros: " (count completed-pomodoros) ", " (duration-string total-time) interruptions-str)
+        (str "Pomodoros: " (count completed-pomodoros) " of " (count pomodoros) " completed, "
+             (duration-string total-time) interruptions-str)))))
+
+(defn pomodoro-stats-view
+  "Shows some information about the number of pomodoros created and completed on any given day, where
+  completion is achieved when the :completed-time equals the planned duration :planned-dur.
+  Also, the total time logged via pomodoros is shown."
+  [entries]
+  (let [pomodoros (filter #(= :pomodoro (:entry-type %)) entries)
+        completed-pomodoros (filter #(= (:planned-dur %) (:completed-time %)) pomodoros)
+        completed-count (count completed-pomodoros)
+        total-time (reduce + (map :completed-time pomodoros))
+        interruptions (reduce + (map :interruptions pomodoros))
+        interruptions-str (when (pos? interruptions) (str ". Interruptions: " interruptions))]
+    (when (seq pomodoros)
+      [:span
+       (into [:span] (map (fn [_] [:span.fa.fa-clock-o.completed]) (range completed-count)))
+       (into [:span] (map (fn [_] [:span.fa.fa-clock-o.incomplete]) (range (- (count pomodoros) completed-count))))
+       (str " " (duration-string total-time) interruptions-str)])))
