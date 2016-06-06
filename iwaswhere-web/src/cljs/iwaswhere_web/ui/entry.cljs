@@ -61,7 +61,7 @@
   used in edit mode also sends a modified entry to the store component, which is useful
   for displaying updated hashtags, or also for showing the warning that the entry is not
   saved yet."
-  [entry cfg put-fn new-entry?]
+  [entry cfg put-fn edit-mode?]
   (let [ts (:timestamp entry)
         map? (:latitude entry)
         show-map? (contains? (:show-maps-for cfg) ts)
@@ -70,9 +70,9 @@
         toggle-comments #(put-fn [:cmd/toggle {:timestamp ts :path [:cfg :show-comments-for]}])
         create-comment (h/new-entry-fn put-fn {:comment-for ts})
         create-pomodoro (h/new-entry-fn put-fn (p/pomodoro-defaults ts))
-        toggle-edit #(if new-entry? (put-fn [:entry/remove-local entry])
-                                    (put-fn [:entry/update-local (merge {:new-entry true} entry)]))
-        trash-entry #(if new-entry? (put-fn [:entry/remove-local {:timestamp ts}])
+        toggle-edit #(if edit-mode? (put-fn [:entry/remove-local entry])
+                                    (put-fn [:entry/update-local entry]))
+        trash-entry #(if edit-mode? (put-fn [:entry/remove-local {:timestamp ts}])
                                     (put-fn [:cmd/trash {:timestamp ts}]))
         upvotes (:upvotes entry)
         upvote-fn (fn [op] #(put-fn [:text-entry/update (update-in entry [:upvotes] op)]))
@@ -95,9 +95,9 @@
        [:time (.format (js/moment ts) ", h:mm a") formatted-duration]]
       [:div
        (when (seq (:linked-entries-list entry))
-         (let [entry-active? (= (-> cfg :active) (:timestamp entry))]
-           [:span.link-btn {:on-click #(put-fn [:cmd/set-active (if entry-active? nil (:timestamp entry))])
-                            :class    (when entry-active? "active")}
+         (let [entry-active? (= (-> cfg :active) (:timestamp entry))
+               set-active-fn #(put-fn [:cmd/set-active (if entry-active? nil (:timestamp entry))])]
+           [:span.link-btn {:on-click set-active-fn :class (when entry-active? "active")}
             (str " linked: " (count (:linked-entries-list entry)))]))]
       [:div
        [:span.fa.toggle {:on-click (upvote-fn inc) :class (if (pos? upvotes) "fa-thumbs-up" "fa-thumbs-o-up")}]
@@ -105,10 +105,8 @@
        (when (pos? upvotes) [:span.fa.fa-thumbs-down.toggle {:on-click (upvote-fn dec)}])
        (when map? [:span.fa.fa-map-o.toggle {:on-click toggle-map}])
        [:span.fa.fa-pencil-square-o.toggle {:on-click toggle-edit}]
-       (when-not (:comment-for entry)
-         [:span.fa.fa-clock-o.toggle {:on-click create-pomodoro}])
-       (when-not (:comment-for entry)
-         [:span.fa.fa-comment-o.toggle {:on-click create-comment}])
+       (when-not (:comment-for entry) [:span.fa.fa-clock-o.toggle {:on-click create-pomodoro}])
+       (when-not (:comment-for entry) [:span.fa.fa-comment-o.toggle {:on-click create-comment}])
        (when (seq (:comments entry))
          [:span.fa.fa-comments.toggle {:on-click toggle-comments
                                        :class    (when-not show-comments? "hidden-comments")}])
@@ -116,12 +114,11 @@
          [:a {:href (str "/#" ts) :target "_blank"} [:span.fa.fa-external-link.toggle]])
        (when-not (:comment-for entry) [new-link entry put-fn])
        [trash-icon trash-entry]]]
-     (when (= :pomodoro (:entry-type entry)) [p/pomodoro-header entry put-fn])
+     (when (= :pomodoro (:entry-type entry)) [p/pomodoro-header entry put-fn edit-mode?])
      [hashtags-mentions-list entry]
      [l/leaflet-map entry (or show-map? (:show-all-maps cfg))]
-     (if new-entry?
-       [e/editable-md-render entry hashtags mentions put-fn toggle-edit]
-       [md/markdown-render entry (:show-hashtags cfg)])
+     (if edit-mode? [e/editable-md-render entry hashtags mentions put-fn toggle-edit]
+                    [md/markdown-render entry (:show-hashtags cfg)])
      [m/image-view entry]
      [m/audioplayer-view entry]
      [m/videoplayer-view entry]]))
