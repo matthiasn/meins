@@ -83,7 +83,7 @@
         new-state (:new-state (store/set-active-fn {:current-state current-state
                                                     :msg-payload   test-entry}))]
     (testing "active entry is set"
-      (is (= test-entry (:active new-state))))))
+      (is (= test-entry (:active (:cfg new-state)))))))
 
 (deftest show-more-test
   "Ensure that query is properly updated when more results are desired."

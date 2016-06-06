@@ -61,21 +61,23 @@
   used in edit mode also sends a modified entry to the store component, which is useful
   for displaying updated hashtags, or also for showing the warning that the entry is not
   saved yet."
-  [entry store-snapshot put-fn new-entry? show-comments?]
+  [entry cfg put-fn new-entry?]
   (let [ts (:timestamp entry)
         map? (:latitude entry)
-        show-map? (contains? (:show-maps-for store-snapshot) ts)
+        show-map? (contains? (:show-maps-for cfg) ts)
         toggle-map #(put-fn [:cmd/toggle {:timestamp ts :path [:cfg :show-maps-for]}])
-        toggle-edit #(do (if new-entry?
-                           (put-fn [:entry/remove-local entry])
-                           (put-fn [:entry/update-local (merge {:new-entry true} entry)])))
-        trash-entry #(if new-entry?
-                      (put-fn [:entry/remove-local {:timestamp ts}])
-                      (put-fn [:cmd/trash {:timestamp ts}]))
+        show-comments? (contains? (:show-comments-for cfg) ts)
+        toggle-comments #(put-fn [:cmd/toggle {:timestamp ts :path [:cfg :show-comments-for]}])
+        create-comment (h/new-entry-fn put-fn {:comment-for ts})
+        create-pomodoro (h/new-entry-fn put-fn (p/pomodoro-defaults ts))
+        toggle-edit #(if new-entry? (put-fn [:entry/remove-local entry])
+                                    (put-fn [:entry/update-local (merge {:new-entry true} entry)]))
+        trash-entry #(if new-entry? (put-fn [:entry/remove-local {:timestamp ts}])
+                                    (put-fn [:cmd/trash {:timestamp ts}]))
         upvotes (:upvotes entry)
         upvote-fn (fn [op] #(put-fn [:text-entry/update (update-in entry [:upvotes] op)]))
-        hashtags (:hashtags store-snapshot)
-        mentions (:mentions store-snapshot)
+        hashtags (:hashtags cfg)
+        mentions (:mentions cfg)
         arrival-ts (:arrival-timestamp entry)
         departure-ts (:departure-timestamp entry)
         dur (when (and arrival-ts departure-ts)
@@ -93,7 +95,7 @@
        [:time (.format (js/moment ts) ", h:mm a") formatted-duration]]
       [:div
        (when (seq (:linked-entries-list entry))
-         (let [entry-active? (= (-> store-snapshot :active) (:timestamp entry))]
+         (let [entry-active? (= (-> cfg :active) (:timestamp entry))]
            [:span.link-btn {:on-click #(put-fn [:cmd/set-active (if entry-active? nil (:timestamp entry))])
                             :class    (when entry-active? "active")}
             (str " linked: " (count (:linked-entries-list entry)))]))]
@@ -104,23 +106,22 @@
        (when map? [:span.fa.fa-map-o.toggle {:on-click toggle-map}])
        [:span.fa.fa-pencil-square-o.toggle {:on-click toggle-edit}]
        (when-not (:comment-for entry)
-         [:span.fa.fa-clock-o.toggle {:on-click (h/new-entry-fn put-fn (p/pomodoro-defaults ts))}])
+         [:span.fa.fa-clock-o.toggle {:on-click create-pomodoro}])
        (when-not (:comment-for entry)
-         [:span.fa.fa-comment-o.toggle {:on-click #(do ((h/new-entry-fn put-fn {:comment-for ts}))
-                                                       (reset! show-comments? true))}])
+         [:span.fa.fa-comment-o.toggle {:on-click create-comment}])
        (when (seq (:comments entry))
-         [:span.fa.fa-comments.toggle {:on-click #(swap! show-comments? not)
-                                       :class    (when-not @show-comments? "hidden-comments")}])
+         [:span.fa.fa-comments.toggle {:on-click toggle-comments
+                                       :class    (when-not show-comments? "hidden-comments")}])
        (when-not (:comment-for entry)
          [:a {:href (str "/#" ts) :target "_blank"} [:span.fa.fa-external-link.toggle]])
        (when-not (:comment-for entry) [new-link entry put-fn])
        [trash-icon trash-entry]]]
      (when (= :pomodoro (:entry-type entry)) [p/pomodoro-header entry put-fn])
      [hashtags-mentions-list entry]
-     [l/leaflet-map entry (or show-map? (:show-all-maps store-snapshot))]
+     [l/leaflet-map entry (or show-map? (:show-all-maps cfg))]
      (if new-entry?
        [e/editable-md-render entry hashtags mentions put-fn toggle-edit]
-       [md/markdown-render entry (:show-hashtags store-snapshot)])
+       [md/markdown-render entry (:show-hashtags cfg)])
      [m/image-view entry]
      [m/audioplayer-view entry]
      [m/videoplayer-view entry]]))
@@ -133,23 +134,22 @@
   for displaying updated hashtags, or also for showing the warning that the entry is not
   saved yet."
   [entry cfg new-entries put-fn]
-  (let [show-comments? (r/atom false)]
-    (fn [entry cfg new-entries put-fn]
-      (let [ts (:timestamp entry)
-            entry (or (get new-entries ts) entry)
-            comments (:comments entry)
-            comments (if (:show-pvt cfg) comments (filter u/pvt-filter comments))
-            comments-map (into {} (map (fn [c] [(:timestamp c) c])) comments)
-            local-comments (into {} (filter (fn [[_ts c]] (= (:comment-for c) (:timestamp entry))) new-entries))
-            all-comments (sort-by :timestamp (vals (merge comments-map local-comments)))]
-        [:div.entry-with-comments
-         [journal-entry entry cfg put-fn (contains? new-entries ts) show-comments?]
-         (when (seq all-comments)
-           (if (or @show-comments? (seq local-comments))
-             [:div.comments
-              (for [comment all-comments]
-                ^{:key (str "c" (:timestamp comment))}
-                [journal-entry comment cfg put-fn (contains? new-entries (:timestamp comment)) show-comments?])]
-             [:div.show-comments {:on-click #(swap! show-comments? not)}
-              (let [n (count comments)]
-                [:span (str "show " n " comment" (when (> n 1) "s"))])]))]))))
+  (let [ts (:timestamp entry)
+        entry (or (get new-entries ts) entry)
+        comments (:comments entry)
+        comments (if (:show-pvt cfg) comments (filter u/pvt-filter comments))
+        comments-map (into {} (map (fn [c] [(:timestamp c) c])) comments)
+        toggle-comments #(put-fn [:cmd/toggle {:timestamp ts :path [:cfg :show-comments-for]}])
+        local-comments (into {} (filter (fn [[_ts c]] (= (:comment-for c) (:timestamp entry))) new-entries))
+        all-comments (sort-by :timestamp (vals (merge comments-map local-comments)))]
+    [:div.entry-with-comments
+     [journal-entry entry cfg put-fn (contains? new-entries ts)]
+     (when (seq all-comments)
+       (if (or (contains? (:show-comments-for cfg) ts) (seq local-comments))
+         [:div.comments
+          (for [comment all-comments]
+            ^{:key (str "c" (:timestamp comment))}
+            [journal-entry comment cfg put-fn (contains? new-entries (:timestamp comment))])]
+         [:div.show-comments {:on-click toggle-comments}
+          (let [n (count comments)]
+            [:span (str "show " n " comment" (when (> n 1) "s"))])]))]))

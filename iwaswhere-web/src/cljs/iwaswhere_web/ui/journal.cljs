@@ -18,7 +18,7 @@
         with-comments? (fn [entry] (and (or (and comments-w-entries? (not (:comment-for entry)))
                                             (not comments-w-entries?))
                                         (or (:new-entry entry) show-context?)))
-        active-entry (get (:entries-map store-snapshot) (:active store-snapshot))]
+        active-entry (get (:entries-map store-snapshot) (:active (:cfg store-snapshot)))]
     [:div.journal
      [:div.journal-entries
       (for [entry (filter #(and (not (:comment-for %))

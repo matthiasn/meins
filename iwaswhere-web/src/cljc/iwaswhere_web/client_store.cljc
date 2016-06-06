@@ -27,7 +27,9 @@
                              :last-alive  (st/now)
                              :new-entries @cse/new-entries-ls
                              :temp-query  {}
-                             :cfg         {:show-maps-for      #{}
+                             :cfg         {:active             nil
+                                           :show-maps-for      #{}
+                                           :show-comments-for  #{}
                                            :sort-by-upvotes    false
                                            :show-all-maps      false
                                            :show-hashtags      true
@@ -65,7 +67,7 @@
 (defn set-active-fn
   "Sets entry in payload as the active entry for which to show linked entries."
   [{:keys [current-state msg-payload]}]
-  {:new-state (assoc-in current-state [:active] msg-payload)})
+  {:new-state (assoc-in current-state [:cfg :active] msg-payload)})
 
 (defn cmp-map
   "Creates map for the component which holds the client-side application state."

@@ -23,7 +23,7 @@
     (testing "active entry not set"
       (is (not (:active new-state))))
     (testing "active entry is set in base state for subseqent test"
-      (is (= st/test-entry (:active new-state1))))
+      (is (= st/test-entry (:active (:cfg new-state1)))))
     (testing "query is updated"
       (is (= st/open-tasks-query (:current-query new-state2))))
     (testing "active entry not set after updating query"
