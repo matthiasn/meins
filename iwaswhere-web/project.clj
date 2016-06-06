@@ -47,6 +47,9 @@
   :figwheel {:server-port 3450
              :css-dirs    ["resources/public/css"]}
 
+  :test-refresh {:notify-on-success false
+                 :changes-only      false}
+
   :cljsbuild {:builds [{:id           "dev"
                         :source-paths ["src/cljc" "src/cljs" "env/dev/cljs"]
                         :figwheel     true

@@ -35,9 +35,11 @@ The styling is maintained via SASS in a bunch of `.scss` files. Automatic conver
 
 There a **unit-tests** for the handler functions on the server side. It's useful to start them in refresh mode so that they get run again on each code change:
 
-    $lein test-refresh
+    $ lein test-refresh
 
-This mechanism is also very fast. While the initial startup takes like 10 seconds, each subsequent run currently takes around 100ms.
+This mechanism is also very fast. While the initial startup takes like 10 seconds, each subsequent run currently takes around 100ms. If you have **[growl](http://growl.info/)** installed, you can also call it like this:
+
+    $ lein test-refresh :growl
 
 
 ## REPL
