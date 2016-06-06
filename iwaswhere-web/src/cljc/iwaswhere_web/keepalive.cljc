@@ -48,14 +48,11 @@
   [switchboard]
   (sb/send-mult-cmd
     switchboard
-    [[:cmd/init-comp (sched/cmp-map :client/scheduler-cmp)]  ; Scheduler component
-     [:cmd/send {:to  :client/scheduler-cmp
+    [[:cmd/send {:to  :client/scheduler-cmp
                  :msg [:cmd/schedule-new {:timeout 1000
                                           :message [:cmd/keep-alive]
                                           :repeat true
-                                          :initial false}]}]
-     [:cmd/route-all {:from :client/scheduler-cmp :to :client/ws-cmp}]
-     [:cmd/route {:from :client/scheduler-cmp :to :client/store-cmp}]]))
+                                          :initial false}]}]]))
 
 (defn set-alive-fn
   "Set :last-alive key whenever a keepalive response message was received by the backend."

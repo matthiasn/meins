@@ -190,18 +190,40 @@
                   store/play-audio (fn [id] (swap! play-counter update-in [id] inc))]
       (let [current-state @(:state (store/initial-state-fn #()))
             new-state (:new-state (store/update-local-fn {:current-state current-state :msg-payload test-entry}))
-            new-state1 (:new-state (store/pomodoro-inc-fn {:current-state new-state :msg-payload pomodoro-inc-msg}))
-            new-state2 (:new-state (store/pomodoro-inc-fn {:current-state new-state1 :msg-payload pomodoro-inc-msg}))]
+            new-state1 (:new-state (store/pomodoro-start-fn {:current-state new-state :msg-payload test-entry}))
+            new-state2 (:new-state (store/pomodoro-inc-fn {:current-state new-state1 :msg-payload pomodoro-inc-msg}))
+            new-state3 (:new-state (store/pomodoro-inc-fn {:current-state new-state2 :msg-payload pomodoro-inc-msg}))]
         (testing "pomodoro test entry in new-entries"
           (is (= test-entry (get-in new-state [:new-entries 1465059173965]))))
+        (testing "pomodoro set to running"
+          (is (:pomodoro-running (get-in new-state1 [:new-entries 1465059173965]))))
         (testing "time incremented"
-          (is (= 1 (get-in new-state1 [:new-entries 1465059173965 :completed-time]))))
+          (is (= 1 (get-in new-state2 [:new-entries 1465059173965 :completed-time]))))
         (testing "time incremented"
-          (is (= 2 (get-in new-state2 [:new-entries 1465059173965 :completed-time]))))
+          (is (= 2 (get-in new-state3 [:new-entries 1465059173965 :completed-time]))))
         (testing "new entries atom properly updated - this would be backed by localstorage on client"
-          (is (= (:new-entries new-state2) @store/new-entries-ls)))
+          (is (= (:new-entries new-state3) @store/new-entries-ls)))
         (testing "tick was played twice"
           (is (= (get-in @play-counter ["ticking-clock"]) 2)))))))
+
+(deftest pomodoro-start-test
+  "Tests that the pomodoro-start handler properly sets the entry status to started and and stopped."
+  (with-redefs [store/new-entries-ls (atom {})]
+    (let [current-state @(:state (store/initial-state-fn #()))
+          new-state (:new-state (store/update-local-fn {:current-state current-state :msg-payload test-entry}))
+          new-state1 (:new-state (store/pomodoro-start-fn {:current-state new-state :msg-payload test-entry}))
+          new-state2 (:new-state (store/pomodoro-inc-fn {:current-state new-state1 :msg-payload pomodoro-inc-msg}))
+          new-state3 (:new-state (store/pomodoro-start-fn {:current-state new-state2 :msg-payload test-entry}))]
+      (testing "pomodoro test entry in new-entries"
+          (is (= test-entry (get-in new-state [:new-entries 1465059173965]))))
+      (testing "pomodoro set to running"
+        (is (:pomodoro-running (get-in new-state1 [:new-entries 1465059173965]))))
+      (testing "time incremented"
+        (is (= 1 (get-in new-state2 [:new-entries 1465059173965 :completed-time]))))
+      (testing "pomodoro set to not running"
+        (is (not (:pomodoro-running (get-in new-state3 [:new-entries 1465059173965])))))
+      (testing "new entries atom properly updated - this would be backed by localstorage on client"
+        (is (= (:new-entries new-state3) @store/new-entries-ls))))))
 
 (deftest toggle-key-test
   "toggle key messages flip boolean value"

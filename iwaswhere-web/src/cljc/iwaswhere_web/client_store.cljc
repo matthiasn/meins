@@ -1,7 +1,7 @@
 (ns iwaswhere-web.client-store
   (:require #?(:cljs [alandipert.storage-atom :refer [local-storage]])
-            [matthiasn.systems-toolbox.component :as st]
-            [iwaswhere-web.keepalive :as ka]))
+    [matthiasn.systems-toolbox.component :as st]
+    [iwaswhere-web.keepalive :as ka]))
 
 (defn new-state-fn
   "Update client side state with list of journal entries received from backend."
@@ -29,16 +29,16 @@
   a map with temporary entries that are being edited but not saved yet, and sets that
   contain information for which entries to show the map, or the edit mode."
   [_put-fn]
-  (let [initial-state (atom {:entries         []
-                             :last-alive      (st/now)
-                             :new-entries     @new-entries-ls
-                             :cfg {:show-maps-for      #{}
-                                   :sort-by-upvotes    false
-                                   :show-all-maps      false
-                                   :show-hashtags      true
-                                   :comments-w-entries true
-                                   :show-context       true
-                                   :show-pvt           false}})]
+  (let [initial-state (atom {:entries     []
+                             :last-alive  (st/now)
+                             :new-entries @new-entries-ls
+                             :cfg         {:show-maps-for      #{}
+                                           :sort-by-upvotes    false
+                                           :show-all-maps      false
+                                           :show-hashtags      true
+                                           :comments-w-entries true
+                                           :show-context       true
+                                           :show-pvt           false}})]
     {:state initial-state}))
 
 (defn toggle-set-fn
@@ -85,17 +85,33 @@
    :cljs (defn play-audio [id] (.play (.getElementById js/document id))))
 
 (defn pomodoro-inc-fn
-  "Update locally stored new entry changes from edit element."
+  "Increments completed time of entry. Plays next tick sound and schedules a new increment
+  message. Finally plays completion sound."
   [{:keys [current-state msg-payload]}]
   (let [ts (:timestamp msg-payload)
         new-state (update-in current-state [:new-entries ts :completed-time] inc)]
     (when (get-in current-state [:new-entries ts])
       (let [new-entry (get-in new-state [:new-entries ts])
             done? (= (:planned-dur new-entry) (:completed-time new-entry))]
-        (if done? (play-audio "ringer")
-                  (play-audio "ticking-clock"))
-        (update-local-storage new-state)
-        {:new-state new-state}))))
+        (if (:pomodoro-running new-entry)
+          (do (if done? (play-audio "ringer")
+                        (play-audio "ticking-clock"))
+              (update-local-storage new-state)
+              {:new-state new-state
+               :emit-msg  (when (not done?)
+                            [:cmd/schedule-new {:timeout 1000 :message [:cmd/pomodoro-inc {:timestamp ts}]}])})
+          {:new-state current-state})))))
+
+(defn pomodoro-start-fn
+  "Start pomodoro for entry. Will toggle the :pomodoro-running status of the entry
+  and schedule an initial increment message."
+  [{:keys [current-state msg-payload]}]
+  (let [ts (:timestamp msg-payload)
+        new-state (update-in current-state [:new-entries ts :pomodoro-running] not)]
+    (when (get-in current-state [:new-entries ts])
+      (update-local-storage new-state)
+      {:new-state new-state
+       :emit-msg  [:cmd/schedule-new {:timeout 1000 :message [:cmd/pomodoro-inc {:timestamp ts}]}]})))
 
 (defn update-local-fn
   "Update locally stored new entry changes from edit element."
@@ -118,8 +134,8 @@
   "Update query in client state, with resetting the active entry in the linked entries view."
   [{:keys [current-state msg-payload]}]
   (let [new-state (-> current-state
-                    (assoc-in [:current-query] msg-payload)
-                    (assoc-in [:active] nil))]
+                      (assoc-in [:current-query] msg-payload)
+                      (assoc-in [:active] nil))]
     {:new-state new-state}))
 
 (defn show-more-fn
@@ -127,9 +143,9 @@
   [{:keys [current-state]}]
   (let [current-query (:current-query current-state)
         new-query (update-in current-query [:n] + 20)
-        new-state (assoc-in current-state[:current-query] new-query)]
+        new-state (assoc-in current-state [:current-query] new-query)]
     {:new-state new-state
-     :emit-msg [:state/get new-query]}))
+     :emit-msg  [:state/get new-query]}))
 
 (defn set-active-fn
   "Sets entry in payload as the active entry for which to show linked entries."
@@ -152,6 +168,7 @@
                        :entry/saved        entry-saved-fn
                        :cmd/set-active     set-active-fn
                        :cmd/pomodoro-inc   pomodoro-inc-fn
+                       :cmd/pomodoro-start pomodoro-start-fn
                        :cmd/toggle         toggle-set-fn
                        :cmd/toggle-key     toggle-key-fn
                        :cmd/keep-alive     ka/reset-fn

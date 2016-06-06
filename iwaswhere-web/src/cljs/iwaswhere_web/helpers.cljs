@@ -69,6 +69,7 @@
   (-> entry
       (dissoc :comments)
       (dissoc :new-entry)
+      (dissoc :pomodoro-running)
       (dissoc :linked-entries-list)))
 
 (defn query-from-search-hash
