@@ -58,13 +58,14 @@
 
     div:nth-child(2) {
       flex-grow: 1;
-      font-size: 0.8em;
 
       .incomplete {
+        font-size: 1.1em;
         color: #999;
       }
       .completed {
-        color: #007d4e;
+        color: $green;
+        font-size: 1.1em;
       }
     }
 
@@ -85,7 +86,8 @@
     padding-bottom: 0.2rem;
 
     .dur {
-      margin-right: 1rem;
+      margin-left: 0.5em;
+      margin-right: 0.5em;
     }
 
     .start {

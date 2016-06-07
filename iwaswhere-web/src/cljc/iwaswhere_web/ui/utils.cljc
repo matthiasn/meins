@@ -9,9 +9,10 @@
         seconds (rem seconds 3600)
         min (int (/ seconds 60))
         sec (rem seconds 60)]
-    (str (when (pos? hours) (str hours "h "))
-         (when (pos? min) (str min "m "))
-         (when (pos? sec) (str sec "s")))))
+    (s/trim
+      (str (when (pos? hours) (str hours "h "))
+           (when (pos? min) (str min "m "))
+           (when (pos? sec) (str sec "s"))))))
 
 (defn pvt-filter
   "Filter for entries that I consider private."

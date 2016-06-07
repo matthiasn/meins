@@ -14,17 +14,20 @@
 
 (defn pomodoro-header
   "Header showing time done, plus controls when not completed."
-  [entry put-fn edit-mode?]
+  [entry start-fn edit-mode?]
   (let [time-left? #(> (:planned-dur %) (:completed-time %))
         running? (:pomodoro-running entry)
-        start-fn #(put-fn [:cmd/pomodoro-start entry])]
-    [:div.pomodoro
-     [:strong (if (time-left? entry) "Pomodoro: " "Pomodoro completed: ")]
-     [:span.dur (u/duration-string (:completed-time entry))]
-     (when (and edit-mode? (time-left? entry))
-       [:span.btn {:on-click start-fn :class (if running? "stop" "start")}
-        [:span.fa {:class (if running? "fa-pause-circle-o" "fa-play-circle-o")}]
-        (if running? " pause" " start")])]))
+        completed-time (:completed-time entry)]
+    (when (= (:entry-type entry) :pomodoro)
+      [:div.pomodoro
+       (if (time-left? entry) [:span.fa.fa-clock-o.incomplete]
+                              [:span.fa.fa-clock-o.completed])
+       (when (pos? completed-time)
+         [:span.dur (u/duration-string completed-time)])
+       (when (and edit-mode? (time-left? entry))
+         [:span.btn {:on-click start-fn :class (if running? "stop" "start")}
+          [:span.fa {:class (if running? "fa-pause-circle-o" "fa-play-circle-o")}]
+          (if running? " pause" " start")])])))
 
 (defn pomodoro-stats
   "Create some stats about the provided entries."

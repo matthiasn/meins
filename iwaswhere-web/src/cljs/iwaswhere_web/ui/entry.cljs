@@ -88,7 +88,9 @@
        [:a {:href (str "/#" (.format (js/moment ts) "YYYY-MM-DD"))}
         [:time (.format (js/moment ts) "ddd, MMMM Do YYYY")]]
        [:time (.format (js/moment ts) ", h:mm a") formatted-duration]]
-      [:div info]
+      (if (= :pomodoro (:entry-type entry))
+        [p/pomodoro-header entry #(put-fn [:cmd/pomodoro-start entry]) edit-mode?]
+        [:div info])
       [:div
        (when (seq (:linked-entries-list entry))
          (let [entry-active? (= (:active cfg) (:timestamp entry))
@@ -110,7 +112,6 @@
          [:a {:href (str "/#" ts) :target "_blank"} [:span.fa.fa-external-link.toggle]])
        (when-not (:comment-for entry) [new-link entry put-fn])
        [trash-icon trash-entry]]]
-     (when (= :pomodoro (:entry-type entry)) [p/pomodoro-header entry put-fn edit-mode?])
      [hashtags-mentions-list entry]
      [l/leaflet-map entry (or show-map? (:show-all-maps cfg))]
      (if edit-mode? [e/editable-md-render entry hashtags mentions put-fn toggle-edit]
