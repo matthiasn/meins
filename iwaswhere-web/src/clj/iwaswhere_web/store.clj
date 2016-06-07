@@ -18,7 +18,7 @@
         state-emit-mapper (fn [sente-uid]
                             (let [start-ts (System/currentTimeMillis)
                                   query (get-in current-state [:client-queries sente-uid])
-                                  res (do (g/get-filtered-results current-state query))
+                                  res (g/get-filtered-results current-state query)
                                   duration-ms (- (System/currentTimeMillis) start-ts)]
                               (log/info "Query" sente-uid "took" duration-ms "ms")
                               (with-meta [:state/new (merge res {:duration-ms duration-ms})] {:sente-uid sente-uid})))

@@ -36,12 +36,12 @@
           entry-comments-mentions (apply set/union (map :mentions (:comments entry)))
           mentions (set (map s/lower-case (set/union entry-mentions entry-comments-mentions)))
 
-          match? (or (and (set/subset? q-tags tags)
-                          (empty? (set/intersection q-not-tags tags))
-                          (or (empty? q-mentions)
-                              (seq (set/intersection q-mentions mentions)))
-                          (or day-match? (empty? q-day))
-                          (or q-ts-match? (empty? q-timestamp))))]
+          match? (and (set/subset? q-tags tags)
+                      (empty? (set/intersection q-not-tags tags))
+                      (or (empty? q-mentions)
+                          (seq (set/intersection q-mentions mentions)))
+                      (or day-match? (empty? q-day))
+                      (or q-ts-match? (empty? q-timestamp)))]
       match?)))
 
 (defn compare-w-upvotes
@@ -50,10 +50,10 @@
   (let [upvotes-x (get x :upvotes 0)
         upvotes-y (get y :upvotes 0)]
     (if-not (= upvotes-x upvotes-y)
-      (. clojure.lang.Util (compare upvotes-y upvotes-x))
+      (clojure.lang.Util/compare upvotes-y upvotes-x)
       (if (pos? upvotes-x)                                  ; when entries have upvotes, sort oldest on top
-        (. clojure.lang.Util (compare (:timestamp x) (:timestamp y)))
-        (. clojure.lang.Util (compare (:timestamp y) (:timestamp x)))))))
+        (clojure.lang.Util/compare (:timestamp x) (:timestamp y))
+        (clojure.lang.Util/compare (:timestamp y) (:timestamp x))))))
 
 (defn get-comments
   "Extract all comments for entry."
@@ -180,8 +180,7 @@
   [graph entry]
   (let [linked-entries (:linked-entries entry)]
     (reduce (fn [acc linked-entry]
-              (-> acc
-                  (uber/add-edges [(:timestamp entry) linked-entry {:relationship :LINKED}])))
+              (uber/add-edges acc [(:timestamp entry) linked-entry {:relationship :LINKED}]))
             graph
             linked-entries)))
 
