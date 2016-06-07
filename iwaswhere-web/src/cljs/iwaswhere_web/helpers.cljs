@@ -1,7 +1,8 @@
 (ns iwaswhere-web.helpers
   (:require [matthiasn.systems-toolbox.component :as st]
             [goog.dom.Range]
-            [clojure.string :as s]))
+            [clojure.string :as s]
+            [iwaswhere-web.utils.parse :as p]))
 
 (defn send-w-geolocation
   "Calls geolocation, sends entry enriched by geo information inside the
@@ -15,22 +16,6 @@
                  (merge data {:latitude  (.-latitude coords)
                               :longitude (.-longitude coords)})])))))
 
-(def tag-char-class "[\\w\\-\\u00C0-\\u017F]")
-
-(defn parse-entry
-  "Parses entry for hashtags and mentions. Either can consist of any of the word characters, dashes
-  and unicode characters that for example comprise German 'Umlaute'.
-  The negative lookahead (?!`) makes sure that tags and mentions are not found and processed
-  when they are quoted as code with backticks."
-  [text]
-  (let [tag-regex (str "(?!^) ?#" tag-char-class "+(?!" tag-char-class ")(?![`)])")
-        tags (set (map s/trim (re-seq (js/RegExp. tag-regex "m") text)))
-        mention-regex (str " ?@" tag-char-class "+(?!" tag-char-class ")(?![`)])")
-        mentions (set (map s/trim (re-seq (js/RegExp. mention-regex "m") text)))]
-    {:md        text
-     :tags      tags
-     :mentions  mentions}))
-
 (defn new-entry-fn
   "Create a new, empty entry. The opts map is merged last with the generated entry, thus keys can
   be overwritten here.
@@ -40,7 +25,7 @@
   [put-fn opts]
   (fn [_ev]
     (let [ts (st/now)
-          entry (merge (parse-entry "")
+          entry (merge (p/parse-entry "")
                        {:timestamp  ts
                         :new-entry  true
                         :timezone   (or (when-let [resolved (.-resolved (new js/Intl.DateTimeFormat))]
@@ -51,19 +36,6 @@
                        opts)]
       (put-fn [:entry/new entry])
       (send-w-geolocation entry put-fn))))
-
-(defn parse-search
-  "Parses search string for hashtags, mentions, and hashtags that should not be contained in the filtered entries.
-  Such hashtags can for now be marked like this: #~done. Finding tasks that are not done, which don't have #done
-  in either the entry or any of its comments, can be found like this: #task #~done"
-  [text]
-  {:search-text text
-   :tags        (set (map second (re-seq (js/RegExp. (str "(?:^|[^~])(#" tag-char-class "+)") "m") text)))
-   :not-tags    (set (re-seq (js/RegExp. (str "~#" tag-char-class "+") "m") text))
-   :mentions    (set (re-seq (js/RegExp. (str "@" tag-char-class "+") "m") text))
-   :date-string (re-find #"[0-9]{4}-[0-9]{2}-[0-9]{2}" text)
-   :timestamp   (re-find #"[0-9]{13}" text)
-   :n           40})
 
 (defn clean-entry
   [entry]
@@ -77,16 +49,7 @@
   "Get query from location hash for current page."
   []
   (let [search-hash (subs (js/decodeURIComponent (aget js/window "location" "hash")) 1)]
-    (parse-search search-hash)))
-
-(defn autocomplete-tags
-  "Determine autocomplete options for the partial tag (or mention) before the cursor."
-  [before-cursor regex-prefix tags]
-  (let [current-tag (s/trim (str (re-find (js/RegExp. (str regex-prefix tag-char-class "+$") "") before-cursor)))
-        current-tag-regex (js/RegExp. current-tag "i")
-        tag-substr-filter (fn [tag] (when (seq current-tag) (re-find current-tag-regex tag)))
-        f-tags (filter tag-substr-filter tags)]
-    [current-tag f-tags]))
+    (p/parse-search search-hash)))
 
 (defn string-before-cursor
   "Determine the substring right before the cursor of the current selection. Only returns that

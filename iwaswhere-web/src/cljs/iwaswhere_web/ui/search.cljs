@@ -1,6 +1,7 @@
 (ns iwaswhere-web.ui.search
   (:require [iwaswhere-web.helpers :as h]
             [iwaswhere-web.ui.utils :as u]
+            [iwaswhere-web.utils.parse :as p]
             [matthiasn.systems-toolbox-ui.reagent :as r]
             [clojure.string :as s]))
 
@@ -11,16 +12,16 @@
         store-snapshot @observed
         hashtags (:hashtags (:cfg store-snapshot))
         mentions (:mentions (:cfg store-snapshot))
-        on-input-fn #(put-fn [:search/update (h/parse-search (.. % -target -innerText))])
+        on-input-fn #(put-fn [:search/update (p/parse-search (.. % -target -innerText))])
 
         ; find incomplete tag or mention before cursor, show suggestions
         before-cursor (h/string-before-cursor (:search-text (:current-query @observed)))
-        [curr-tag f-tags] (h/autocomplete-tags before-cursor "#" hashtags)
-        [curr-mention f-mentions] (h/autocomplete-tags before-cursor "@" mentions)
+        [curr-tag f-tags] (p/autocomplete-tags before-cursor "#" hashtags)
+        [curr-mention f-mentions] (p/autocomplete-tags before-cursor "@" mentions)
         tag-replace-fn (fn [curr-tag tag]
-                         (let [curr-tag-regex (js/RegExp (str curr-tag "(?!" h/tag-char-class ")") "i")
+                         (let [curr-tag-regex (js/RegExp (str curr-tag "(?!" p/tag-char-class ")") "i")
                                search-text (:search-text (:current-query @observed))
-                               new-search (h/parse-search (s/replace search-text curr-tag-regex tag))]
+                               new-search (p/parse-search (s/replace search-text curr-tag-regex tag))]
                            (swap! local assoc-in [:current-query] new-search)
                            (put-fn [:search/update new-search])))
         get-tags #(% (:current-query @local))

@@ -4,6 +4,7 @@
   autosuggestions for tags and mentions."
   (:require [iwaswhere-web.helpers :as h]
             [iwaswhere-web.ui.utils :as u]
+            [iwaswhere-web.utils.parse :as p]
             [reagent.core :as r]
             [clojure.string :as s]))
 
@@ -40,7 +41,7 @@
       (let [latest-entry (dissoc entry :comments)
             md-string (or (:md @local-display-entry) "edit here")
             get-content #(aget (.. % -target -parentElement -parentElement -firstChild -firstChild) "innerText")
-            update-temp-fn #(let [updated-entry (merge latest-entry (h/parse-entry (get-content %)))]
+            update-temp-fn #(let [updated-entry (merge latest-entry (p/parse-entry (get-content %)))]
                              (put-fn [:entry/update-local updated-entry]))
             save-fn #(do (put-fn [:text-entry/update (if (and (:new-entry entry) (not (:comment-for entry)))
                                                        (update-in (h/clean-entry latest-entry) [:tags] conj "#new")
@@ -49,13 +50,13 @@
 
             ; find incomplete tag or mention before cursor, show suggestions
             before-cursor (h/string-before-cursor (:md latest-entry))
-            [curr-tag f-tags] (h/autocomplete-tags before-cursor "(?!^) ?#" hashtags)
-            [curr-mention f-mentions] (h/autocomplete-tags before-cursor " ?@" mentions)
+            [curr-tag f-tags] (p/autocomplete-tags before-cursor "(?!^) ?#" hashtags)
+            [curr-mention f-mentions] (p/autocomplete-tags before-cursor " ?@" mentions)
 
             tag-replace-fn (fn [curr-tag tag]
-                             (let [curr-tag-regex (js/RegExp (str curr-tag "(?!" h/tag-char-class ")") "i")
+                             (let [curr-tag-regex (js/RegExp (str curr-tag "(?!" p/tag-char-class ")") "i")
                                    md (:md latest-entry)
-                                   updated (merge entry (h/parse-entry (s/replace md curr-tag-regex tag)))]
+                                   updated (merge entry (p/parse-entry (s/replace md curr-tag-regex tag)))]
                                (reset! local-display-entry updated)
                                (.setTimeout js/window (fn [] (h/focus-on-end @edit-elem-atom)) 100)))
 
