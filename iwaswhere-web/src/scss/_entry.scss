@@ -52,19 +52,32 @@
 
     div:nth-child(1) {
       flex-grow: 1;
-      font-size: 0.6em;
+      font-size: 0.8em;
     }
 
     div:nth-child(2) {
       flex-grow: 1;
 
       .incomplete {
-        font-size: 1.1em;
+        font-size: 1em;
         color: #999;
       }
       .completed {
         color: $green;
-        font-size: 1.1em;
+        font-size: 1em;
+      }
+      .fa-bolt {
+        color: $red;
+        font-size: 1em;
+      }
+      .dur {
+        margin-left: 0.2em;
+        margin-right: 0.3em;
+        font-size: 0.8em;
+        font-weight: bold;
+      }
+      .fa {
+        margin-right: 0.1em;
       }
     }
 
@@ -84,14 +97,9 @@
   .pomodoro {
     padding-bottom: 0.2rem;
 
-    .dur {
-      margin-left: 0.5em;
-    }
-
     .btn {
       margin-left: 0.5em;
     }
-
     .start {
       background-color: $green;
     }

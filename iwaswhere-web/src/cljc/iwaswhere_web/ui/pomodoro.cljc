@@ -24,6 +24,7 @@
                               [:span.fa.fa-clock-o.completed])
        (when (pos? completed-time)
          [:span.dur (u/duration-string completed-time)])
+       (into [:span] (map (fn [_] [:span.fa.fa-bolt]) (range (:interruptions entry))))
        (when (and edit-mode? (time-left? entry))
          [:span.btn {:on-click start-fn :class (if running? "stop" "start")}
           [:span.fa {:class (if running? "fa-pause-circle-o" "fa-play-circle-o")}]
@@ -39,7 +40,7 @@
     {:pomodoros           (count pomodoros)
      :completed-pomodoros (count completed-pomodoros)
      :total-time          (reduce + (map :completed-time pomodoros))
-     :interruptions       (reduce + (map :interruptions pomodoros))
+     :interruptions       interruptions
      :interruptions-str   interruptions-str}))
 
 (defn pomodoro-stats-str
@@ -59,9 +60,10 @@
   completion is achieved when the :completed-time equals the planned duration :planned-dur.
   Also, the total time logged via pomodoros is shown."
   [entries]
-  (let [{:keys [pomodoros completed-pomodoros total-time interruptions-str]} (pomodoro-stats entries)]
+  (let [{:keys [pomodoros completed-pomodoros total-time interruptions]} (pomodoro-stats entries)]
     (when (pos? pomodoros)
       [:span
        (into [:span] (map (fn [_] [:span.fa.fa-clock-o.completed]) (range completed-pomodoros)))
        (into [:span] (map (fn [_] [:span.fa.fa-clock-o.incomplete]) (range (- pomodoros completed-pomodoros))))
-       (str " " (u/duration-string total-time) interruptions-str)])))
+       [:span.dur (u/duration-string total-time)]
+       (into [:span] (map (fn [_] [:span.fa.fa-bolt]) (range interruptions)))])))

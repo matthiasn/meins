@@ -51,7 +51,8 @@
              [:span.fa.fa-clock-o.completed]
              [:span.fa.fa-clock-o.completed]]
             [:span [:span.fa.fa-clock-o.incomplete]]
-            " 1h 6m 40s"])))
+            [:span.dur "1h 6m 40s"]
+            [:span]])))
 
   (testing "works on test entries with interruptions, with 3 completed and 2 incomplete icons"
     (is (= (p/pomodoro-stats-view test-entries)
@@ -62,7 +63,11 @@
              [:span.fa.fa-clock-o.completed]]
             [:span [:span.fa.fa-clock-o.incomplete]
              [:span.fa.fa-clock-o.incomplete]]
-            " 1h 48m 20s. Interruptions: 3"]))))
+            [:span.dur "1h 48m 20s"]
+            [:span
+             [:span.fa.fa-bolt]
+             [:span.fa.fa-bolt]
+             [:span.fa.fa-bolt]]]))))
 
 (deftest pomodoro-stats-str-test
   "Test that the pomodoro-stats-str function properly formats the pomodoro stats string."
@@ -138,6 +143,19 @@
    :timestamp      1465059173965
    :md             "Moving to #cljc"})
 
+(def test-entry3a
+  {:mentions       #{}
+   :tags           #{"#cljc"}
+   :timezone       "Europe/Berlin"
+   :utc-offset     -120
+   :entry-type     :pomodoro
+   :planned-dur    1500
+   :interruptions  3
+   :comment-for    1465059139281
+   :completed-time 1500
+   :timestamp      1465059173965
+   :md             "Moving to #cljc"})
+
 (deftest pomodoro-header-test
   (let [fake-start-fn #()]
     (testing "renders nothing when entry not of type :pomodoro"
@@ -145,32 +163,66 @@
 
     (testing "renders just the icon when not started"
       (is (= (p/pomodoro-header test-entry fake-start-fn false)
-             [:div.pomodoro [:span.fa.fa-clock-o.incomplete] nil nil])))
+             [:div.pomodoro [:span.fa.fa-clock-o.incomplete] nil [:span] nil])))
 
     (testing "renders just the icon when not started"
       (is (= (p/pomodoro-header test-entry fake-start-fn false)
-             [:div.pomodoro [:span.fa.fa-clock-o.incomplete] nil nil])))
+             [:div.pomodoro [:span.fa.fa-clock-o.incomplete] nil [:span] nil])))
 
     (testing "renders icon and duration when started"
       (is (= (p/pomodoro-header test-entry2 fake-start-fn false)
-             [:div.pomodoro [:span.fa.fa-clock-o.incomplete] [:span.dur "1m 40s"] nil])))
+             [:div.pomodoro [:span.fa.fa-clock-o.incomplete] [:span.dur "1m 40s"] [:span] nil])))
 
     (testing "renders icon, duration and start button in edit mode"
       (is (= (p/pomodoro-header test-entry2 fake-start-fn true)
-             [:div.pomodoro [:span.fa.fa-clock-o.incomplete] [:span.dur "1m 40s"]
+             [:div.pomodoro [:span.fa.fa-clock-o.incomplete]
+              [:span.dur "1m 40s"]
+              [:span]
               [:span.btn {:on-click fake-start-fn :class "start"}
                [:span.fa {:class "fa-play-circle-o"}] " start"]])))
 
     (testing "renders icon, duration and pause button in edit mode when running"
       (is (= (p/pomodoro-header test-entry2a fake-start-fn true)
-             [:div.pomodoro [:span.fa.fa-clock-o.incomplete] [:span.dur "1m 40s"]
+             [:div.pomodoro [:span.fa.fa-clock-o.incomplete]
+              [:span.dur "1m 40s"]
+              [:span]
               [:span.btn {:on-click fake-start-fn :class "stop"}
                [:span.fa {:class "fa-pause-circle-o"}] " pause"]])))
 
     (testing "renders completed icon and duration when completed"
       (is (= (p/pomodoro-header test-entry3 fake-start-fn false)
-             [:div.pomodoro [:span.fa.fa-clock-o.completed] [:span.dur "25m"] nil])))
+             [:div.pomodoro
+              [:span.fa.fa-clock-o.completed]
+              [:span.dur "25m"]
+              [:span]
+              nil])))
+
+    (testing "renders completed icon and duration when completed, with interruptions"
+      (is (= (p/pomodoro-header test-entry3a fake-start-fn false)
+             [:div.pomodoro
+              [:span.fa.fa-clock-o.completed]
+              [:span.dur "25m"]
+              [:span
+               [:span.fa.fa-bolt]
+               [:span.fa.fa-bolt]
+               [:span.fa.fa-bolt]]
+              nil])))
 
     (testing "renders icon, duration and no start button in edit mode when time is up"
       (is (= (p/pomodoro-header test-entry3 fake-start-fn true)
-             [:div.pomodoro [:span.fa.fa-clock-o.completed] [:span.dur "25m"] nil])))))
+             [:div.pomodoro
+              [:span.fa.fa-clock-o.completed]
+              [:span.dur "25m"]
+              [:span]
+              nil])))
+
+    (testing "renders icon, duration and no start button in edit mode when time is up"
+      (is (= (p/pomodoro-header test-entry3a fake-start-fn true)
+             [:div.pomodoro
+              [:span.fa.fa-clock-o.completed]
+              [:span.dur "25m"]
+              [:span
+               [:span.fa.fa-bolt]
+               [:span.fa.fa-bolt]
+               [:span.fa.fa-bolt]]
+              nil])))))
