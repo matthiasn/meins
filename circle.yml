@@ -5,3 +5,4 @@ test:
     - lein test2junit
   post:
     - ant
+    - mv test2junit $CIRCLE_TEST_REPORTS
