@@ -31,7 +31,7 @@
                               (tag-replace-fn curr-tag (first f-tags)))
                             (when (and curr-mention (seq f-mentions))
                               (tag-replace-fn curr-mention (first f-mentions)))
-                            (.setTimeout js/window (fn [] (u/focus-on-end (.-target ev))) 50)
+                            (.setTimeout js/window (fn [] (h/focus-on-end (.-target ev))) 50)
                             (.preventDefault ev))))]
     [:div.search
      [:div.hashtags

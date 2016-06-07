@@ -1,7 +1,8 @@
 (ns iwaswhere-web.ui.pomodoro
   "This namespace holds the fucntions for rendering the text (markdown) content of a journal entry.
   This includes both a properly styled element for static content and the edit-mode view, with
-  autosuggestions for tags and mentions.")
+  autosuggestions for tags and mentions."
+  (:require [iwaswhere-web.ui.utils :as u]))
 
 (defn pomodoro-defaults
   [ts]
@@ -11,17 +12,6 @@
    :completed-time 0
    :interruptions  0})
 
-(defn duration-string
-  "Format duration string from seconds."
-  [seconds]
-  (let [hours (int (/ seconds 3600))
-        seconds (rem seconds 3600)
-        min (int (/ seconds 60))
-        sec (rem seconds 60)]
-    (str (when (pos? hours) (str hours "h "))
-         (when (pos? min) (str min "m "))
-         (when (pos? sec) (str sec "s")))))
-
 (defn pomodoro-header
   "Header showing time done, plus controls when not completed."
   [entry put-fn edit-mode?]
@@ -30,7 +20,7 @@
         start-fn #(put-fn [:cmd/pomodoro-start entry])]
     [:div.pomodoro
      [:strong (if (time-left? entry) "Pomodoro: " "Pomodoro completed: ")]
-     [:span.dur (duration-string (:completed-time entry))]
+     [:span.dur (u/duration-string (:completed-time entry))]
      (when (and edit-mode? (time-left? entry))
        [:span.btn {:on-click start-fn :class (if running? "stop" "start")}
         [:span.fa {:class (if running? "fa-pause-circle-o" "fa-play-circle-o")}]
@@ -57,9 +47,9 @@
   (let [{:keys [pomodoros completed-pomodoros total-time interruptions-str]} (pomodoro-stats entries)]
     (when (pos? pomodoros)
       (if (= pomodoros completed-pomodoros)
-        (str "Pomodoros: " completed-pomodoros ", " (duration-string total-time) interruptions-str)
+        (str "Pomodoros: " completed-pomodoros ", " (u/duration-string total-time) interruptions-str)
         (str "Pomodoros: " completed-pomodoros " of " pomodoros " completed, "
-             (duration-string total-time) interruptions-str)))))
+             (u/duration-string total-time) interruptions-str)))))
 
 (defn pomodoro-stats-view
   "Shows some information about the number of pomodoros created and completed on any given day, where
@@ -71,4 +61,4 @@
       [:span
        (into [:span] (map (fn [_] [:span.fa.fa-clock-o.completed]) (range completed-pomodoros)))
        (into [:span] (map (fn [_] [:span.fa.fa-clock-o.incomplete]) (range (- pomodoros completed-pomodoros))))
-       (str " " (duration-string total-time) interruptions-str)])))
+       (str " " (u/duration-string total-time) interruptions-str)])))

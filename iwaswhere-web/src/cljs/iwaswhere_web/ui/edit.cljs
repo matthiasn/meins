@@ -17,7 +17,7 @@
   (r/create-class
     {:component-did-mount #(let [el (r/dom-node %)]
                             (reset! edit-elem-atom el)
-                            (u/focus-on-end el))
+                            (h/focus-on-end el))
      :reagent-render      (fn [md-string update-temp-fn on-keydown-fn edit-elem-atom]
                             [:code {:content-editable true
                                     :on-input         update-temp-fn
@@ -57,7 +57,7 @@
                                    md (:md latest-entry)
                                    updated (merge entry (h/parse-entry (s/replace md curr-tag-regex tag)))]
                                (reset! local-display-entry updated)
-                               (.setTimeout js/window (fn [] (u/focus-on-end @edit-elem-atom)) 100)))
+                               (.setTimeout js/window (fn [] (h/focus-on-end @edit-elem-atom)) 100)))
 
             on-keydown-fn (fn [ev]
                             (let [key-code (.. ev -keyCode)

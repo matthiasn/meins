@@ -3,8 +3,9 @@
   This includes both a properly styled element for static content and the edit-mode view, with
   autosuggestions for tags and mentions."
   (:require [markdown.core :as md]
-            [clojure.string :as s]
-            [iwaswhere-web.helpers :as h]))
+            [clojure.string :as s]))
+
+(def tag-char-class "[\\w\\-\\u00C0-\\u017F]")
 
 (defn hashtags-replacer
   "Replaces hashtags in entry text. Depending on show-hashtags? switch either displays
@@ -14,7 +15,7 @@
   (fn [acc hashtag]
     (let [f-hashtag (if show-hashtags? hashtag (subs hashtag 1))
           with-link (str " <a href='/#" hashtag "'>" f-hashtag "</a>")]
-      (s/replace acc (re-pattern (str "[^*]" hashtag "(?!" h/tag-char-class ")(?![`)])")) with-link))))
+      (s/replace acc (re-pattern (str "[^*]" hashtag "(?!" tag-char-class ")(?![`)])")) with-link))))
 
 (defn mentions-replacer
   "Replaces mentions in entry text."
@@ -22,9 +23,9 @@
   (fn [acc mention]
     (let [f-mention (if show-hashtags? mention (subs mention 1))
           with-link (str " <a class='mention-link' href='/#" mention "'>" f-mention "</a>")]
-      (s/replace acc (re-pattern (str mention "(?!" h/tag-char-class ")")) with-link))))
+      (s/replace acc (re-pattern (str mention "(?!" tag-char-class ")")) with-link))))
 
-(defn- reducer
+(defn reducer
   "Generic reducer, allows calling specified function for each item in the collection."
   [text coll fun]
   (reduce fun text coll))
@@ -37,5 +38,7 @@
   (when-let [md-string (:md entry)]
     (let [formatted-md (-> md-string
                            (reducer (:tags entry) (hashtags-replacer show-hashtags?))
-                           (reducer (:mentions entry) (mentions-replacer show-hashtags?)))]
-      [:div {:dangerouslySetInnerHTML {:__html (md/md->html formatted-md)}}])))
+                           (reducer (:mentions entry) (mentions-replacer show-hashtags?)))
+          html #?(:clj (md/md-to-html-string formatted-md)
+                  :cljs (md/md->html formatted-md))]
+      [:div {:dangerouslySetInnerHTML {:__html html}}])))

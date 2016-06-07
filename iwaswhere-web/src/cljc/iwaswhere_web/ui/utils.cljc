@@ -1,15 +1,17 @@
 (ns iwaswhere-web.ui.utils
   (:require [clojure.string :as s]
-            [goog.dom.Range]
             [clojure.set :as set]))
 
-(defn focus-on-end
-  "Focus on the provided element, and then places the caret in the last position of the element's contents"
-  [el]
-  (.focus el)
-  (doto (.createFromNodeContents goog.dom.Range el)
-    (.collapse false)
-    .select))
+(defn duration-string
+  "Format duration string from seconds."
+  [seconds]
+  (let [hours (int (/ seconds 3600))
+        seconds (rem seconds 3600)
+        min (int (/ seconds 60))
+        sec (rem seconds 60)]
+    (str (when (pos? hours) (str hours "h "))
+         (when (pos? min) (str min "m "))
+         (when (pos? sec) (str sec "s")))))
 
 (defn pvt-filter
   "Filter for entries that I consider private."

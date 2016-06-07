@@ -15,7 +15,7 @@
         new-state (:new-state (k/set-alive-fn {:current-state current-state}))]
 
     (testing ":last-alive timestamp set"
-      (is (< (- (stc/now) (:last-alive new-state)) 10)))
+      (is (< (- (stc/now) (:last-alive new-state)) 100)))
 
     (testing "client state reset when :last-alive too long ago"
       (with-redefs [k/max-age -1]

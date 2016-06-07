@@ -1,5 +1,6 @@
 (ns iwaswhere-web.helpers
   (:require [matthiasn.systems-toolbox.component :as st]
+            [goog.dom.Range]
             [clojure.string :as s]))
 
 (defn send-w-geolocation
@@ -99,3 +100,11 @@
     (if (not= -1 (.indexOf (str comp-str) node-value))
       (subs node-value 0 cursor-pos)
       "")))
+
+(defn focus-on-end
+  "Focus on the provided element, and then places the caret in the last position of the element's contents"
+  [el]
+  (.focus el)
+  (doto (.createFromNodeContents goog.dom.Range el)
+    (.collapse false)
+    .select))

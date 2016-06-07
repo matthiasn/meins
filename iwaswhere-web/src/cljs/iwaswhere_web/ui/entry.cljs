@@ -80,13 +80,8 @@
         mentions (:mentions cfg)
         arrival-ts (:arrival-timestamp entry)
         departure-ts (:departure-timestamp entry)
-        dur (when (and arrival-ts departure-ts)
-              (-> (- departure-ts arrival-ts) (/ 60000) (Math/floor)))
-        formatted-duration (when (and dur (< dur 99999))
-                             (let [minutes (rem dur 60)
-                                   hours (Math/floor (/ dur 60))]
-                               (str ", " (when (pos? hours) (str hours "h "))
-                                    (when (pos? minutes) (str minutes "m")))))]
+        dur (when (and arrival-ts departure-ts) (-> (- departure-ts arrival-ts) (/ 1000) (Math/floor)))
+        formatted-duration (when (and dur (< dur 99999)) (str ", " (u/duration-string dur)))]
     [:div.entry
      [:div.header
       [:div
