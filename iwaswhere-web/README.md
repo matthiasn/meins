@@ -1,32 +1,49 @@
-# iWasWhere
+# iwaswhere-web
 
-This is the web and backend portion of a system for tracking the user's movement in space, plus related tasks and ideas.
+This is the **web application** part of **iWasWhere**. You can read more about the motivation **[here](../README.md)**. This system is written in **Clojure** and **ClojureScript**, making use of the **[systems-toolbox](https://github.com/matthiasn/systems-toolbox)** for its architecture.
 
-## Usage
+
+## Installation
 
 Before first usage, you want to install the **[Bower](http://bower.io)** dependencies:
 
     $ bower install
 
-Once this is done, you can start the application as usual:
+Next, you need to compile the **ClojureScript**:
+
+    $ lein cljsbuild once release
+
+This will compile the ClojureScript into JavaScript using `:advanced` optimization.
+    
+The styling is maintained via **SASS** in a bunch of `.scss` files. These need to be converted to CSS:
+
+    $ lein sass once
+
+There is no **CSS** framework involved here. Rather, the styling is self-contained, which is possible thanks to **[CSS Flexible Box Layout](https://www.w3.org/TR/css-flexbox-1/)**. It's great for layout. You should learn it.
+
+
+## Usage
+
+Once you have completed all the steps in the previous section, all you need to do is:
 
     $ lein run
 
-This will run the application on **[http://localhost:8888/](http://localhost:8888/)**. However, we will still need to compile the ClojureScript:
+This will run the application on **[http://localhost:8888/](http://localhost:8888/)**. By default, the webserver exposed by the systems-toolbox library listens on port 8888 and only binds to the localhost interface. You can use environment variables to change this behavior, for example:
+
+    $ HOST="0.0.0.0" PORT=8888 lein run
+
+
+## Development
+
+During development, it makes sense to automatically recompile the **ClojureScript** when any change is detected. You can use **cljsbuild**, which works very well, but requires reloading the web page:
 
     $ lein cljsbuild auto release
 
-This will compile the ClojureScript into JavaScript using `:advanced` optimization.
-
-You can also use **[Figwheel](https://github.com/bhauman/lein-figwheel)** to automatically update the application as you make changes. For that, open another terminal:
+Alternatively, you can use **[Figwheel](https://github.com/bhauman/lein-figwheel)** to automatically update the application as you make changes. For that, open another terminal:
 
     $ lein figwheel
 
-By default, the webserver exposed by the systems-toolbox library listens on port 8888 and only binds to the localhost interface. You can use environment variables to change this behavior, for example:
-
-    $ HOST="0.0.0.0" PORT=8888 lein run
-    
-The styling is maintained via SASS in a bunch of `.scss` files. Automatic conversion to CSS can be started with:
+The **systems-toolbox** library supports **Figwheel**, and all components will be reloaded while retaining their previous state. This works particularly well when doing changes that don't affect component state structure. Figwheel also detects CSS changes. Here, it particularly shines, as the UI will re-render immediately after any CSS change, without jumping or going back to the initial state after loading. For this, you need to keep the **sass watch** task running, like so:
 
     $ lein sass watch
 
