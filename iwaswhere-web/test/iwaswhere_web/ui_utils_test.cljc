@@ -13,3 +13,51 @@
     (is (= (u/duration-string 1111) "18m 31s"))
     (is (= (u/duration-string 11111) "3h 5m 11s"))
     (is (= (u/duration-string 111111) "30h 51m 51s"))))
+
+(def test-entry
+  {:mentions       #{}
+   :tags           #{}
+   :timezone       "Europe/Berlin"
+   :utc-offset     -120
+   :timestamp      1465059173965
+   :md             ""})
+
+(def test-entry2
+  {:mentions       #{}
+   :tags           #{"#cljc"}
+   :timezone       "Europe/Berlin"
+   :utc-offset     -120
+   :timestamp      1465059173965
+   :md             "Moving to #cljc"})
+
+(def pvt-entry
+  {:mentions       #{}
+   :tags           #{"#pvt"}
+   :timezone       "Europe/Berlin"
+   :utc-offset     -120
+   :timestamp      1465059173965
+   :md             "Some #pvt entry"})
+
+(def pvt-entry2
+  {:mentions       #{}
+   :tags           #{"#private"}
+   :timezone       "Europe/Berlin"
+   :utc-offset     -120
+   :timestamp      1465059173965
+   :md             "Some #private entry"})
+
+(def pvt-entry3
+  {:mentions       #{}
+   :tags           #{"#nsfw"}
+   :timezone       "Europe/Berlin"
+   :utc-offset     -120
+   :timestamp      1465059173965
+   :md             "Something #nsfw"})
+
+(deftest pvt-filter-test
+  (testing "properly detects privacy status of entries"
+    (is (u/pvt-filter test-entry))
+    (is (u/pvt-filter test-entry2))
+    (is (not (u/pvt-filter pvt-entry)))
+    (is (not (u/pvt-filter pvt-entry2)))
+    (is (not (u/pvt-filter pvt-entry3)))))

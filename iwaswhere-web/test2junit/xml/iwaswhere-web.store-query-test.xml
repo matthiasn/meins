@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="iwaswhere-web.store-query-test" errors="0" failures="0" tests="1" time="0.3715" timestamp="2016-06-05_13:50:37+0200">
-    <testcase name="query-test" classname="iwaswhere-web.store-query-test" time="0.3704">
-    </testcase>
-</testsuite>

@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="iwaswhere-web.store-test" errors="0" failures="0" tests="3" time="0.0426" timestamp="2016-06-05_13:50:37+0200">
-    <testcase name="trash-entry-test" classname="iwaswhere-web.store-test" time="0.0231">
-    </testcase>
-    <testcase name="geo-entry-update-test" classname="iwaswhere-web.store-test" time="0.0118">
-    </testcase>
-    <testcase name="geo-entry-persist-test" classname="iwaswhere-web.store-test" time="0.0061">
-    </testcase>
-</testsuite>
