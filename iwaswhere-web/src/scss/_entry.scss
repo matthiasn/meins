@@ -4,8 +4,7 @@
   border-style: solid;
   border-width: 1px;
   background: white;
-  border-radius: 0.3em;
-  overflow: hidden;
+  border-radius: $entry-border-radius;
 }
 
 .entry {
@@ -87,7 +86,10 @@
 
     .dur {
       margin-left: 0.5em;
-      margin-right: 0.5em;
+    }
+
+    .btn {
+      margin-left: 0.5em;
     }
 
     .start {
@@ -116,6 +118,10 @@
   .entry:nth-child(odd) {
     background-color: lighten($hashtag-blue, 40%);
   }
+  .entry:last-child {
+    border-bottom-right-radius: $entry-border-radius;
+    border-bottom-left-radius: $entry-border-radius;
+  }
 }
 
 .show-comments {
@@ -123,10 +129,10 @@
   height: 22px;
 
   span {
-    margin-left: 5px;
+    margin-left: 0.8em;
     padding: 1px 5px;
     color: white;
-    background-color: #999;
+    background-color: lighten(desaturate($hashtag-blue, 35%), 15%);
     cursor: pointer;
     font-size: 0.8em;
   }
