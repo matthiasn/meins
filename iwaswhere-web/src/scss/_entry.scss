@@ -1,13 +1,15 @@
 .entry-with-comments {
   margin: 3px 5px 3px 0;
-  border-color: #1f8dd6;
+  border-color: darken($hashtag-blue, 25%);
   border-style: solid;
   border-width: 1px;
+  background: white;
+  border-radius: 0.3em;
+  overflow: hidden;
 }
 
 .entry {
-  background: white;
-  padding: 5px 5px 2px 5px;
+  padding: 0.5em 0.8em 0.2em 0.8em;
 
   .active {
     border-color: green;
@@ -105,17 +107,18 @@
 }
 
 .comments {
-  margin-left: 20px;
   > .entry {
-    margin-top: 4px;
+    padding-left: 20px;
+    padding-right: 5px;
   }
-
+  .entry:nth-child(odd) {
+    background-color: lighten($hashtag-blue, 40%);
+  }
 }
 
 .show-comments {
   margin-top: -2px;
   height: 22px;
-  background-color: white;
 
   span {
     margin-left: 5px;
