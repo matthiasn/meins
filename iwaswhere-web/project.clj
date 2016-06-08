@@ -20,9 +20,9 @@
                  [com.drewnoakes/metadata-extractor "2.8.1"]
                  [ubergraph "0.2.2"]
                  [camel-snake-kebab "0.4.0"]
-                 [matthiasn/systems-toolbox "0.5.22"]
+                 [matthiasn/systems-toolbox "0.6.1"]
                  [matthiasn/systems-toolbox-ui "0.5.9"]
-                 [matthiasn/systems-toolbox-sente "0.5.17"]
+                 [matthiasn/systems-toolbox-sente "0.5.18"]
                  [alandipert/storage-atom "2.0.1"]]
 
   :source-paths ["src/cljc" "src/clj/"]

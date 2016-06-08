@@ -3,6 +3,8 @@
   which then holds the server side application state."
   (:require [iwaswhere-web.files :as f]
             [iwaswhere-web.graph :as g]
+            [iwaswhere-web.specs :as specs]
+            [clojure.spec :as spec]
             [ubergraph.core :as uber]
             [clojure.string :as s]
             [iwaswhere-web.keepalive :as ka]

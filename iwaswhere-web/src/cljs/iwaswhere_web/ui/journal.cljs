@@ -31,7 +31,7 @@
           ^{:key (:timestamp entry)}
           [e/entry-with-comments entry cfg new-entries put-fn]))
       (when (and show-context? (seq entries))
-        (let [show-more #(put-fn [:show/more {}])]
+        (let [show-more #(put-fn [:show/more])]
           [:div.show-more {:on-click show-more :on-mouse-over show-more}
            [:span.show-more-btn [:span.fa.fa-plus-square] " show more"]]))
       (when-let [stats (:stats store-snapshot)]
