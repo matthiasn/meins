@@ -84,8 +84,8 @@
         new-state (update-in new-state [:new-entries ts :pomodoro-running] not)]
     (when (get-in current-state [:new-entries ts])
       (update-local-storage new-state)
-      {:new-state new-state
-       :emit-msg  [:cmd/schedule-new {:timeout 1000 :message [:cmd/pomodoro-inc {:timestamp ts}]}]})))
+      {:new-state    new-state
+       :send-to-self [:cmd/pomodoro-inc {:timestamp ts}]})))
 
 (defn update-local-fn
   "Update locally stored new entry changes from edit element."

@@ -3,7 +3,7 @@
   :url "https://github.com/matthiasn/systems-toolbox"
   :license {:name "GNU GENERAL PUBLIC LICENSE"
             :url  "http://www.gnu.org/licenses/gpl-3.0.en.html"}
-  :dependencies [[org.clojure/clojure "1.9.0-alpha3"]
+  :dependencies [[org.clojure/clojure "1.9.0-alpha5"]
                  [org.clojure/clojurescript "1.9.36"]
                  [org.clojure/core.async "0.2.374"]
                  [org.clojure/tools.logging "0.3.1"]
@@ -11,7 +11,7 @@
                  [ch.qos.logback/logback-classic "1.1.7"]
                  [hiccup "1.0.5"]
                  [clj-pid "0.1.2"]
-                 [clj-time "0.11.0"]
+                 [clj-time "0.12.0"]
                  [me.raynes/fs "1.4.6"]
                  [markdown-clj "0.9.89"]
                  [cheshire "5.6.1"]
@@ -23,8 +23,7 @@
                  [matthiasn/systems-toolbox "0.5.22"]
                  [matthiasn/systems-toolbox-ui "0.5.9"]
                  [matthiasn/systems-toolbox-sente "0.5.17"]
-                 [alandipert/storage-atom "2.0.1"]
-                 [clj-time "0.11.0"]]
+                 [alandipert/storage-atom "2.0.1"]]
 
   :source-paths ["src/cljc" "src/clj/"]
 
