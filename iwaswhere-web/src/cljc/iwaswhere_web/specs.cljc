@@ -19,6 +19,9 @@
   (fn [s]
     (re-find (re-pattern (str "^" prefix p/tag-char-class "+$")) s)))
 
+(defn namespaced-keyword? [k] (and (keyword? k) (namespace k)))
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;  Journal Entry Specs
 (s/def :iww.entry/timestamp (number-in-range? 0 5000000000000))
@@ -140,3 +143,10 @@
                    :iww.search-result/mentions
                    :iww.search-result/stats
                    :iww.search-result/duration-ms]))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Spec for :state/publish-current
+(s/def :iww.ws/sente-uid string?)
+(s/def :state/publish-current
+  (s/keys :opt-un [:iww.ws/sente-uid]))
