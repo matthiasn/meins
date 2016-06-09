@@ -23,19 +23,19 @@
   a map with temporary entries that are being edited but not saved yet, and sets that
   contain information for which entries to show the map, or the edit mode."
   [_put-fn]
-  (let [initial-state (atom {:entries     []
-                             :last-alive  (st/now)
-                             :new-entries @cse/new-entries-ls
-                             :temp-query  {}
-                             :cfg         {:active             nil
-                                           :show-maps-for      #{}
-                                           :show-comments-for  #{}
-                                           :sort-by-upvotes    false
-                                           :show-all-maps      false
-                                           :show-hashtags      true
-                                           :comments-w-entries true
-                                           :show-context       true
-                                           :show-pvt           false}})]
+  (let [initial-state (atom {:entries        []
+                             :last-alive     (st/now)
+                             :new-entries    @cse/new-entries-ls
+                             :current-query  {}
+                             :cfg            {:active             nil
+                                              :show-maps-for      #{}
+                                              :show-comments-for  #{}
+                                              :sort-by-upvotes    false
+                                              :show-all-maps      false
+                                              :show-hashtags      true
+                                              :comments-w-entries true
+                                              :show-context       true
+                                              :show-pvt           false}})]
     {:state initial-state}))
 
 (defn toggle-set-fn
@@ -75,6 +75,7 @@
   {:cmp-id            cmp-id
    :state-fn          initial-state-fn
    :snapshot-xform-fn #(dissoc % :last-alive)
+   :state-spec        :state/client-store-spec
    :handler-map       (merge cse/entry-handler-map
                              s/search-handler-map
                              {:state/new          new-state-fn

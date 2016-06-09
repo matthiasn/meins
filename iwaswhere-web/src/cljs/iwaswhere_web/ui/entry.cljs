@@ -51,7 +51,7 @@
                                          linked-entries (conj entry-links (long link))
                                          new-entry (h/clean-entry (merge entry {:linked-entries linked-entries}))]
                                      (when link
-                                       (put-fn [:text-entry/update new-entry])
+                                       (put-fn [:entry/update new-entry])
                                        (swap! visible not)))))}])])))
 
 (defn journal-entry
@@ -73,9 +73,9 @@
         toggle-edit #(if edit-mode? (put-fn [:entry/remove-local entry])
                                     (put-fn [:entry/update-local entry]))
         trash-entry #(if edit-mode? (put-fn [:entry/remove-local {:timestamp ts}])
-                                    (put-fn [:cmd/trash {:timestamp ts}]))
+                                    (put-fn [:entry/trash {:timestamp ts}]))
         upvotes (:upvotes entry)
-        upvote-fn (fn [op] #(put-fn [:text-entry/update (update-in entry [:upvotes] op)]))
+        upvote-fn (fn [op] #(put-fn [:entry/update (update-in entry [:upvotes] op)]))
         hashtags (:hashtags cfg)
         mentions (:mentions cfg)
         arrival-ts (:arrival-timestamp entry)

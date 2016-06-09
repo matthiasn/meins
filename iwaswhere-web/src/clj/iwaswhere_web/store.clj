@@ -70,11 +70,10 @@
   [cmp-id]
   {:cmp-id      cmp-id
    :state-fn    (state-fn f/daily-logs-path)
-   :handler-map {:geo-entry/persist     f/geo-entry-persist-fn
-                 :geo-entry/import      f/entry-import-fn
-                 :text-entry/update     f/geo-entry-persist-fn
+   :handler-map {:entry/import          f/entry-import-fn
+                 :entry/update          f/geo-entry-persist-fn
+                 :entry/trash           f/trash-entry-fn
                  :state/publish-current publish-state-fn
-                 :cmd/trash             f/trash-entry-fn
                  :state/get             state-get-fn
                  :cmd/keep-alive        ka/keepalive-fn
                  :cmd/query-gc          ka/query-gc-fn}})

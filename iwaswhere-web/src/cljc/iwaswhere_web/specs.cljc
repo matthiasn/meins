@@ -73,7 +73,7 @@
 ;; the following message types expect a properly formed entry
 (s/def :entry/new entry-spec)
 (s/def :entry/update-local entry-spec)
-(s/def :text-entry/update entry-spec)
+(s/def :entry/update entry-spec)
 (s/def :entry/saved entry-spec)
 
 ;; geo-enriched entries require a properly formed entry with latitude and longitude
@@ -81,8 +81,10 @@
 
 ;; the following message types only require timestamp to be present
 (s/def :entry/remove-local timestamp-required-spec)
+(s/def :entry/trash timestamp-required-spec)
 (s/def :cmd/pomodoro-inc timestamp-required-spec)
 (s/def :cmd/pomodoro-start timestamp-required-spec)
+(s/def :cmd/set-active number?)
 (s/def :cmd/toggle timestamp-required-spec)
 
 
@@ -150,3 +152,52 @@
 (s/def :iww.ws/sente-uid string?)
 (s/def :state/publish-current
   (s/keys :opt-un [:iww.ws/sente-uid]))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Client Store State Spec
+{:entries     []
+ :temp-query  {}
+ :cfg         {:active             nil
+               :show-maps-for      #{}
+               :show-comments-for  #{}
+               :sort-by-upvotes    false
+               :show-all-maps      false
+               :show-hashtags      true
+               :comments-w-entries true
+               :show-context       true
+               :show-pvt           false}}
+
+(s/def :iww.client-state/entries (s/* entry-spec))
+(s/def :iww.client-state/last-alive (number-in-range? 0 5000000000000))
+(s/def :iww.client-state/current-query map?)
+
+;; map with entries as values
+;(s/def :iww.client-state/new-entries (s/* entry-spec))
+
+(s/def :iww.client-state.cfg/active (s/nilable number?))
+(s/def :iww.client-state.cfg/show-maps-for set?)
+(s/def :iww.client-state.cfg/show-comments-for set?)
+(s/def :iww.client-state.cfg/sort-by-upvotes boolean?)
+(s/def :iww.client-state.cfg/show-all-maps boolean?)
+(s/def :iww.client-state.cfg/show-hashtags boolean?)
+(s/def :iww.client-state.cfg/comments-w-entries boolean?)
+(s/def :iww.client-state.cfg/show-context boolean?)
+(s/def :iww.client-state.cfg/show-pvt boolean?)
+(s/def :iww.client-state/cfg
+  (s/keys :req-un [:iww.client-state.cfg/active
+                   :iww.client-state.cfg/show-maps-for
+                   :iww.client-state.cfg/show-comments-for
+                   :iww.client-state.cfg/sort-by-upvotes
+                   :iww.client-state.cfg/show-all-maps
+                   :iww.client-state.cfg/show-hashtags
+                   :iww.client-state.cfg/comments-w-entries
+                   :iww.client-state.cfg/show-context
+                   :iww.client-state.cfg/show-pvt]))
+
+(s/def :state/client-store-spec
+  (s/keys :req-un [:iww.client-state/entries
+                   :iww.client-state/last-alive
+                   :iww.client-state/new-entries
+                   :iww.client-state/current-query
+                   :iww.client-state/cfg]))

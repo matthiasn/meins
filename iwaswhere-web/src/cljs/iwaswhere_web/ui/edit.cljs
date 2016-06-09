@@ -43,9 +43,9 @@
             get-content #(aget (.. % -target -parentElement -parentElement -firstChild -firstChild) "innerText")
             update-temp-fn #(let [updated-entry (merge latest-entry (p/parse-entry (get-content %)))]
                              (put-fn [:entry/update-local updated-entry]))
-            save-fn #(do (put-fn [:text-entry/update (if (and (:new-entry entry) (not (:comment-for entry)))
-                                                       (update-in (h/clean-entry latest-entry) [:tags] conj "#new")
-                                                       (h/clean-entry latest-entry))])
+            save-fn #(do (put-fn [:entry/update (if (and (:new-entry entry) (not (:comment-for entry)))
+                                                  (update-in (h/clean-entry latest-entry) [:tags] conj "#new")
+                                                  (h/clean-entry latest-entry))])
                          (toggle-edit))
 
             ; find incomplete tag or mention before cursor, show suggestions
