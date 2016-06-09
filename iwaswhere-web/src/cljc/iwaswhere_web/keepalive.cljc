@@ -63,4 +63,6 @@
   "Reset local state when last message from backend was seen more than 10 seconds ago."
   [{:keys [current-state]}]
   (when (> (- (st/now) (:last-alive current-state)) max-age)
-    {:new-state {}}))
+    {:new-state (-> current-state
+                    (assoc-in [:entries] [])
+                    (assoc-in [:entries-map] {}))}))
