@@ -22,7 +22,7 @@
                                   query (get-in current-state [:client-queries sente-uid])
                                   res (g/get-filtered-results current-state query)
                                   duration-ms (- (System/currentTimeMillis) start-ts)]
-                              (log/info "Query" sente-uid "took" duration-ms "ms")
+                              (log/debug "Query" sente-uid "took" duration-ms "ms")
                               (with-meta [:state/new (merge res {:duration-ms duration-ms})] {:sente-uid sente-uid})))
         state-msgs (vec (map state-emit-mapper sente-uids))]
     {:emit-msg state-msgs}))
