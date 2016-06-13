@@ -10,8 +10,8 @@
    {:timestamp 12346 :entry-type :pomodoro :planned-dur 1500 :completed-time 1000 :interruptions 0}
    {:timestamp 12347 :entry-type :pomodoro :planned-dur 1500 :completed-time 1500 :interruptions 0}
    {:timestamp 12348 :entry-type :pomodoro :planned-dur 1500 :completed-time 1500 :interruptions 0}
-   {:timestamp 12348 :entry-type :pomodoro :planned-dur 1500 :completed-time 1500 :interruptions 2}
-   {:timestamp 12348 :entry-type :pomodoro :planned-dur 1500 :completed-time 1000 :interruptions 1}])
+   {:timestamp 12349 :entry-type :pomodoro :planned-dur 1500 :completed-time 1500 :interruptions 2}
+   {:timestamp 12350 :entry-type :pomodoro :planned-dur 1500 :completed-time 1000 :interruptions 1}])
 
 (deftest pomodoro-stats-test
   "Test that the pomodoro-stats properly summarizes pomodoro stats."
@@ -68,6 +68,29 @@
              [:span.fa.fa-bolt]
              [:span.fa.fa-bolt]
              [:span.fa.fa-bolt]]]))))
+
+(def test-entries2
+  (concat test-entries
+          [{:timestamp 12350 :entry-type :pomodoro :planned-dur 1500 :completed-time 1000 :interruptions 3}
+           {:timestamp 12350 :entry-type :pomodoro :planned-dur 1500 :completed-time 1000 :interruptions 0}
+           {:timestamp 12350 :entry-type :pomodoro :planned-dur 1500 :completed-time 1500 :interruptions 3}]))
+
+(deftest pomodoro-stats-view-test2
+  "Test that the pomodoro-stats-view function properly formats the pomodoro stats view when there are more than three
+  interruptions and pomodoros."
+  (testing "shows combination of icon and count"
+    (is (= (p/pomodoro-stats-view test-entries2)
+           [:span
+            [:span
+             [:span.fa.fa-clock-o.completed]
+             [:span.completed-cnt 4]]
+            [:span
+             [:span.fa.fa-clock-o.incomplete]
+             [:span.incomplete-cnt 4]]
+            [:span.dur "2h 46m 40s"]
+            [:span
+             [:span.fa.fa-bolt]
+             [:span.bolt-cnt 9]]]))))
 
 (deftest pomodoro-stats-str-test
   "Test that the pomodoro-stats-str function properly formats the pomodoro stats string."
@@ -225,4 +248,15 @@
                [:span.fa.fa-bolt]
                [:span.fa.fa-bolt]
                [:span.fa.fa-bolt]]
+              nil])))
+
+    (testing "renders icon, duration and no start button in edit mode when time is up. Shows
+    one bolt plus count when more than 3 interruptions."
+      (is (= (p/pomodoro-header (merge test-entry3a {:interruptions 4}) fake-start-fn true)
+             [:div.pomodoro
+              [:span.fa.fa-clock-o.completed]
+              [:span.dur "25m"]
+              [:span
+               [:span.fa.fa-bolt]
+               [:span.bolt-cnt 4]]
               nil])))))

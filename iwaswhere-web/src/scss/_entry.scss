@@ -66,9 +66,26 @@
         color: $green;
         font-size: 1em;
       }
+      .completed-cnt {
+        color: $green;
+        font-size: 0.8em;
+        font-weight: bold;
+        padding-right: 0.3em;
+      }
+      .incomplete-cnt {
+        color: #999;
+        font-size: 0.8em;
+        font-weight: bold;
+        padding-right: 0.3em;
+      }
       .fa-bolt {
         color: $red;
         font-size: 1em;
+      }
+      .bolt-cnt {
+        color: $red;
+        font-size: 0.8em;
+        font-weight: bold;
       }
       .dur {
         margin-left: 0.2em;
