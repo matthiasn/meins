@@ -25,15 +25,9 @@
      [:cmd/init-comp (jrn/cmp-map :client/journal-cmp)]     ; UI component for journal
      [:cmd/init-comp (store/cmp-map :client/store-cmp)]     ; Data store component
      [:cmd/init-comp (sched/cmp-map :client/scheduler-cmp)] ; Scheduler component
-     [:cmd/route-all {:from [:client/store-cmp
-                             :client/search-cmp
-                             :client/journal-cmp
-                             :client/menu-cmp]
+     [:cmd/route-all {:from #{:client/store-cmp :client/search-cmp :client/journal-cmp :client/menu-cmp}
                       :to   :client/ws-cmp}]
-     [:cmd/route {:from [:client/ws-cmp
-                         :client/search-cmp
-                         :client/journal-cmp
-                         :client/menu-cmp]
+     [:cmd/route {:from #{:client/ws-cmp :client/search-cmp :client/journal-cmp :client/menu-cmp}
                   :to   :client/store-cmp}]
      [:cmd/observe-state {:from :client/store-cmp :to [:client/journal-cmp
                                                        :client/search-cmp

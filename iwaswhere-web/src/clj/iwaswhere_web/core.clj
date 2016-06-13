@@ -34,7 +34,7 @@
      [:cmd/route {:from :server/ws-cmp :to :server/store-cmp}]
      [:cmd/route {:from :server/ws-cmp :to :server/imports-cmp}]
      [:cmd/route {:from :server/imports-cmp :to :server/store-cmp}]
-     [:cmd/route-all {:from [:server/store-cmp] :to :server/ws-cmp}]]))
+     [:cmd/route-all {:from :server/store-cmp :to :server/ws-cmp}]]))
 
 (defn -main
   "Starts the application from command line, saves and logs process ID. The system that is fired up when
