@@ -34,3 +34,18 @@ body {
 @import "media.scss";
 @import "menu.scss";
 @import "search.scss";
+
+
+
+/* Overwrite the default to keep the scrollbar always visible.
+   From: http://simurai.com/blog/2011/07/26/webkit-scrollbar */
+::-webkit-scrollbar {
+  -webkit-appearance: none;
+  width: 7px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background-color: rgba(0,0,0,.5);
+  -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
+}
