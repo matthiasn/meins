@@ -28,9 +28,9 @@
   [switchboard]
   (sb/send-mult-cmd
     switchboard
-    [[:cmd/init-comp (sente/cmp-map :server/ws-cmp idx/sente-map)]
-     [:cmd/init-comp (i/cmp-map :server/imports-cmp)]
-     [:cmd/init-comp (st/cmp-map :server/store-cmp)]
+    [[:cmd/init-comp #{(sente/cmp-map :server/ws-cmp idx/sente-map)
+                       (i/cmp-map :server/imports-cmp)
+                       (st/cmp-map :server/store-cmp)}]
      [:cmd/route {:from :server/ws-cmp :to #{:server/store-cmp :server/imports-cmp}}]
      [:cmd/route {:from :server/imports-cmp :to :server/store-cmp}]
      [:cmd/route {:from :server/store-cmp :to :server/ws-cmp}]]))

@@ -22,12 +22,12 @@
   []
   (sb/send-mult-cmd
     switchboard
-    [[:cmd/init-comp (sente/cmp-map :client/ws-cmp sente-cfg)] ; WebSocket communication component
-     [:cmd/init-comp (s/cmp-map :client/search-cmp)]           ; UI component for search
-     [:cmd/init-comp (m/cmp-map :client/menu-cmp)]             ; UI component for menu
-     [:cmd/init-comp (jrn/cmp-map :client/journal-cmp)]        ; UI component for journal
-     [:cmd/init-comp (store/cmp-map :client/store-cmp)]        ; Data store component
-     [:cmd/init-comp (sched/cmp-map :client/scheduler-cmp)]    ; Scheduler component
+    [[:cmd/init-comp #{(sente/cmp-map :client/ws-cmp sente-cfg) ; WebSocket communication component
+                       (s/cmp-map :client/search-cmp)           ; UI component for search
+                       (m/cmp-map :client/menu-cmp)             ; UI component for menu
+                       (jrn/cmp-map :client/journal-cmp)        ; UI component for journal
+                       (store/cmp-map :client/store-cmp)        ; Data store component
+                       (sched/cmp-map :client/scheduler-cmp)}]  ; Scheduler component
 
      [:cmd/route {:from #{:client/store-cmp :client/search-cmp :client/journal-cmp :client/menu-cmp}
                   :to   :client/ws-cmp}]
