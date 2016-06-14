@@ -4,7 +4,7 @@
   (:gen-class)
   (:require [matthiasn.systems-toolbox.switchboard :as sb]
             [matthiasn.systems-toolbox-sente.server :as sente]
-            [iwaswhere-web.index :as index]
+            [iwaswhere-web.index :as idx]
             [iwaswhere-web.keepalive :as ka]
             [iwaswhere-web.specs :as specs]
             [clojure.tools.logging :as log]
@@ -28,13 +28,12 @@
   [switchboard]
   (sb/send-mult-cmd
     switchboard
-    [[:cmd/init-comp (sente/cmp-map :server/ws-cmp index/sente-map)]
+    [[:cmd/init-comp (sente/cmp-map :server/ws-cmp idx/sente-map)]
      [:cmd/init-comp (i/cmp-map :server/imports-cmp)]
      [:cmd/init-comp (st/cmp-map :server/store-cmp)]
-     [:cmd/route {:from :server/ws-cmp :to :server/store-cmp}]
-     [:cmd/route {:from :server/ws-cmp :to :server/imports-cmp}]
+     [:cmd/route {:from :server/ws-cmp :to #{:server/store-cmp :server/imports-cmp}}]
      [:cmd/route {:from :server/imports-cmp :to :server/store-cmp}]
-     [:cmd/route-all {:from :server/store-cmp :to :server/ws-cmp}]]))
+     [:cmd/route {:from :server/store-cmp :to :server/ws-cmp}]]))
 
 (defn -main
   "Starts the application from command line, saves and logs process ID. The system that is fired up when
