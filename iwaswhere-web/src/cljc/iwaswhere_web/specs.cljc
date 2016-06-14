@@ -10,6 +10,7 @@
   [start end]
   (fn [val]
     (and (number? val) (<= start val) (< val end))))
+(def possible-timestamp? (number-in-range? 0 5000000000000))
 
 (defn pos-int? [n] (and (integer? n) (pos? n)))
 
@@ -24,14 +25,14 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;  Journal Entry Specs
-(s/def :iww.entry/timestamp (number-in-range? 0 5000000000000))
+(s/def :iww.entry/timestamp possible-timestamp?)
 (s/def :iww.entry/md string?)
 (s/def :iww.entry/tags (s/coll-of (is-tag? "#") #{}))
 (s/def :iww.entry/mentions (s/coll-of (is-tag? "@") #{}))
 (s/def :iww.entry/timezone (s/nilable string?))
 (s/def :iww.entry/utc-offset (number-in-range? -720 720))
 (s/def :iww.entry/entry-type #{:pomodoro})
-(s/def :iww.entry/comment-for (number-in-range? 0 5000000000000))
+(s/def :iww.entry/comment-for possible-timestamp?)
 (s/def :iww.entry/latitude (s/nilable (number-in-range? -180.0 180.0)))
 (s/def :iww.entry/longitude (s/nilable (number-in-range? -180.0 180.0)))
 (s/def :iww.entry/planned-dur (s/and integer? pos?))
@@ -157,24 +158,12 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Client Store State Spec
-{:entries     []
- :temp-query  {}
- :cfg         {:active             nil
-               :show-maps-for      #{}
-               :show-comments-for  #{}
-               :sort-by-upvotes    false
-               :show-all-maps      false
-               :show-hashtags      true
-               :comments-w-entries true
-               :show-context       true
-               :show-pvt           false}}
-
 (s/def :iww.client-state/entries (s/* entry-spec))
-(s/def :iww.client-state/last-alive (number-in-range? 0 5000000000000))
+(s/def :iww.client-state/last-alive possible-timestamp?)
 (s/def :iww.client-state/current-query map?)
 
 ;; map with entries as values
-;(s/def :iww.client-state/new-entries (s/* entry-spec))
+(s/def :iww.client-state/new-entries (s/map-of possible-timestamp? entry-spec))
 
 (s/def :iww.client-state.cfg/active (s/nilable number?))
 (s/def :iww.client-state.cfg/show-maps-for set?)
