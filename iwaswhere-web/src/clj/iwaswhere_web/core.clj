@@ -6,7 +6,7 @@
             [matthiasn.systems-toolbox-sente.server :as sente]
             [iwaswhere-web.index :as idx]
             [iwaswhere-web.keepalive :as ka]
-            [iwaswhere-web.specs :as specs]
+            [iwaswhere-web.specs]
             [clojure.tools.logging :as log]
             [clj-pid.core :as pid]
             [io.aviso.logging :as pretty]
