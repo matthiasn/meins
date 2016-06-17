@@ -12,7 +12,7 @@
     (and (number? val) (<= start val) (< val end))))
 (def possible-timestamp? (number-in-range? 0 5000000000000))
 
-(defn pos-int? [n] (and (integer? n) (pos? n)))
+#?(:cljs (defn pos-int? [n] (and (integer? n) (pos? n))))
 
 (defn is-tag?
   "Check if string is a tag, such as a hashtag with the '#' prefix or  a mention with the '@' prefix."
