@@ -9,12 +9,8 @@
             [iwaswhere-web.specs]
             [clojure.tools.logging :as log]
             [clj-pid.core :as pid]
-            [io.aviso.logging :as pretty]
             [iwaswhere-web.store :as st]
             [iwaswhere-web.imports :as i]))
-
-(pretty/install-pretty-logging)
-(pretty/install-uncaught-exception-handler)
 
 (defonce switchboard (sb/component :server/switchboard))
 
