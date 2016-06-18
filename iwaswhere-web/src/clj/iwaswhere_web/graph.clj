@@ -68,7 +68,7 @@
   "Extract all linked entries for entry, including their comments."
   [entry g n sort-by-upvotes?]
   (let [linked (->> (flatten (uber/find-edges g {:src n :relationship :LINKED}))
-                    (remove :mirror?)
+                    ;(remove :mirror?)
                     (map #(uber/attrs g (:dest %)))
                     (sort-by :timestamp)
                     (map (fn [linked-entry]

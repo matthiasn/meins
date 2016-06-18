@@ -69,6 +69,7 @@
         show-comments? (contains? (:show-comments-for cfg) ts)
         toggle-comments #(put-fn [:cmd/toggle {:timestamp ts :path [:cfg :show-comments-for]}])
         create-comment (h/new-entry-fn put-fn {:comment-for ts})
+        create-linked-entry (h/new-entry-fn put-fn {:linked-entries [ts]})
         create-pomodoro (h/new-entry-fn put-fn (p/pomodoro-defaults ts))
         toggle-edit #(if edit-mode? (put-fn [:entry/remove-local entry])
                                     (put-fn [:entry/update-local entry]))
@@ -103,6 +104,7 @@
        (when (pos? upvotes) [:span.fa.fa-thumbs-down.toggle {:on-click (upvote-fn dec)}])
        (when map? [:span.fa.fa-map-o.toggle {:on-click toggle-map}])
        [:span.fa.fa-pencil-square-o.toggle {:on-click toggle-edit}]
+       (when-not edit-mode? [:span.fa.fa-link.toggle {:on-click create-linked-entry}])
        (when-not (:comment-for entry) [:span.fa.fa-clock-o.toggle {:on-click create-pomodoro}])
        (when-not (:comment-for entry) [:span.fa.fa-comment-o.toggle {:on-click create-comment}])
        (when (seq (:comments entry))
