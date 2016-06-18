@@ -3,16 +3,12 @@
     #?(:clj  [clojure.spec :as s]
        :cljs [cljs.spec :as s])))
 
-#?(:cljs (defn boolean? [x] (= (type x) js/Boolean)))
-
 (defn number-in-range?
   "Return function that returns true if start <= val and val < end"
   [start end]
   (fn [val]
     (and (number? val) (<= start val) (< val end))))
 (def possible-timestamp? (number-in-range? 0 5000000000000))
-
-#?(:cljs (defn pos-int? [n] (and (integer? n) (pos? n))))
 
 (defn is-tag?
   "Check if string is a tag, such as a hashtag with the '#' prefix or  a mention with the '@' prefix."

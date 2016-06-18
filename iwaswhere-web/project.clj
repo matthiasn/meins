@@ -4,8 +4,7 @@
   :license {:name "GNU GENERAL PUBLIC LICENSE"
             :url  "http://www.gnu.org/licenses/gpl-3.0.en.html"}
   :dependencies [[org.clojure/clojure "1.9.0-alpha7"]
-                 [org.clojure/clojurescript "1.9.36"]
-                 [org.clojure/core.async "0.2.382"]
+                 [org.clojure/clojurescript "1.9.76" :exclusions [org.clojure/tools.reader]]
                  [org.clojure/tools.logging "0.3.1"]
                  [org.clojure/tools.namespace "0.2.11"]
                  [ch.qos.logback/logback-classic "1.1.7"]
