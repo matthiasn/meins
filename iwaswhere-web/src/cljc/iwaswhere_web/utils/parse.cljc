@@ -27,7 +27,7 @@
   [text]
   {:search-text text
    :tags        (set (map second (re-seq search-tag-regex text)))
-   :not-tags    (set (re-seq search-not-tags-regex text))
+   :not-tags    (set (map #(s/replace % "~" "") (re-seq search-not-tags-regex text)))
    :mentions    (set (re-seq search-mention-regex text))
    :date-string (re-find #"[0-9]{4}-[0-9]{2}-[0-9]{2}" text)
    :timestamp   (re-find #"[0-9]{13}" text)

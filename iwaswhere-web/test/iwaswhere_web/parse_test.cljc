@@ -49,7 +49,7 @@
 (def open-tasks-search
   {:search-text "#task ~#done ~#backlog ~#outdated"
    :tags        #{"#task"}
-   :not-tags #{"~#backlog" "~#done" "~#outdated"}
+   :not-tags #{"#backlog" "#done" "#outdated"}
    :mentions    #{}
    :date-string nil
    :timestamp   nil

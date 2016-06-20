@@ -33,10 +33,8 @@
   Removes '~' from the not-tags, which is the set of tags that shall not be contained
   in matching entries or any of their comments."
   [{:keys [current-state msg-payload msg-meta]}]
-  (let [sente-uid (:sente-uid msg-meta)
-        query (update-in msg-payload [:not-tags] (fn [not-tags] (set (map #(s/replace % #"~" "") not-tags))))
-        new-state (update-in current-state [:client-queries sente-uid] merge query)]
-    {:new-state    new-state
+  (let [sente-uid (:sente-uid msg-meta)]
+    {:new-state    (update-in current-state [:client-queries sente-uid] merge msg-payload)
      :send-to-self [[:state/publish-current {:sente-uid sente-uid}]
                     (with-meta [:cmd/keep-alive] msg-meta)]}))
 

@@ -2,11 +2,37 @@
   (:require [matthiasn.systems-toolbox-ui.reagent :as r]
             [iwaswhere-web.ui.utils :as u]
             [iwaswhere-web.ui.entry :as e]
-            [iwaswhere-web.ui.pomodoro :as p]))
+            [iwaswhere-web.ui.pomodoro :as p]
+            [iwaswhere-web.utils.parse :as ps]
+            [clojure.set :as set]))
+
+(defn linked-entries-filter
+  "Filter linked entries by search."
+  [local-snapshot]
+  (fn [entry]
+    (let [linked-filter (:linked-filter local-snapshot)
+          combined-tags (reduce #(set/union %1 (:tags %2)) (:tags entry) (:comments entry))]
+      (and (set/subset? (:tags linked-filter) combined-tags)
+           (empty? (set/intersection (:not-tags linked-filter) combined-tags))))))
+
+(defn linked-entries-view
+  "Renders linked entries in right side column, filter by local search."
+  [local linked-entries new-entries cfg put-fn]
+  (when linked-entries
+    (let [on-input-fn #(swap! local assoc-in [:linked-filter] (ps/parse-search (.. % -target -innerText)))
+          linked-entries (if (:show-pvt cfg) linked-entries (filter u/pvt-filter linked-entries))
+          linked-entries (filter (linked-entries-filter @local) linked-entries)]
+      [:div.journal-entries
+       [:div.search-field {:content-editable true :on-input on-input-fn}
+        (:search-text (:linked-filter @local))]
+       (for [entry linked-entries]
+         (when (and (not (:comment-for entry)) (or (:new-entry entry) (:show-context cfg)))
+           ^{:key (:timestamp entry)}
+           [e/entry-with-comments entry cfg new-entries put-fn]))])))
 
 (defn journal-view
   "Renders journal div, one entry per item, with map if geo data exists in the entry."
-  [{:keys [observed put-fn]}]
+  [{:keys [observed local put-fn]}]
   (let [store-snapshot @observed
         cfg (:cfg store-snapshot)
         entries (:entries store-snapshot)
@@ -42,12 +68,7 @@
       [:div (p/pomodoro-stats-str filtered-entries)]
       (when-let [ms (:duration-ms store-snapshot)]
         [:div.stats (str "Query completed in " ms "ms")])]
-     (when linked-entries
-       [:div.journal-entries
-        (for [entry (if show-pvt? linked-entries (filter u/pvt-filter linked-entries))]
-          (when (and (not (:comment-for entry)) (or (:new-entry entry) show-context?))
-            ^{:key (:timestamp entry)}
-            [e/entry-with-comments entry cfg new-entries put-fn]))])]))
+     (linked-entries-view local linked-entries new-entries cfg put-fn)]))
 
 (defn cmp-map
   [cmp-id]

@@ -38,7 +38,7 @@
   (merge simple-query
          {:search-text "#task ~#done ~#backlog"
           :tags        #{"#task"}
-          :not-tags    #{"~#done" "~#backlog"}}))
+          :not-tags    #{"#done" "#backlog"}}))
 
 (def test-entries
   [{:mentions  #{}

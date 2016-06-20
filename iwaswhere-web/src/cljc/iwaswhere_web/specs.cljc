@@ -11,7 +11,7 @@
 (def possible-timestamp? (number-in-range? 0 5000000000000))
 
 (defn is-tag?
-  "Check if string is a tag, such as a hashtag with the '#' prefix or  a mention with the '@' prefix."
+  "Check if string is a tag, such as a hashtag with the '#' prefix or a mention with the '@' prefix."
   [prefix]
   (fn [s]
     (re-find (re-pattern (str "^" prefix p/tag-char-class "+$")) s)))
@@ -101,7 +101,7 @@
 ;; Search Spec
 (s/def :iww.search/search-text string?)
 (s/def :iww.search/tags (s/coll-of (is-tag? "#") #{}))
-(s/def :iww.search/not-tags (s/coll-of (is-tag? "~#") #{}))
+(s/def :iww.search/not-tags :iww.search/tags)
 (s/def :iww.search/mentions (s/coll-of (is-tag? "@") #{}))
 (s/def :iww.search/date-string (s/nilable #(re-find #"[0-9]{4}-[0-9]{2}-[0-9]{2}" %)))
 (s/def :iww.search/timestamp (s/nilable #(re-find #"[0-9]{13}" %)))
