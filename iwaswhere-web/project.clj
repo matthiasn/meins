@@ -47,7 +47,8 @@
              :css-dirs    ["resources/public/css"]}
 
   :test-refresh {:notify-on-success false
-                 :changes-only      false}
+                 :changes-only      false
+                 :watch-dirs        ["src" "test"]}
 
   :cljsbuild {:builds [{:id           "dev"
                         :source-paths ["src/cljc" "src/cljs" "env/dev/cljs"]

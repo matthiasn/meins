@@ -18,11 +18,13 @@
         with-comments? (fn [entry] (and (or (and comments-w-entries? (not (:comment-for entry)))
                                             (not comments-w-entries?))
                                         (or (:new-entry entry) show-context?)))
-        active-entry (get (:entries-map store-snapshot) (:active (:cfg store-snapshot)))]
+        active-entry (get (:entries-map store-snapshot) (:active (:cfg store-snapshot)))
+        linked-entries (:linked-entries-list active-entry)]
     [:div.journal
      [:div.journal-entries
       (for [entry (filter #(and (not (:comment-for %))
-                                (not (contains? (:entries-map store-snapshot) (:timestamp %))))
+                                (not (contains? (:entries-map store-snapshot) (:timestamp %)))
+                                (not (contains? (set (map :timestamp linked-entries)) (:timestamp %))))
                           (vals new-entries))]
         ^{:key (:timestamp entry)}
         [e/entry-with-comments entry cfg new-entries put-fn])
@@ -40,7 +42,7 @@
       [:div (p/pomodoro-stats-str filtered-entries)]
       (when-let [ms (:duration-ms store-snapshot)]
         [:div.stats (str "Query completed in " ms "ms")])]
-     (when-let [linked-entries (:linked-entries-list active-entry)]
+     (when linked-entries
        [:div.journal-entries
         (for [entry (if show-pvt? linked-entries (filter u/pvt-filter linked-entries))]
           (when (and (not (:comment-for entry)) (or (:new-entry entry) show-context?))
