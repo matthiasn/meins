@@ -35,7 +35,7 @@
   :plugins [[lein-cljsbuild "1.1.3" :exclusions [org.apache.commons/commons-compress]]
             [lein-figwheel "0.5.4-3" :exclusions [org.clojure/clojure]]
             [lein-sassy "1.0.7" :exclusions [org.clojure/clojure org.codehaus.plexus/plexus-utils]]
-            [com.jakemccrary/lein-test-refresh "0.15.0"]
+            [com.jakemccrary/lein-test-refresh "0.16.0"]
             [test2junit "1.2.2"]
             [lein-doo "0.1.6"]
             [lein-codox "0.9.5" :exclusions [org.clojure/clojure]]]
