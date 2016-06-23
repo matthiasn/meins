@@ -14,7 +14,7 @@
 (defn publish-state-fn
   "Publishes current state, as filtered for the respective clients. Sends to single connected client
   with the latest filter when message payload contains :sente-uid, otherwise sends to all clients."
-  [{:keys [current-state msg-payload]}]
+  [{:keys [current-state msg-payload msg-meta]}]
   (let [sente-uid (:sente-uid msg-payload)
         sente-uids (if sente-uid [sente-uid] (keys (:client-queries current-state)))
         state-emit-mapper (fn [sente-uid]
@@ -22,8 +22,10 @@
                                   query (get-in current-state [:client-queries sente-uid])
                                   res (g/get-filtered-results current-state query)
                                   duration-ms (- (System/currentTimeMillis) start-ts)]
-                              (log/debug "Query" sente-uid "took" duration-ms "ms")
-                              (with-meta [:state/new (merge res {:duration-ms duration-ms})] {:sente-uid sente-uid})))
+                              (log/info "Query" sente-uid "took" duration-ms "ms")
+                              (log/info "Result size" (count (str res)))
+                              (with-meta [:state/new (merge res {:duration-ms duration-ms})]
+                                         (merge msg-meta {:sente-uid sente-uid}))))
         state-msgs (vec (map state-emit-mapper sente-uids))]
     {:emit-msg state-msgs}))
 
@@ -35,7 +37,7 @@
   [{:keys [current-state msg-payload msg-meta]}]
   (let [sente-uid (:sente-uid msg-meta)]
     {:new-state    (update-in current-state [:client-queries sente-uid] merge msg-payload)
-     :send-to-self [[:state/publish-current {:sente-uid sente-uid}]
+     :send-to-self [(with-meta [:state/publish-current {:sente-uid sente-uid}] msg-meta)
                     (with-meta [:cmd/keep-alive] msg-meta)]}))
 
 (defn state-fn

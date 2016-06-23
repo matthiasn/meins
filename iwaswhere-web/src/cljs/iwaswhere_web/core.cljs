@@ -13,7 +13,7 @@
 
 (defonce switchboard (sb/component :client/switchboard))
 
-(def sente-cfg {:relay-types #{:state/get :search/update :cmd/keep-alive :entry/update :entry/trash
+(def sente-cfg {:relay-types #{:state/get :cmd/keep-alive :entry/update :entry/trash
                                :import/geo :import/photos :import/phone}})
 
 (defn init!
@@ -43,3 +43,4 @@
   (ka/init-keepalive! switchboard))
 
 (init!)
+

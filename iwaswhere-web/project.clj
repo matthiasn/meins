@@ -4,7 +4,7 @@
   :license {:name "GNU GENERAL PUBLIC LICENSE"
             :url  "http://www.gnu.org/licenses/gpl-3.0.en.html"}
   :dependencies [[org.clojure/clojure "1.9.0-alpha7"]
-                 [org.clojure/clojurescript "1.9.76" :exclusions [org.clojure/tools.reader]]
+                 [org.clojure/clojurescript "1.9.93"]
                  [org.clojure/tools.logging "0.3.1"]
                  [org.clojure/tools.namespace "0.2.11"]
                  [ch.qos.logback/logback-classic "1.1.7"]
@@ -13,7 +13,7 @@
                  [clj-time "0.12.0"]
                  [me.raynes/fs "1.4.6"]
                  [markdown-clj "0.9.89"]
-                 [cheshire "5.6.1"]
+                 [cheshire "5.6.2"]
                  [cljsjs/moment "2.10.6-4"]
                  [cljsjs/leaflet "0.7.7-4"]
                  [com.drewnoakes/metadata-extractor "2.8.1"]
@@ -59,6 +59,7 @@
                                        :output-dir    "resources/public/js/build/"
                                        :output-to     "resources/public/js/build/iwaswhere.js"
                                        :source-map    true}}
+
                        {:id           "release"
                         :source-paths ["src/cljc" "src/cljs"]
                         :figwheel     true
