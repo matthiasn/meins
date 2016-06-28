@@ -67,12 +67,12 @@
 (defn get-tags-mentions-matches
   "Extract matching timestamps for query."
   [g query]
-  (let [t-matched (map #(set (map :dest (uber/find-edges g {:src          {:tag %}
-                                                            :relationship :CONTAINS})))
-                       (:tags query))
-        m-matched (map #(set (map :dest (uber/find-edges g {:src          {:mention %}
-                                                            :relationship :CONTAINS})))
-                       (:mentions query))]
+  (let [mapper (fn [tag-type]
+                 (fn [tag]
+                   (set (map :dest (uber/find-edges g {:src          {tag-type tag}
+                                                       :relationship :CONTAINS})))))
+        t-matched (map (mapper :tag) (map s/lower-case (:tags query)))
+        m-matched (map (mapper :mention) (map s/lower-case (:mentions query)))]
     (apply set/intersection
            (concat t-matched m-matched))))
 
@@ -119,15 +119,19 @@
   "Finds all hashtags used in entries by finding the edges that originate from the
   :hashtags node."
   [current-state]
-  (let [g (:graph current-state)]
-    (set (map #(-> % :dest :tag) (uber/find-edges g {:src :hashtags})))))
+  (let [g (:graph current-state)
+        ltags (map #(-> % :dest :tag) (uber/find-edges g {:src :hashtags}))
+        tags (map #(:val (uber/attrs g {:tag %})) ltags)]
+    (set tags)))
 
 (defn find-all-mentions
   "Finds all hashtags used in entries by finding the edges that originate from the
   :hashtags node."
   [current-state]
-  (let [g (:graph current-state)]
-    (set (map #(-> % :dest :mention) (uber/find-edges g {:src :mentions})))))
+  (let [g (:graph current-state)
+        lmentions (map #(-> % :dest :mention) (uber/find-edges g {:src :mentions}))
+        mentions (map #(:val (uber/attrs g {:mention %})) lmentions)]
+    (set mentions)))
 
 (defn get-basic-stats
   "Generate some very basic stats about the graph size for display in UI."
@@ -166,11 +170,12 @@
   [graph entry]
   (let [tags (:tags entry)]
     (reduce (fn [acc tag]
-              (let [tag (s/lower-case tag)]
+              (let [ltag (s/lower-case tag)]
                 (-> acc
-                    (uber/add-nodes :hashtags {:tag tag})
-                    (uber/add-edges [{:tag tag} (:timestamp entry) {:relationship :CONTAINS}]
-                                    [:hashtags {:tag tag} {:relationship :IS}]))))
+                    (uber/add-nodes :hashtags)
+                    (uber/add-nodes-with-attrs [{:tag ltag} {:val tag}])
+                    (uber/add-edges [{:tag ltag} (:timestamp entry) {:relationship :CONTAINS}]
+                                    [:hashtags {:tag ltag} {:relationship :IS}]))))
             graph
             tags)))
 
@@ -180,12 +185,13 @@
   [graph entry]
   (let [mentions (:mentions entry)]
     (reduce (fn [acc mention]
-              (let [mention (s/lower-case mention)]
+              (let [lmention (s/lower-case mention)]
                 (-> acc
-                    (uber/add-nodes :mentions {:mention mention})
+                    (uber/add-nodes :mentions)
+                    (uber/add-nodes-with-attrs [{:mention lmention} {:val mention}])
                     (uber/add-edges
-                      [{:mention mention} (:timestamp entry) {:relationship :CONTAINS}]
-                      [:mentions {:mention mention} {:relationship :IS}]))))
+                      [{:mention lmention} (:timestamp entry) {:relationship :CONTAINS}]
+                      [:mentions {:mention lmention} {:relationship :IS}]))))
             graph
             mentions)))
 
@@ -255,7 +261,8 @@
         old-entry (when (uber/has-node? graph ts) (uber/attrs graph ts))
         tags-not-in-new (set/difference (:tags old-entry) (:tags entry))
         mentions-not-in-new (set/difference (:mentions old-entry) (:mentions entry))
-        remove-tag-edges (fn [g tags k] (reduce #(uber/remove-edges %1 [(:timestamp entry) {k %2}]) g tags))]
+        remove-tag-edges (fn [g tags k]
+                           (reduce #(uber/remove-edges %1 [(:timestamp entry) {k %2}]) g tags))]
     (-> current-state
         (update-in [:graph] #(uber/add-nodes-with-attrs % [ts (merge old-entry entry)]))
         (update-in [:graph] remove-tag-edges tags-not-in-new :tag)
