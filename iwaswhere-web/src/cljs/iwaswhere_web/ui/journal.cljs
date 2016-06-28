@@ -8,34 +8,39 @@
 
 (defn linked-entries-filter
   "Filter linked entries by search."
-  [local-snapshot]
+  [entries-map local-snapshot]
   (fn [entry]
     (let [linked-filter (:linked-filter local-snapshot)
-          combined-tags (reduce #(set/union %1 (:tags %2)) (:tags entry) (:comments entry))]
+          comments (map #(get entries-map %) (:comments entry))
+          combined-tags (reduce #(set/union %1 (:tags %2)) (:tags entry) comments)]
       (and (set/subset? (:tags linked-filter) combined-tags)
            (empty? (set/intersection (:not-tags linked-filter) combined-tags))))))
 
 (defn linked-entries-view
   "Renders linked entries in right side column, filter by local search."
-  [local linked-entries new-entries cfg put-fn]
+  [local linked-entries entries-map new-entries cfg put-fn]
   (when linked-entries
-    (let [on-input-fn #(swap! local assoc-in [:linked-filter] (ps/parse-search (.. % -target -innerText)))
+    (let [on-input-fn #(swap! local assoc-in [:linked-filter]
+                              (ps/parse-search (.. % -target -innerText)))
           linked-entries (if (:show-pvt cfg) linked-entries (filter u/pvt-filter linked-entries))
-          linked-entries (filter (linked-entries-filter @local) linked-entries)]
+          linked-entries (filter (linked-entries-filter entries-map @local) linked-entries)]
       [:div.journal-entries
        [:div.search-field {:content-editable true :on-input on-input-fn}
         (:search-text (:linked-filter @local))]
        (for [entry linked-entries]
          (when (and (not (:comment-for entry)) (or (:new-entry entry) (:show-context cfg)))
-           ^{:key (:timestamp entry)}
-           [e/entry-with-comments entry cfg new-entries put-fn]))])))
+           (let [entry (assoc-in entry [:comments] (map (fn [ts] (get entries-map ts))
+                                                        (:comments entry)))]
+             ^{:key (:timestamp entry)}
+             [e/entry-with-comments entry cfg new-entries put-fn])))])))
 
 (defn journal-view
   "Renders journal div, one entry per item, with map if geo data exists in the entry."
   [{:keys [observed local put-fn]}]
   (let [store-snapshot @observed
         cfg (:cfg store-snapshot)
-        entries (:entries store-snapshot)
+        entries-map (:entries-map store-snapshot)
+        entries (map (fn [ts] (get entries-map ts)) (:entries store-snapshot))
         show-pvt? (:show-pvt cfg)
         filtered-entries (if show-pvt? entries (filter u/pvt-filter entries))
         new-entries (:new-entries store-snapshot)
@@ -45,7 +50,8 @@
                                             (not comments-w-entries?))
                                         (or (:new-entry entry) show-context?)))
         active-entry (get (:entries-map store-snapshot) (:active (:cfg store-snapshot)))
-        linked-entries (:linked-entries-list active-entry)]
+        linked-entries (:linked-entries-list active-entry)
+        linked-entries (map (fn [ts] (get entries-map ts)) linked-entries)]
     [:div.journal
      [:div.journal-entries
       (for [entry (filter #(and (not (:comment-for %))
@@ -56,8 +62,10 @@
         [e/entry-with-comments entry cfg new-entries put-fn])
       (for [entry filtered-entries]
         (when (with-comments? entry)
-          ^{:key (:timestamp entry)}
-          [e/entry-with-comments entry cfg new-entries put-fn]))
+          (let [entry (assoc-in entry [:comments] (map (fn [ts] (get entries-map ts))
+                                                       (:comments entry)))]
+            ^{:key (:timestamp entry)}
+            [e/entry-with-comments entry cfg new-entries put-fn])))
       (when (and show-context? (seq entries))
         (let [show-more #(put-fn [:show/more])]
           [:div.show-more {:on-click show-more :on-mouse-over show-more}
@@ -68,7 +76,7 @@
       [:div (p/pomodoro-stats-str filtered-entries)]
       (when-let [ms (:duration-ms store-snapshot)]
         [:div.stats (str "Query completed in " ms "ms")])]
-     (linked-entries-view local linked-entries new-entries cfg put-fn)]))
+     (linked-entries-view local linked-entries entries-map new-entries cfg put-fn)]))
 
 (defn cmp-map
   [cmp-id]

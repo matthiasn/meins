@@ -28,10 +28,9 @@
   "Update client side state with list of journal entries received from backend."
   [{:keys [current-state msg-payload msg-meta]}]
   (print-duration msg-meta)
-  (let [entries-map (into {} (map (fn [entry] [(:timestamp entry) entry]) (:entries msg-payload)))
-        new-state (-> current-state
+  (let [new-state (-> current-state
                       (assoc-in [:entries] (:entries msg-payload))
-                      (assoc-in [:entries-map] entries-map)
+                      (assoc-in [:entries-map] (:entries-map msg-payload))
                       (assoc-in [:cfg :hashtags] (:hashtags msg-payload))
                       (assoc-in [:stats] (:stats msg-payload))
                       (assoc-in [:duration-ms] (:duration-ms msg-payload))
@@ -55,6 +54,7 @@
                                               :show-hashtags      true
                                               :comments-w-entries true
                                               :show-context       true
+                                              :mute               false
                                               :show-pvt           false}})]
     {:state initial-state}))
 

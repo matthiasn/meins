@@ -3,30 +3,32 @@
   which then holds the server side application state."
   (:require [iwaswhere-web.files :as f]
             [iwaswhere-web.graph :as g]
-            [iwaswhere-web.specs :as specs]
-            [clojure.spec :as spec]
+            [iwaswhere-web.specs]
             [ubergraph.core :as uber]
-            [clojure.string :as s]
             [iwaswhere-web.keepalive :as ka]
             [clojure.tools.logging :as log]
-            [me.raynes.fs :as fs]))
+            [me.raynes.fs :as fs]
+            [matthiasn.systems-toolbox.component.helpers :as h]))
 
 (defn publish-state-fn
   "Publishes current state, as filtered for the respective clients. Sends to single connected client
   with the latest filter when message payload contains :sente-uid, otherwise sends to all clients."
   [{:keys [current-state msg-payload msg-meta]}]
-  (let [sente-uid (:sente-uid msg-payload)
+  (let [ts (h/now)
+        _ (log/debug ts "publish-state-fn started")
+        sente-uid (:sente-uid msg-payload)
         sente-uids (if sente-uid [sente-uid] (keys (:client-queries current-state)))
         state-emit-mapper (fn [sente-uid]
                             (let [start-ts (System/currentTimeMillis)
                                   query (get-in current-state [:client-queries sente-uid])
-                                  res (g/get-filtered-results current-state query)
+                                  res (doall (g/get-filtered-results current-state query))
                                   duration-ms (- (System/currentTimeMillis) start-ts)]
                               (log/info "Query" sente-uid "took" duration-ms "ms")
                               (log/info "Result size" (count (str res)))
                               (with-meta [:state/new (merge res {:duration-ms duration-ms})]
                                          (merge msg-meta {:sente-uid sente-uid}))))
         state-msgs (vec (map state-emit-mapper sente-uids))]
+    (log/debug (h/now) "publish-state-fn done, ms since start" (- (h/now) ts) )
     {:emit-msg state-msgs}))
 
 (defn state-get-fn

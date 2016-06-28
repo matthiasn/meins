@@ -131,7 +131,9 @@
                    :iww.search-stats/node-count
                    :iww.search-stats/edge-count]))
 
-(s/def :iww.search-result/entries (s/* entry-spec))
+;(s/def :iww.search-result/entries (s/* entry-spec))
+(s/def :iww.search-result/entries (s/* possible-timestamp?))
+(s/def :iww.search-result/entries-map (s/map-of possible-timestamp? entry-spec))
 (s/def :iww.search-result/hashtags (s/coll-of string? #{}))
 (s/def :iww.search-result/mentions (s/coll-of string? #{}))
 (s/def :iww.search-result/stats search-stats-spec)
@@ -139,6 +141,7 @@
 
 (s/def :state/new
   (s/keys :req-un [:iww.search-result/entries
+                   :iww.search-result/entries-map
                    :iww.search-result/hashtags
                    :iww.search-result/mentions
                    :iww.search-result/stats
@@ -154,7 +157,8 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Client Store State Spec
-(s/def :iww.client-state/entries (s/* entry-spec))
+(s/def :iww.client-state/entries (s/* possible-timestamp?))
+(s/def :iww.client-state/entries-map (s/map-of possible-timestamp? entry-spec))
 (s/def :iww.client-state/last-alive possible-timestamp?)
 (s/def :iww.client-state/current-query map?)
 

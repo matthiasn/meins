@@ -61,18 +61,28 @@
   (merge entry
          {:comments (->> (flatten (uber/find-edges g {:dest n :relationship :COMMENT}))
                          (remove :mirror?)
-                         (map #(uber/attrs g (:src %)))
-                         (sort-by :timestamp))}))
+                         (map #(:src %))
+                         (sort))}))
+
+(defn get-tags-mentions-matches
+  "Extract matching timestamps for query."
+  [g query]
+  (let [t-matched (map #(set (map :dest (uber/find-edges g {:src          {:tag %}
+                                                            :relationship :CONTAINS})))
+                       (:tags query))
+        m-matched (map #(set (map :dest (uber/find-edges g {:src          {:mention %}
+                                                            :relationship :CONTAINS})))
+                       (:mentions query))]
+    (apply set/intersection
+           (concat t-matched m-matched))))
 
 (defn get-linked-entries
   "Extract all linked entries for entry, including their comments."
   [entry g n sort-by-upvotes?]
   (let [linked (->> (flatten (uber/find-edges g {:src n :relationship :LINKED}))
                     ;(remove :mirror?)
-                    (map #(uber/attrs g (:dest %)))
-                    (sort-by :timestamp)
-                    (map (fn [linked-entry]
-                           (get-comments linked-entry g (:timestamp linked-entry)))))]
+                    (map #(:dest %))
+                    (sort))]
     (merge entry {:linked-entries-list (if sort-by-upvotes? (sort compare-w-upvotes linked) linked)})))
 
 (defn extract-sorted-entries
@@ -81,17 +91,29 @@
   Warns when node not in graph. (debugging, should never happen)"
   [current-state query]
   (let [sort-by-upvotes? (:sort-by-upvotes query)
+        g (:graph current-state)
         mapper-fn (fn [n]
-                    (let [g (:graph current-state)]
-                      (if (uber/has-node? g n)
-                        (-> (uber/attrs g n)
-                            (get-comments g n)
-                            (get-linked-entries g n sort-by-upvotes?))
-                        (log/warn "extract-sorted-entries can't find node: " n))))
-        entries (map mapper-fn (:sorted-entries current-state))]
+                    (if (uber/has-node? g n)
+                      (-> (uber/attrs g n)
+                          (get-comments g n)
+                          (get-linked-entries g n sort-by-upvotes?))
+                      (log/warn "extract-sorted-entries can't find node: " n)))
+        matched-entries (if (or (seq (:tags query)) (seq (:mentions query)))
+                          (into (sorted-set-by >) (sort-by < (get-tags-mentions-matches g query)))
+                          (:sorted-entries current-state))
+        entries (map mapper-fn matched-entries)]
     (if sort-by-upvotes?
       (sort compare-w-upvotes entries)
       entries)))
+
+(defn extract-entries-by-ts
+  ""
+  [current-state entries]
+  (map (fn [n]
+         (let [g (:graph current-state)]
+           (if (uber/has-node? g n)
+             (uber/attrs g n)
+             (log/warn "extract-sorted-entries can't find node: " n)))) entries))
 
 (defn find-all-hashtags
   "Finds all hashtags used in entries by finding the edges that originate from the
@@ -119,11 +141,24 @@
   some basic stats."
   [current-state query]
   (let [n (:n query)
-        entries (take n (filter (entries-filter-fn query) (extract-sorted-entries current-state query)))]
-    {:entries  entries
-     :hashtags (find-all-hashtags current-state)
-     :mentions (find-all-mentions current-state)
-     :stats    (get-basic-stats current-state)}))
+        entry-mapper (fn [entry] [(:timestamp entry) entry])
+        entries (take n (filter (entries-filter-fn query)
+                                (extract-sorted-entries current-state query)))
+        comment-timestamps (set (flatten (map :comments entries)))
+        linked-entries (extract-entries-by-ts current-state
+                                              (set (flatten (map :linked-entries-list entries))))
+        linked-entries (map (fn [e] (get-comments e (:graph current-state) (:timestamp e)))
+                            linked-entries)
+        linked-comments-ts (set (flatten (map :comments linked-entries)))
+        comments (extract-entries-by-ts current-state
+                                        (set/union comment-timestamps linked-comments-ts))]
+    {:entries     (map :timestamp entries)
+     :entries-map (merge (into {} (map entry-mapper entries))
+                         (into {} (map entry-mapper comments))
+                         (into {} (map entry-mapper linked-entries)))
+     :hashtags    (find-all-hashtags current-state)
+     :mentions    (find-all-mentions current-state)
+     :stats       (get-basic-stats current-state)}))
 
 (defn add-hashtags
   "Add hashtag edges to graph for a new entry. When a hashtag exists already, an edge to
@@ -131,10 +166,11 @@
   [graph entry]
   (let [tags (:tags entry)]
     (reduce (fn [acc tag]
-              (-> acc
-                  (uber/add-nodes :hashtags {:tag tag})
-                  (uber/add-edges [{:tag tag} (:timestamp entry) {:relationship :CONTAINS}]
-                                  [:hashtags {:tag tag} {:relationship :IS}])))
+              (let [tag (s/lower-case tag)]
+                (-> acc
+                    (uber/add-nodes :hashtags {:tag tag})
+                    (uber/add-edges [{:tag tag} (:timestamp entry) {:relationship :CONTAINS}]
+                                    [:hashtags {:tag tag} {:relationship :IS}]))))
             graph
             tags)))
 
@@ -144,10 +180,12 @@
   [graph entry]
   (let [mentions (:mentions entry)]
     (reduce (fn [acc mention]
-              (-> acc
-                  (uber/add-nodes :mentions {:mention mention})
-                  (uber/add-edges [{:mention mention} (:timestamp entry) {:relationship :CONTAINS}]
-                                  [:mentions {:mention mention} {:relationship :IS}])))
+              (let [mention (s/lower-case mention)]
+                (-> acc
+                    (uber/add-nodes :mentions {:mention mention})
+                    (uber/add-edges
+                      [{:mention mention} (:timestamp entry) {:relationship :CONTAINS}]
+                      [:mentions {:mention mention} {:relationship :IS}]))))
             graph
             mentions)))
 

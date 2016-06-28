@@ -43,6 +43,8 @@
   :sass {:src "src/scss/"
          :dst "resources/public/css/"}
 
+  ;:global-vars {*assert* false}
+
   :figwheel {:server-port 3450
              :css-dirs    ["resources/public/css"]}
 
@@ -65,6 +67,7 @@
                         :figwheel     true
                         :compiler     {:main          "iwaswhere-web.core"
                                        :asset-path    "js/build"
+                                       ;:elide-asserts true
                                        :externs       ["externs/misc.js" "externs/leaflet.ext.js"]
                                        :output-to     "resources/public/js/build/iwaswhere.js"
                                        :optimizations :advanced}}

@@ -21,7 +21,7 @@ pom.xml.asc
 *.iml
 .DS_Store
 
-resources/
+resources/public/
 *.pid
 *.out
 *.zip

@@ -37,7 +37,8 @@
    :md             "Moving to #cljc"})
 
 (def state-from-backend
-  {:entries [test-entry test-entry]
+  {:entries [(:timestamp test-entry)]
+   :entries-map {(:timestamp test-entry) test-entry}
    :linked-entries-list []
    :hashtags            #{"#drama" "#hashtag" "#blah"}
    :mentions            #{"@myself" "@me" "@I"}
@@ -66,8 +67,7 @@
     (testing "entries are on new state"
       (is (= (:entries new-state) (:entries state-from-backend))))
     (testing "entries map is on new state"
-      (is (= (:entries-map new-state)
-             (into {} (map (fn [entry] [(:timestamp entry) entry]) (:entries state-from-backend))))))
+      (is (= (:entries-map new-state) (:entries-map state-from-backend))))
     (testing "hashtags are on new state"
       (is (= (:hashtags (:cfg new-state)) (:hashtags state-from-backend))))
     (testing "mentions are on new state"

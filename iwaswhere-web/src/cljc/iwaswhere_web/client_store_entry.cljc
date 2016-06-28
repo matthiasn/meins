@@ -65,12 +65,14 @@
       (let [new-entry (get-in new-state [:new-entries ts])
             done? (= (:planned-dur new-entry) (:completed-time new-entry))]
         (if (:pomodoro-running new-entry)
-          (do (if done? (play-audio "ringer")
-                        (play-audio "ticking-clock"))
+          (do (when-not (:mute (:cfg current-state))
+                (if done? (play-audio "ringer")
+                          (play-audio "ticking-clock")))
               (update-local-storage new-state)
               {:new-state new-state
                :emit-msg  (when (not done?)
-                            [:cmd/schedule-new {:timeout 1000 :message [:cmd/pomodoro-inc {:timestamp ts}]}])})
+                            [:cmd/schedule-new {:timeout 1000
+                                                :message [:cmd/pomodoro-inc {:timestamp ts}]}])})
           {:new-state current-state})))))
 
 (defn pomodoro-start-fn

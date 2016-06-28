@@ -28,7 +28,7 @@
       {:emit-msg  (with-meta [:cmd/keep-alive-res] msg-meta)
        :new-state new-state})))
 
-(def max-age 10000)
+(def max-age 15000)
 
 (defn query-gc-fn
   "Garbage collect queries whose corresponding client has not recently sent a keepalive message."
@@ -49,7 +49,7 @@
   (sb/send-mult-cmd
     switchboard
     [[:cmd/send {:to  :client/scheduler-cmp
-                 :msg [:cmd/schedule-new {:timeout 1000
+                 :msg [:cmd/schedule-new {:timeout 5000
                                           :message [:cmd/keep-alive]
                                           :repeat true
                                           :initial false}]}]]))

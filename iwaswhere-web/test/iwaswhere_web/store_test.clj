@@ -62,7 +62,7 @@
           (testing "entry added to graph"
             (is (contains? (:sorted-entries new-state) (:timestamp test-entry)))
             ;; graph query also contains lists of comments and linked entries, which would be empty here
-            (is (= test-entry (-> (first (:entries res))
+            (is (= test-entry (-> (get (:entries-map res) (:timestamp test-entry))
                                   (dissoc :comments)
                                   (dissoc :linked-entries-list)))))
 
@@ -91,7 +91,7 @@
   (testing "entry updated in graph"
     (is (contains? (:sorted-entries state) (:timestamp test-entry)))
     ;; graph query also contains lists of comments and linked entries, which would be empty here
-    (is (= test-entry (-> (first (:entries res))
+    (is (= test-entry (-> (get (:entries-map res) (:timestamp test-entry))
                           (dissoc :comments)
                           (dissoc :linked-entries-list)))))
 
