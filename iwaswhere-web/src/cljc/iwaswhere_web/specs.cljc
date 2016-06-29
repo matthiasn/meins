@@ -23,8 +23,13 @@
 ;;  Journal Entry Specs
 (s/def :iww.entry/timestamp possible-timestamp?)
 (s/def :iww.entry/md string?)
-(s/def :iww.entry/tags (s/coll-of (is-tag? "#") #{}))
-(s/def :iww.entry/mentions (s/coll-of (is-tag? "@") #{}))
+
+#?(:clj  (s/def :iww.entry/tags (s/coll-of (is-tag? "#")))
+   :cljs (s/def :iww.entry/tags (s/coll-of (is-tag? "#") #{})))
+
+#?(:clj  (s/def :iww.entry/mentions (s/coll-of (is-tag? "@")))
+   :cljs (s/def :iww.entry/mentions (s/coll-of (is-tag? "@") #{})))
+
 (s/def :iww.entry/timezone (s/nilable string?))
 (s/def :iww.entry/utc-offset (number-in-range? -720 720))
 (s/def :iww.entry/entry-type #{:pomodoro})
@@ -100,9 +105,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Search Spec
 (s/def :iww.search/search-text string?)
-(s/def :iww.search/tags (s/coll-of (is-tag? "#") #{}))
+(s/def :iww.search/tags :iww.entry/tags)
 (s/def :iww.search/not-tags :iww.search/tags)
-(s/def :iww.search/mentions (s/coll-of (is-tag? "@") #{}))
+(s/def :iww.search/mentions :iww.entry/mentions)
 (s/def :iww.search/date-string (s/nilable #(re-find #"[0-9]{4}-[0-9]{2}-[0-9]{2}" %)))
 (s/def :iww.search/timestamp (s/nilable #(re-find #"[0-9]{13}" %)))
 (s/def :iww.search/n pos-int?)
@@ -134,8 +139,8 @@
 ;(s/def :iww.search-result/entries (s/* entry-spec))
 (s/def :iww.search-result/entries (s/* possible-timestamp?))
 (s/def :iww.search-result/entries-map (s/map-of possible-timestamp? entry-spec))
-(s/def :iww.search-result/hashtags (s/coll-of string? #{}))
-(s/def :iww.search-result/mentions (s/coll-of string? #{}))
+(s/def :iww.search-result/hashtags (s/* string?))
+(s/def :iww.search-result/mentions (s/* string?))
 (s/def :iww.search-result/stats search-stats-spec)
 (s/def :iww.search-result/duration-ms number?)
 
