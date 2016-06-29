@@ -1,0 +1,6 @@
+sudo: required
+dist: trusty
+before_install: cd iwaswhere-web
+language: clojure
+jdk:
+  - oraclejdk8
