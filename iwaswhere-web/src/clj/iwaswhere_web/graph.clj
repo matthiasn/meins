@@ -6,7 +6,6 @@
             [clj-time.core :as ct]
             [clojure.string :as s]
             [clojure.set :as set]
-            [clojure.data :as d]
             [clojure.tools.logging :as log]
             [clj-time.format :as timef]))
 
@@ -14,7 +13,7 @@
   "Creates a filter function which ensures that all tags and mentions in the query are
   contained in the filtered entry or any of it's comments, and none of the not-tags.
   Also allows filtering per day."
-  [q]
+  [q graph]
   (fn [entry]
     (let [local-fmt (timef/with-zone (timef/formatters :year-month-day) (ct/default-time-zone))
           entry-day (timef/unparse local-fmt (ctc/from-long (:timestamp entry)))
@@ -29,7 +28,8 @@
           q-mentions (set (map s/lower-case (:mentions q)))
 
           entry-tags (set (map s/lower-case (:tags entry)))
-          entry-comments-tags (apply set/union (map :tags (:comments entry)))
+          entry-comments (map #(uber/attrs graph  %) (:comments entry))
+          entry-comments-tags (apply set/union (map :tags entry-comments))
           tags (set (map s/lower-case (set/union entry-tags entry-comments-tags)))
 
           entry-mentions (set (map s/lower-case (:mentions entry)))
@@ -51,7 +51,7 @@
         upvotes-y (get y :upvotes 0)]
     (if-not (= upvotes-x upvotes-y)
       (clojure.lang.Util/compare upvotes-y upvotes-x)
-      (if (pos? upvotes-x)                                  ; when entries have upvotes, sort oldest on top
+      (if (pos? upvotes-x)    ; when entries have upvotes, sort oldest on top
         (clojure.lang.Util/compare (:timestamp x) (:timestamp y))
         (clojure.lang.Util/compare (:timestamp y) (:timestamp x))))))
 
@@ -73,7 +73,7 @@
                                                        :relationship :CONTAINS})))))
         t-matched (map (mapper :tag) (map s/lower-case (:tags query)))
         m-matched (map (mapper :mention) (map s/lower-case (:mentions query)))]
-    (apply set/intersection
+    (apply set/union
            (concat t-matched m-matched))))
 
 (defn get-linked-entries
@@ -145,13 +145,14 @@
   some basic stats."
   [current-state query]
   (let [n (:n query)
+        graph (:graph current-state)
         entry-mapper (fn [entry] [(:timestamp entry) entry])
-        entries (take n (filter (entries-filter-fn query)
+        entries (take n (filter (entries-filter-fn query graph)
                                 (extract-sorted-entries current-state query)))
         comment-timestamps (set (flatten (map :comments entries)))
         linked-entries (extract-entries-by-ts current-state
                                               (set (flatten (map :linked-entries-list entries))))
-        linked-entries (map (fn [e] (get-comments e (:graph current-state) (:timestamp e)))
+        linked-entries (map (fn [e] (get-comments e graph (:timestamp e)))
                             linked-entries)
         linked-comments-ts (set (flatten (map :comments linked-entries)))
         comments (extract-entries-by-ts current-state

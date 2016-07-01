@@ -13,7 +13,7 @@
                  [clj-time "0.12.0"]
                  [me.raynes/fs "1.4.6"]
                  [markdown-clj "0.9.89"]
-                 [cheshire "5.6.2"]
+                 [cheshire "5.6.3"]
                  [cljsjs/moment "2.10.6-4"]
                  [cljsjs/leaflet "0.7.7-4"]
                  [com.drewnoakes/metadata-extractor "2.8.1"]
@@ -33,7 +33,7 @@
   :jvm-opts ["-XX:-OmitStackTraceInFastThrow"]
 
   :plugins [[lein-cljsbuild "1.1.3" :exclusions [org.apache.commons/commons-compress]]
-            [lein-figwheel "0.5.4-3" :exclusions [org.clojure/clojure]]
+            [lein-figwheel "0.5.4-5" :exclusions [org.clojure/clojure]]
             [lein-sassy "1.0.7" :exclusions [org.clojure/clojure org.codehaus.plexus/plexus-utils]]
             [com.jakemccrary/lein-test-refresh "0.16.0"]
             [test2junit "1.2.2"]
