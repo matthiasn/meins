@@ -4,7 +4,7 @@
   Then later on application startup, all these state changes can be
   replayed to recreate the application state. This mechanism is inspired
   by Event Sourcing (http://martinfowler.com/eaaDev/EventSourcing.html)."
-  (:require [iwaswhere-web.graph :as g]
+  (:require [iwaswhere-web.graph-add :as ga]
             [clj-time.core :as time]
             [clj-time.format :as timef]
             [clojure.tools.logging :as log]
@@ -35,7 +35,7 @@
     ; is an update to a visit, and otherwise, the exists? logic would refuse to import it.
     (if (and exists? (not= (:md existing) "No departure recorded #visit"))
       (log/warn "Entry exists, skipping" msg-payload)
-      (let [new-state (g/add-node current-state entry-ts msg-payload)]
+      (let [new-state (ga/add-node current-state entry-ts msg-payload)]
         (append-daily-log msg-payload)
         {:new-state    new-state
          :send-to-self [:state/publish-current {}]}))))
@@ -44,7 +44,7 @@
   "Handler function for persisting journal entry."
   [{:keys [current-state msg-payload]}]
   (let [entry-ts (:timestamp msg-payload)
-        new-state (g/add-node current-state entry-ts msg-payload)]
+        new-state (ga/add-node current-state entry-ts msg-payload)]
     (append-daily-log msg-payload)
     {:new-state    new-state
      :emit-msg     [:entry/saved msg-payload]
@@ -54,7 +54,7 @@
   "Handler function for deleting journal entry."
   [{:keys [current-state msg-payload]}]
   (let [entry-ts (:timestamp msg-payload)
-        new-state (g/remove-node current-state entry-ts)]
+        new-state (ga/remove-node current-state entry-ts)]
     (log/info "Entry" entry-ts "marked as deleted.")
     (append-daily-log (merge msg-payload {:deleted true}))
     {:new-state    new-state

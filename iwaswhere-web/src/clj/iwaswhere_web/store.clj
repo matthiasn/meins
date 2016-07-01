@@ -3,6 +3,7 @@
   which then holds the server side application state."
   (:require [iwaswhere-web.files :as f]
             [iwaswhere-web.graph :as g]
+            [iwaswhere-web.graph-add :as ga]
             [iwaswhere-web.specs]
             [ubergraph.core :as uber]
             [iwaswhere-web.keepalive :as ka]
@@ -63,8 +64,8 @@
               (let [parsed (clojure.edn/read-string line)
                     ts (:timestamp parsed)]
                 (if (:deleted parsed)
-                  (swap! state g/remove-node ts)
-                  (swap! state g/add-node ts parsed)))))))
+                  (swap! state ga/remove-node ts)
+                  (swap! state ga/add-node ts parsed)))))))
       {:state state})))
 
 (defn cmp-map
