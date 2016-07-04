@@ -15,9 +15,7 @@
   "Publishes current state, as filtered for the respective clients. Sends to single connected client
   with the latest filter when message payload contains :sente-uid, otherwise sends to all clients."
   [{:keys [current-state msg-payload msg-meta]}]
-  (let [ts (h/now)
-        _ (log/debug ts "publish-state-fn started")
-        sente-uid (:sente-uid msg-payload)
+  (let [sente-uid (:sente-uid msg-payload)
         sente-uids (if sente-uid [sente-uid] (keys (:client-queries current-state)))
         state-emit-mapper (fn [sente-uid]
                             (let [start-ts (System/currentTimeMillis)
@@ -29,7 +27,6 @@
                               (with-meta [:state/new (merge res {:duration-ms duration-ms})]
                                          (merge msg-meta {:sente-uid sente-uid}))))
         state-msgs (vec (map state-emit-mapper sente-uids))]
-    (log/debug (h/now) "publish-state-fn done, ms since start" (- (h/now) ts) )
     {:emit-msg state-msgs}))
 
 (defn state-get-fn

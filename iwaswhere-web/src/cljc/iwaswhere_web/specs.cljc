@@ -14,7 +14,7 @@
   "Check if string is a tag, such as a hashtag with the '#' prefix or a mention with the '@' prefix."
   [prefix]
   (fn [s]
-    (re-find (re-pattern (str "^" prefix p/tag-char-class "+$")) s)))
+    (re-find (re-pattern (str "^" prefix p/tag-char-cls "+$")) s)))
 
 (defn namespaced-keyword? [k] (and (keyword? k) (namespace k)))
 

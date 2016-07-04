@@ -7,7 +7,8 @@
             [clojure.string :as s]
             [clojure.set :as set]
             [clojure.tools.logging :as log]
-            [clj-time.format :as timef]))
+            [clj-time.format :as timef]
+            [clj-time.format :as ctf]))
 
 (defn entries-filter-fn
   "Creates a filter function which ensures that all tags and mentions in the query are
@@ -61,7 +62,7 @@
   (merge entry
          {:comments (->> (flatten (uber/find-edges g {:dest n :relationship :COMMENT}))
                          (remove :mirror?)
-                         (map #(:src %))
+                         (map :src)
                          (sort))}))
 
 (defn get-tags-mentions-matches
@@ -73,15 +74,24 @@
                                                        :relationship :CONTAINS})))))
         t-matched (map (mapper :tag) (map s/lower-case (:tags query)))
         m-matched (map (mapper :mention) (map s/lower-case (:mentions query)))]
-    (apply set/union
-           (concat t-matched m-matched))))
+    (apply set/union (concat t-matched m-matched))))
+
+(defn get-nodes-for-day
+  "Extract matching timestamps for query."
+  [g query]
+  (let [dt (ctf/parse (ctf/formatters :year-month-day) (:date-string query))]
+    (set (map :dest (uber/find-edges g {:src          {:type  :timeline/day
+                                                       :year  (ct/year dt)
+                                                       :month (ct/month dt)
+                                                       :day   (ct/day dt)}
+                                        :relationship :DATE})))))
 
 (defn get-linked-entries
   "Extract all linked entries for entry, including their comments."
   [entry g n sort-by-upvotes?]
   (let [linked (->> (flatten (uber/find-edges g {:src n :relationship :LINKED}))
                     ;(remove :mirror?)
-                    (map #(:dest %))
+                    (map :dest)
                     (sort))]
     (merge entry {:linked-entries-list (if sort-by-upvotes? (sort compare-w-upvotes linked) linked)})))
 
@@ -98,22 +108,33 @@
                           (get-comments g n)
                           (get-linked-entries g n sort-by-upvotes?))
                       (log/warn "extract-sorted-entries can't find node: " n)))
-        matched-entries (if (or (seq (:tags query)) (seq (:mentions query)))
-                          (into (sorted-set-by >) (sort-by < (get-tags-mentions-matches g query)))
-                          (:sorted-entries current-state))
+        sort-fn #(into (sorted-set-by >) %)
+        matched-entries (cond
+                          ; set with timestamps matching tags and mentions
+                          (or (seq (:tags query)) (seq (:mentions query)))
+                          (sort-fn (get-tags-mentions-matches g query))
+                          ; set with the one timestamp in query
+                          (:timestamp query) #{(Long/parseLong (:timestamp query))}
+                          ; set with timestamps matching the day
+                          (:date-string query) (sort-fn (get-nodes-for-day g query))
+                          ; set with all timestamps (leads to full scan)
+                          :else (:sorted-entries current-state))
         entries (map mapper-fn matched-entries)]
     (if sort-by-upvotes?
       (sort compare-w-upvotes entries)
       entries)))
 
 (defn extract-entries-by-ts
-  ""
-  [current-state entries]
+  "Find all entries for given timestamps set."
+  [current-state entry-timestamps]
   (map (fn [n]
          (let [g (:graph current-state)]
            (if (uber/has-node? g n)
-             (uber/attrs g n)
-             (log/warn "extract-sorted-entries can't find node: " n)))) entries))
+             (let [entry (uber/attrs g n)]
+               (when (empty? entry) (log/warn "empty node:" entry))
+               entry)
+             (log/warn "extract-entries-by-ts can't find node: " n))))
+       entry-timestamps))
 
 (defn find-all-hashtags
   "Finds all hashtags used in entries by finding the edges that originate from the
@@ -152,8 +173,7 @@
         comment-timestamps (set (flatten (map :comments entries)))
         linked-entries (extract-entries-by-ts current-state
                                               (set (flatten (map :linked-entries-list entries))))
-        linked-entries (map (fn [e] (get-comments e graph (:timestamp e)))
-                            linked-entries)
+        linked-entries (map (fn [e] (get-comments e graph (:timestamp e))) linked-entries)
         linked-comments-ts (set (flatten (map :comments linked-entries)))
         comments (extract-entries-by-ts current-state
                                         (set/union comment-timestamps linked-comments-ts))]

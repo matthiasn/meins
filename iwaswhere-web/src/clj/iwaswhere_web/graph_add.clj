@@ -4,6 +4,7 @@
   (:require [ubergraph.core :as uber]
             [clj-time.coerce :as ctc]
             [clj-time.core :as ct]
+            [clj-time.format :as ctf]
             [clojure.string :as s]
             [clojure.set :as set]
             [clojure.tools.logging :as log]))
@@ -68,7 +69,10 @@
   [graph entry]
   (let [linked-entries (:linked-entries entry)]
     (reduce (fn [acc linked-entry]
-              (uber/add-edges acc [(:timestamp entry) linked-entry {:relationship :LINKED}]))
+              (if (uber/has-node? graph linked-entry)
+                (uber/add-edges acc [(:timestamp entry) linked-entry {:relationship :LINKED}])
+                (do (log/warn "Linked node does not exist, skipping" linked-entry)
+                    acc)))
             graph
             linked-entries)))
 

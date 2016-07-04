@@ -19,7 +19,7 @@
         [curr-tag f-tags] (p/autocomplete-tags before-cursor "#" hashtags)
         [curr-mention f-mentions] (p/autocomplete-tags before-cursor "@" mentions)
         tag-replace-fn (fn [curr-tag tag]
-                         (let [curr-tag-regex (js/RegExp (str curr-tag "(?!" p/tag-char-class ")") "i")
+                         (let [curr-tag-regex (js/RegExp (str curr-tag "(?!" p/tag-char-cls ")") "i")
                                search-text (:search-text (:current-query @observed))
                                new-search (p/parse-search (s/replace search-text curr-tag-regex tag))]
                            (swap! local assoc-in [:current-query] new-search)

@@ -54,7 +54,7 @@
             [curr-mention f-mentions] (p/autocomplete-tags before-cursor " ?@" mentions)
 
             tag-replace-fn (fn [curr-tag tag]
-                             (let [curr-tag-regex (js/RegExp (str curr-tag "(?!" p/tag-char-class ")") "i")
+                             (let [curr-tag-regex (js/RegExp (str curr-tag "(?!" p/tag-char-cls ")") "i")
                                    md (:md latest-entry)
                                    updated (merge entry (p/parse-entry (s/replace md curr-tag-regex tag)))]
                                (reset! local-display-entry updated)
