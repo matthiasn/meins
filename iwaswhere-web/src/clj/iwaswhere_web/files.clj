@@ -48,7 +48,8 @@
     (append-daily-log msg-payload)
     {:new-state    new-state
      :emit-msg     [:entry/saved msg-payload]
-     :send-to-self [:state/publish-current {}]}))
+     :send-to-self [[:state/stats-tags]
+                    [:state/publish-current {}]]}))
 
 (defn trash-entry-fn
   "Handler function for deleting journal entry."

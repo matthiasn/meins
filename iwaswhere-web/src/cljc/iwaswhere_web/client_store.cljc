@@ -5,35 +5,17 @@
     [iwaswhere-web.client-store-entry :as cse]
     [iwaswhere-web.client-store-search :as s]))
 
-(defn print-duration
-  [msg-meta]
-  (when msg-meta
-    (let [store-meta (:client/store-cmp msg-meta)
-          store-duration (- (:in-ts store-meta) (:out-ts store-meta))
-          cli-ws-meta (:client/ws-cmp msg-meta)
-          cli-ws-duration (- (:out-ts cli-ws-meta) (:in-ts cli-ws-meta))
-          srv-ws-meta (:server/ws-cmp msg-meta)
-          srv-ws-duration (- (:in-ts srv-ws-meta) (:out-ts srv-ws-meta))
-          srv-store-meta (:server/store-cmp msg-meta)
-          srv-store-duration (- (:out-ts srv-store-meta) (:in-ts srv-store-meta))]
-      (prn msg-meta)
-      (prn "duration from and to :client/store-cmp in ms:" store-duration)
-      (prn "duration from and to :client/ws-cmp in ms:" cli-ws-duration)
-      (prn "ms from :client/store-cmp to :client/ws-cmp:" (- (:in-ts cli-ws-meta) (:out-ts store-meta)))
-      (prn "ms from :client/ws-cmp to :client/store-cmp:" (- (:in-ts store-meta) (:out-ts cli-ws-meta)))
-      (prn "duration from and to :server/ws-cmp in ms:" srv-ws-duration)
-      (prn "duration from and to :server/store-cmp in ms:" srv-store-duration))))
-
 (defn new-state-fn
   "Update client side state with list of journal entries received from backend."
   [{:keys [current-state msg-payload msg-meta]}]
-  (print-duration msg-meta)
-  (let [new-state (-> current-state
+  (let [store-meta (:client/store-cmp msg-meta)
+        new-state (-> current-state
                       (assoc-in [:entries] (:entries msg-payload))
                       (assoc-in [:entries-map] (:entries-map msg-payload))
                       (assoc-in [:cfg :hashtags] (:hashtags msg-payload))
                       (assoc-in [:stats] (:stats msg-payload))
-                      (assoc-in [:duration-ms] (:duration-ms msg-payload))
+                      (assoc-in [:timing] {:query (:duration-ms msg-payload)
+                                           :rtt   (- (:in-ts store-meta) (:out-ts store-meta))})
                       (assoc-in [:cfg :mentions] (:mentions msg-payload)))]
     {:new-state new-state}))
 

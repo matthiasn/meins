@@ -2,6 +2,7 @@
   "This namespace contains the functions necessary to instantiate the store-cmp,
   which then holds the server side application state."
   (:require [iwaswhere-web.files :as f]
+            [taoensso.timbre.profiling :refer [p profile]]
             [iwaswhere-web.graph :as g]
             [iwaswhere-web.graph-add :as ga]
             [iwaswhere-web.specs]
@@ -9,25 +10,25 @@
             [iwaswhere-web.keepalive :as ka]
             [clojure.tools.logging :as log]
             [me.raynes.fs :as fs]
-            [matthiasn.systems-toolbox.component.helpers :as h]))
+            [clojure.pprint :as pp]))
 
 (defn publish-state-fn
   "Publishes current state, as filtered for the respective clients. Sends to single connected client
   with the latest filter when message payload contains :sente-uid, otherwise sends to all clients."
   [{:keys [current-state msg-payload msg-meta]}]
-  (let [sente-uid (:sente-uid msg-payload)
-        sente-uids (if sente-uid [sente-uid] (keys (:client-queries current-state)))
-        state-emit-mapper (fn [sente-uid]
-                            (let [start-ts (System/currentTimeMillis)
-                                  query (get-in current-state [:client-queries sente-uid])
-                                  res (doall (g/get-filtered-results current-state query))
-                                  duration-ms (- (System/currentTimeMillis) start-ts)]
-                              (log/info "Query" sente-uid "took" duration-ms "ms")
-                              (log/info "Result size" (count (str res)))
-                              (with-meta [:state/new (merge res {:duration-ms duration-ms})]
-                                         (merge msg-meta {:sente-uid sente-uid}))))
-        state-msgs (vec (map state-emit-mapper sente-uids))]
-    {:emit-msg state-msgs}))
+  (if-let [sente-uid (:sente-uid msg-payload)]
+    (let [start-ts (System/nanoTime)
+          query (get-in current-state [:client-queries sente-uid])
+          res (g/get-filtered-results current-state query)
+          ms (/ (- (System/nanoTime) start-ts) 1000000)
+          ms-string (pp/cl-format nil "~,3f ms" ms)
+          res-msg (with-meta [:state/new (merge res {:duration-ms ms-string})]
+                             (merge msg-meta {:sente-uid sente-uid}))]
+      (log/info "Query" sente-uid "took" ms-string)
+      (log/info "Result size" (count (str res)))
+      {:emit-msg res-msg})
+    {:send-to-self (map (fn [uid] [:state/publish-current {:sente-uid uid}])
+                        (keys (:client-queries current-state)))}))
 
 (defn state-get-fn
   "Handler function for retrieving current state. Updates filter for connected client, and then
@@ -39,6 +40,14 @@
     {:new-state    (update-in current-state [:client-queries sente-uid] merge msg-payload)
      :send-to-self [(with-meta [:state/publish-current {:sente-uid sente-uid}] msg-meta)
                     (with-meta [:cmd/keep-alive] msg-meta)]}))
+
+(defn stats-tags-fn
+  "Precomputes stats and tags (they only change on insert anyway)."
+  [{:keys [current-state]}]
+  {:new-state (-> current-state
+                  (assoc-in [:stats] (g/get-basic-stats current-state))
+                  (assoc-in [:hashtags] (g/find-all-hashtags current-state))
+                  (assoc-in [:mentions] (g/find-all-mentions current-state)))})
 
 (defn state-fn
   "Initial state function, creates state atom and then parses all files in
@@ -52,7 +61,12 @@
     (fs/mkdirs f/daily-logs-path)
     (let [state (atom {:sorted-entries (sorted-set-by >)
                        :graph          (uber/graph)
-                       :client-queries {}})
+                       :client-queries {}
+                       :hashtags       #{}
+                       :mentions       #{}
+                       :stats          {:entry-count 0
+                                        :node-count  0
+                                        :edge-count  0}})
           files (file-seq (clojure.java.io/file path))]
       (doseq [f (f/filter-by-name files #"\d{4}-\d{2}-\d{2}.jrn")]
         (with-open [reader (clojure.java.io/reader f)]
@@ -63,6 +77,8 @@
                 (if (:deleted parsed)
                   (swap! state ga/remove-node ts)
                   (swap! state ga/add-node ts parsed)))))))
+      ; nicer would be: send off :state/stats-tags message
+      (swap! state #(:new-state (stats-tags-fn {:current-state %})))
       {:state state})))
 
 (defn cmp-map
@@ -75,5 +91,6 @@
                  :entry/trash           f/trash-entry-fn
                  :state/publish-current publish-state-fn
                  :state/get             state-get-fn
+                 :state/stats-tags      stats-tags-fn
                  :cmd/keep-alive        ka/keepalive-fn
                  :cmd/query-gc          ka/query-gc-fn}})

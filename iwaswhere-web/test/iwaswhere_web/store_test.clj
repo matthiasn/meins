@@ -57,6 +57,7 @@
       (with-redefs [f/daily-logs-path logs-path]
         (let [{:keys [new-state emit-msg]} (f/geo-entry-persist-fn {:current-state current-state
                                                                     :msg-payload   test-entry})
+              {:keys [new-state]} (s/stats-tags-fn {:current-state new-state})
               res (g/get-filtered-results new-state simple-query)]
 
           (testing "entry added to graph"
@@ -103,8 +104,8 @@
 
 (deftest geo-entry-update-test
   (testing
-    "Validates that handler properly updates entry and persists entry. In particular, if new only the old entry
-    contained a particular tag, this orphan should be removed from database."
+    "Validates that handler properly updates and persists entry. In particular, if only the old
+     entry contained a particular tag, this orphan should be removed from database."
     (let [test-ts (System/currentTimeMillis)
           {:keys [current-state logs-path]} (mk-test-state test-ts)
           test-entry (mk-test-entry test-ts)
@@ -114,8 +115,10 @@
       (with-redefs [f/daily-logs-path logs-path]
         (let [{:keys [new-state]} (f/geo-entry-persist-fn {:current-state current-state
                                                            :msg-payload   test-entry})
-              {:keys [new-state emit-msg]} (f/geo-entry-persist-fn {:current-state new-state
-                                                                    :msg-payload   updated-test-entry})
+              {:keys [new-state emit-msg]} (f/geo-entry-persist-fn
+                                             {:current-state new-state
+                                              :msg-payload   updated-test-entry})
+              {:keys [new-state]} (s/stats-tags-fn {:current-state new-state})
               res (g/get-filtered-results new-state simple-query)
 
               state-from-disk (:current-state (mk-test-state test-ts))
@@ -157,16 +160,19 @@
 
 (deftest trash-entry-test
   (testing
-    "Validates that handler properly deletes entry from graph and persists the deletion message. Also
-    runs the same assertions against graph reconstructed from files."
+    "Validates that handler properly deletes entry from graph and persists the deletion message.
+     Also runs the same assertions against graph reconstructed from files."
     (let [test-ts (System/currentTimeMillis)
           {:keys [current-state logs-path]} (mk-test-state test-ts)
           test-entry (mk-test-entry test-ts)
           delete-msg {:timestamp (:timestamp test-entry) :deleted true}]
       (with-redefs [f/daily-logs-path logs-path]
-        (let [{:keys [new-state]} (f/geo-entry-persist-fn {:current-state current-state :msg-payload some-test-entry})
-              {:keys [new-state]} (f/geo-entry-persist-fn {:current-state new-state :msg-payload test-entry})
-              {:keys [new-state]} (f/trash-entry-fn {:current-state new-state :msg-payload delete-msg})
+        (let [{:keys [new-state]} (f/geo-entry-persist-fn {:current-state current-state
+                                                           :msg-payload   some-test-entry})
+              {:keys [new-state]} (f/geo-entry-persist-fn {:current-state new-state
+                                                           :msg-payload   test-entry})
+              {:keys [new-state]} (f/trash-entry-fn {:current-state new-state
+                                                     :msg-payload   delete-msg})
               res (g/get-filtered-results new-state simple-query)
 
               state-from-disk (:current-state (mk-test-state test-ts))

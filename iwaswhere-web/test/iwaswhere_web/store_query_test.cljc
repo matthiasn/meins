@@ -4,6 +4,7 @@
             [matthiasn.systems-toolbox.component :as stc]
             [iwaswhere-web.files :as f]
             [iwaswhere-web.store-test :as st]
+            [iwaswhere-web.store :as s]
             [iwaswhere-web.store :as s]))
 
 (def simple-query
@@ -74,7 +75,6 @@
   (-> (s/publish-state-fn {:current-state current-state
                            :msg-payload   {:sente-uid client-id}})
       :emit-msg   ; get published messages
-      first       ; first msg
       second      ; msg-payload
       :entries))
 
@@ -107,6 +107,8 @@
                           (add-query no-results-query no-results-query-uid)
                           (add-query tasks-done-query tasks-done-query-uid)
                           (add-query tasks-not-done-query tasks-not-done-query-uid))
+
+            {:keys [new-state]} (s/stats-tags-fn {:current-state new-state})
             client-queries (:client-queries new-state)]
 
         (testing "client queries associated with proper connection IDs"
@@ -137,9 +139,8 @@
 
         (testing "stats show expected numbers"
           (let [res (-> (s/publish-state-fn {:current-state new-state
-                                             :msg-payload {:sente-uid simple-query-uid}})
+                                             :msg-payload   {:sente-uid simple-query-uid}})
                         :emit-msg
-                        first
                         second)
                 stats (:stats res)]
             (is (= (:entry-count stats) 105))
@@ -149,7 +150,6 @@
           (let [res (-> (s/publish-state-fn {:current-state new-state
                                              :msg-payload   {:sente-uid simple-query-uid}})
                         :emit-msg
-                        first
                         second)]
             (is (= (:hashtags res) #{"#task" "#entry" "#test" "#done" "#completed" "#blah" "#new"}))
             (is (= (:mentions res) #{"@myself" "@someone"}))))))))

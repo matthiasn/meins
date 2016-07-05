@@ -8,7 +8,8 @@
             [clojure.set :as set]
             [clojure.tools.logging :as log]
             [clj-time.format :as timef]
-            [clj-time.format :as ctf]))
+            [clj-time.format :as ctf]
+            [clojure.core.reducers :as r]))
 
 (defn entries-filter-fn
   "Creates a filter function which ensures that all tags and mentions in the query are
@@ -181,6 +182,6 @@
      :entries-map (merge (into {} (map entry-mapper entries))
                          (into {} (map entry-mapper comments))
                          (into {} (map entry-mapper linked-entries)))
-     :hashtags    (find-all-hashtags current-state)
-     :mentions    (find-all-mentions current-state)
-     :stats       (get-basic-stats current-state)}))
+     :hashtags    (:hashtags current-state)
+     :mentions    (:mentions current-state)
+     :stats       (:stats current-state)}))

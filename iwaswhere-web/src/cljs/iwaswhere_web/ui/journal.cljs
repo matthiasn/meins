@@ -4,7 +4,8 @@
             [iwaswhere-web.ui.entry :as e]
             [iwaswhere-web.ui.pomodoro :as p]
             [iwaswhere-web.utils.parse :as ps]
-            [clojure.set :as set]))
+            [clojure.set :as set]
+            [cljs.pprint :as pp]))
 
 (defn linked-entries-filter
   "Filter linked entries by search."
@@ -74,8 +75,9 @@
         [:div (:entry-count stats) " entries, " (:node-count stats) " nodes, " (:edge-count stats) " edges, "
          (count (:hashtags cfg)) " hashtags, " (count (:mentions cfg)) " people"])
       [:div (p/pomodoro-stats-str filtered-entries)]
-      (when-let [ms (:duration-ms store-snapshot)]
-        [:div.stats (str "Query completed in " ms "ms")])]
+      (when-let [ms (get-in store-snapshot [:timing :query])]
+        [:div.stats (str "Query completed in " ms ", RTT "
+                         (get-in store-snapshot [:timing :rtt]) " ms")])]
      (linked-entries-view local linked-entries entries-map new-entries cfg put-fn)]))
 
 (defn cmp-map

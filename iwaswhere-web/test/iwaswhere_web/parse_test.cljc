@@ -44,7 +44,7 @@
    :mentions    #{}
    :date-string nil
    :timestamp   nil
-   :n           20})
+   :n           15})
 
 (def open-tasks-search
   {:search-text "#task ~#done ~#backlog ~#outdated"
@@ -53,7 +53,7 @@
    :mentions    #{}
    :date-string nil
    :timestamp   nil
-   :n           20})
+   :n           15})
 
 (def tasks-done-search
   {:search-text "#task #done @myself"
@@ -62,7 +62,7 @@
    :mentions    #{"@myself"}
    :date-string nil
    :timestamp   nil
-   :n           20})
+   :n           15})
 
 (def day-search
   {:search-text "2016-06-07 #task #done @myself"
@@ -71,7 +71,7 @@
    :mentions    #{"@myself"}
    :date-string "2016-06-07"
    :timestamp   nil
-   :n           20})
+   :n           15})
 
 (def timestamp-search
   {:search-text "1465325998053"
@@ -80,7 +80,7 @@
    :mentions    #{}
    :date-string nil
    :timestamp   "1465325998053"
-   :n           20})
+   :n           15})
 
 (deftest parse-search-test
   (testing "empty query is parsed correctly"

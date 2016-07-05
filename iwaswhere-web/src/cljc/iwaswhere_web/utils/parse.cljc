@@ -32,7 +32,7 @@
    :mentions    (set (re-seq search-mention-regex text))
    :date-string (re-find #"[0-9]{4}-[0-9]{2}-[0-9]{2}" text)
    :timestamp   (re-find #"[0-9]{13}" text)
-   :n           20})
+   :n           15})
 
 (defn autocomplete-tags
   "Determine autocomplete options for the partial tag (or mention) before the cursor."

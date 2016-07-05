@@ -65,9 +65,32 @@
       "")))
 
 (defn focus-on-end
-  "Focus on the provided element, and then places the caret in the last position of the element's contents"
+  "Focus on the provided element, and then places the caret in the last position of the element's
+   contents"
   [el]
   (.focus el)
   (doto (.createFromNodeContents goog.dom.Range el)
     (.collapse false)
     .select))
+
+(defn print-duration
+  "Helper for inspecting where time is spent."
+  [msg-meta]
+  (when msg-meta
+    (let [store-m (:client/store-cmp msg-meta)
+          store-duration (- (:in-ts store-m) (:out-ts store-m))
+          cli-ws-m (:client/ws-cmp msg-meta)
+          cli-ws-dur (- (:out-ts cli-ws-m) (:in-ts cli-ws-m))
+          srv-ws-m (:server/ws-cmp msg-meta)
+          srv-ws-dur (- (:in-ts srv-ws-m) (:out-ts srv-ws-m))
+          srv-store-m (:server/store-cmp msg-meta)
+          srv-store-dur (- (:out-ts srv-store-m) (:in-ts srv-store-m))]
+      (prn msg-meta)
+      (prn "duration from and to :client/store-cmp in ms:" store-duration)
+      (prn "duration from and to :client/ws-cmp in ms:" cli-ws-dur)
+      (prn "ms from :client/store-cmp to :client/ws-cmp:" (- (:in-ts cli-ws-m) (:out-ts store-m)))
+      (prn "ms from :client/ws-cmp to :client/store-cmp:" (- (:in-ts store-m) (:out-ts cli-ws-m)))
+      (prn "ms from :client/ws-cmp to :server/ws-cmp:" (- (:out-ts srv-ws-m) (:in-ts cli-ws-m)))
+      (prn "ms from :server/ws-cmp to :client/ws-cmp:" (- (:out-ts cli-ws-m) (:in-ts srv-ws-m)))
+      (prn "duration from and to :server/ws-cmp in ms:" srv-ws-dur)
+      (prn "duration from and to :server/store-cmp in ms:" srv-store-dur))))

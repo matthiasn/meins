@@ -37,13 +37,29 @@
    :md             "Moving to #cljc"})
 
 (def state-from-backend
-  {:entries [(:timestamp test-entry)]
-   :entries-map {(:timestamp test-entry) test-entry}
+  {:entries             [(:timestamp test-entry)]
+   :entries-map         {(:timestamp test-entry) test-entry}
    :linked-entries-list []
    :hashtags            #{"#drama" "#hashtag" "#blah"}
    :mentions            #{"@myself" "@me" "@I"}
    :stats               {:entry-count 4118 :node-count 5636 :edge-count 28726}
    :duration-ms         19})
+
+(def meta-from-backend
+  {:server/ws-cmp     {:out-ts 1467748026835
+                       :in-ts  1467748026845}
+   :sente-uid         "b1ea383d-f1b1-42fe-9125-f5953e605cd7"
+   :cmp-seq           [:client/search-cmp :client/store-cmp :client/ws-cmp :server/store-cmp
+                       :server/store-cmp :server/ws-cmp :client/store-cmp]
+   :server/store-cmp  {:in-ts  1467748026835
+                       :out-ts 1467748026845}
+   :client/store-cmp  {:out-ts 1467748026813
+                       :in-ts  1467748026870}
+   :client/search-cmp {:out-ts 1467748026684}
+   :client/ws-cmp     {:in-ts  1467748026814
+                       :out-ts 1467748026869}
+   :tag               "5a5183de-ee04-4b2f-9dbf-aa4fe2c245f7"
+   :corr-id           "39476852-fdc1-474a-a933-76cc83a55b31"})
 
 (def entry-update
   {:timestamp 1465059173965
@@ -63,7 +79,8 @@
 (deftest new-state-test
   (let [current-state @(:state (store/initial-state-fn #()))
         new-state (:new-state (store/new-state-fn {:current-state current-state
-                                                   :msg-payload   state-from-backend}))]
+                                                   :msg-payload   state-from-backend
+                                                   :msg-meta      meta-from-backend}))]
     (testing "entries are on new state"
       (is (= (:entries new-state) (:entries state-from-backend))))
     (testing "entries map is on new state"
@@ -75,7 +92,8 @@
     (testing "stats are on new state"
       (is (= (:stats new-state) (:stats state-from-backend))))
     (testing "query duration is on new state"
-      (is (= (:duration-ms new-state) (:duration-ms state-from-backend))))))
+      (is (= (:query (:timing new-state)) (:duration-ms state-from-backend)))
+      (is (= (:rtt (:timing new-state)) 57)))))
 
 (deftest set-active-test
   "Test that active entry is updated properly in store component state"

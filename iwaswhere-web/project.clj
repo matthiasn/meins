@@ -14,6 +14,7 @@
                  [me.raynes/fs "1.4.6"]
                  [markdown-clj "0.9.89"]
                  [cheshire "5.6.3"]
+                 [com.taoensso/timbre "4.5.1"]
                  [cljsjs/moment "2.10.6-4"]
                  [cljsjs/leaflet "0.7.7-4"]
                  [com.drewnoakes/metadata-extractor "2.8.1"]

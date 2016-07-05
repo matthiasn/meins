@@ -127,9 +127,9 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Search Result Spec
-(s/def :iww.search-stats/entry-count pos-int?)
-(s/def :iww.search-stats/node-count pos-int?)
-(s/def :iww.search-stats/edge-count pos-int?)
+(s/def :iww.search-stats/entry-count int?)
+(s/def :iww.search-stats/node-count int?)
+(s/def :iww.search-stats/edge-count int?)
 
 (def search-stats-spec
   (s/keys :req-un [:iww.search-stats/entry-count
@@ -142,7 +142,7 @@
 (s/def :iww.search-result/hashtags (s/* string?))
 (s/def :iww.search-result/mentions (s/* string?))
 (s/def :iww.search-result/stats search-stats-spec)
-(s/def :iww.search-result/duration-ms number?)
+(s/def :iww.search-result/duration-ms string?)
 
 (s/def :state/new
   (s/keys :req-un [:iww.search-result/entries
