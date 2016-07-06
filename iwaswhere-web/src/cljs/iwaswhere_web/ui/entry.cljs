@@ -73,7 +73,8 @@
         toggle-comments #(put-fn [:cmd/toggle {:timestamp ts :path [:cfg :show-comments-for]}])
         create-comment (h/new-entry-fn put-fn {:comment-for ts})
         create-linked-entry (h/new-entry-fn put-fn {:linked-entries [ts]})
-        create-pomodoro (h/new-entry-fn put-fn (p/pomodoro-defaults ts))
+        create-pomodoro #(do ((h/new-entry-fn put-fn (p/pomodoro-defaults ts)))
+                             (put-fn [:cmd/set-opt {:timestamp ts :path [:cfg :show-comments-for]}]))
         toggle-edit #(if edit-mode? (put-fn [:entry/remove-local entry])
                                     (put-fn [:entry/update-local entry]))
         trash-entry #(if edit-mode? (put-fn [:entry/remove-local {:timestamp ts}])
@@ -83,8 +84,8 @@
         hashtags (:hashtags cfg)
         mentions (:mentions cfg)
         arrival-ts (:arrival-timestamp entry)
-        departure-ts (:departure-timestamp entry)
-        dur (when (and arrival-ts departure-ts) (-> (- departure-ts arrival-ts) (/ 1000) (Math/floor)))
+        depart-ts (:departure-timestamp entry)
+        dur (when (and arrival-ts depart-ts) (-> (- depart-ts arrival-ts) (/ 1000) (Math/floor)))
         formatted-duration (when (and dur (< dur 99999)) (str ", " (u/duration-string dur)))]
     [:div.entry
      [:div.header

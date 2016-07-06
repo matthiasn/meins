@@ -51,6 +51,14 @@
                     (update-in current-state path conj timestamp))]
     {:new-state new-state}))
 
+(defn set-conj-fn
+  "Like toggle-set-fn but only adds timestamp to set specified in path. Noop if already in there."
+  [{:keys [current-state msg-payload]}]
+  (let [path (:path msg-payload)
+        ts (:timestamp msg-payload)
+        new-state (update-in current-state path conj ts)]
+    {:new-state new-state}))
+
 (defn toggle-key-fn
   "Toggles config key."
   [{:keys [current-state msg-payload]}]
@@ -84,6 +92,7 @@
                               :show/more          show-more-fn
                               :cmd/set-active     set-active-fn
                               :cmd/toggle         toggle-set-fn
+                              :cmd/set-opt        set-conj-fn
                               :cmd/toggle-key     toggle-key-fn
                               :cmd/keep-alive     ka/reset-fn
                               :cmd/keep-alive-res ka/set-alive-fn})})

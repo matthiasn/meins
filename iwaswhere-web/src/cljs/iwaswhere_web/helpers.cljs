@@ -25,13 +25,14 @@
   [put-fn opts]
   (fn [_ev]
     (let [ts (st/now)
+          timezone (or (when-let [resolved (.-resolved (new js/Intl.DateTimeFormat))]
+                         (.-timeZone resolved))
+                       (when-let [resolved (.resolvedOptions (new js/Intl.DateTimeFormat))]
+                         (.-timeZone resolved)))
           entry (merge (p/parse-entry "")
                        {:timestamp  ts
                         :new-entry  true
-                        :timezone   (or (when-let [resolved (.-resolved (new js/Intl.DateTimeFormat))]
-                                          (.-timeZone resolved))
-                                        (when-let [resolved (.resolvedOptions (new js/Intl.DateTimeFormat))]
-                                          (.-timeZone resolved)))
+                        :timezone   timezone
                         :utc-offset (.getTimezoneOffset (new js/Date))}
                        opts)]
       (put-fn [:entry/new entry])
