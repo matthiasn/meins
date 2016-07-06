@@ -7,7 +7,8 @@
             [cljsjs.moment]
             [iwaswhere-web.helpers :as h]
             [iwaswhere-web.ui.utils :as u]
-            [reagent.core :as r]))
+            [reagent.core :as r]
+            [cljs.pprint :as pp]))
 
 (defn hashtags-mentions-list
   "Horizontally renders list with hashtags and mentions."
@@ -49,7 +50,9 @@
                                    (let [link (re-find #"[0-9]{13}" (.-value (.-target ev)))
                                          entry-links (:linked-entries entry)
                                          linked-entries (conj entry-links (long link))
-                                         new-entry (h/clean-entry (merge entry {:linked-entries linked-entries}))]
+                                         new-entry (h/clean-entry
+                                                     (merge entry
+                                                            {:linked-entries linked-entries}))]
                                      (when link
                                        (put-fn [:entry/update new-entry])
                                        (swap! visible not)))))}])])))
@@ -136,7 +139,8 @@
         comments (if (:show-pvt cfg) comments (filter u/pvt-filter comments))
         comments-map (into {} (map (fn [c] [(:timestamp c) c])) comments)
         toggle-comments #(put-fn [:cmd/toggle {:timestamp ts :path [:cfg :show-comments-for]}])
-        local-comments (into {} (filter (fn [[_ts c]] (= (:comment-for c) (:timestamp entry))) new-entries))
+        local-comments (into {} (filter (fn [[_ts c]] (= (:comment-for c) (:timestamp entry)))
+                                        new-entries))
         all-comments (sort-by :timestamp (vals (merge comments-map local-comments)))]
     [:div.entry-with-comments
      [journal-entry entry cfg put-fn (contains? new-entries ts) (p/pomodoro-stats-view all-comments)]

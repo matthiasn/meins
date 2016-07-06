@@ -1,9 +1,9 @@
-(defproject matthiasn/iwaswhere-web "0.1.1-SNAPSHOT"
+(defproject matthiasn/iwaswhere-web "0.1.2"
   :description "Sample application built with systems-toolbox library"
   :url "https://github.com/matthiasn/systems-toolbox"
   :license {:name "GNU GENERAL PUBLIC LICENSE"
             :url  "http://www.gnu.org/licenses/gpl-3.0.en.html"}
-  :dependencies [[org.clojure/clojure "1.9.0-alpha8"]
+  :dependencies [[org.clojure/clojure "1.9.0-alpha9"]
                  [org.clojure/clojurescript "1.9.93"]
                  [org.clojure/tools.logging "0.3.1"]
                  [org.clojure/tools.namespace "0.2.11"]
@@ -31,7 +31,7 @@
   :auto-clean false
 
   :main iwaswhere-web.core
-  :jvm-opts ["-XX:-OmitStackTraceInFastThrow"]
+  :jvm-opts ["-XX:-OmitStackTraceInFastThrow" "-Dapple.awt.UIElement=true"]
 
   :plugins [[lein-cljsbuild "1.1.3" :exclusions [org.apache.commons/commons-compress]]
             [lein-figwheel "0.5.4-5" :exclusions [org.clojure/clojure]]

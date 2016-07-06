@@ -94,7 +94,9 @@
                     ;(remove :mirror?)
                     (map :dest)
                     (sort))]
-    (merge entry {:linked-entries-list (if sort-by-upvotes? (sort compare-w-upvotes linked) linked)})))
+    (merge entry {:linked-entries-list (if sort-by-upvotes?
+                                         (sort compare-w-upvotes linked)
+                                         linked)})))
 
 (defn extract-sorted-entries
   "Extracts nodes and their properties in descending timestamp order by looking for node by mapping
@@ -167,6 +169,7 @@
   some basic stats."
   [current-state query]
   (let [n (:n query)
+        sort-by-upvotes? (:sort-by-upvotes query)
         graph (:graph current-state)
         entry-mapper (fn [entry] [(:timestamp entry) entry])
         entries (take n (filter (entries-filter-fn query graph)
@@ -174,7 +177,12 @@
         comment-timestamps (set (flatten (map :comments entries)))
         linked-entries (extract-entries-by-ts current-state
                                               (set (flatten (map :linked-entries-list entries))))
-        linked-entries (map (fn [e] (get-comments e graph (:timestamp e))) linked-entries)
+        linked-entries (map (fn [entry]
+                              (let [ts (:timestamp entry)]
+                                (-> entry
+                                    (get-comments graph ts)
+                                    (get-linked-entries graph ts sort-by-upvotes?))))
+                            linked-entries)
         linked-comments-ts (set (flatten (map :comments linked-entries)))
         comments (extract-entries-by-ts current-state
                                         (set/union comment-timestamps linked-comments-ts))]
