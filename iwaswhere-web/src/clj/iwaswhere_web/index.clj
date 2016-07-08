@@ -13,10 +13,10 @@
      [:head
       [:meta {:name "viewport" :content "width=device-width, initial-scale=1"}]
       [:title "iWasWhere"]
-      [:link {:href "/bower_components/normalize-css/normalize.css" :media "screen" :rel "stylesheet"}]
-      [:link {:href "/bower_components/lato/css/lato.css" :media "screen" :rel "stylesheet"}]
-      [:link {:href "/bower_components/font-awesome/css/font-awesome.css" :media "screen" :rel "stylesheet"}]
-      [:link {:href "/bower_components/leaflet/dist/leaflet.css" :media "screen" :rel "stylesheet"}]
+      [:link {:href "/webjars/normalize-css/3.0.3/normalize.css" :media "screen" :rel "stylesheet"}]
+      [:link {:href "/webjars/github-com-mrkelly-lato/0.3.0/css/lato.css" :media "screen" :rel "stylesheet"}]
+      [:link {:href "/webjars/fontawesome/4.6.3/css/font-awesome.css" :media "screen" :rel "stylesheet"}]
+      [:link {:href "/webjars/leaflet/0.7.7/dist/leaflet.css" :media "screen" :rel "stylesheet"}]
       [:link {:href "/css/iwaswhere.css" :media "screen" :rel "stylesheet"}]
       [:link {:href "/images/favicon.png" :rel "shortcut icon" :type "image/png"}]]
      [:body
