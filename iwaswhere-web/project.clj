@@ -57,6 +57,8 @@
                  :changes-only      false
                  :watch-dirs        ["src" "test"]}
 
+  :aliases {"build" ["do" "clean" ["cljsbuild" "once" "release"] ["sass" "once"]]}
+
   :cljsbuild {:builds [{:id           "dev"
                         :source-paths ["src/cljc" "src/cljs" "env/dev/cljs"]
                         :figwheel     true

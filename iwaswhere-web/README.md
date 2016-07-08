@@ -5,11 +5,7 @@ This is the **web application** part of **iWasWhere**. You can read more about t
 
 ## Installation
 
-Before first usage, you want to install the **[Bower](http://bower.io)** dependencies:
-
-    $ bower install
-
-Next, you need to compile the **ClojureScript**:
+First, you need to compile the **ClojureScript**:
 
     $ lein cljsbuild once release
 
@@ -21,6 +17,9 @@ The styling is maintained via **SASS** in a bunch of `.scss` files. These need t
 
 There is no **CSS** framework involved here. Rather, the styling is self-contained, which is possible thanks to **[CSS Flexible Box Layout](https://www.w3.org/TR/css-flexbox-1/)**. It's great for layout. You should learn it.
 
+You can also use the following task bundle instead of the previous two:
+
+    $ lein build
 
 ## Usage
 
