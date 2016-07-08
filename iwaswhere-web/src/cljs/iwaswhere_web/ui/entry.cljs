@@ -99,7 +99,7 @@
       [:div
        (when (seq (:linked-entries-list entry))
          (let [entry-active? (= (:active cfg) (:timestamp entry))
-               set-active-fn #(put-fn [:cmd/set-active (when-not entry-active? (:timestamp entry))])]
+               set-active-fn #(put-fn [:cmd/set-active (:timestamp entry)])]
            [:span.link-btn {:on-click set-active-fn :class (when entry-active? "active")}
             (str " linked: " (count (:linked-entries-list entry)))]))]
       [:div

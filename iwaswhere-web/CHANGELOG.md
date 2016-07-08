@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
 
+## [0.1.5] - 2016-07-08
+### Changed
+- toggle display of active entry
+- filter: don't show linked entries for active entry in left column
+- hide second search bar when no active entry
+
 ## [0.1.4] - 2016-07-08
 ### Changed
 - remove dev dependency on Bower, pull dependencies in via WebJars

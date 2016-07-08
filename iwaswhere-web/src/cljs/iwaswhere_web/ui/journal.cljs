@@ -26,8 +26,9 @@
           linked-entries (if (:show-pvt cfg) linked-entries (filter u/pvt-filter linked-entries))
           linked-entries (filter (linked-entries-filter entries-map @local) linked-entries)]
       [:div.journal-entries
-       [:div.search-field {:content-editable true :on-input on-input-fn}
-        (:search-text (:linked-filter @local))]
+       (when (:active cfg)
+         [:div.search-field {:content-editable true :on-input on-input-fn}
+          (:search-text (:linked-filter @local))])
        (for [entry linked-entries]
          (when (and (not (:comment-for entry)) (or (:new-entry entry) (:show-context cfg)))
            (let [entry (assoc-in entry [:comments] (map (fn [ts] (get entries-map ts))
@@ -51,17 +52,16 @@
                                             (not comments-w-entries?))
                                         (or (:new-entry entry) show-context?)))
         active-entry (get (:entries-map store-snapshot) (:active (:cfg store-snapshot)))
-        linked-entries (:linked-entries-list active-entry)
-        linked-entries (map (fn [ts] (get entries-map ts)) linked-entries)]
+        linked-entries-set (set (:linked-entries-list active-entry))
+        linked-entries (map (fn [ts] (get entries-map ts)) linked-entries-set)]
     [:div.journal
      [:div.journal-entries
-      (for [entry (filter #(and (not (:comment-for %))
-                                (not (contains? (:entries-map store-snapshot) (:timestamp %)))
-                                (not (contains? (set (map :timestamp linked-entries)) (:timestamp %))))
+      (for [entry (filter #(or (not (:comment-for %))
+                                (not (contains? (:entries-map store-snapshot) (:timestamp %))))
                           (vals new-entries))]
         ^{:key (:timestamp entry)}
         [e/entry-with-comments entry cfg new-entries put-fn])
-      (for [entry filtered-entries]
+      (for [entry (filter #(not (contains? linked-entries-set (:timestamp %))) filtered-entries)]
         (when (with-comments? entry)
           (let [entry (assoc-in entry [:comments] (map (fn [ts] (get entries-map ts))
                                                        (:comments entry)))]
@@ -72,8 +72,8 @@
           [:div.show-more {:on-click show-more :on-mouse-over show-more}
            [:span.show-more-btn [:span.fa.fa-plus-square] " show more"]]))
       (when-let [stats (:stats store-snapshot)]
-        [:div (:entry-count stats) " entries, " (:node-count stats) " nodes, " (:edge-count stats) " edges, "
-         (count (:hashtags cfg)) " hashtags, " (count (:mentions cfg)) " people"])
+        [:div (:entry-count stats) " entries, " (:node-count stats) " nodes, " (:edge-count stats)
+         " edges, " (count (:hashtags cfg)) " hashtags, " (count (:mentions cfg)) " people"])
       [:div (p/pomodoro-stats-str filtered-entries)]
       (when-let [ms (get-in store-snapshot [:timing :query])]
         [:div.stats (str "Query completed in " ms ", RTT "

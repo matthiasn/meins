@@ -77,7 +77,10 @@
 (defn set-active-fn
   "Sets entry in payload as the active entry for which to show linked entries."
   [{:keys [current-state msg-payload]}]
-  {:new-state (assoc-in current-state [:cfg :active] msg-payload)})
+  (let [currently-active (get-in current-state [:cfg :active])]
+    {:new-state (assoc-in current-state [:cfg :active] (if (= currently-active msg-payload)
+                                                         nil
+                                                         msg-payload))}))
 
 (defn cmp-map
   "Creates map for the component which holds the client-side application state."
