@@ -39,23 +39,26 @@
 
 (defn new-link
   "Renders input for adding link entry."
-  [entry put-fn]
+  [entry put-fn create-linked-entry]
   (let [visible (r/atom false)]
-    (fn [entry put-fn]
-      [:span.fa.fa-link.toggle.new-link-btn {:on-click #(swap! visible not)}
+    (fn [entry put-fn create-linked-entry]
+      [:span.new-link-btn
+       [:span.fa.fa-link.toggle {:on-click #(swap! visible not)}]
        (when @visible
-         [:input {:on-click    #(.stopPropagation %)
-                  :on-key-down (fn [ev]
-                                 (when (= (.-keyCode ev) 13)
-                                   (let [link (re-find #"[0-9]{13}" (.-value (.-target ev)))
-                                         entry-links (:linked-entries entry)
-                                         linked-entries (conj entry-links (long link))
-                                         new-entry (h/clean-entry
-                                                     (merge entry
-                                                            {:linked-entries linked-entries}))]
-                                     (when link
-                                       (put-fn [:entry/update new-entry])
-                                       (swap! visible not)))))}])])))
+         [:span.new-link
+          [:span.fa.fa-plus-square {:on-click #(do (create-linked-entry) (swap! visible not))}]
+          [:input {:on-click    #(.stopPropagation %)
+                   :on-key-down (fn [ev]
+                                  (when (= (.-keyCode ev) 13)
+                                    (let [link (re-find #"[0-9]{13}" (.-value (.-target ev)))
+                                          entry-links (:linked-entries entry)
+                                          linked-entries (conj entry-links (long link))
+                                          new-entry (h/clean-entry
+                                                      (merge entry
+                                                             {:linked-entries linked-entries}))]
+                                      (when link
+                                        (put-fn [:entry/update new-entry])
+                                        (swap! visible not)))))}]])])))
 
 (defn journal-entry
   "Renders individual journal entry. Interaction with application state happens via
@@ -103,12 +106,12 @@
            [:span.link-btn {:on-click set-active-fn :class (when entry-active? "active")}
             (str " linked: " (count (:linked-entries-list entry)))]))]
       [:div
-       [:span.fa.toggle {:on-click (upvote-fn inc) :class (if (pos? upvotes) "fa-thumbs-up" "fa-thumbs-o-up")}]
+       [:span.fa.toggle
+        {:on-click (upvote-fn inc) :class (if (pos? upvotes) "fa-thumbs-up" "fa-thumbs-o-up")}]
        (when (pos? upvotes) [:span.upvotes " " upvotes])
        (when (pos? upvotes) [:span.fa.fa-thumbs-down.toggle {:on-click (upvote-fn dec)}])
        (when map? [:span.fa.fa-map-o.toggle {:on-click toggle-map}])
        [:span.fa.fa-pencil-square-o.toggle {:on-click toggle-edit}]
-       (when-not edit-mode? [:span.fa.fa-link.toggle {:on-click create-linked-entry}])
        (when-not (:comment-for entry) [:span.fa.fa-clock-o.toggle {:on-click create-pomodoro}])
        (when-not (:comment-for entry) [:span.fa.fa-comment-o.toggle {:on-click create-comment}])
        (when (seq (:comments entry))
@@ -116,7 +119,7 @@
                                        :class    (when-not show-comments? "hidden-comments")}])
        (when-not (:comment-for entry)
          [:a {:href (str "/#" ts) :target "_blank"} [:span.fa.fa-external-link.toggle]])
-       (when-not (:comment-for entry) [new-link entry put-fn])
+       (when-not (:comment-for entry) [new-link entry put-fn create-linked-entry])
        [trash-icon trash-entry]]]
      [hashtags-mentions-list entry]
      [l/leaflet-map entry (or show-map? (:show-all-maps cfg))]
