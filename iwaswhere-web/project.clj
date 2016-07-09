@@ -23,6 +23,7 @@
                  [matthiasn/systems-toolbox "0.6.1-alpha1"]
                  [matthiasn/systems-toolbox-ui "0.6.1-alpha2"]
                  [matthiasn/systems-toolbox-sente "0.6.1-alpha2"]
+                 [clucy "0.4.0"]
                  [org.webjars.bower/fontawesome "4.6.3"]
                  [org.webjars.bower/normalize-css "3.0.3"]
                  [org.webjars.bower/leaflet "0.7.7"]
@@ -38,7 +39,7 @@
   :jvm-opts ["-XX:-OmitStackTraceInFastThrow" "-Dapple.awt.UIElement=true"]
 
   :plugins [[lein-cljsbuild "1.1.3" :exclusions [org.apache.commons/commons-compress]]
-            [lein-figwheel "0.5.4-5" :exclusions [org.clojure/clojure]]
+            [lein-figwheel "0.5.4-7" :exclusions [org.clojure/clojure]]
             [lein-sassy "1.0.7" :exclusions [org.clojure/clojure org.codehaus.plexus/plexus-utils]]
             [com.jakemccrary/lein-test-refresh "0.16.0"]
             [test2junit "1.2.2"]

@@ -56,8 +56,9 @@
         linked-entries (map (fn [ts] (get entries-map ts)) linked-entries-set)]
     [:div.journal
      [:div.journal-entries
-      (for [entry (filter #(or (not (:comment-for %))
-                                (not (contains? (:entries-map store-snapshot) (:timestamp %))))
+      (for [entry (filter #(and (not (:comment-for %))
+                                (not (contains? (:entries-map store-snapshot) (:timestamp %)))
+                                (not (contains? linked-entries-set (:timestamp %))))
                           (vals new-entries))]
         ^{:key (:timestamp entry)}
         [e/entry-with-comments entry cfg new-entries put-fn])

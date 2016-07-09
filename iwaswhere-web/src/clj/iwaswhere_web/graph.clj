@@ -2,6 +2,7 @@
   "this namespace manages interactions with the graph data structure, which
   holds all entries and their connections."
   (:require [ubergraph.core :as uber]
+            [iwaswhere-web.fulltext-search :as ft]
             [clj-time.coerce :as ctc]
             [clj-time.core :as ct]
             [clojure.string :as s]
@@ -116,6 +117,9 @@
                           ; set with timestamps matching tags and mentions
                           (or (seq (:tags query)) (seq (:mentions query)))
                           (sort-fn (get-tags-mentions-matches g query))
+                          ; full-text search
+                          (:ft-search query)
+                          (sort-fn (ft/search query))
                           ; set with the one timestamp in query
                           (:timestamp query) #{(Long/parseLong (:timestamp query))}
                           ; set with timestamps matching the day

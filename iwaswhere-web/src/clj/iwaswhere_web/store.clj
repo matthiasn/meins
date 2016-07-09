@@ -10,6 +10,7 @@
             [iwaswhere-web.keepalive :as ka]
             [clojure.tools.logging :as log]
             [me.raynes.fs :as fs]
+            [iwaswhere-web.fulltext-search :as ft]
             [clojure.pprint :as pp]))
 
 (defn publish-state-fn
@@ -59,8 +60,11 @@
   (fn
     [_put-fn]
     (fs/mkdirs f/daily-logs-path)
-    (let [state (atom {:sorted-entries (sorted-set-by >)
+    (let [entries-to-index (atom [])
+          state (atom {:sorted-entries (sorted-set-by >)
                        :graph          (uber/graph)
+                       ;:lucene-index   (clucy/memory-index)
+                       :lucene-index   ft/index
                        :client-queries {}
                        :hashtags       #{}
                        :mentions       #{}
@@ -76,7 +80,14 @@
                     ts (:timestamp parsed)]
                 (if (:deleted parsed)
                   (swap! state ga/remove-node ts)
-                  (swap! state ga/add-node ts parsed)))))))
+                  (do (swap! entries-to-index conj (select-keys parsed [:timestamp :md]))
+                      (swap! state ga/add-node ts parsed))))))))
+      (future
+        (let [t (with-out-str
+                  (time (doseq [entry @entries-to-index]
+                          (ft/add-to-index (:lucene-index @state) entry))))]
+          (log/info "Indexed" (count @entries-to-index) "entries." t))
+        (reset! entries-to-index []))
       ; nicer would be: send off :state/stats-tags message
       (swap! state #(:new-state (stats-tags-fn {:current-state %})))
       {:state state})))

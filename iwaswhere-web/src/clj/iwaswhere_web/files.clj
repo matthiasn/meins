@@ -8,6 +8,7 @@
             [clj-time.core :as time]
             [clj-time.format :as timef]
             [clojure.tools.logging :as log]
+            [iwaswhere-web.fulltext-search :as ft]
             [ubergraph.core :as uber]))
 
 (def data-path (or (System/getenv "DATA_PATH")
@@ -48,6 +49,7 @@
   [{:keys [current-state msg-payload]}]
   (let [entry-ts (:timestamp msg-payload)
         new-state (ga/add-node current-state entry-ts msg-payload)]
+    (ft/add-to-index (:lucene-index current-state) msg-payload)
     (append-daily-log msg-payload)
     {:new-state    new-state
      :emit-msg     [:entry/saved msg-payload]

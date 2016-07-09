@@ -39,6 +39,17 @@
 
 (def empty-search
   {:search-text ""
+   :ft-search   nil
+   :tags        #{}
+   :not-tags    #{}
+   :mentions    #{}
+   :date-string nil
+   :timestamp   nil
+   :n           15})
+
+(def fulltext-search
+  {:search-text "\"travel AND aircraft\""
+   :ft-search   "travel AND aircraft"
    :tags        #{}
    :not-tags    #{}
    :mentions    #{}
@@ -48,6 +59,7 @@
 
 (def open-tasks-search
   {:search-text "#task ~#done ~#backlog ~#outdated"
+   :ft-search   nil
    :tags        #{"#task"}
    :not-tags #{"#backlog" "#done" "#outdated"}
    :mentions    #{}
@@ -57,6 +69,7 @@
 
 (def tasks-done-search
   {:search-text "#task #done @myself"
+   :ft-search   nil
    :tags        #{"#task" "#done"}
    :not-tags    #{}
    :mentions    #{"@myself"}
@@ -66,6 +79,7 @@
 
 (def day-search
   {:search-text "2016-06-07 #task #done @myself"
+   :ft-search   nil
    :tags        #{"#task" "#done"}
    :not-tags    #{}
    :mentions    #{"@myself"}
@@ -75,6 +89,7 @@
 
 (def timestamp-search
   {:search-text "1465325998053"
+   :ft-search   nil
    :tags        #{}
    :not-tags    #{}
    :mentions    #{}
@@ -91,6 +106,9 @@
 
   (testing "tasks done query is parsed correctly"
     (is (= (p/parse-search (:search-text tasks-done-search)) tasks-done-search)))
+
+  (testing "fulltext search string is parsed correctly"
+    (is (= (p/parse-search (:search-text fulltext-search)) fulltext-search)))
 
   (testing "day query is parsed correctly"
     (is (= (p/parse-search (:search-text day-search)) day-search)))

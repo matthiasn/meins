@@ -22,11 +22,13 @@
 
 (defn parse-search
   "Parses search string for hashtags, mentions, and hashtags that should not be contained in the
-   filtered entries. Such hashtags can for now be marked like this: #~done. Finding tasks that
+   filtered entries. Such hashtags can for now be marked like this: ~#done. Finding tasks that
    are not done, which don't have #done in either the entry or any of its comments, can be found
-   like this: #task #~done"
+   like this: #task ~#done."
   [text]
   {:search-text text
+   :ft-search   (when-let [ft-search (re-find #"\".*\"" text)]
+                  (s/replace ft-search "\"" ""))
    :tags        (set (map second (re-seq search-tag-regex text)))
    :not-tags    (set (map #(s/replace % "~" "") (re-seq search-not-tags-regex text)))
    :mentions    (set (re-seq search-mention-regex text))
