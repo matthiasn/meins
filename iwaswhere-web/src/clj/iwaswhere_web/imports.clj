@@ -86,7 +86,7 @@
                       (extract-ts (str (get exif "Date/Time Original")) filename)
                       (st/now))
         target-filename (str timestamp "-" filename)]
-    (fs/rename rel-path (str "data/images/" target-filename))
+    (fs/rename rel-path (str f/data-path "/images/" target-filename))
     {:raw-exif  exif
      :timestamp timestamp
      :latitude  (dms-to-dd exif "GPS Latitude" "GPS Latitude Ref")
@@ -101,7 +101,7 @@
         rel-path (.getPath file)
         timestamp (.lastModified file)
         target-filename (str timestamp "-" filename)]
-    (fs/rename rel-path (str "data/videos/" target-filename))
+    (fs/rename rel-path (str f/data-path "/videos/" target-filename))
     {:timestamp  timestamp
      :video-file target-filename
      :tags       #{"#video" "#import"}}))
@@ -115,7 +115,7 @@
         timestamp (.lastModified audio-file)
         rel-path (.getPath audio-file)
         target-filename (s/replace (str timestamp "-" filename) " " "_")]
-    (fs/rename rel-path (str "data/audio/" target-filename))
+    (fs/rename rel-path (str f/data-path "/audio/" target-filename))
     {:timestamp  (c/to-long (tf/parse f ts-str))
      :audio-file target-filename
      :tags       #{"#audio" "#import"}}))
@@ -123,7 +123,7 @@
 (defn import-media
   "Imports photos from respective directory."
   [{:keys [put-fn msg-meta]}]
-  (let [files (file-seq (clojure.java.io/file "data/import"))]
+  (let [files (file-seq (clojure.java.io/file (str f/data-path "/import")))]
     (log/info "importing media files")
     (doseq [file (f/filter-by-name files #"[ A-Za-z0-9_]+.(jpg|JPG|PNG|png|m4v|m4a)")]
       (let [filename (.getName file)]
@@ -141,7 +141,7 @@
   "Imports geo data from respective directory.
   For now, only pays attention to visits."
   [{:keys [put-fn msg-meta]}]
-  (let [files (file-seq (clojure.java.io/file "data/geo-import"))]
+  (let [files (file-seq (clojure.java.io/file (str f/data-path "/geo-import")))]
     (log/info "importing photos")
     (doseq [file (f/filter-by-name files #"visits.json" #_#"[-0-9]+.(json)")]
       (let [filename (.getName file)]
@@ -166,7 +166,7 @@
 (defn import-phone
   "Imports text entries from phone."
   [{:keys [put-fn msg-meta]}]
-  (let [files (file-seq (clojure.java.io/file "data/geo-import"))]
+  (let [files (file-seq (clojure.java.io/file (str f/data-path "/geo-import")))]
     (log/info "importing photos")
     (doseq [file (f/filter-by-name files #"text-entries.json")]
       (let [filename (.getName file)]

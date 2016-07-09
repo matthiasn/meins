@@ -76,7 +76,7 @@
          " edges, " (count (:hashtags cfg)) " hashtags, " (count (:mentions cfg)) " people"])
       [:div (p/pomodoro-stats-str filtered-entries)]
       (when-let [ms (get-in store-snapshot [:timing :query])]
-        [:div.stats (str "Query completed in " ms ", RTT "
+        [:div.stats (str "Query with " (count entries) " results completed in " ms ", RTT "
                          (get-in store-snapshot [:timing :rtt]) " ms")])]
      (linked-entries-view local linked-entries entries-map new-entries cfg put-fn)]))
 

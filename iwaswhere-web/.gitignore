@@ -30,3 +30,5 @@ resources/public/
 figwheel_server.log
 out/
 test2junit/
+packages/
+

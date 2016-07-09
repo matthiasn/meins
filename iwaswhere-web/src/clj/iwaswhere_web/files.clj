@@ -10,7 +10,9 @@
             [clojure.tools.logging :as log]
             [ubergraph.core :as uber]))
 
-(def daily-logs-path "./data/daily-logs/")
+(def data-path (or (System/getenv "DATA_PATH")
+                   (str (System/getProperty "user.home") "/iWasWhere/data")))
+(def daily-logs-path (str data-path "/daily-logs/"))
 
 (defn filter-by-name
   "Filter a sequence of files by their name, matched via regular expression."
@@ -20,7 +22,8 @@
 (defn append-daily-log
   "Appends journal entry to the current day's log file."
   [entry]
-  (let [filename (str daily-logs-path (timef/unparse (timef/formatters :year-month-day) (time/now)) ".jrn")
+  (let [filename (str daily-logs-path
+                      (timef/unparse (timef/formatters :year-month-day) (time/now)) ".jrn")
         serialized (str (pr-str entry) "\n")]
     (spit filename serialized :append true)))
 

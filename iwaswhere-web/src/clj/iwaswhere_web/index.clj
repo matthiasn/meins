@@ -2,7 +2,8 @@
   "This namespace takes care of rendering the static HTML into which the React / Reagent
   components are mounted on the client side at runtime."
   (:require [hiccup.core :refer [html]]
-            [compojure.route :as r]))
+            [compojure.route :as r]
+            [iwaswhere-web.files :as f]))
 
 (defn index-page
   "Generates index page HTML with the specified page title."
@@ -37,9 +38,9 @@
   is not used here but can be useful in scenarios when requests are supposed to be handled by a another
   component."
   [_put-fn]
-  [(r/files "/photos" {:root "data/images/"})
-   (r/files "/audio" {:root "data/audio/"})
-   (r/files "/videos" {:root "data/videos/"})])
+  [(r/files "/photos" {:root (str f/data-path "/images/")})
+   (r/files "/audio" {:root (str f/data-path "/audio/")})
+   (r/files "/videos" {:root (str f/data-path "/videos/")})])
 
 (def sente-map
   "Configuration map for sente-cmp."
