@@ -55,28 +55,33 @@
             [curr-tag f-tags] (p/autocomplete-tags before-cursor "(?!^) ?#" hashtags)
             [curr-mention f-mentions] (p/autocomplete-tags before-cursor " ?@" mentions)
 
-            replace-tag (fn [curr-tag tag]
-                          (let [curr-regex (js/RegExp (str curr-tag "(?!" p/tag-char-cls ")") "i")
-                                md (:md latest-entry)
-                                updated (merge entry (p/parse-entry (s/replace md curr-regex tag)))]
-                            (reset! local-display-entry updated)
-                            (put-fn [:entry/update-local updated])
-                            (.setTimeout js/window (fn [] (h/focus-on-end @edit-elem-atom)) 100)))
+            replace-tag
+            (fn [curr-tag tag]
+              (let [curr-regex (js/RegExp (str curr-tag "(?!" p/tag-char-cls ")") "i")
+                    md (:md latest-entry)
+                    updated (merge entry (p/parse-entry (s/replace md curr-regex tag)))]
+                (reset! local-display-entry updated)
+                (put-fn [:entry/update-local updated])
+                (.setTimeout js/window (fn [] (h/focus-on-end @edit-elem-atom)) 100)))
 
-            on-keydown-fn (fn [ev]
-                            (let [key-code (.. ev -keyCode)
-                                  meta-key (.. ev -metaKey)]
-                              (when (and meta-key (= key-code 83))
-                                (when (not= (dissoc @local-display-entry :comments)
-                                            (dissoc latest-entry :new-entry))
-                                  (save-fn))
-                                (.preventDefault ev))
-                              (when (= key-code 9)          ; TAB key pressed
-                                (when (and curr-tag (seq f-tags))
-                                  (replace-tag curr-tag (first f-tags)))
-                                (when (and curr-mention (seq f-mentions))
-                                  (replace-tag curr-mention (first f-mentions)))
-                                (.preventDefault ev))))]
+            on-keydown-fn
+            (fn [ev]
+              (let [key-code (.. ev -keyCode)
+                    meta-key (.. ev -metaKey)]
+                (when (and meta-key (= key-code 83))
+                  (if (not= (dissoc @local-display-entry :comments)
+                            (dissoc latest-entry :new-entry))
+                    (save-fn)
+                    (toggle-edit))
+                  (when-let [comment-for (:comment-for entry)]
+                    (put-fn [:cmd/set-opt {:timestamp comment-for :path [:cfg :show-comments-for]}]))
+                  (.preventDefault ev))
+                (when (= key-code 9)          ; TAB key pressed
+                  (when (and curr-tag (seq f-tags))
+                    (replace-tag curr-tag (first f-tags)))
+                  (when (and curr-mention (seq f-mentions))
+                    (replace-tag curr-mention (first f-mentions)))
+                  (.preventDefault ev))))]
         [:div.edit-md
          [:pre [editable-code-elem md-string update-temp-fn on-keydown-fn edit-elem-atom]]
          [u/suggestions ts f-tags curr-tag replace-tag "hashtag"]

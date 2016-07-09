@@ -4,8 +4,10 @@ All notable changes to this project will be documented in this file. This change
 
 ## [0.1.6] - 2016-07-09
 ### Changed
+- fulltext search
 - data path defaults to ~/iWasWhere/data
 - packaging script
+- UX improvements when adding and saving comments
 
 ## [0.1.5] - 2016-07-08
 ### Changed
