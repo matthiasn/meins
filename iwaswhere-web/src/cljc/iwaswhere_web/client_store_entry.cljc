@@ -35,12 +35,15 @@
     {:new-state new-state}))
 
 (defn geo-enrich-fn
-  "Enrich locally stored new entry with geolocation once it becomes available."
+  "Enrich locally stored new entry with geolocation once it becomes available.
+   Does nothing when entry is already saved in backend."
   [{:keys [current-state msg-payload]}]
   (let [ts (:timestamp msg-payload)
+        local-entry (get-in current-state [:new-entries ts])
         new-state (update-in current-state [:new-entries ts] #(merge msg-payload %))]
-    (update-local-storage new-state)
-    {:new-state new-state}))
+    (when local-entry
+      (update-local-storage new-state)
+      {:new-state new-state})))
 
 (defn entry-saved-fn
   "Remove new entry from local when saving is confirmed by backend."
