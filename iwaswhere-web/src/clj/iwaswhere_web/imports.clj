@@ -137,6 +137,8 @@
                  (put-fn (with-meta [:entry/import file-info] msg-meta))))
              (catch Exception ex (log/error (str "Error while importing " filename) ex)))))))
 
+(defn double-ts-to-long [ts] (long (* ts 1000)))
+
 (defn import-geo
   "Imports geo data from respective directory.
   For now, only pays attention to visits."
@@ -149,8 +151,8 @@
         (try (let [lines (line-seq (clojure.java.io/reader file))]
                (doseq [line lines]
                  (let [raw-visit (cc/parse-string line #(keyword (s/replace % "_" "-")))
-                       arrival-ts (:arrival-timestamp raw-visit)
-                       departure-ts (:departure-timestamp raw-visit)
+                       arrival-ts (double-ts-to-long (:arrival-timestamp raw-visit))
+                       departure-ts (double-ts-to-long (:departure-timestamp raw-visit))
                        dur (-> (- departure-ts arrival-ts)
                                (/ 6000)
                                (Math/floor)
@@ -173,8 +175,10 @@
         (log/info "Trying to import " filename)
         (try (let [lines (line-seq (clojure.java.io/reader file))]
                (doseq [line lines]
-                 (let [entry (m/add-tags-mentions (cc/parse-string line #(keyword (s/replace % "_" "-"))))
-                       entry (update-in entry [:tags] conj "#import")]
+                 (let [entry (-> (cc/parse-string line #(keyword (s/replace % "_" "-")))
+                                 (m/add-tags-mentions)
+                                 (update-in [:tags] conj "#import")
+                                 (update-in [:timestamp] double-ts-to-long))]
                    (put-fn (with-meta [:entry/import entry] msg-meta)))))
              (catch Exception ex (log/error (str "Error while importing " filename) ex)))))))
 
