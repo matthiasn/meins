@@ -14,15 +14,15 @@
                  [me.raynes/fs "1.4.6"]
                  [markdown-clj "0.9.89"]
                  [cheshire "5.6.3"]
-                 [com.taoensso/timbre "4.5.1"]
+                 [com.taoensso/timbre "4.5.1" :exclusions [io.aviso/pretty]]
                  [cljsjs/moment "2.10.6-4"]
                  [cljsjs/leaflet "0.7.7-4"]
-                 [com.drewnoakes/metadata-extractor "2.8.1"]
+                 [com.drewnoakes/metadata-extractor "2.9.1"]
                  [ubergraph "0.2.2"]
                  [camel-snake-kebab "0.4.0"]
                  [matthiasn/systems-toolbox "0.6.1-alpha1"]
-                 [matthiasn/systems-toolbox-ui "0.6.1-alpha2"]
-                 [matthiasn/systems-toolbox-sente "0.6.1-alpha2"]
+                 [matthiasn/systems-toolbox-ui "0.6.1-alpha5"]
+                 [matthiasn/systems-toolbox-sente "0.6.1-alpha3"]
                  [clucy "0.4.0"]
                  [org.webjars.bower/fontawesome "4.6.3"]
                  [org.webjars.bower/normalize-css "3.0.3"]
@@ -43,7 +43,7 @@
             [lein-sassy "1.0.7" :exclusions [org.clojure/clojure org.codehaus.plexus/plexus-utils]]
             [com.jakemccrary/lein-test-refresh "0.16.0"]
             [test2junit "1.2.2"]
-            [lein-doo "0.1.6"]
+            [lein-doo "0.1.7"]
             [lein-codox "0.9.5" :exclusions [org.clojure/clojure]]]
 
   :sass {:src "src/scss/"
@@ -58,7 +58,7 @@
                  :changes-only      false
                  :watch-dirs        ["src" "test"]}
 
-  :aliases {"build" ["do" "clean" ["cljsbuild" "once" "release"] ["sass" "once"]]}
+  :aliases {"build" ["do" "clean" ["cljsbuild" "once" "release"] ["sass" "once"] "uberjar"]}
 
   :cljsbuild {:builds [{:id           "dev"
                         :source-paths ["src/cljc" "src/cljs" "env/dev/cljs"]

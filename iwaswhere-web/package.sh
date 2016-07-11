@@ -1,5 +1,7 @@
 #!/bin/sh
 
+lein build
+
 $JAVA_HOME/bin/javapackager -deploy -native \
                             -outdir packages \
                             -outfile iWasWhere \
