@@ -76,7 +76,8 @@
                         :compiler     {:main          "iwaswhere-web.core"
                                        :asset-path    "js/build"
                                        ;:elide-asserts true
-                                       :externs       ["externs/misc.js" "externs/leaflet.ext.js"]
+                                       :externs       ["externs/misc.js"
+                                                       "externs/leaflet.ext.js"]
                                        :output-to     "resources/public/js/build/iwaswhere.js"
                                        :optimizations :advanced}}
                        {:id           "cljs-test"

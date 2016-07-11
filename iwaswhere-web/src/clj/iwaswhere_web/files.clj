@@ -34,15 +34,15 @@
   (let [entry-ts (:timestamp msg-payload)
         graph (:graph current-state)
         exists? (uber/has-node? graph entry-ts)
-        existing (when exists? (uber/attrs graph entry-ts))]
-    ; Okay this is slightly too specific for my taste, but currently, the completion of a visit
-    ; is an update to a visit, and otherwise, the exists? logic would refuse to import it.
-    (if (and exists? (not= (:md existing) "No departure recorded #visit"))
-      (log/warn "Entry exists, skipping" msg-payload)
-      (let [new-state (ga/add-node current-state entry-ts msg-payload)]
-        (append-daily-log msg-payload)
-        {:new-state    new-state
-         :send-to-self [:state/publish-current {}]}))))
+        existing (when exists? (uber/attrs graph entry-ts))
+        node-to-add (if exists?
+                      (merge existing
+                             (select-keys msg-payload [:longitude :latitude
+                                                       :horizontal-accuracy :gps-timestamp]))
+                      msg-payload)]
+    (append-daily-log msg-payload)
+    {:new-state    (ga/add-node current-state entry-ts node-to-add)
+     :send-to-self [:state/publish-current {}]}))
 
 (defn geo-entry-persist-fn
   "Handler function for persisting journal entry."
