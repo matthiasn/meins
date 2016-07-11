@@ -20,7 +20,9 @@
 (defn set-location-handler
   "Update query in client state, with resetting the active entry in the linked entries view."
   [{:keys [current-state]}]
-  (set-location-hash (:search-text (:current-query current-state))))
+  (set-location-hash (str (:search-text (:current-query current-state))
+                          "|"
+                          (-> current-state :cfg :active))))
 
 (def search-handler-map
   {:search/update   update-query-fn

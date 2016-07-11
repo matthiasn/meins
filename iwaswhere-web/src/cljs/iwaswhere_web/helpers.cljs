@@ -48,9 +48,13 @@
 
 (defn query-from-search-hash
   "Get query from location hash for current page."
-  []
-  (let [search-hash (subs (js/decodeURIComponent (aget js/window "location" "hash")) 1)]
-    (p/parse-search search-hash)))
+  [put-fn]
+  (let [search-hash (subs (js/decodeURIComponent (aget js/window "location" "hash")) 1)
+        split-str (s/split search-hash #"\|")
+        search (str (first split-str))]
+    (when-let [active-entry (second split-str)]
+      (put-fn [:cmd/set-active (js/parseInt active-entry)]))
+    (p/parse-search search)))
 
 (defn string-before-cursor
   "Determine the substring right before the cursor of the current selection. Only returns that

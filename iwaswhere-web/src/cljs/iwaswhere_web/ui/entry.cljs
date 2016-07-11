@@ -77,7 +77,8 @@
         create-comment (h/new-entry-fn put-fn {:comment-for ts})
         create-linked-entry (h/new-entry-fn put-fn {:linked-entries [ts]})
         create-pomodoro #(do ((h/new-entry-fn put-fn (p/pomodoro-defaults ts)))
-                             (put-fn [:cmd/set-opt {:timestamp ts :path [:cfg :show-comments-for]}]))
+                             (put-fn [:cmd/set-opt {:timestamp ts
+                                                    :path      [:cfg :show-comments-for]}]))
         toggle-edit #(if edit-mode? (put-fn [:entry/remove-local entry])
                                     (put-fn [:entry/update-local entry]))
         trash-entry #(if edit-mode? (put-fn [:entry/remove-local {:timestamp ts}])
@@ -88,7 +89,9 @@
         mentions (:mentions cfg)
         arrival-ts (:arrival-timestamp entry)
         depart-ts (:departure-timestamp entry)
-        dur (when (and arrival-ts depart-ts) (-> (- depart-ts arrival-ts) (/ 1000) (Math/floor)))
+        dur (when (and arrival-ts depart-ts) (-> (- depart-ts arrival-ts)
+                                                 (/ 1000)
+                                                 (Math/floor)))
         formatted-duration (when (and dur (< dur 99999)) (str ", " (u/duration-string dur)))]
     [:div.entry
      [:div.header
@@ -145,9 +148,10 @@
         toggle-comments #(put-fn [:cmd/toggle {:timestamp ts :path [:cfg :show-comments-for]}])
         local-comments (into {} (filter (fn [[_ts c]] (= (:comment-for c) (:timestamp entry)))
                                         new-entries))
-        all-comments (sort-by :timestamp (vals (merge comments-map local-comments)))]
+        all-comments (sort-by :timestamp (vals (merge comments-map local-comments)))
+        new-entries? (contains? new-entries ts)]
     [:div.entry-with-comments
-     [journal-entry entry cfg put-fn (contains? new-entries ts) (p/pomodoro-stats-view all-comments)]
+     [journal-entry entry cfg put-fn new-entries? (p/pomodoro-stats-view all-comments)]
      (when (seq all-comments)
        (if (or (contains? (:show-comments-for cfg) ts) (seq local-comments))
          [:div.comments

@@ -18,13 +18,16 @@
            (empty? (set/intersection (:not-tags linked-filter) combined-tags))))))
 
 (defn linked-entries-view
-  "Renders linked entries in right side column, filter by local search."
+  "Renders linked entries in right side column, filtered by local search."
   [local linked-entries entries-map new-entries cfg put-fn]
   (when linked-entries
     (let [on-input-fn #(swap! local assoc-in [:linked-filter]
                               (ps/parse-search (.. % -target -innerText)))
-          linked-entries (if (:show-pvt cfg) linked-entries (filter u/pvt-filter linked-entries))
-          linked-entries (filter (linked-entries-filter entries-map @local) linked-entries)]
+          linked-entries (if (:show-pvt cfg)
+                           linked-entries
+                           (filter u/pvt-filter linked-entries))
+          linked-entries (filter (linked-entries-filter entries-map @local)
+                                 linked-entries)]
       [:div.journal-entries
        (when (:active cfg)
          [:div.search-field {:content-editable true :on-input on-input-fn}

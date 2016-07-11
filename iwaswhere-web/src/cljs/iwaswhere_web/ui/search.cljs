@@ -53,7 +53,7 @@
   "Initializes listener for location hash changes, which alters local component state with
   the latest query on change, plus sends query to backend."
   [{:keys [local observed put-fn]}]
-  (let [hash-change-fn #(let [new-search (h/query-from-search-hash)]
+  (let [hash-change-fn #(let [new-search (h/query-from-search-hash put-fn)]
                          (when (not= new-search (:current-query @observed))
                            (swap! local assoc-in [:current-query] new-search)
                            (put-fn [:search/update new-search])))]
