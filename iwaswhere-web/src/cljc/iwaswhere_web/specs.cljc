@@ -125,6 +125,8 @@
 (s/def :search/update search-spec)
 (s/def :state/get search-spec)
 
+(s/def :linked-filter/set search-spec)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Search Result Spec
 (s/def :iww.search-stats/entry-count int?)

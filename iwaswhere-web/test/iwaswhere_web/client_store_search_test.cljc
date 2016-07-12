@@ -58,4 +58,4 @@
         (testing "query is set locally"
           (is (= st/open-tasks-query (:current-query new-state))))
         (testing "location hash was changed"
-          (is (= @location-hash (str (:search-text (:current-query new-state)) "|"))))))))
+          (is (= @location-hash (str (:search-text (:current-query new-state)) "||"))))))))

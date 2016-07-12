@@ -29,6 +29,7 @@
                              :new-entries    @cse/new-entries-ls
                              :current-query  {}
                              :cfg            {:active             nil
+                                              :linked-filter      {}
                                               :show-maps-for      #{}
                                               :show-comments-for  #{}
                                               :sort-by-upvotes    false
@@ -77,10 +78,17 @@
 (defn set-active-fn
   "Sets entry in payload as the active entry for which to show linked entries."
   [{:keys [current-state msg-payload]}]
+  {:new-state (assoc-in current-state [:cfg :active] msg-payload)
+   :emit-msg  s/update-location-hash-msg})
+
+(defn toggle-active-fn
+  "Sets entry in payload as the active entry for which to show linked entries."
+  [{:keys [current-state msg-payload]}]
   (let [currently-active (get-in current-state [:cfg :active])]
     {:new-state (assoc-in current-state [:cfg :active] (if (= currently-active msg-payload)
                                                          nil
-                                                         msg-payload))}))
+                                                         msg-payload))
+     :emit-msg  s/update-location-hash-msg}))
 
 (defn cmp-map
   "Creates map for the component which holds the client-side application state."
@@ -94,6 +102,7 @@
                              {:state/new          new-state-fn
                               :show/more          show-more-fn
                               :cmd/set-active     set-active-fn
+                              :cmd/toggle-active  toggle-active-fn
                               :cmd/toggle         toggle-set-fn
                               :cmd/set-opt        set-conj-fn
                               :cmd/toggle-key     toggle-key-fn

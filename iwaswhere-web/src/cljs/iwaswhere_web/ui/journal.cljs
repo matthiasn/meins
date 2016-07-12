@@ -9,29 +9,28 @@
 
 (defn linked-entries-filter
   "Filter linked entries by search."
-  [entries-map local-snapshot]
+  [entries-map linked-filter]
   (fn [entry]
-    (let [linked-filter (:linked-filter local-snapshot)
-          comments (map #(get entries-map %) (:comments entry))
+    (let [comments (map #(get entries-map %) (:comments entry))
           combined-tags (reduce #(set/union %1 (:tags %2)) (:tags entry) comments)]
       (and (set/subset? (:tags linked-filter) combined-tags)
            (empty? (set/intersection (:not-tags linked-filter) combined-tags))))))
 
 (defn linked-entries-view
   "Renders linked entries in right side column, filtered by local search."
-  [local linked-entries entries-map new-entries cfg put-fn]
+  [linked-entries entries-map new-entries cfg put-fn]
   (when linked-entries
-    (let [on-input-fn #(swap! local assoc-in [:linked-filter]
-                              (ps/parse-search (.. % -target -innerText)))
+    (let [on-input-fn #(let [linked-filter (ps/parse-search (.. % -target -innerText))]
+                        (put-fn [:linked-filter/set linked-filter]))
           linked-entries (if (:show-pvt cfg)
                            linked-entries
                            (filter u/pvt-filter linked-entries))
-          linked-entries (filter (linked-entries-filter entries-map @local)
+          linked-entries (filter (linked-entries-filter entries-map (:linked-filter cfg))
                                  linked-entries)]
       [:div.journal-entries
        (when (:active cfg)
          [:div.search-field {:content-editable true :on-input on-input-fn}
-          (:search-text (:linked-filter @local))])
+          (:search-text (:linked-filter cfg))])
        (for [entry linked-entries]
          (when (and (not (:comment-for entry)) (or (:new-entry entry) (:show-context cfg)))
            (let [entry (assoc-in entry [:comments] (map (fn [ts] (get entries-map ts))
@@ -41,7 +40,7 @@
 
 (defn journal-view
   "Renders journal div, one entry per item, with map if geo data exists in the entry."
-  [{:keys [observed local put-fn]}]
+  [{:keys [observed put-fn]}]
   (let [store-snapshot @observed
         cfg (:cfg store-snapshot)
         entries-map (:entries-map store-snapshot)
@@ -82,7 +81,7 @@
       (when-let [ms (get-in store-snapshot [:timing :query])]
         [:div.stats (str "Query with " (count entries) " results completed in " ms ", RTT "
                          (get-in store-snapshot [:timing :rtt]) " ms")])]
-     (linked-entries-view local linked-entries entries-map new-entries cfg put-fn)]))
+     (linked-entries-view linked-entries entries-map new-entries cfg put-fn)]))
 
 (defn cmp-map
   [cmp-id]

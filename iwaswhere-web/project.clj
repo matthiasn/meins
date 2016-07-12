@@ -1,9 +1,9 @@
-(defproject matthiasn/iwaswhere-web "0.1.6"
+(defproject matthiasn/iwaswhere-web "0.1.7"
   :description "Sample application built with systems-toolbox library"
   :url "https://github.com/matthiasn/systems-toolbox"
   :license {:name "GNU GENERAL PUBLIC LICENSE"
             :url  "http://www.gnu.org/licenses/gpl-3.0.en.html"}
-  :dependencies [[org.clojure/clojure "1.9.0-alpha9"]
+  :dependencies [[org.clojure/clojure "1.9.0-alpha10"]
                  [org.clojure/clojurescript "1.9.93"]
                  [org.clojure/tools.logging "0.3.1"]
                  [org.clojure/tools.namespace "0.2.11"]
@@ -20,9 +20,9 @@
                  [com.drewnoakes/metadata-extractor "2.9.1"]
                  [ubergraph "0.2.2"]
                  [camel-snake-kebab "0.4.0"]
-                 [matthiasn/systems-toolbox "0.6.1-alpha1"]
-                 [matthiasn/systems-toolbox-ui "0.6.1-alpha5"]
-                 [matthiasn/systems-toolbox-sente "0.6.1-alpha3"]
+                 [matthiasn/systems-toolbox "0.6.1-alpha2"]
+                 [matthiasn/systems-toolbox-ui "0.6.1-alpha6"]
+                 [matthiasn/systems-toolbox-sente "0.6.1-alpha4"]
                  [clucy "0.4.0"]
                  [org.webjars.bower/fontawesome "4.6.3"]
                  [org.webjars.bower/normalize-css "3.0.3"]

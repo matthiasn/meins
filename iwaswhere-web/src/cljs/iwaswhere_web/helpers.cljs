@@ -52,8 +52,11 @@
   (let [search-hash (subs (js/decodeURIComponent (aget js/window "location" "hash")) 1)
         split-str (s/split search-hash #"\|")
         search (str (first split-str))]
-    (when-let [active-entry (second split-str)]
-      (put-fn [:cmd/set-active (js/parseInt active-entry)]))
+    (when-let [active-entry (js/parseInt (second split-str))]
+      (when (number? active-entry)
+        (put-fn [:cmd/set-active active-entry])))
+    (when-let [linked-filter (get split-str 2)]
+      (put-fn [:linked-filter/set (p/parse-search linked-filter)]))
     (p/parse-search search)))
 
 (defn string-before-cursor
