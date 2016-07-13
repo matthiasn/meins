@@ -88,6 +88,7 @@
 (s/def :cmd/pomodoro-inc timestamp-required-spec)
 (s/def :cmd/pomodoro-start timestamp-required-spec)
 (s/def :cmd/set-active number?)
+(s/def :cmd/toggle-active number?)
 (s/def :cmd/toggle timestamp-required-spec)
 
 
@@ -98,6 +99,9 @@
                                                    :number number?))))
 (def path-map (s/keys :req-un [:iww.cfg/path]))
 (s/def :cmd/toggle-key path-map)
+
+(s/def :cmd/set-opt (s/keys :req-un [:iww.cfg/path
+                                     :iww.entry/timestamp]))
 
 ;; message expected to not have a payload
 (s/def :show/more nil?)
