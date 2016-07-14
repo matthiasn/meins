@@ -1,4 +1,4 @@
-(defproject matthiasn/iwaswhere-web "0.1.7"
+(defproject matthiasn/iwaswhere-web "0.1.8"
   :description "Sample application built with systems-toolbox library"
   :url "https://github.com/matthiasn/systems-toolbox"
   :license {:name "GNU GENERAL PUBLIC LICENSE"
@@ -32,7 +32,7 @@
 
   :source-paths ["src/cljc" "src/clj/"]
 
-  :clean-targets ^{:protect false} ["resources/public/js/build/" "target/"]
+  :clean-targets ^{:protect false} ["resources/public/js/build/" "target/" "packages/"]
   :auto-clean false
 
   :main iwaswhere-web.core

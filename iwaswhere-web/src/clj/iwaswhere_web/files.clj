@@ -36,9 +36,11 @@
         exists? (uber/has-node? graph entry-ts)
         existing (when exists? (uber/attrs graph entry-ts))
         node-to-add (if exists?
-                      (merge existing
-                             (select-keys msg-payload [:longitude :latitude
-                                                       :horizontal-accuracy :gps-timestamp]))
+                      (if (= (:md existing) "No departure recorded #visit")
+                        msg-payload
+                        (merge existing
+                               (select-keys msg-payload [:longitude :latitude
+                                                         :horizontal-accuracy :gps-timestamp])))
                       msg-payload)]
     (append-daily-log msg-payload)
     {:new-state    (ga/add-node current-state entry-ts node-to-add)
