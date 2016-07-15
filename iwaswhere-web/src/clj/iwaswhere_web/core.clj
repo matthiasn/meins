@@ -10,6 +10,7 @@
             [clojure.tools.logging :as log]
             [clj-pid.core :as pid]
             [iwaswhere-web.store :as st]
+            [iwaswhere-web.upload :as up]
             [iwaswhere-web.imports :as i]))
 
 (defonce switchboard (sb/component :server/switchboard))
@@ -26,15 +27,17 @@
     switchboard
     [[:cmd/init-comp #{(sente/cmp-map :server/ws-cmp idx/sente-map)
                        (i/cmp-map :server/imports-cmp)
-                       (st/cmp-map :server/store-cmp)}]
+                       (st/cmp-map :server/store-cmp)
+                       (up/cmp-map :server/upload-cmp)}]
      [:cmd/route {:from :server/ws-cmp :to #{:server/store-cmp :server/imports-cmp}}]
      [:cmd/route {:from :server/imports-cmp :to :server/store-cmp}]
+     [:cmd/route {:from :server/upload-cmp :to :server/store-cmp}]
      [:cmd/route {:from :server/store-cmp :to :server/ws-cmp}]]))
 
 (defn -main
-  "Starts the application from command line, saves and logs process ID. The system that is fired up when
-  restart! is called proceeds in core.async's thread pool. Since we don't want the application to exit when
-  just because the current thread is out of work, we just put it to sleep."
+  "Starts the application from command line, saves and logs process ID. The system that is fired up
+   when restart! is called proceeds in core.async's thread pool. Since we don't want the application
+   to exit when the current thread is out of work, we just put it to sleep."
   [& _args]
   (pid/save "iwaswhere.pid")
   (pid/delete-on-shutdown! "iwaswhere.pid")

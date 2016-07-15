@@ -1,9 +1,13 @@
 # Change Log
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
-## [0.1.7] - 2016-07-12
+## [0.1.9] - 2016-07-15
 ### Changed
-- active entry and linked filter on location hash -> bookmark-able
+- import upload endpoints
+
+## [0.1.8] - 2016-07-14
+### Changed
+- fix problem when importing completed visits
 
 ## [0.1.6] - 2016-07-09
 ### Changed

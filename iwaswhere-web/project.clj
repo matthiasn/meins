@@ -1,4 +1,4 @@
-(defproject matthiasn/iwaswhere-web "0.1.8"
+(defproject matthiasn/iwaswhere-web "0.1.9"
   :description "Sample application built with systems-toolbox library"
   :url "https://github.com/matthiasn/systems-toolbox"
   :license {:name "GNU GENERAL PUBLIC LICENSE"
@@ -14,7 +14,7 @@
                  [me.raynes/fs "1.4.6"]
                  [markdown-clj "0.9.89"]
                  [cheshire "5.6.3"]
-                 [com.taoensso/timbre "4.5.1" :exclusions [io.aviso/pretty]]
+                 [com.taoensso/timbre "4.6.0"]
                  [cljsjs/moment "2.10.6-4"]
                  [cljsjs/leaflet "0.7.7-4"]
                  [com.drewnoakes/metadata-extractor "2.9.1"]
@@ -28,6 +28,7 @@
                  [org.webjars.bower/normalize-css "3.0.3"]
                  [org.webjars.bower/leaflet "0.7.7"]
                  [org.webjars.npm/github-com-mrkelly-lato "0.3.0"]
+                 [org.webjars.npm/bwip-js "1.0.5"]
                  [alandipert/storage-atom "2.0.1"]]
 
   :source-paths ["src/cljc" "src/clj/"]

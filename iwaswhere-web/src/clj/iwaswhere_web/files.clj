@@ -44,7 +44,8 @@
                       msg-payload)]
     (append-daily-log msg-payload)
     {:new-state    (ga/add-node current-state entry-ts node-to-add)
-     :send-to-self [:state/publish-current {}]}))
+     :send-to-self [[:state/stats-tags]
+                    [:state/publish-current {}]]}))
 
 (defn geo-entry-persist-fn
   "Handler function for persisting journal entry."

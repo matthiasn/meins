@@ -34,9 +34,9 @@
       [:script {:src "/js/build/iwaswhere.js"}]]]))
 
 (defn routes-fn
-  "Adds a route for serving photos. This routes function will receive the put-fn of the ws-cmp, which
-  is not used here but can be useful in scenarios when requests are supposed to be handled by a another
-  component."
+  "Adds routes for serving media files. This routes function will receive the put-fn of the ws-cmp,
+   which is not used here but can be useful in scenarios when requests are supposed to be handled
+   by a another component."
   [_put-fn]
   [(r/files "/photos" {:root (str f/data-path "/images/")})
    (r/files "/audio" {:root (str f/data-path "/audio/")})

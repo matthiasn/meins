@@ -10,6 +10,7 @@
             [me.raynes.fs :as fs]
             [clj-time.format :as tf]
             [clojure.tools.logging :as log]
+            [clojure.java.io :as io]
             [clojure.string :as s])
   (:import [com.drew.imaging ImageMetadataReader]))
 
@@ -123,7 +124,7 @@
 (defn import-media
   "Imports photos from respective directory."
   [{:keys [put-fn msg-meta]}]
-  (let [files (file-seq (clojure.java.io/file (str f/data-path "/import")))]
+  (let [files (file-seq (io/file (str f/data-path "/import")))]
     (log/info "importing media files")
     (doseq [file (f/filter-by-name files #"[ A-Za-z0-9_]+.(jpg|JPG|PNG|png|m4v|m4a)")]
       (let [filename (.getName file)]
@@ -139,48 +140,56 @@
 
 (defn double-ts-to-long [ts] (long (* ts 1000)))
 
+(defn import-visits-fn
+  [rdr put-fn msg-meta filename]
+  (try (let [lines (line-seq rdr)]
+         (doseq [line lines]
+           (let [raw-visit (cc/parse-string line #(keyword (s/replace % "_" "-")))
+                 arrival-ts (double-ts-to-long (:arrival-timestamp raw-visit))
+                 departure-ts (double-ts-to-long (:departure-timestamp raw-visit))
+                 dur (-> (- departure-ts arrival-ts)
+                         (/ 6000)
+                         (Math/floor)
+                         (/ 10))
+                 visit (merge raw-visit {:timestamp arrival-ts
+                                         :md        (if (> dur 9999)
+                                                      "No departure recorded #visit"
+                                                      (str "Duration: " dur "m #visit"))
+                                         :tags      #{"#visit" "#import"}})]
+             (put-fn (with-meta [:entry/import visit] msg-meta)))))
+       (catch Exception ex (log/error (str "Error while importing " filename) ex))))
+
 (defn import-geo
   "Imports geo data from respective directory.
   For now, only pays attention to visits."
   [{:keys [put-fn msg-meta]}]
-  (let [files (file-seq (clojure.java.io/file (str f/data-path "/geo-import")))]
+  (let [files (file-seq (io/file (str f/data-path "/geo-import")))]
     (log/info "importing photos")
     (doseq [file (f/filter-by-name files #"visits.json" #_#"[-0-9]+.(json)")]
       (let [filename (.getName file)]
         (log/info "Trying to import " filename)
-        (try (let [lines (line-seq (clojure.java.io/reader file))]
-               (doseq [line lines]
-                 (let [raw-visit (cc/parse-string line #(keyword (s/replace % "_" "-")))
-                       arrival-ts (double-ts-to-long (:arrival-timestamp raw-visit))
-                       departure-ts (double-ts-to-long (:departure-timestamp raw-visit))
-                       dur (-> (- departure-ts arrival-ts)
-                               (/ 6000)
-                               (Math/floor)
-                               (/ 10))
-                       visit (merge raw-visit {:timestamp arrival-ts
-                                               :md        (if (> dur 9999)
-                                                            "No departure recorded #visit"
-                                                            (str "Duration: " dur "m #visit"))
-                                               :tags      #{"#visit" "#import"}})]
-                   (put-fn (with-meta [:entry/import visit] msg-meta)))))
-             (catch Exception ex (log/error (str "Error while importing " filename) ex)))))))
+        (import-visits-fn (io/reader file) put-fn msg-meta filename)))))
 
-(defn import-phone
+(defn import-text-entries-fn
+  [rdr put-fn msg-meta filename]
+  (try (let [lines (line-seq rdr)]
+         (doseq [line lines]
+           (let [entry (-> (cc/parse-string line #(keyword (s/replace % "_" "-")))
+                           (m/add-tags-mentions)
+                           (update-in [:tags] conj "#import")
+                           (update-in [:timestamp] double-ts-to-long))]
+             (put-fn (with-meta [:entry/import entry] msg-meta)))))
+       (catch Exception ex (log/error (str "Error while importing " filename) ex))))
+
+(defn import-text-entries
   "Imports text entries from phone."
   [{:keys [put-fn msg-meta]}]
-  (let [files (file-seq (clojure.java.io/file (str f/data-path "/geo-import")))]
+  (let [files (file-seq (io/file (str f/data-path "/geo-import")))]
     (log/info "importing photos")
     (doseq [file (f/filter-by-name files #"text-entries.json")]
       (let [filename (.getName file)]
         (log/info "Trying to import " filename)
-        (try (let [lines (line-seq (clojure.java.io/reader file))]
-               (doseq [line lines]
-                 (let [entry (-> (cc/parse-string line #(keyword (s/replace % "_" "-")))
-                                 (m/add-tags-mentions)
-                                 (update-in [:tags] conj "#import")
-                                 (update-in [:timestamp] double-ts-to-long))]
-                   (put-fn (with-meta [:entry/import entry] msg-meta)))))
-             (catch Exception ex (log/error (str "Error while importing " filename) ex)))))))
+        (import-text-entries-fn (io/reader file) put-fn msg-meta filename)))))
 
 (defn cmp-map
   "Generates component map for imports-cmp."
@@ -188,4 +197,4 @@
   {:cmp-id      cmp-id
    :handler-map {:import/photos import-media
                  :import/geo    import-geo
-                 :import/phone  import-phone}})
+                 :import/phone  import-text-entries}})
