@@ -170,15 +170,24 @@
         (log/info "Trying to import " filename)
         (import-visits-fn (io/reader file) put-fn msg-meta filename)))))
 
+(defn import-text-entry-fn
+  [line put-fn msg-meta filename]
+  (let [entry (-> (cc/parse-string line #(keyword (s/replace % "_" "-")))
+                  (m/add-tags-mentions)
+                  (update-in [:tags] conj "#import")
+                  (update-in [:timestamp] double-ts-to-long))]
+    (put-fn (with-meta [:entry/import entry] msg-meta))))
+
 (defn import-text-entries-fn
   [rdr put-fn msg-meta filename]
   (try (let [lines (line-seq rdr)]
          (doseq [line lines]
-           (let [entry (-> (cc/parse-string line #(keyword (s/replace % "_" "-")))
-                           (m/add-tags-mentions)
-                           (update-in [:tags] conj "#import")
-                           (update-in [:timestamp] double-ts-to-long))]
-             (put-fn (with-meta [:entry/import entry] msg-meta)))))
+           (when-not (empty? line)
+             (let [entry (-> (cc/parse-string line #(keyword (s/replace % "_" "-")))
+                             (m/add-tags-mentions)
+                             (update-in [:tags] conj "#import")
+                             (update-in [:timestamp] double-ts-to-long))]
+               (put-fn (with-meta [:entry/import entry] msg-meta))))))
        (catch Exception ex (log/error (str "Error while importing " filename) ex))))
 
 (defn import-text-entries
