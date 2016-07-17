@@ -3,6 +3,7 @@
   components are mounted on the client side at runtime."
   (:require [hiccup.core :refer [html]]
             [compojure.route :as r]
+            [iwaswhere-web.upload-qr :as qr]
             [iwaswhere-web.files :as f]))
 
 (defn index-page
@@ -40,7 +41,8 @@
   [_put-fn]
   [(r/files "/photos" {:root (str f/data-path "/images/")})
    (r/files "/audio" {:root (str f/data-path "/audio/")})
-   (r/files "/videos" {:root (str f/data-path "/videos/")})])
+   (r/files "/videos" {:root (str f/data-path "/videos/")})
+   qr/address-qr-route])
 
 (def sente-map
   "Configuration map for sente-cmp."

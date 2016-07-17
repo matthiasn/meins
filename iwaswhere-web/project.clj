@@ -24,11 +24,11 @@
                  [matthiasn/systems-toolbox-ui "0.6.1-alpha6"]
                  [matthiasn/systems-toolbox-sente "0.6.1-alpha4"]
                  [clucy "0.4.0"]
+                 [clj.qrgen "0.4.0"]
                  [org.webjars.bower/fontawesome "4.6.3"]
                  [org.webjars.bower/normalize-css "3.0.3"]
                  [org.webjars.bower/leaflet "0.7.7"]
                  [org.webjars.npm/github-com-mrkelly-lato "0.3.0"]
-                 [org.webjars.npm/bwip-js "1.0.5"]
                  [alandipert/storage-atom "2.0.1"]]
 
   :source-paths ["src/cljc" "src/clj/"]
