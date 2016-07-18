@@ -24,6 +24,7 @@
                  [matthiasn/systems-toolbox-ui "0.6.1-alpha6"]
                  [matthiasn/systems-toolbox-sente "0.6.1-alpha4"]
                  [clucy "0.4.0"]
+                 [seesaw "1.4.5"]
                  [clj.qrgen "0.4.0"]
                  [org.webjars.bower/fontawesome "4.6.3"]
                  [org.webjars.bower/normalize-css "3.0.3"]
@@ -37,7 +38,7 @@
   :auto-clean false
 
   :main iwaswhere-web.core
-  :jvm-opts ["-XX:-OmitStackTraceInFastThrow" "-Dapple.awt.UIElement=true"]
+  :jvm-opts ["-XX:-OmitStackTraceInFastThrow"]
 
   :plugins [[lein-cljsbuild "1.1.3" :exclusions [org.apache.commons/commons-compress]]
             [lein-figwheel "0.5.4-7" :exclusions [org.clojure/clojure]]
