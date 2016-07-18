@@ -156,7 +156,9 @@
                                                       "No departure recorded #visit"
                                                       (str "Duration: " dur "m #visit"))
                                          :tags      #{"#visit" "#import"}})]
-             (put-fn (with-meta [:entry/import visit] msg-meta)))))
+             (if-not (neg? (:timestamp visit))
+               (put-fn (with-meta [:entry/import visit] msg-meta))
+               (log/warn "negative timestamp?" visit)))))
        (catch Exception ex (log/error (str "Error while importing " filename) ex))))
 
 (defn import-geo
@@ -169,14 +171,6 @@
       (let [filename (.getName file)]
         (log/info "Trying to import " filename)
         (import-visits-fn (io/reader file) put-fn msg-meta filename)))))
-
-(defn import-text-entry-fn
-  [line put-fn msg-meta filename]
-  (let [entry (-> (cc/parse-string line #(keyword (s/replace % "_" "-")))
-                  (m/add-tags-mentions)
-                  (update-in [:tags] conj "#import")
-                  (update-in [:timestamp] double-ts-to-long))]
-    (put-fn (with-meta [:entry/import entry] msg-meta))))
 
 (defn import-text-entries-fn
   [rdr put-fn msg-meta filename]
