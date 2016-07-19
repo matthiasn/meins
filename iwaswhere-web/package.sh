@@ -10,5 +10,6 @@ $JAVA_HOME/bin/javapackager -deploy -native \
                             -appclass iwaswhere_web.core \
                             -name "iWasWhere" \
                             -title "iWasWhere" \
-                            -BappVersion="0.1.9"
+                            -BappVersion="0.1.9" \
+                            -Bruntime=$JAVA_HOME
 
