@@ -11,13 +11,16 @@
   justify-content: space-between;
 
   background-color: #2d3e50;
-  padding: 0 20px;
+  padding: 0 110px 0 20px;
 
   img {
     width: 100px;
     position: fixed;
-    bottom: 0;
+    top: 0;
     right: 0;
+    margin: -4px -4px;
+    clip-path: inset(4px 4px 4px 4px);
+    -webkit-clip-path: inset(4px 4px 4px 4px);
   }
 
   h1 {
