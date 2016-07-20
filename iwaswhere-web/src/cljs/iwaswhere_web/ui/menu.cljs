@@ -48,7 +48,8 @@
     [:button {:on-click #(do (put-fn [:import/photos]) (put-fn [:import/geo]) (put-fn [:import/phone]))}
      [:span.fa.fa-map] " import"]]
    [:h1 "iWasWhere?"]
-   [cfg-view @observed put-fn]])
+   [cfg-view @observed put-fn]
+   [:img {:src "/upload-address.png"}]])
 
 (defn cmp-map
   [cmp-id]
