@@ -172,6 +172,14 @@
         (log/info "Trying to import " filename)
         (import-visits-fn (io/reader file) put-fn msg-meta filename)))))
 
+(defn update-audio-tag
+  [entry]
+  (if (:audio-file entry)
+    (-> entry
+        (update-in [:tags] conj "#audio")
+        (update-in [:md] str " #audio"))
+    entry))
+
 (defn import-text-entries-fn
   [rdr put-fn msg-meta filename]
   (try (let [lines (line-seq rdr)]
@@ -180,6 +188,7 @@
              (let [entry (-> (cc/parse-string line #(keyword (s/replace % "_" "-")))
                              (m/add-tags-mentions)
                              (update-in [:tags] conj "#import")
+                             (update-audio-tag)
                              (update-in [:timestamp] double-ts-to-long))]
                (put-fn (with-meta [:entry/import entry] msg-meta))))))
        (catch Exception ex (log/error (str "Error while importing " filename) ex))))
