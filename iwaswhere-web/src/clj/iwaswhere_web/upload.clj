@@ -1,9 +1,10 @@
 (ns iwaswhere-web.upload
   "Provides upload via REST call."
   (:require [ring.adapter.jetty :as j]
-            [compojure.core :refer [routes POST]]
+            [compojure.core :refer [routes POST PUT]]
             [clojure.java.io :as io]
             [iwaswhere-web.imports :as i]
+            [iwaswhere-web.files :as f]
             [clojure.string :as s]))
 
 (defn state-fn
@@ -16,10 +17,18 @@
                     (case filename
                       "text-entries.json" (i/import-text-entries-fn rdr put-fn {} filename)
                       "visits.json" (i/import-visits-fn rdr put-fn {} filename)
-                      :default)
+                      (prn req))
                     "OK"))
-        app (routes (POST "/upload/:filename" [filename :as r] (post-fn filename r put-fn)))]
-    (j/run-jetty app {:port 3001 :join? false}))
+        audio-post-fn (fn [filename req put-fn]
+                        (let [filename (str f/data-path "/audio/" filename)]
+                          (prn req)
+                          (io/copy (:body req) (java.io.File. filename)))
+                        "OK")
+        app (routes
+              (PUT "/upload/audio/:filename" [filename :as r] (audio-post-fn filename r put-fn))
+              (POST "/upload/:filename" [filename :as r] (post-fn filename r put-fn)))]
+    (future
+      (j/run-jetty app {:port 3001 :join? false})))
   {:state (atom {})})
 
 (defn cmp-map
