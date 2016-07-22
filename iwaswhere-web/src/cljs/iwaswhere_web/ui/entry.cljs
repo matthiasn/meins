@@ -25,17 +25,34 @@
 
 (defn trash-icon
   "Renders a trash icon, which transforms into a warning button that needs to be clicked
-  again for actual deletion. This label is a little to the right, so it can't be clicked
-  accidentally, and disappears again within 5 seconds."
+   again for actual deletion. This label is a little to the right, so it can't be clicked
+   accidentally, and disappears again within 5 seconds."
   [trash-fn]
   (let [clicked (r/atom false)
         guarded-trash-fn (fn [_ev]
                            (swap! clicked not)
                            (.setTimeout js/window #(reset! clicked false) 5000))]
-    (fn [trash-entry]
+    (fn [trash-fn]
       (if @clicked
         [:span.delete-warn {:on-click trash-fn} [:span.fa.fa-trash] "  confirm delete?"]
         [:span.fa.fa-trash-o.toggle {:on-click guarded-trash-fn}]))))
+
+(defn edit-icon
+  "Renders an edit icon, which transforms into a warning button that needs to be clicked
+   again for actually discarding changes. This label is a little to the right, so it can't be
+   clicked accidentally, and disappears again within 5 seconds."
+  [toggle-edit edit-mode?]
+  (let [clicked (r/atom false)
+        guarded-edit-fn (fn [_ev]
+                           (swap! clicked not)
+                           (.setTimeout js/window #(reset! clicked false) 5000))]
+    (fn [toggle-edit edit-mode?]
+      (if edit-mode?
+        (if @clicked
+          [:span.delete-warn {:on-click #(do (toggle-edit) (swap! clicked not))}
+           [:span.fa.fa-trash] "  discard changes?"]
+          [:span.fa.fa-pencil-square-o.toggle {:on-click guarded-edit-fn}])
+        [:span.fa.fa-pencil-square-o.toggle {:on-click toggle-edit}]))))
 
 (defn new-link
   "Renders input for adding link entry."
@@ -114,7 +131,8 @@
        (when (pos? upvotes) [:span.upvotes " " upvotes])
        (when (pos? upvotes) [:span.fa.fa-thumbs-down.toggle {:on-click (upvote-fn dec)}])
        (when map? [:span.fa.fa-map-o.toggle {:on-click toggle-map}])
-       [:span.fa.fa-pencil-square-o.toggle {:on-click toggle-edit}]
+       ;[:span.fa.fa-pencil-square-o.toggle {:on-click toggle-edit}]
+       [edit-icon toggle-edit edit-mode?]
        (when-not (:comment-for entry) [:span.fa.fa-clock-o.toggle {:on-click create-pomodoro}])
        (when-not (:comment-for entry) [:span.fa.fa-comment-o.toggle {:on-click create-comment}])
        (when (seq (:comments entry))
