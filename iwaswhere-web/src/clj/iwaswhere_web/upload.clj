@@ -19,13 +19,13 @@
                       "visits.json" (i/import-visits-fn rdr put-fn {} filename)
                       (prn req))
                     "OK"))
-        audio-post-fn (fn [filename req put-fn]
-                        (let [filename (str f/data-path "/audio/" filename)]
-                          (prn req)
-                          (io/copy (:body req) (java.io.File. filename)))
-                        "OK")
+        binary-post-fn (fn [dir filename req]
+                         (let [filename (str f/data-path "/" dir "/" filename)]
+                           (prn req)
+                           (io/copy (:body req) (java.io.File. filename)))
+                         "OK")
         app (routes
-              (PUT "/upload/audio/:filename" [filename :as r] (audio-post-fn filename r put-fn))
+              (PUT "/upload/:dir/:file" [dir file :as r] (binary-post-fn dir file r))
               (POST "/upload/:filename" [filename :as r] (post-fn filename r put-fn)))]
     (future
       (j/run-jetty app {:port 3001 :join? false})))
