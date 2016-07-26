@@ -84,12 +84,12 @@
 (defn entry-actions
   "Entry-related action buttons. Hidden by default, become visible when mouse
    hovers over element, stays visible for a little while after mose leaves."
-  [entry cfg put-fn edit-mode?]
+  [entry cfg put-fn edit-mode? toggle-edit]
   (let [visible (r/atom false)
         hide-fn (fn [_ev]
                   (.setTimeout js/window #(reset! visible false) 6000))]
     (fn
-      [entry cfg put-fn edit-mode?]
+      [entry cfg put-fn edit-mode? toggle-edit]
       (let [ts (:timestamp entry)
             map? (:latitude entry)
             toggle-map #(put-fn [:cmd/toggle
@@ -105,8 +105,6 @@
                               (put-fn [:cmd/set-opt
                                        {:timestamp ts
                                         :path      [:cfg :show-comments-for]}]))
-            toggle-edit #(if edit-mode? (put-fn [:entry/remove-local entry])
-                                        (put-fn [:entry/update-local entry]))
             trash-entry #(if edit-mode?
                           (put-fn [:entry/remove-local {:timestamp ts}])
                           (put-fn [:entry/trash {:timestamp ts}]))
@@ -140,6 +138,8 @@
            [new-link entry put-fn create-linked-entry])
          [trash-icon trash-entry]]))))
 
+
+
 (defn journal-entry
   "Renders individual journal entry. Interaction with application state happens
    via messages that are sent to the store component, for example for toggling
@@ -153,19 +153,13 @@
         toggle-edit #(if edit-mode? (put-fn [:entry/remove-local entry])
                                     (put-fn [:entry/update-local entry]))
         hashtags (:hashtags cfg)
-        mentions (:mentions cfg)
-        arrival-ts (:arrival-timestamp entry)
-        depart-ts (:departure-timestamp entry)
-        dur (when (and arrival-ts depart-ts)
-              (-> (- depart-ts arrival-ts) (/ 1000) (Math/floor)))
-        formatted-duration (when (and dur (< dur 99999))
-                             (str ", " (u/duration-string dur)))]
+        mentions (:mentions cfg)]
     [:div.entry
      [:div.header
       [:div
        [:a {:href (str "/#" (.format (js/moment ts) "YYYY-MM-DD"))}
         [:time (.format (js/moment ts) "ddd, MMMM Do YYYY")]]
-       [:time (.format (js/moment ts) ", h:mm a") formatted-duration]]
+       [:time (.format (js/moment ts) ", h:mm a") (u/visit-duration entry)]]
       (if (= :pomodoro (:entry-type entry))
         [p/pomodoro-header entry #(put-fn [:cmd/pomodoro-start entry]) edit-mode?]
         [:div info])
@@ -176,7 +170,7 @@
            [:span.link-btn {:on-click set-active-fn
                             :class    (when entry-active? "active")}
             (str " linked: " (count (:linked-entries-list entry)))]))]
-      [entry-actions entry cfg put-fn edit-mode?]]
+      [entry-actions entry cfg put-fn edit-mode? toggle-edit]]
      [hashtags-mentions-list entry]
      [l/leaflet-map entry (or show-map? (:show-all-maps cfg))]
      (if edit-mode?
