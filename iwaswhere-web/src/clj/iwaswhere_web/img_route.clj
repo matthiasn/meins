@@ -1,0 +1,28 @@
+(ns iwaswhere-web.img-route
+  "Functions for serving images."
+  (:require [compojure.core :refer [GET]]
+            [iwaswhere-web.files :as f]
+            [clojure.java.io :as io]
+            [image-resizer.format :refer :all]
+            [image-resizer.resize :refer :all]
+            [image-resizer.scale-methods :refer :all]
+            [image-resizer.rotate :refer :all]
+            [iwaswhere-web.imports :as i]
+            [clojure.string :as s]))
+
+(def img-resized-route
+  (GET "/photos2/:filename" [filename :as r]
+    (let [filename (str f/data-path "/images/" filename)
+          file (io/file filename)
+          exif (i/extract-exif file)
+          orientation (get exif "Orientation")
+          rotate-fn (if (s/includes? orientation "(Rotate 90 CW)")
+                      (rotate-270-counter-clockwise-fn)
+                      identity)
+          params (:params r)
+          width (Integer/parseInt (or (:width params) "1024"))
+          height (Integer/parseInt (or (:height params) "1024"))]
+      (-> file
+          (rotate-fn)
+          ((resize-fn width height speed))
+          (as-stream-by-mime-type "image/jpeg")))))

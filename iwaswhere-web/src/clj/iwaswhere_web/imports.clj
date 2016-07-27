@@ -15,9 +15,10 @@
   (:import [com.drew.imaging ImageMetadataReader]))
 
 (defn dms-to-dd
-  "Converts DMS (degree, minute, second) to DD (decimal degree) format. Returns nil
-  when not all 3 groups dm, m, and s are contained in coord string. Result negative
-  when coord in Western or Southern Hemisphere according to ref argument."
+  "Converts DMS (degree, minute, second) to DD (decimal degree) format. Returns
+   nil when not all 3 groups dm, m, and s are contained in coord string. Result
+   negative when coord in Western or Southern Hemisphere according to ref
+   argument."
   [exif coord-key ref-key]
   (let [coord (get exif coord-key)
         ref (get exif ref-key)]
@@ -34,9 +35,10 @@
               dd)))))))
 
 (defn add-filename-offset
-  "Add the last three digits of the filename to the timestamp in order to avoid collisions when
-  photos were taken in burst mode on the iPhone, as unfortunately the photo timestamp is only
-  precise to the second and the capture rate for iPhone 6s is 10fps."
+  "Add the last three digits of the filename to the timestamp in order to avoid
+   collisions when photos were taken in burst mode on the iPhone, as
+   unfortunately the photo timestamp is only precise to the second and the
+   capture rate for iPhone 6s is 10fps."
   [millis filename]
   (let [filename-number (re-find #"\d{3}(?=\.)" filename)
         offset (if filename-number (Integer. filename-number) 0)]
@@ -50,15 +52,17 @@
   [ts filename]
   (let [f (tf/formatter "yyyy:MM:dd HH:mm:ss.SS z")]
     (when (and (seq ts)
-               (re-matches #"\d{4}:\d{2}:\d{2} \d{2}:\d{2}:\d{2}\.\d{2} [A-Z]{1,5}" ts))
+               (re-matches
+                 #"\d{4}:\d{2}:\d{2} \d{2}:\d{2}:\d{2}\.\d{2} [A-Z]{1,5}" ts))
       (add-filename-offset (c/to-long (tf/parse f ts)) filename))))
 
 (defn extract-ts
-  "Converts 'Date/Time' exif tag into milliseconds since epoch. Assumes local timezone at the time
-  of importing a photo, which may or may not be accurate. In case of iPhone, this is only relevant
-  for screenshots, media saved to local camera roll or when no GPS available, such as in the case
-  of being in an aircraft (airplane mode). This is unfortunate, why would they not just use UTC
-  all the time?"
+  "Converts 'Date/Time' exif tag into milliseconds since epoch. Assumes local
+   timezone at the time of importing a photo, which may or may not be accurate.
+   In case of iPhone, this is only relevant for screenshots, media saved to
+   local camera roll or when no GPS available, such as in the case of being in
+   an aircraft (airplane mode). This is unfortunate, why would they not just use
+   UTC all the time?"
   [ts filename]
   (let [dtz (t/default-time-zone)
         f (tf/formatter "yyyy:MM:dd HH:mm:ss" dtz)]
@@ -72,20 +76,28 @@
   [tag]
   (into {} (map #(hash-map (.getTagName %) (.getDescription %)) tag)))
 
+(defn extract-exif
+  [file]
+  (let [metadata (ImageMetadataReader/readMetadata file)
+        exif-directories (.getDirectories metadata)
+        tags (map #(.getTags %) exif-directories)
+        exif (into {} (map extract-from-tag tags))]
+    exif))
+
 (defn import-image
-  "Takes an image file (as a java.io.InputStream or java.io.File) and extracts exif information into a map.
-  Borrowed and modified from: https://github.com/joshuamiller/exif-processor"
+  "Takes an image file (as a java.io.InputStream or java.io.File) and extracts
+   exif information into a map.
+   Borrowed and modified from: https://github.com/joshuamiller/exif-processor"
   [file]
   (let [filename (.getName file)
         rel-path (.getPath file)
-        metadata (ImageMetadataReader/readMetadata file)
-        exif-directories (.getDirectories metadata)
-        tags (map #(.getTags %) exif-directories)
-        exif (into {} (map extract-from-tag tags))
-        timestamp (or (extract-gps-ts (str (get exif "GPS Date Stamp") " " (get exif "GPS Time-Stamp")) filename)
-                      (extract-ts (str (get exif "Date/Time")) filename)
-                      (extract-ts (str (get exif "Date/Time Original")) filename)
-                      (st/now))
+        exif (extract-exif file)
+        timestamp (or
+                    (extract-gps-ts (str (get exif "GPS Date Stamp") " "
+                                         (get exif "GPS Time-Stamp")) filename)
+                    (extract-ts (str (get exif "Date/Time")) filename)
+                    (extract-ts (str (get exif "Date/Time Original")) filename)
+                    (st/now))
         target-filename (str timestamp "-" filename)]
     (fs/rename rel-path (str f/data-path "/images/" target-filename))
     {:raw-exif  exif
@@ -96,7 +108,8 @@
      :tags      #{"#photo" "#import"}}))
 
 (defn import-video
-  "Takes an video file (as a java.io.InputStream or java.io.File) creates entry from it."
+  "Takes an video file (as a java.io.InputStream or java.io.File) creates entry
+   from it."
   [file]
   (let [filename (.getName file)
         rel-path (.getPath file)
@@ -108,7 +121,8 @@
      :tags       #{"#video" "#import"}}))
 
 (defn import-audio
-  "Takes an audio file (as a java.io.InputStream or java.io.File) creates entry from it."
+  "Takes an audio file (as a java.io.InputStream or java.io.File) creates entry
+   from it."
   [audio-file]
   (let [filename (.getName audio-file)
         ts-str (subs filename 0 15)
@@ -126,7 +140,8 @@
   [{:keys [put-fn msg-meta]}]
   (let [files (file-seq (io/file (str f/data-path "/import")))]
     (log/info "importing media files")
-    (doseq [file (f/filter-by-name files #"[ A-Za-z0-9_]+.(jpg|JPG|PNG|png|m4v|m4a)")]
+    (doseq [file (f/filter-by-name files
+                                   #"[ A-Za-z0-9_]+.(jpg|JPG|PNG|png|m4v|m4a)")]
       (let [filename (.getName file)]
         (log/info "Trying to import " filename)
         (try (let [[_ file-type] (re-find #"^.*\.([a-z0-9]{3})$" filename)
@@ -136,30 +151,33 @@
                                (import-image file))]
                (when file-info
                  (put-fn (with-meta [:entry/import file-info] msg-meta))))
-             (catch Exception ex (log/error (str "Error while importing " filename) ex)))))))
+             (catch Exception ex (log/error (str "Error while importing "
+                                                 filename) ex)))))))
 
 (defn double-ts-to-long [ts] (long (* ts 1000)))
 
 (defn import-visits-fn
   [rdr put-fn msg-meta filename]
-  (try (let [lines (line-seq rdr)]
-         (doseq [line lines]
-           (let [raw-visit (cc/parse-string line #(keyword (s/replace % "_" "-")))
-                 arrival-ts (double-ts-to-long (:arrival-timestamp raw-visit))
-                 departure-ts (double-ts-to-long (:departure-timestamp raw-visit))
-                 dur (-> (- departure-ts arrival-ts)
-                         (/ 6000)
-                         (Math/floor)
-                         (/ 10))
-                 visit (merge raw-visit {:timestamp arrival-ts
-                                         :md        (if (> dur 9999)
-                                                      "No departure recorded #visit"
-                                                      (str "Duration: " dur "m #visit"))
-                                         :tags      #{"#visit" "#import"}})]
-             (if-not (neg? (:timestamp visit))
-               (put-fn (with-meta [:entry/import visit] msg-meta))
-               (log/warn "negative timestamp?" visit)))))
-       (catch Exception ex (log/error (str "Error while importing " filename) ex))))
+  (try
+    (let [lines (line-seq rdr)]
+      (doseq [line lines]
+        (let [raw-visit (cc/parse-string line #(keyword (s/replace % "_" "-")))
+              arrival-ts (double-ts-to-long (:arrival-timestamp raw-visit))
+              departure-ts (double-ts-to-long (:departure-timestamp raw-visit))
+              dur (-> (- departure-ts arrival-ts)
+                      (/ 6000)
+                      (Math/floor)
+                      (/ 10))
+              visit (merge raw-visit
+                           {:timestamp arrival-ts
+                            :md        (if (> dur 9999)
+                                         "No departure recorded #visit"
+                                         (str "Duration: " dur "m #visit"))
+                            :tags      #{"#visit" "#import"}})]
+          (if-not (neg? (:timestamp visit))
+            (put-fn (with-meta [:entry/import visit] msg-meta))
+            (log/warn "negative timestamp?" visit)))))
+    (catch Exception ex (log/error (str "Error while importing " filename) ex))))
 
 (defn import-geo
   "Imports geo data from respective directory.
@@ -185,13 +203,15 @@
   (try (let [lines (line-seq rdr)]
          (doseq [line lines]
            (when-not (empty? line)
-             (let [entry (-> (cc/parse-string line #(keyword (s/replace % "_" "-")))
-                             (m/add-tags-mentions)
-                             (update-in [:tags] conj "#import")
-                             (update-audio-tag)
-                             (update-in [:timestamp] double-ts-to-long))]
+             (let [entry
+                   (-> (cc/parse-string line #(keyword (s/replace % "_" "-")))
+                       (m/add-tags-mentions)
+                       (update-in [:tags] conj "#import")
+                       (update-audio-tag)
+                       (update-in [:timestamp] double-ts-to-long))]
                (put-fn (with-meta [:entry/import entry] msg-meta))))))
-       (catch Exception ex (log/error (str "Error while importing " filename) ex))))
+       (catch Exception ex (log/error (str "Error while importing "
+                                           filename) ex))))
 
 (defn import-text-entries
   "Imports text entries from phone."

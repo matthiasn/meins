@@ -1,11 +1,15 @@
-(ns iwaswhere-web.ui.media)
+(ns iwaswhere-web.ui.media
+  (:require [clojure.string :as s]))
 
 (defn image-view
-  "Renders image view."
+  "Renders image view. Used resized and properly rotated image endpoint
+   when JPEG file requested."
   [entry]
-  (when-let [img-file (:img-file entry)]
-    [:a {:href (str "/photos/" img-file) :target "_blank"}
-     [:img {:src (str "/photos/" img-file)}]]))
+  (when-let [file (:img-file entry)]
+    (let [path (str "/photos/" file)
+          resized (if (s/includes? path ".JPG") (str "/photos2/" file) path)]
+      [:a {:href path :target "_blank"}
+       [:img {:src resized}]])))
 
 (defn audioplayer-view
   "Renders audio player view."

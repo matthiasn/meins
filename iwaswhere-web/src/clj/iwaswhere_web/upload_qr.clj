@@ -1,6 +1,5 @@
 (ns iwaswhere-web.upload-qr
-  "This namespace takes care of rendering the static HTML into which the React / Reagent
-  components are mounted on the client side at runtime."
+  "Functions for rendering a QR code that contains the IP address for upload."
   (:require [compojure.core :refer [GET]]
             [clj.qrgen :as qr])
   (:import (java.net NetworkInterface Inet4Address)))

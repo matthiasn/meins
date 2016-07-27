@@ -87,7 +87,7 @@
   [entry cfg put-fn edit-mode? toggle-edit]
   (let [visible (r/atom false)
         hide-fn (fn [_ev]
-                  (.setTimeout js/window #(reset! visible false) 6000))]
+                  (.setTimeout js/window #(reset! visible false) 60000))]
     (fn
       [entry cfg put-fn edit-mode? toggle-edit]
       (let [ts (:timestamp entry)
@@ -137,8 +137,6 @@
          (when-not (:comment-for entry)
            [new-link entry put-fn create-linked-entry])
          [trash-icon trash-entry]]))))
-
-
 
 (defn journal-entry
   "Renders individual journal entry. Interaction with application state happens
