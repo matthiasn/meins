@@ -54,29 +54,30 @@
 (deftest markdown-render-test
   ""
   (testing "renders test-entry as expected, with #"
-    (is (= (m/markdown-render test-entry true)
+    (is (= (second ((m/markdown-render test-entry true) test-entry true))
            [:div {:dangerouslySetInnerHTML {:__html "<p>Moving to <a href='/##cljc'>#cljc</a></p>"}}])))
 
   (testing "renders test-entry as expected, without #"
-    (is (= (m/markdown-render test-entry false)
+    (is (= (second ((m/markdown-render test-entry false) test-entry false))
            [:div {:dangerouslySetInnerHTML {:__html "<p>Moving to <a href='/##cljc'>cljc</a></p>"}}])))
 
   (testing "renders more complex test-entry2 as expected, with #"
-    (is (= (m/markdown-render test-entry2 true)
+    (is (= (second ((m/markdown-render test-entry2 true) test-entry2 true))
            [:div {:dangerouslySetInnerHTML {:__html "<p>New <a href='/##task'>#task</a>: count the time spent <a href='/##interacting'>#interacting</a> with the <a href='/##UI'>#UI</a> when no <a href='/##pomodoro'>#pomodoro</a> is running. Mouse-over and key <a href='/##events'>#events</a> should be a good indicator for that. When nothing happens longer than x, don't extend the current period of activity but rather close the last one at the last <a href='/##timestamp'>#timestamp</a> and create a new period of activity. I like that. Not all work can possibly happen in <a href='/##pomodoros'>#pomodoros</a>, and it would be a waste of data to not capture that time.  <a class='mention-link' href='/#@myself'>@myself</a> </p>"}}])))
 
   (testing "renders more complex test-entry2 as expected, without #"
-    (is (= (m/markdown-render test-entry2 false)
+    (is (= (second ((m/markdown-render test-entry2 false) test-entry2 false))
            [:div {:dangerouslySetInnerHTML {:__html "<p>New <a href='/##task'>task</a>: count the time spent <a href='/##interacting'>interacting</a> with the <a href='/##UI'>UI</a> when no <a href='/##pomodoro'>pomodoro</a> is running. Mouse-over and key <a href='/##events'>events</a> should be a good indicator for that. When nothing happens longer than x, don't extend the current period of activity but rather close the last one at the last <a href='/##timestamp'>timestamp</a> and create a new period of activity. I like that. Not all work can possibly happen in <a href='/##pomodoros'>pomodoros</a>, and it would be a waste of data to not capture that time.  <a class='mention-link' href='/#@myself'>myself</a> </p>"}}])))
 
-  (testing "renders unordered list in test-entry3 as expected"
-    (is (= (m/markdown-render test-entry3 true)
-           [:div {:dangerouslySetInnerHTML {:__html "<p>Some test with <a href='/##unordered-list'>#unordered-list</a>:</p><ul><li>line 1</li><li>line 2</li><li>line 3</li><li>line 4</li></ul>"}}])))
+  (testing "renders unordered list in test-entry3 as expected, first line only
+            initially because of :comment-for"
+    (is (= (second ((m/markdown-render test-entry3 true) test-entry3 true))
+           [:div {:dangerouslySetInnerHTML {:__html "<p>Some test with <a href='/##unordered-list'>#unordered-list</a>:</p>"}}])))
 
   (testing "multiple hashtags in a row are rendered correctly"
-    (is (= (m/markdown-render test-entry4 true)
+    (is (= (second ((m/markdown-render test-entry4 true) test-entry4 true))
            [:div {:dangerouslySetInnerHTML {:__html "<p>This test case is to prevent a regression where multiple hashtags in a row were not properly formatted. <a href='/##tag1'>#tag1</a> <a href='/##tag2'>#tag2</a> <a href='/##tag3'>#tag3</a></p>"}}])))
 
   (testing "hashtags can be a substring of another hashtag"
-    (is (= (m/markdown-render test-entry5 true)
+    (is (= (second ((m/markdown-render test-entry5 true) test-entry5 true))
            [:div {:dangerouslySetInnerHTML {:__html "<p>This test case is to prevent a regression where the <a href='/##formatting'>#formatting</a> was messed if one tag was a substring of another. <a href='/##format'>#format</a></p>"}}]))))
