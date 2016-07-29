@@ -1,17 +1,38 @@
 (ns iwaswhere-web.ui-pomodoros-test
-  "Here, we test the pomodoro UI functions. These tests are written in cljc and can also run on the JVM,
-  as we only have pure punctions in the target namespace."
+  "Here, we test the pomodoro UI functions. These tests are written in cljc and
+   can also run on the JVM, as we only have pure punctions in the target
+    namespace."
   (:require #?(:clj [clojure.test :refer [deftest testing is]]
                :cljs [cljs.test :refer-macros [deftest testing is]])
                     [iwaswhere-web.ui.pomodoro :as p]))
 
 (def test-entries
   [{:timestamp 12345}
-   {:timestamp 12346 :entry-type :pomodoro :planned-dur 1500 :completed-time 1000 :interruptions 0}
-   {:timestamp 12347 :entry-type :pomodoro :planned-dur 1500 :completed-time 1500 :interruptions 0}
-   {:timestamp 12348 :entry-type :pomodoro :planned-dur 1500 :completed-time 1500 :interruptions 0}
-   {:timestamp 12349 :entry-type :pomodoro :planned-dur 1500 :completed-time 1500 :interruptions 2}
-   {:timestamp 12350 :entry-type :pomodoro :planned-dur 1500 :completed-time 1000 :interruptions 1}])
+   {:timestamp      12346
+    :entry-type     :pomodoro
+    :planned-dur    1500
+    :completed-time 1000
+    :interruptions  0}
+   {:timestamp      12347
+    :entry-type     :pomodoro
+    :planned-dur    1500
+    :completed-time 1500
+    :interruptions  0}
+   {:timestamp      12348
+    :entry-type     :pomodoro
+    :planned-dur    1500
+    :completed-time 1500
+    :interruptions  0}
+   {:timestamp      12349
+    :entry-type     :pomodoro
+    :planned-dur    1500
+    :completed-time 1500
+    :interruptions  2}
+   {:timestamp      12350
+    :entry-type     :pomodoro
+    :planned-dur    1500
+    :completed-time 1000
+    :interruptions  1}])
 
 (deftest pomodoro-stats-test
   "Test that the pomodoro-stats properly summarizes pomodoro stats."
@@ -39,22 +60,25 @@
             :interruptions-str   ". Interruptions: 3"}))))
 
 (deftest pomodoro-stats-view-test
-  "Test that the pomodoro-stats-view function properly formats the pomodoro stats view,
-  with the correct number of formatted icons and summary string."
+  "Test that the pomodoro-stats-view function properly formats the pomodoro
+   stats view, with the correct number of formatted icons and summary string."
   (testing "works on empty seq of entries"
     (is (nil? (p/pomodoro-stats-view []))))
 
-  (testing "works on first 4 test entries, with two completed and one incomplete icons"
+  (testing
+    "works on first 4 test entries, with 2 completed and 1 incomplete icons"
     (is (= (p/pomodoro-stats-view (take 4 test-entries))
            [:span
             [:span
              [:span.fa.fa-clock-o.completed]
              [:span.fa.fa-clock-o.completed]]
             [:span [:span.fa.fa-clock-o.incomplete]]
-            [:span.dur "1h 6m 40s"]
+            [:span.dur "1h 6m"]
             [:span]])))
 
-  (testing "works on test entries with interruptions, with 3 completed and 2 incomplete icons"
+  (testing
+    "works on test entries with interruptions, with 3 completed and 2 incomplete
+     icons"
     (is (= (p/pomodoro-stats-view test-entries)
            [:span
             [:span
@@ -63,7 +87,7 @@
              [:span.fa.fa-clock-o.completed]]
             [:span [:span.fa.fa-clock-o.incomplete]
              [:span.fa.fa-clock-o.incomplete]]
-            [:span.dur "1h 48m 20s"]
+            [:span.dur "1h 48m"]
             [:span
              [:span.fa.fa-bolt]
              [:span.fa.fa-bolt]
@@ -71,13 +95,25 @@
 
 (def test-entries2
   (concat test-entries
-          [{:timestamp 12350 :entry-type :pomodoro :planned-dur 1500 :completed-time 1000 :interruptions 3}
-           {:timestamp 12350 :entry-type :pomodoro :planned-dur 1500 :completed-time 1000 :interruptions 0}
-           {:timestamp 12350 :entry-type :pomodoro :planned-dur 1500 :completed-time 1500 :interruptions 3}]))
+          [{:timestamp      12350
+            :entry-type     :pomodoro
+            :planned-dur    1500
+            :completed-time 1000
+            :interruptions  3}
+           {:timestamp      12350
+            :entry-type     :pomodoro
+            :planned-dur    1500
+            :completed-time 1000
+            :interruptions  0}
+           {:timestamp      12350
+            :entry-type     :pomodoro
+            :planned-dur    1500
+            :completed-time 1500
+            :interruptions  3}]))
 
 (deftest pomodoro-stats-view-test2
-  "Test that the pomodoro-stats-view function properly formats the pomodoro stats view when there are more than three
-  interruptions and pomodoros."
+  "Test that the pomodoro-stats-view function properly formats the pomodoro
+   stats view when there are more than three interruptions and pomodoros."
   (testing "shows combination of icon and count"
     (is (= (p/pomodoro-stats-view test-entries2)
            [:span
@@ -87,23 +123,24 @@
             [:span
              [:span.fa.fa-clock-o.incomplete]
              [:span.incomplete-cnt 4]]
-            [:span.dur "2h 46m 40s"]
+            [:span.dur "2h 46m"]
             [:span
              [:span.fa.fa-bolt]
              [:span.bolt-cnt 9]]]))))
 
 (deftest pomodoro-stats-str-test
-  "Test that the pomodoro-stats-str function properly formats the pomodoro stats string."
+  "Test that the pomodoro-stats-str function properly formats the pomodoro stats
+   string."
   (testing "works on empty seq of entries"
     (is (nil? (p/pomodoro-stats-str []))))
 
   (testing "works on test entries"
     (is (= (p/pomodoro-stats-str (take 4 test-entries))
-           "Pomodoros: 2 of 3 completed, 1h 6m 40s")))
+           "Pomodoros: 2 of 3 completed, 1h 6m")))
 
   (testing "works on test entries with interruptions"
     (is (= (p/pomodoro-stats-str test-entries)
-           "Pomodoros: 3 of 5 completed, 1h 48m 20s. Interruptions: 3"))))
+           "Pomodoros: 3 of 5 completed, 1h 48m. Interruptions: 3"))))
 
 (def empty-test-entry
   {:mentions   #{}
@@ -194,7 +231,11 @@
 
     (testing "renders icon and duration when started"
       (is (= (p/pomodoro-header test-entry2 fake-start-fn false)
-             [:div.pomodoro [:span.fa.fa-clock-o.incomplete] [:span.dur "1m 40s"] [:span] nil])))
+             [:div.pomodoro
+              [:span.fa.fa-clock-o.incomplete]
+              [:span.dur "1m 40s"]
+              [:span]
+              nil])))
 
     (testing "renders icon, duration and start button in edit mode"
       (is (= (p/pomodoro-header test-entry2 fake-start-fn true)
@@ -220,7 +261,8 @@
               [:span]
               nil])))
 
-    (testing "renders completed icon and duration when completed, with interruptions"
+    (testing
+      "renders completed icon and duration when completed, with interruptions"
       (is (= (p/pomodoro-header test-entry3a fake-start-fn false)
              [:div.pomodoro
               [:span.fa.fa-clock-o.completed]
@@ -231,7 +273,8 @@
                [:span.fa.fa-bolt]]
               nil])))
 
-    (testing "renders icon, duration and no start button in edit mode when time is up"
+    (testing
+      "renders icon, duration and no start button in edit mode when time is up"
       (is (= (p/pomodoro-header test-entry3 fake-start-fn true)
              [:div.pomodoro
               [:span.fa.fa-clock-o.completed]
@@ -239,7 +282,8 @@
               [:span]
               nil])))
 
-    (testing "renders icon, duration and no start button in edit mode when time is up"
+    (testing
+      "renders icon, duration and no start button in edit mode when time is up"
       (is (= (p/pomodoro-header test-entry3a fake-start-fn true)
              [:div.pomodoro
               [:span.fa.fa-clock-o.completed]
@@ -250,9 +294,10 @@
                [:span.fa.fa-bolt]]
               nil])))
 
-    (testing "renders icon, duration and no start button in edit mode when time is up. Shows
-    one bolt plus count when more than 3 interruptions."
-      (is (= (p/pomodoro-header (merge test-entry3a {:interruptions 4}) fake-start-fn true)
+    (testing "renders icon, duration and no start button in edit mode when time
+              is up. Shows one bolt plus count when more than 3 interruptions."
+      (is (= (p/pomodoro-header (merge test-entry3a {:interruptions 4})
+                                fake-start-fn true)
              [:div.pomodoro
               [:span.fa.fa-clock-o.completed]
               [:span.dur "25m"]
