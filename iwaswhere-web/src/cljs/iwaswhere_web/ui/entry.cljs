@@ -114,7 +114,7 @@
                                   (update-in entry [:upvotes] op)]))]
         [:div {:on-mouse-enter #(reset! visible true)
                :on-mouse-leave hide-fn
-               :style          {:opacity (if @visible 1 0)}}
+               :style          {:opacity (if (or edit-mode? @visible) 1 0)}}
          [:span.fa.toggle
           {:on-click (upvote-fn inc)
            :class    (if (pos? upvotes) "fa-thumbs-up" "fa-thumbs-o-up")}]
