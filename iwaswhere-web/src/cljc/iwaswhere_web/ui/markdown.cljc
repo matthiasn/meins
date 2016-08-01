@@ -35,15 +35,21 @@
   "Renders a markdown div using :dangerouslySetInnerHTML. Not that dangerous
    here since application is only running locally, so in doubt we could only
    harm ourselves. Returns nil when entry does not contain markdown text."
-  [entry show-hashtags?]
-  (let [first-line-only #?(:clj  (atom true)
-                           :cljs (rc/atom true))]
-    (fn [entry show-hashtags?]
+  [entry cfg]
+  (let [show-shortened #?(:clj  (atom true)
+                          :cljs (rc/atom true))]
+    (fn [entry cfg]
       (when-let [md-string (:md entry)]
-        (let [is-comment? (:comment-for entry)
+        (let [show-hashtags? (:show-hashtags cfg)
+              lines-shortened (:lines-shortened cfg)
+              is-comment? (:comment-for entry)
               lines (s/split-lines md-string)
-              shortened? (and @first-line-only is-comment? (> (count lines) 1))
-              md-string (if shortened? (first lines) md-string)
+              shortened? (and @show-shortened is-comment?
+                              (> (count lines) lines-shortened))
+              md-string (if shortened?
+                          (let [lines (take lines-shortened lines)]
+                            (apply str (interpose "\n" lines)))
+                          md-string)
               formatted-md
               (-> md-string
                   (reducer (:tags entry) (hashtags-replacer show-hashtags?))
@@ -53,5 +59,5 @@
           [:div
            [:div {:dangerouslySetInnerHTML {:__html html}}]
            (when shortened?
-             [:span.fa.fa-ellipsis-h.more
-              {:on-mouse-enter #(swap! first-line-only not)}])])))))
+             [:span.more {:on-mouse-enter #(swap! show-shortened not)}
+              "[...]"])])))))

@@ -38,7 +38,8 @@
                                               :comments-w-entries true
                                               :show-context       true
                                               :mute               false
-                                              :show-pvt           false}})]
+                                              :show-pvt           false
+                                              :lines-shortened    3}})]
     {:state initial-state}))
 
 (defn toggle-set-fn
@@ -90,6 +91,13 @@
                                                          msg-payload))
      :emit-msg  s/update-location-hash-msg}))
 
+(defn toggle-lines
+  "Toggle number of lines to show when comments are shortend. Cycles from
+   one to ten."
+  [{:keys [current-state]}]
+  {:new-state (update-in current-state [:cfg :lines-shortened]
+                         #(if (< % 10) (inc %) 1))})
+
 (defn cmp-map
   "Creates map for the component which holds the client-side application state."
   [cmp-id]
@@ -107,4 +115,5 @@
                               :cmd/set-opt        set-conj-fn
                               :cmd/toggle-key     toggle-key-fn
                               :cmd/keep-alive     ka/reset-fn
-                              :cmd/keep-alive-res ka/set-alive-fn})})
+                              :cmd/keep-alive-res ka/set-alive-fn
+                              :cmd/toggle-lines   toggle-lines})})

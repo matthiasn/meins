@@ -173,7 +173,7 @@
      [l/leaflet-map entry (or show-map? (:show-all-maps cfg))]
      (if edit-mode?
        [e/editable-md-render entry hashtags mentions put-fn toggle-edit]
-       [md/markdown-render entry (:show-hashtags cfg)])
+       [md/markdown-render entry cfg])
      [m/image-view entry]
      [m/audioplayer-view entry]
      [m/videoplayer-view entry]]))
