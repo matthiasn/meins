@@ -11,8 +11,7 @@
             [iwaswhere-web.fulltext-search :as ft]
             [ubergraph.core :as uber]))
 
-(def data-path (or (System/getenv "DATA_PATH")
-                   (str (System/getProperty "user.home") "/iWasWhere/data")))
+(def data-path (or (System/getenv "DATA_PATH") "data"))
 (def daily-logs-path (str data-path "/daily-logs/"))
 
 (defn filter-by-name
@@ -24,7 +23,8 @@
   "Appends journal entry to the current day's log file."
   [entry]
   (let [filename (str daily-logs-path
-                      (timef/unparse (timef/formatters :year-month-day) (time/now)) ".jrn")
+                      (timef/unparse (timef/formatters :year-month-day)
+                                     (time/now)) ".jrn")
         serialized (str (pr-str entry) "\n")]
     (spit filename serialized :append true)))
 
@@ -39,8 +39,10 @@
                       (if (= (:md existing) "No departure recorded #visit")
                         msg-payload
                         (merge existing
-                               (select-keys msg-payload [:longitude :latitude
-                                                         :horizontal-accuracy :gps-timestamp])))
+                               (select-keys msg-payload [:longitude
+                                                         :latitude
+                                                         :horizontal-accuracy
+                                                         :gps-timestamp])))
                       msg-payload)]
     (when-not (= existing node-to-add)
       (append-daily-log node-to-add))

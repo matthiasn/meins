@@ -1,7 +1,8 @@
 (ns iwaswhere-web.upload-qr
   "Functions for rendering a QR code that contains the IP address for upload."
   (:require [compojure.core :refer [GET]]
-            [clj.qrgen :as qr])
+            [clj.qrgen :as qr]
+            [iwaswhere-web.upload :as up])
   (:import (java.net NetworkInterface Inet4Address)))
 
 ; ip-filter, ip-extract, and ips functions borrowed from:
@@ -25,5 +26,5 @@
   (GET "/upload-address.png" []
     (qr/as-input-stream
       (let [ip (first (first (ips)))]
-        (qr/from (str "http://" ip ":3001/upload/")
+        (qr/from (str "http://" ip ":" up/upload-port "/upload/")
                  :size [300 300])))))
