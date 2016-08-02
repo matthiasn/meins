@@ -104,4 +104,5 @@
                  :state/get             state-get-fn
                  :state/stats-tags      stats-tags-fn
                  :cmd/keep-alive        ka/keepalive-fn
-                 :cmd/query-gc          ka/query-gc-fn}})
+                 :cmd/query-gc          ka/query-gc-fn
+                 :stats/pomo-day-get    g/get-pomodoro-day-stats}})

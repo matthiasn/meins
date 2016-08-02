@@ -29,7 +29,8 @@
       [:div.flex-container
        [:div#header]
        [:div#search]
-       [:div#journal]]
+       [:div#journal]
+       [:div#stats]]
       ;; Currently, from http://www.orangefreesounds.com/old-clock-ringing-short/
       ;; TODO: record own alarm clock
       [:audio#ringer {:autoPlay false :loop false}
@@ -53,4 +54,5 @@
   "Configuration map for sente-cmp."
   {:index-page-fn index-page
    :routes-fn     routes-fn
-   :relay-types   #{:cmd/keep-alive-res :entry/saved :state/new}})
+   :relay-types   #{:cmd/keep-alive-res :entry/saved :state/new
+                    :stats/pomo-day}})

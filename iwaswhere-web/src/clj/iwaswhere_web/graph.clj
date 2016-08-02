@@ -13,12 +13,13 @@
             [clojure.core.reducers :as r]))
 
 (defn entries-filter-fn
-  "Creates a filter function which ensures that all tags and mentions in the query are
-  contained in the filtered entry or any of it's comments, and none of the not-tags.
-  Also allows filtering per day."
+  "Creates a filter function which ensures that all tags and mentions in the
+   query are contained in the filtered entry or any of it's comments, and none
+    of the not-tags. Also allows filtering per day."
   [q graph]
   (fn [entry]
-    (let [local-fmt (timef/with-zone (timef/formatters :year-month-day) (ct/default-time-zone))
+    (let [local-fmt (timef/with-zone (timef/formatters :year-month-day)
+                                     (ct/default-time-zone))
           entry-day (timef/unparse local-fmt (ctc/from-long (:timestamp entry)))
           q-day (:date-string q)
           day-match? (= q-day entry-day)
@@ -36,8 +37,10 @@
           tags (set (map s/lower-case (set/union entry-tags entry-comments-tags)))
 
           entry-mentions (set (map s/lower-case (:mentions entry)))
-          entry-comments-mentions (apply set/union (map :mentions (:comments entry)))
-          mentions (set (map s/lower-case (set/union entry-mentions entry-comments-mentions)))
+          entry-comments-mentions (apply set/union (map :mentions
+                                                        (:comments entry)))
+          mentions (set (map s/lower-case
+                             (set/union entry-mentions entry-comments-mentions)))
 
           match? (and (set/subset? q-tags tags)
                       (empty? (set/intersection q-not-tags tags))
@@ -48,7 +51,8 @@
       match?)))
 
 (defn compare-w-upvotes
-  "Sort comparator which considers upvotes first, and, if those are equal, the timestamp second."
+  "Sort comparator which considers upvotes first, and, if those are equal, the
+   timestamp second."
   [x y]
   (let [upvotes-x (get x :upvotes 0)
         upvotes-y (get y :upvotes 0)]
@@ -62,7 +66,8 @@
   "Extract all comments for entry."
   [entry g n]
   (merge entry
-         {:comments (->> (flatten (uber/find-edges g {:dest n :relationship :COMMENT}))
+         {:comments (->> (flatten (uber/find-edges g {:dest n
+                                                      :relationship :COMMENT}))
                          (remove :mirror?)
                          (map :src)
                          (sort))}))
@@ -72,8 +77,9 @@
   [g query]
   (let [mapper (fn [tag-type]
                  (fn [tag]
-                   (set (map :dest (uber/find-edges g {:src          {tag-type tag}
-                                                       :relationship :CONTAINS})))))
+                   (set (map :dest
+                             (uber/find-edges g {:src          {tag-type tag}
+                                                 :relationship :CONTAINS})))))
         t-matched (map (mapper :tag) (map s/lower-case (:tags query)))
         m-matched (map (mapper :mention) (map s/lower-case (:mentions query)))]
     (apply set/union (concat t-matched m-matched))))
@@ -100,9 +106,10 @@
                                          linked)})))
 
 (defn extract-sorted-entries
-  "Extracts nodes and their properties in descending timestamp order by looking for node by mapping
-  over the sorted set and extracting attributes for each node.
-  Warns when node not in graph. (debugging, should never happen)"
+  "Extracts nodes and their properties in descending timestamp order by looking
+   for node by mapping over the sorted set and extracting attributes for each
+   node.
+   Warns when node not in graph. (debugging, should never happen)"
   [current-state query]
   (let [sort-by-upvotes? (:sort-by-upvotes query)
         g (:graph current-state)
@@ -121,9 +128,11 @@
                           (:ft-search query)
                           (sort-fn (ft/search query))
                           ; set with the one timestamp in query
-                          (:timestamp query) #{(Long/parseLong (:timestamp query))}
+                          (:timestamp query) #{(Long/parseLong
+                                                 (:timestamp query))}
                           ; set with timestamps matching the day
-                          (:date-string query) (sort-fn (get-nodes-for-day g query))
+                          (:date-string query) (sort-fn
+                                                 (get-nodes-for-day g query))
                           ; set with all timestamps (leads to full scan)
                           :else (:sorted-entries current-state))
         entries (map mapper-fn matched-entries)]
@@ -144,8 +153,8 @@
        entry-timestamps))
 
 (defn find-all-hashtags
-  "Finds all hashtags used in entries by finding the edges that originate from the
-  :hashtags node."
+  "Finds all hashtags used in entries by finding the edges that originate from
+   the :hashtags node."
   [current-state]
   (let [g (:graph current-state)
         ltags (map #(-> % :dest :tag) (uber/find-edges g {:src :hashtags}))
@@ -153,13 +162,35 @@
     (set tags)))
 
 (defn find-all-mentions
-  "Finds all hashtags used in entries by finding the edges that originate from the
-  :hashtags node."
+  "Finds all hashtags used in entries by finding the edges that originate from
+   the :hashtags node."
   [current-state]
   (let [g (:graph current-state)
-        lmentions (map #(-> % :dest :mention) (uber/find-edges g {:src :mentions}))
+        lmentions (map #(-> % :dest :mention)
+                       (uber/find-edges g {:src :mentions}))
         mentions (map #(:val (uber/attrs g {:mention %})) lmentions)]
     (set mentions)))
+
+(defn get-pomodoro-day-stats
+  "Get pomodoro stats for specified day."
+  [{:keys [current-state msg-payload msg-meta]}]
+  (let [g (:graph current-state)
+        date-string (:date-string msg-payload)
+        day-nodes (get-nodes-for-day g {:date-string date-string})
+        day-nodes-attrs (map #(uber/attrs g %) day-nodes)
+        pomodoro-nodes (filter #(= (:entry-type %) :pomodoro) day-nodes-attrs)
+        stats {:date-string date-string
+               :total       (count pomodoro-nodes)
+               :completed   (count (filter #(= (:planned-dur %)
+                                               (:completed-time %))
+                                           pomodoro-nodes))
+               :started     (count (filter #(and (pos? (:completed-time %))
+                                                 (< (:completed-time %)
+                                                    (:planned-dur %)))
+                                           pomodoro-nodes))
+               :total-time  (apply + (map :completed-time pomodoro-nodes))}]
+    (prn stats)
+    {:emit-msg (with-meta [:stats/pomo-day stats] msg-meta)}))
 
 (defn get-basic-stats
   "Generate some very basic stats about the graph size for display in UI."
@@ -180,7 +211,7 @@
                                 (extract-sorted-entries current-state query)))
         comment-timestamps (set (flatten (map :comments entries)))
         linked-entries (extract-entries-by-ts current-state
-                                              (set (flatten (map :linked-entries-list entries))))
+                         (set (flatten (map :linked-entries-list entries))))
         linked-entries (map (fn [entry]
                               (let [ts (:timestamp entry)]
                                 (-> entry
@@ -189,7 +220,7 @@
                             linked-entries)
         linked-comments-ts (set (flatten (map :comments linked-entries)))
         comments (extract-entries-by-ts current-state
-                                        (set/union comment-timestamps linked-comments-ts))]
+                   (set/union comment-timestamps linked-comments-ts))]
     {:entries     (map :timestamp entries)
      :entries-map (merge (into {} (map entry-mapper entries))
                          (into {} (map entry-mapper comments))

@@ -15,19 +15,22 @@
                       (assoc-in [:cfg :hashtags] (:hashtags msg-payload))
                       (assoc-in [:stats] (:stats msg-payload))
                       (assoc-in [:timing] {:query (:duration-ms msg-payload)
-                                           :rtt   (- (:in-ts store-meta) (:out-ts store-meta))})
+                                           :rtt   (- (:in-ts store-meta)
+                                                     (:out-ts store-meta))})
                       (assoc-in [:cfg :mentions] (:mentions msg-payload)))]
     {:new-state new-state}))
 
 (defn initial-state-fn
-  "Creates the initial component state atom. Holds a list of entries from the backend,
-  a map with temporary entries that are being edited but not saved yet, and sets that
-  contain information for which entries to show the map, or the edit mode."
+  "Creates the initial component state atom. Holds a list of entries from the
+   backend, a map with temporary entries that are being edited but not saved
+   yet, and sets that contain information for which entries to show the map,
+   or the edit mode."
   [_put-fn]
   (let [initial-state (atom {:entries        []
                              :last-alive     (st/now)
                              :new-entries    @cse/new-entries-ls
                              :current-query  {}
+                             :pomodoro-stats (sorted-map)
                              :cfg            {:active             nil
                                               :linked-filter      {}
                                               :show-maps-for      #{}
@@ -54,7 +57,8 @@
     {:new-state new-state}))
 
 (defn set-conj-fn
-  "Like toggle-set-fn but only adds timestamp to set specified in path. Noop if already in there."
+  "Like toggle-set-fn but only adds timestamp to set specified in path.
+   Noop if already in there."
   [{:keys [current-state msg-payload]}]
   (let [path (:path msg-payload)
         ts (:timestamp msg-payload)
@@ -68,7 +72,8 @@
     {:new-state (update-in current-state path not)}))
 
 (defn show-more-fn
-  "Runs previous query but with more results. Also updates the number to show in the UI."
+  "Runs previous query but with more results. Also updates the number to show in
+   the UI."
   [{:keys [current-state]}]
   (let [current-query (:current-query current-state)
         new-query (update-in current-query [:n] + 20)
@@ -86,9 +91,10 @@
   "Sets entry in payload as the active entry for which to show linked entries."
   [{:keys [current-state msg-payload]}]
   (let [currently-active (get-in current-state [:cfg :active])]
-    {:new-state (assoc-in current-state [:cfg :active] (if (= currently-active msg-payload)
-                                                         nil
-                                                         msg-payload))
+    {:new-state (assoc-in current-state [:cfg :active]
+                          (if (= currently-active msg-payload)
+                            nil
+                            msg-payload))
      :emit-msg  s/update-location-hash-msg}))
 
 (defn toggle-lines
@@ -97,6 +103,13 @@
   [{:keys [current-state]}]
   {:new-state (update-in current-state [:cfg :lines-shortened]
                          #(if (< % 10) (inc %) 1))})
+
+(defn pomo-stats-fn
+  "Store received stats on component state."
+  [{:keys [current-state msg-payload]}]
+  (let [ds (:date-string msg-payload)
+        new-state (assoc-in current-state [:pomodoro-stats ds] msg-payload)]
+    {:new-state new-state}))
 
 (defn cmp-map
   "Creates map for the component which holds the client-side application state."
@@ -108,6 +121,7 @@
    :handler-map       (merge cse/entry-handler-map
                              s/search-handler-map
                              {:state/new          new-state-fn
+                              :stats/pomo-day     pomo-stats-fn
                               :show/more          show-more-fn
                               :cmd/set-active     set-active-fn
                               :cmd/toggle-active  toggle-active-fn

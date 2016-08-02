@@ -158,6 +158,8 @@
                    :iww.search-result/stats
                    :iww.search-result/duration-ms]))
 
+(s/def :stats/pomo-day-get
+  (s/keys :req-un [:iww.search/date-string]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Spec for :state/publish-current
