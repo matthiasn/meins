@@ -45,7 +45,7 @@
               is-comment? (:comment-for entry)
               lines (s/split-lines md-string)
               shortened? (and @show-shortened is-comment?
-                              (> (count lines) lines-shortened))
+                              (>= (count lines) lines-shortened))
               md-string (if shortened?
                           (let [lines (take lines-shortened lines)]
                             (apply str (interpose "\n" lines)))
