@@ -24,5 +24,6 @@
 (def address-qr-route
   (GET "/upload-address.png" []
     (qr/as-input-stream
-      (qr/from (str "http://" (first (first (ips))) ":3001/upload/")
-               :size [300 300]))))
+      (let [ip (first (first (ips)))]
+        (qr/from (str "http://" ip ":3001/upload/")
+                 :size [300 300])))))
