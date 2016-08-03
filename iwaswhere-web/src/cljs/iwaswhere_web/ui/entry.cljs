@@ -156,8 +156,10 @@
      [:div.header
       [:div
        [:a {:href (str "/#" (.format (js/moment ts) "YYYY-MM-DD"))}
-        [:time (.format (js/moment ts) "ddd, MMMM Do YYYY")]]
-       [:time (.format (js/moment ts) ", h:mm a") (u/visit-duration entry)]]
+        ;[:time (.format (js/moment ts) "ddd, MMMM Do YYYY")]
+        [:time (.format (js/moment ts) "ddd, YYYY-MM-DD HH:mm")]]
+       ;[:time (.format (js/moment ts) ", h:mm a") (u/visit-duration entry)]
+       [:time (u/visit-duration entry)]]
       (if (= :pomodoro (:entry-type entry))
         [p/pomodoro-header entry #(put-fn [:cmd/pomodoro-start entry]) edit-mode?]
         [:div info])

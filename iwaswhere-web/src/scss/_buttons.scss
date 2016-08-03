@@ -3,6 +3,7 @@
   color: white;
   font-size: 0.8em;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .not-saved {
@@ -33,6 +34,7 @@ button {
   display: inline-block;
   font-size: 16px;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .button-primary {
