@@ -189,7 +189,6 @@
                                                     (:planned-dur %)))
                                            pomodoro-nodes))
                :total-time  (apply + (map :completed-time pomodoro-nodes))}]
-    (prn stats)
     {:emit-msg (with-meta [:stats/pomo-day stats] msg-meta)}))
 
 (defn get-basic-stats

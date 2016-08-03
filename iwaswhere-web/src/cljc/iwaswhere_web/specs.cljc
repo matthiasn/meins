@@ -10,8 +10,11 @@
     (and (number? val) (<= start val) (< val end))))
 (def possible-timestamp? (number-in-range? 0 5000000000000))
 
+(defn int-not-neg? [val] (and (int? val) (>= val 0)))
+
 (defn is-tag?
-  "Check if string is a tag, such as a hashtag with the '#' prefix or a mention with the '@' prefix."
+  "Check if string is a tag, such as a hashtag with the '#' prefix or a mention
+   with the '@' prefix."
   [prefix]
   (fn [s]
     (re-find (re-pattern (str "^" prefix p/tag-char-cls "+$")) s)))
@@ -160,6 +163,18 @@
 
 (s/def :stats/pomo-day-get
   (s/keys :req-un [:iww.search/date-string]))
+
+(s/def :pomo-stats/total int-not-neg?)
+(s/def :pomo-stats/completed int-not-neg?)
+(s/def :pomo-stats/started int-not-neg?)
+(s/def :pomo-stats/total-time int-not-neg?)
+
+(s/def :stats/pomo-day
+  (s/keys :req-un [:iww.search/date-string
+                   :pomo-stats/total
+                   :pomo-stats/completed
+                   :pomo-stats/started
+                   :pomo-stats/total-time]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Spec for :state/publish-current
