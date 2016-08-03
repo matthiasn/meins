@@ -47,6 +47,7 @@
                           :to   #{:client/journal-cmp :client/search-cmp
                                   :client/menu-cmp :client/stats-cmp}}]
 
+     [:cmd/route {:from :client/ws-cmp :to :client/stats-cmp}]
      [:cmd/route {:from :client/store-cmp :to :client/scheduler-cmp}]
      [:cmd/route {:from :client/scheduler-cmp :to #{:client/store-cmp
                                                     :client/ws-cmp}}]])
