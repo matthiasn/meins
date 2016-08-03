@@ -1,0 +1,15 @@
+#stats {
+  flex: 0 0 auto;
+  height: 100px;
+  background-color: rgba(200,200, 240, 0.27);
+  overflow-y: auto;
+  padding: 5px;
+
+  .stats {
+    button {
+      line-height: 0.8em;
+      font-size: 0.8em;
+    }
+  }
+}
+

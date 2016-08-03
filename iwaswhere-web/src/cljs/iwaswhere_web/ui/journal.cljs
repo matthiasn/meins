@@ -2,10 +2,8 @@
   (:require [matthiasn.systems-toolbox-ui.reagent :as r]
             [iwaswhere-web.ui.utils :as u]
             [iwaswhere-web.ui.entry :as e]
-            [iwaswhere-web.ui.pomodoro :as p]
             [iwaswhere-web.utils.parse :as ps]
-            [clojure.set :as set]
-            [cljs.pprint :as pp]))
+            [clojure.set :as set]))
 
 (defn linked-entries-filter
   "Filter linked entries by search."
@@ -15,7 +13,8 @@
           combined-tags (reduce #(set/union %1 (:tags %2)) (:tags entry)
                                 comments)]
       (and (set/subset? (:tags linked-filter) combined-tags)
-           (empty? (set/intersection (:not-tags linked-filter) combined-tags))))))
+           (empty? (set/intersection (:not-tags linked-filter)
+                                     combined-tags))))))
 
 (defn linked-entries-view
   "Renders linked entries in right side column, filtered by local search."
@@ -85,16 +84,7 @@
       (when (and show-context? (seq entries))
         (let [show-more #(put-fn [:show/more])]
           [:div.show-more {:on-click show-more :on-mouse-over show-more}
-           [:span.show-more-btn [:span.fa.fa-plus-square] " show more"]]))
-      (when-let [stats (:stats store-snapshot)]
-        [:div (:entry-count stats) " entries, " (:node-count stats) " nodes, "
-         (:edge-count stats) " edges, " (count (:hashtags cfg)) " hashtags, "
-         (count (:mentions cfg)) " people"])
-      [:div (p/pomodoro-stats-str filtered-entries)]
-      (when-let [ms (get-in store-snapshot [:timing :query])]
-        [:div.stats (str "Query with " (count entries) " results completed in "
-                         ms ", RTT " (get-in store-snapshot [:timing :rtt])
-                         " ms")])]
+           [:span.show-more-btn [:span.fa.fa-plus-square] " show more"]]))]
      (linked-entries-view linked-entries entries-map new-entries cfg put-fn)]))
 
 (defn cmp-map

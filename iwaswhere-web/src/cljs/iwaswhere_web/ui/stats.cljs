@@ -1,7 +1,7 @@
 (ns iwaswhere-web.ui.stats
   (:require [matthiasn.systems-toolbox-ui.reagent :as r]
-            [cljs.pprint :as pp]
-            [cljsjs.moment]))
+            [cljsjs.moment]
+            [iwaswhere-web.ui.pomodoro :as p]))
 
 (defn get-pomo-stats
   "Retrieves pomodoro stats for the last n days."
@@ -15,12 +15,25 @@
   "Renders stats component."
   [{:keys [observed local put-fn]}]
   (let [store-snapshot @observed
-        pomodoro-stats (:pomodoro-stats store-snapshot)]
-    [:div
-     [:div {:on-click (get-pomo-stats put-fn 14)} "get pomodoro stats"]
+        pomodoro-stats (:pomodoro-stats store-snapshot)
+        cfg (:cfg store-snapshot)
+        entries-map (:entries-map store-snapshot)
+        entries (map (fn [ts] (get entries-map ts)) (:entries store-snapshot))]
+    [:div.stats
+     [:button {:on-click (get-pomo-stats put-fn 14)} "get pomodoro stats"]
      (for [[ds ps] pomodoro-stats]
        ^{:key ds}
-       [:div ds " completed: " (:completed ps) " time: " (:total-time ps)])]))
+       [:div ds " total: " (:total ps) " completed: " (:completed ps)
+        " started: " (:started ps) " time: " (:total-time ps)])
+     (when-let [stats (:stats store-snapshot)]
+       [:div (:entry-count stats) " entries, " (:node-count stats) " nodes, "
+        (:edge-count stats) " edges, " (count (:hashtags cfg)) " hashtags, "
+        (count (:mentions cfg)) " people"])
+     (when-let [ms (get-in store-snapshot [:timing :query])]
+       [:div.stats
+        (str "Query with " (count entries)
+             " results completed in " ms ", RTT "
+             (get-in store-snapshot [:timing :rtt]) " ms")])]))
 
 (defn init-fn
   ""

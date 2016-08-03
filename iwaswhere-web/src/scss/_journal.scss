@@ -1,5 +1,6 @@
 #journal {
   display: flex;
+  flex-grow: 1;
   flex-flow: column;
   min-height: 0;
 }
