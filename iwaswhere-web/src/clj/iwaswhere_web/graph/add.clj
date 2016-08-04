@@ -1,10 +1,8 @@
-(ns iwaswhere-web.graph-add
-  "this namespace manages interactions with the graph data structure, which
-  holds all entries and their connections."
+(ns iwaswhere-web.graph.add
+  "Functions for adding new entries."
   (:require [ubergraph.core :as uber]
             [clj-time.coerce :as ctc]
             [clj-time.core :as ct]
-            [clj-time.format :as ctf]
             [clojure.string :as s]
             [clojure.set :as set]
             [clojure.tools.logging :as log]))

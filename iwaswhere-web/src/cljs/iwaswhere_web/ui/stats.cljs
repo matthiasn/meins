@@ -1,26 +1,24 @@
 (ns iwaswhere-web.ui.stats
   (:require [matthiasn.systems-toolbox-ui.reagent :as r]
             [cljsjs.moment]
-            [iwaswhere-web.ui.pomodoro :as p]))
+            [cljs.pprint :as pp]))
 
 (def ymd-format "YYYY-MM-DD")
+(defn n-days-go [n] (.subtract (js/moment.) n "d"))
+(defn n-days-go-fmt [n] (.format (n-days-go n) ymd-format))
 
-(defn get-pomo-stats
+(defn get-stats
   "Retrieves pomodoro stats for the last n days."
-  [put-fn n]
-  (doseq [ds (map #(.format (.subtract (js/moment.) % "d") ymd-format)
-                  (range n))]
-    (put-fn [:stats/pomo-day-get {:date-string ds}])))
+  [stats-key put-fn n]
+  (doseq [ds (map n-days-go-fmt (range n))]
+    (put-fn [stats-key {:date-string ds}])))
 
 (defn line-chart
   [points stroke]
   [:svg
    {:viewBox "0 0 600 200"}
    [:polyline
-    {:fill         :none
-     :stroke       stroke
-     :stroke-width 1
-     :points       points}]])
+    {:fill :none :stroke stroke :stroke-width 1 :points points}]])
 
 (defn line-points
   [indexed h]
@@ -28,26 +26,13 @@
                              (str (* 10 idx) "," (- h (* 10 v)))) indexed)]
     (apply str (interpose " " point-strings))))
 
-(defn bar-chart
-  [indexed fill-weekday fill-weekend chart-h]
-  [:svg
-   {:viewBox "0 0 600 200"}
-   [:g
-    (for [[idx v] indexed]
-      (let [fill fill-weekday
-            h (* 10 v)
-            x (* 10 idx)
-            y (- chart-h h)]
-        ^{:key (str "pbar" idx)}
-        [:rect {:x x :y y :fill fill :width 9 :height h}]))]])
-
 (defn path
   "Renders path with the given path description attribute."
   [d]
-  [:path {:stroke "rgba(200,200,200,0.5)":stroke-width 1 :d d}])
+  [:path {:stroke "rgba(200,200,200,0.5)" :stroke-width 1 :d d}])
 
-(defn pomodoro-chart
-  [pomodoro-stats stats-key fill-weekday fill-weekend chart-h title]
+(defn bar-chart
+  [pomodoro-stats stats-key fill-weekday fill-weekend chart-h title y-scale]
   (let [indexed (map-indexed (fn [idx [k v]] [idx v]) pomodoro-stats)]
     [:svg
      {:viewBox (str "0 0 600 " chart-h)}
@@ -65,7 +50,7 @@
               fill (if (and (pos? day-of-week) (< day-of-week 6))
                      fill-weekday
                      fill-weekend)
-              h (* 10 (stats-key v))
+              h (* y-scale (stats-key v))
               x (* 10 idx)
               y (- chart-h h)]
           ^{:key (str "pbar" stats-key idx)}
@@ -77,20 +62,20 @@
 
 (defn stats-view
   "Renders stats component."
-  [{:keys [observed local put-fn]}]
+  [{:keys [observed]}]
   (let [store-snapshot @observed
         pomodoro-stats (:pomodoro-stats store-snapshot)
+        activity-stats (:activity-stats store-snapshot)
         cfg (:cfg store-snapshot)
         entries-map (:entries-map store-snapshot)
-        entries (map (fn [ts] (get entries-map ts)) (:entries store-snapshot))
-        totals (map-indexed (fn [idx [k v]] [idx (:total v)]) pomodoro-stats)]
+        entries (map (fn [ts] (get entries-map ts)) (:entries store-snapshot))]
     [:div.stats
-     ;[line-chart (line-points totals 200) "#0074d9"]
-     ;[bar-chart totals "steelblue" "#cc5500" 200]
-     [pomodoro-chart pomodoro-stats :total "steelblue" "#cc5500" 250
-      "Pomodoros total"]
-     [pomodoro-chart pomodoro-stats :completed "steelblue" "#cc5500" 250
-      "Pomodoros completed"]
+     [bar-chart pomodoro-stats :total "steelblue" "#cc5500" 250
+      "Pomodoros total" 10]
+     [bar-chart pomodoro-stats :completed "steelblue" "#cc5500" 250
+      "Pomodoros completed" 10]
+     [bar-chart activity-stats :total-exercise "steelblue" "#cc5500" 250
+      "Activity minutes" 1]
      (when-let [stats (:stats store-snapshot)]
        [:div (:entry-count stats) " entries, " (:node-count stats) " nodes, "
         (:edge-count stats) " edges, " (count (:hashtags cfg)) " hashtags, "
@@ -108,7 +93,8 @@
 
 (defn update-stats
   [{:keys [put-fn]}]
-  (get-pomo-stats put-fn 60))
+  (get-stats :stats/pomo-day-get put-fn 60)
+  (get-stats :stats/activity-day-get put-fn 60))
 
 (defn cmp-map
   [cmp-id]

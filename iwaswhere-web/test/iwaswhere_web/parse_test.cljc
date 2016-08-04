@@ -98,45 +98,57 @@
    :n           15})
 
 (deftest parse-search-test
-  (testing "empty query is parsed correctly"
+  (testing
+    "empty query is parsed correctly"
     (is (= (p/parse-search (:search-text empty-search)) empty-search)))
 
-  (testing "open tasks query is parsed correctly"
+  (testing
+    "open tasks query is parsed correctly"
     (is (= (p/parse-search (:search-text open-tasks-search)) open-tasks-search)))
 
-  (testing "tasks done query is parsed correctly"
+  (testing
+    "tasks done query is parsed correctly"
     (is (= (p/parse-search (:search-text tasks-done-search)) tasks-done-search)))
 
-  (testing "fulltext search string is parsed correctly"
+  (testing
+    "fulltext search string is parsed correctly"
     (is (= (p/parse-search (:search-text fulltext-search)) fulltext-search)))
 
-  (testing "day query is parsed correctly"
+  (testing
+    "day query is parsed correctly"
     (is (= (p/parse-search (:search-text day-search)) day-search)))
 
   (testing "timestamp query is parsed correctly"
     (is (= (p/parse-search (:search-text timestamp-search)) timestamp-search))))
 
 
-(def tags #{"#task" "#goal" "#autocomplete" "#autosuggestion" "#Clojure" "#ClojureScript"})
+(def tags #{"#task" "#goal" "#autocomplete" "#autosuggestion" "#Clojure"
+            "#ClojureScript"})
 (def mentions #{"@JohnDoe" "@myself" "@me"})
 
 (deftest autocomplete-tags-test
-  (testing "empty string before cursor returns zero filtered tags"
+  (testing
+    "empty string before cursor returns zero filtered tags"
     (is (= (p/autocomplete-tags "" "(?!^) ?#" tags) ["" #{}])))
 
-  (testing "Hashtag at end of string parsed correctly"
+  (testing
+    "Hashtag at end of string parsed correctly"
     (is (= (p/autocomplete-tags "some #task" "(?!^) ?#" tags) ["#task" #{"#task"}])))
 
-  (testing "empty tags returns empty filtered tags list"
+  (testing
+    "empty tags returns empty filtered tags list"
     (is (= (p/autocomplete-tags "some #task" "(?!^) ?#" #{}) ["#task" #{}])))
 
-  (testing "partial tag correctly matched with multiple matches"
+  (testing
+    "partial tag correctly matched with multiple matches"
     (is (= (p/autocomplete-tags "some #auto" "(?!^) ?#" tags) ["#auto" #{"#autocomplete" "#autosuggestion"}])))
 
-  (testing "not case sensitive"
+  (testing
+    "not case sensitive"
     (is (= (p/autocomplete-tags "some #cloju" "(?!^) ?#" tags) ["#cloju" #{"#Clojure" "#ClojureScript"}])))
 
-  (testing "also working with mentions"
+  (testing
+    "also working with mentions"
     (is (= (p/autocomplete-tags "@m" "@" mentions) ["@m" #{"@me" "@myself"}]))))
 
 (def codeblock-ignore-str

@@ -111,33 +111,42 @@
             {:keys [new-state]} (s/stats-tags-fn {:current-state new-state})
             client-queries (:client-queries new-state)]
 
-        (testing "client queries associated with proper connection IDs"
+        (testing
+          "client queries associated with proper connection IDs"
           (is (= (get client-queries simple-query-uid) simple-query))
           (is (= (get client-queries tasks-done-query-uid) tasks-done-query)))
 
-        (testing "client queries with not-tags properly re-formatted"
+        (testing
+          "client queries with not-tags properly re-formatted"
           (is (= (get client-queries tasks-not-done-query-uid)
                  (merge tasks-not-done-query {:not-tags #{"#done" "#backlog"}}))))
 
-        (testing "query with no matches should return 0 results"
+        (testing
+          "query with no matches should return 0 results"
           (is (empty? (extract-query-res new-state no-results-query-uid))))
 
-        (testing "simple query has 40 results"
+        (testing
+          "simple query has 40 results"
           (is (= 40 (count (extract-query-res new-state simple-query-uid)))))
 
-        (testing "simple query2 returns all 105 results"
+        (testing
+          "simple query2 returns all 105 results"
           (is (= 105 (count (extract-query-res new-state simple-query2-uid)))))
 
-        (testing "tasks query has 5 results"
+        (testing
+          "tasks query has 5 results"
           (is (= 5 (count (extract-query-res new-state tasks-query-uid)))))
 
-        (testing "tasks done query has 3 results"
+        (testing
+          "tasks done query has 3 results"
           (is (= 3 (count (extract-query-res new-state tasks-done-query-uid)))))
 
-        (testing "tasks - not done query has 2 results"
+        (testing
+          "tasks - not done query has 2 results"
           (is (= 2 (count (extract-query-res new-state tasks-not-done-query-uid)))))
 
-        (testing "stats show expected numbers"
+        (testing
+          "stats show expected numbers"
           (let [res (-> (s/publish-state-fn {:current-state new-state
                                              :msg-payload   {:sente-uid simple-query-uid}})
                         :emit-msg
@@ -146,7 +155,8 @@
             (is (= (:entry-count stats) 105))
             (is (= (:node-count stats) 122))))
 
-        (testing "hashtags and mentions in results"
+        (testing
+          "hashtags and mentions in results"
           (let [res (-> (s/publish-state-fn {:current-state new-state
                                              :msg-payload   {:sente-uid simple-query-uid}})
                         :emit-msg

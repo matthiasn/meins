@@ -31,6 +31,7 @@
                              :new-entries    @cse/new-entries-ls
                              :current-query  {}
                              :pomodoro-stats (sorted-map)
+                             :activity-stats (sorted-map)
                              :cfg            {:active             nil
                                               :linked-filter      {}
                                               :show-maps-for      #{}
@@ -104,12 +105,21 @@
   {:new-state (update-in current-state [:cfg :lines-shortened]
                          #(if (< % 10) (inc %) 1))})
 
+#_
 (defn pomo-stats-fn
   "Store received stats on component state."
   [{:keys [current-state msg-payload]}]
   (let [ds (:date-string msg-payload)
         new-state (assoc-in current-state [:pomodoro-stats ds] msg-payload)]
     {:new-state new-state}))
+
+(defn save-stats
+  "Stores received stats on component state."
+  [k]
+  (fn [{:keys [current-state msg-payload]}]
+    (let [ds (:date-string msg-payload)
+          new-state (assoc-in current-state [k ds] msg-payload)]
+      {:new-state new-state})))
 
 (defn cmp-map
   "Creates map for the component which holds the client-side application state."
@@ -121,7 +131,8 @@
    :handler-map       (merge cse/entry-handler-map
                              s/search-handler-map
                              {:state/new          new-state-fn
-                              :stats/pomo-day     pomo-stats-fn
+                              :stats/pomo-day     (save-stats :pomodoro-stats) ; pomo-stats-fn
+                              :stats/activity-day (save-stats :activity-stats)
                               :show/more          show-more-fn
                               :cmd/set-active     set-active-fn
                               :cmd/toggle-active  toggle-active-fn

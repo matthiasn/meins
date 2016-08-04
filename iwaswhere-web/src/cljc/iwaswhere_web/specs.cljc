@@ -176,6 +176,15 @@
                    :pomo-stats/started
                    :pomo-stats/total-time]))
 
+(s/def :stats/activity-day-get
+  (s/keys :req-un [:iww.search/date-string]))
+
+(s/def :activity-stats/total-exercise int-not-neg?)
+
+(s/def :stats/activity-day
+  (s/keys :req-un [:iww.search/date-string
+                   :activity-stats/total-exercise]))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Spec for :state/publish-current
 (s/def :iww.ws/sente-uid string?)

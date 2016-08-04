@@ -55,4 +55,4 @@
   {:index-page-fn index-page
    :routes-fn     routes-fn
    :relay-types   #{:cmd/keep-alive-res :entry/saved :state/new
-                    :stats/pomo-day}})
+                    :stats/pomo-day :stats/activity-day}})

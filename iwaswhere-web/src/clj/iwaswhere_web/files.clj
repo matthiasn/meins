@@ -4,7 +4,7 @@
   Then later on application startup, all these state changes can be
   replayed to recreate the application state. This mechanism is inspired
   by Event Sourcing (http://martinfowler.com/eaaDev/EventSourcing.html)."
-  (:require [iwaswhere-web.graph-add :as ga]
+  (:require [iwaswhere-web.graph.add :as ga]
             [clj-time.core :as time]
             [clj-time.format :as timef]
             [clojure.tools.logging :as log]

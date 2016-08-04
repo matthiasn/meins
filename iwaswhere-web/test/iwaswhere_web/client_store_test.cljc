@@ -81,17 +81,23 @@
         new-state (:new-state (store/new-state-fn {:current-state current-state
                                                    :msg-payload   state-from-backend
                                                    :msg-meta      meta-from-backend}))]
-    (testing "entries are on new state"
+    (testing
+      "entries are on new state"
       (is (= (:entries new-state) (:entries state-from-backend))))
-    (testing "entries map is on new state"
+    (testing
+      "entries map is on new state"
       (is (= (:entries-map new-state) (:entries-map state-from-backend))))
-    (testing "hashtags are on new state"
+    (testing
+      "hashtags are on new state"
       (is (= (:hashtags (:cfg new-state)) (:hashtags state-from-backend))))
-    (testing "mentions are on new state"
+    (testing
+      "mentions are on new state"
       (is (= (:mentions (:cfg new-state)) (:mentions state-from-backend))))
-    (testing "stats are on new state"
+    (testing
+      "stats are on new state"
       (is (= (:stats new-state) (:stats state-from-backend))))
-    (testing "query duration is on new state"
+    (testing
+      "query duration is on new state"
       (is (= (:query (:timing new-state)) (:duration-ms state-from-backend)))
       (is (= (:rtt (:timing new-state)) 57)))))
 
@@ -100,7 +106,8 @@
   (let [current-state @(:state (store/initial-state-fn #()))
         new-state (:new-state (store/set-active-fn {:current-state current-state
                                                     :msg-payload   test-entry}))]
-    (testing "active entry is set"
+    (testing
+      "active entry is set"
       (is (= test-entry (:active (:cfg new-state)))))))
 
 (deftest show-more-test
@@ -110,9 +117,11 @@
                                                       :msg-payload   open-tasks-query}))
         {:keys [:new-state emit-msg]} (store/show-more-fn {:current-state new-state})
         updated-query (update-in open-tasks-query [:n] + 20)]
-    (testing "query is properly updated, with increased number of results"
+    (testing
+      "query is properly updated, with increased number of results"
       (is (= updated-query (:current-query new-state))))
-    (testing "emits correct query message"
+    (testing
+      "emits correct query message"
       (is (= :state/get (first emit-msg)))
       (is (= updated-query (second emit-msg))))))
 
@@ -123,11 +132,14 @@
                                                     :msg-payload   {:path [:cfg :sort-by-upvotes]}}))
         new-state2 (:new-state (store/toggle-key-fn {:current-state current-state
                                                      :msg-payload   {:path [:some :crazy :long :path]}}))]
-    (testing "before receiving toggle-key msg, key is false, as per initial state"
+    (testing
+      "before receiving toggle-key msg, key is false, as per initial state"
       (is (not (:sort-by-upvotes (:cfg current-state)))))
-    (testing "after receiving toggle-key msg, key is true"
+    (testing
+      "after receiving toggle-key msg, key is true"
       (is (:sort-by-upvotes (:cfg new-state))))
-    (testing "previously unknown key is set to true. can be nested"
+    (testing
+      "previously unknown key is set to true. can be nested"
       (is (get-in new-state2 [:some :crazy :long :path])))))
 
 (deftest toggle-set-test
@@ -139,9 +151,12 @@
                                                     :msg-payload   {:timestamp test-ts :path path}}))
         new-state1 (:new-state (store/toggle-set-fn {:current-state new-state
                                                      :msg-payload   {:timestamp test-ts :path path}}))]
-    (testing "cfg set is initially empty"
+    (testing
+      "cfg set is initially empty"
       (is (empty? (:show-maps-for (:cfg current-state)))))
-    (testing "set contains timestamp after initial toggle"
+    (testing
+      "set contains timestamp after initial toggle"
       (is (contains? (:show-maps-for (:cfg new-state)) test-ts)))
-    (testing "timestamp removed from set after subsequent toggle"
+    (testing
+      "timestamp removed from set after subsequent toggle"
       (is (not (contains? (:show-maps-for (:cfg new-state1)) 1465059139281))))))

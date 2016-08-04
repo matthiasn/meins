@@ -178,7 +178,11 @@
        [md/markdown-render entry cfg])
      [m/image-view entry]
      [m/audioplayer-view entry]
-     [m/videoplayer-view entry]]))
+     [m/videoplayer-view entry]
+     (when-let [activities (:activities entry)]
+       [:pre [:code (with-out-str (pp/pprint activities))]])
+     (when-let [measurements (:measurements entry)]
+       [:pre [:code (with-out-str (pp/pprint measurements))]])]))
 
 (defn entry-with-comments
   "Renders individual journal entry. Interaction with application state happens

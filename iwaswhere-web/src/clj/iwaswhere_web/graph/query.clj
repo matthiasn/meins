@@ -1,4 +1,4 @@
-(ns iwaswhere-web.graph
+(ns iwaswhere-web.graph.query
   "this namespace manages interactions with the graph data structure, which
   holds all entries and their connections."
   (:require [ubergraph.core :as uber]
@@ -170,33 +170,6 @@
                        (uber/find-edges g {:src :mentions}))
         mentions (map #(:val (uber/attrs g {:mention %})) lmentions)]
     (set mentions)))
-
-(defn get-pomodoro-day-stats
-  "Get pomodoro stats for specified day."
-  [{:keys [current-state msg-payload msg-meta]}]
-  (let [g (:graph current-state)
-        date-string (:date-string msg-payload)
-        day-nodes (get-nodes-for-day g {:date-string date-string})
-        day-nodes-attrs (map #(uber/attrs g %) day-nodes)
-        pomodoro-nodes (filter #(= (:entry-type %) :pomodoro) day-nodes-attrs)
-        stats {:date-string date-string
-               :total       (count pomodoro-nodes)
-               :completed   (count (filter #(= (:planned-dur %)
-                                               (:completed-time %))
-                                           pomodoro-nodes))
-               :started     (count (filter #(and (pos? (:completed-time %))
-                                                 (< (:completed-time %)
-                                                    (:planned-dur %)))
-                                           pomodoro-nodes))
-               :total-time  (apply + (map :completed-time pomodoro-nodes))}]
-    {:emit-msg (with-meta [:stats/pomo-day stats] msg-meta)}))
-
-(defn get-basic-stats
-  "Generate some very basic stats about the graph size for display in UI."
-  [current-state]
-  {:entry-count (count (:sorted-entries current-state))
-   :node-count  (count (:node-map (:graph current-state)))
-   :edge-count  (count (uber/find-edges (:graph current-state) {}))})
 
 (defn get-filtered-results
   "Retrieve items to show in UI, also deliver all hashtags for autocomplete and

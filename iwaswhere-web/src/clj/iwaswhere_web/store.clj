@@ -3,8 +3,9 @@
   which then holds the server side application state."
   (:require [iwaswhere-web.files :as f]
             [taoensso.timbre.profiling :refer [p profile]]
-            [iwaswhere-web.graph :as g]
-            [iwaswhere-web.graph-add :as ga]
+            [iwaswhere-web.graph.query :as gq]
+            [iwaswhere-web.graph.stats :as gs]
+            [iwaswhere-web.graph.add :as ga]
             [iwaswhere-web.specs]
             [ubergraph.core :as uber]
             [iwaswhere-web.keepalive :as ka]
@@ -14,13 +15,14 @@
             [clojure.pprint :as pp]))
 
 (defn publish-state-fn
-  "Publishes current state, as filtered for the respective clients. Sends to single connected client
-  with the latest filter when message payload contains :sente-uid, otherwise sends to all clients."
+  "Publishes current state, as filtered for the respective clients. Sends to
+   single connected client with the latest filter when message payload contains
+   :sente-uid, otherwise sends to all clients."
   [{:keys [current-state msg-payload msg-meta]}]
   (if-let [sente-uid (:sente-uid msg-payload)]
     (let [start-ts (System/nanoTime)
           query (get-in current-state [:client-queries sente-uid])
-          res (g/get-filtered-results current-state query)
+          res (gq/get-filtered-results current-state query)
           ms (/ (- (System/nanoTime) start-ts) 1000000)
           ms-string (pp/cl-format nil "~,3f ms" ms)
           res-msg (with-meta [:state/new (merge res {:duration-ms ms-string})]
@@ -32,23 +34,26 @@
                         (keys (:client-queries current-state)))}))
 
 (defn state-get-fn
-  "Handler function for retrieving current state. Updates filter for connected client, and then
-  sends a message to self to publish state for this particular client.
-  Removes '~' from the not-tags, which is the set of tags that shall not be contained
-  in matching entries or any of their comments."
+  "Handler function for retrieving current state. Updates filter for connected
+   client, and then sends a message to self to publish state for this particular
+   client.
+   Removes '~' from the not-tags, which is the set of tags that shall not be
+   contained in matching entries or any of their comments."
   [{:keys [current-state msg-payload msg-meta]}]
   (let [sente-uid (:sente-uid msg-meta)]
-    {:new-state    (update-in current-state [:client-queries sente-uid] merge msg-payload)
-     :send-to-self [(with-meta [:state/publish-current {:sente-uid sente-uid}] msg-meta)
+    {:new-state    (update-in current-state [:client-queries sente-uid]
+                              merge msg-payload)
+     :send-to-self [(with-meta [:state/publish-current {:sente-uid sente-uid}]
+                               msg-meta)
                     (with-meta [:cmd/keep-alive] msg-meta)]}))
 
 (defn stats-tags-fn
   "Precomputes stats and tags (they only change on insert anyway)."
   [{:keys [current-state]}]
   {:new-state (-> current-state
-                  (assoc-in [:stats] (g/get-basic-stats current-state))
-                  (assoc-in [:hashtags] (g/find-all-hashtags current-state))
-                  (assoc-in [:mentions] (g/find-all-mentions current-state)))})
+                  (assoc-in [:stats] (gs/get-basic-stats current-state))
+                  (assoc-in [:hashtags] (gq/find-all-hashtags current-state))
+                  (assoc-in [:mentions] (gq/find-all-mentions current-state)))})
 
 (defn state-fn
   "Initial state function, creates state atom and then parses all files in
@@ -80,7 +85,8 @@
                     ts (:timestamp parsed)]
                 (if (:deleted parsed)
                   (swap! state ga/remove-node ts)
-                  (do (swap! entries-to-index conj (select-keys parsed [:timestamp :md]))
+                  (do (swap! entries-to-index conj
+                             (select-keys parsed [:timestamp :md]))
                       (swap! state ga/add-node ts parsed))))))))
       (future
         (let [t (with-out-str
@@ -97,12 +103,13 @@
   [cmp-id]
   {:cmp-id      cmp-id
    :state-fn    (state-fn f/daily-logs-path)
-   :handler-map {:entry/import          f/entry-import-fn
-                 :entry/update          f/geo-entry-persist-fn
-                 :entry/trash           f/trash-entry-fn
-                 :state/publish-current publish-state-fn
-                 :state/get             state-get-fn
-                 :state/stats-tags      stats-tags-fn
-                 :cmd/keep-alive        ka/keepalive-fn
-                 :cmd/query-gc          ka/query-gc-fn
-                 :stats/pomo-day-get    g/get-pomodoro-day-stats}})
+   :handler-map {:entry/import           f/entry-import-fn
+                 :entry/update           f/geo-entry-persist-fn
+                 :entry/trash            f/trash-entry-fn
+                 :state/publish-current  publish-state-fn
+                 :state/get              state-get-fn
+                 :state/stats-tags       stats-tags-fn
+                 :cmd/keep-alive         ka/keepalive-fn
+                 :cmd/query-gc           ka/query-gc-fn
+                 :stats/pomo-day-get     gs/get-pomodoro-day-stats
+                 :stats/activity-day-get gs/get-activity-day-stats}})
