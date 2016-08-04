@@ -138,3 +138,13 @@
 
   (testing "also working with mentions"
     (is (= (p/autocomplete-tags "@m" "@" mentions) ["@m" #{"@me" "@myself"}]))))
+
+(def codeblock-ignore-str
+  "some #detected `#not-detected #not-detected2` some \n```\ncode block @not-detected blah\n```\n some text @detected \n```\n@not-detected #not-detected blah\n```\n")
+
+(deftest codeblocks-ignored
+  (testing "A codeblock that contains tags will not have the tags returned"
+    (is (= (p/parse-entry codeblock-ignore-str)
+           {:md       codeblock-ignore-str
+            :tags     #{"#detected"}
+            :mentions #{"@detected"}}))))
