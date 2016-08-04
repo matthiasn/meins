@@ -1,7 +1,8 @@
 (ns iwaswhere-web.ui.stats
   (:require [matthiasn.systems-toolbox-ui.reagent :as r]
             [cljsjs.moment]
-            [cljs.pprint :as pp]))
+            [cljs.pprint :as pp]
+            [reagent.core :as rc]))
 
 (def ymd-format "YYYY-MM-DD")
 (defn n-days-go [n] (.subtract (js/moment.) n "d"))
@@ -60,6 +61,60 @@
       [path "M 0 150 l 600 0 z"]
       [path "M 0 200 l 600 0 z"]]]))
 
+(defn pomodoro-bar-chart
+  [pomodoro-stats fill-weekday fill-weekend chart-h title y-scale]
+  (let [local (rc/atom {})]
+    (fn [pomodoro-stats fill-weekday fill-weekend chart-h title y-scale]
+      (let [indexed (map-indexed (fn [idx [k v]] [idx v]) pomodoro-stats)]
+        [:div
+         [:svg
+          {:viewBox (str "0 0 600 " chart-h)}
+          [:g
+           [:text {:x           300
+                   :y           32
+                   :stroke      "none"
+                   :fill        "#AAA"
+                   :text-anchor :middle
+                   :style       {:font-weight :bold
+                                 :font-size   24}}
+            title]
+           (for [[idx v] indexed]
+             (let [day-of-week (.weekday (js/moment. (:date-string v)))
+                   fill (if (and (pos? day-of-week) (< day-of-week 6))
+                          fill-weekday
+                          fill-weekend)
+                   h (* y-scale (:total v))
+                   x (* 10 idx)
+                   y (- chart-h h)
+                   mouse-enter-fn (fn [ev]
+                                    (reset! local
+                                            {:mouse-over v
+                                             :mouse-pos {:x (.-pageX ev)
+                                                         :y (.-pageY ev)}}))
+                   mouse-leave-fn (fn [_ev]
+                                    (when (= v (:mouse-over @local))
+                                      (reset! local {})))]
+               ^{:key (str "pbar" (:total v) idx)}
+               [:rect {:x              x
+                       :y              y
+                       :fill           fill
+                       :width          9
+                       :height         h
+                       :on-mouse-enter mouse-enter-fn
+                       :on-mouse-leave mouse-leave-fn}]))
+           [path "M 0 50 l 600 0 z"]
+           [path "M 0 100 l 600 0 z"]
+           [path "M 0 150 l 600 0 z"]
+           [path "M 0 200 l 600 0 z"]]]
+         (when (:mouse-over @local)
+           [:div.mouse-over-info
+            {:style {:top  (- (:y (:mouse-pos @local)) 20)
+                     :left (+ (:x (:mouse-pos @local)) 20)}}
+            [:span (:date-string (:mouse-over @local))] [:br]
+            [:span "Total: " (:total (:mouse-over @local))] [:br]
+            [:span "Completed: " (:completed (:mouse-over @local))] [:br]
+            [:span "Started: " (:started (:mouse-over @local))] [:br]])]))))
+
 (defn stats-view
   "Renders stats component."
   [{:keys [observed]}]
@@ -70,7 +125,7 @@
         entries-map (:entries-map store-snapshot)
         entries (map (fn [ts] (get entries-map ts)) (:entries store-snapshot))]
     [:div.stats
-     [bar-chart pomodoro-stats :total "steelblue" "#cc5500" 250
+     [pomodoro-bar-chart pomodoro-stats "steelblue" "#cc5500" 250
       "Pomodoros total" 10]
      [bar-chart pomodoro-stats :completed "steelblue" "#cc5500" 250
       "Pomodoros completed" 10]

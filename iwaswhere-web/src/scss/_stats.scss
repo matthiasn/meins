@@ -1,6 +1,6 @@
 #stats {
   flex: 0 0 auto;
-  height: 200px;
+  height: 180px;
   background-color: #eaeaea;
   overflow-y: auto;
   padding: 5px;
@@ -14,7 +14,18 @@
     svg {
       margin: 5px;
       background-color: white;
-      width: 350px;
+      width: 300px;
+
+      rect:hover {
+        opacity: 0.5;
+      }
+    }
+
+    .mouse-over-info {
+      padding: 5px;
+      background-color: white;
+      position: fixed;
+      top: 100px;
     }
   }
 }
