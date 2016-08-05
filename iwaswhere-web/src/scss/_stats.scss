@@ -43,8 +43,16 @@ $total-weekend: lighten($completed-weekend, 30);
     .mouse-over-info {
       padding: 5px;
       background-color: white;
+      border-color: darken($hashtag-blue, 25%);
+      border-style: solid;
+      border-width: 1px;
+      border-radius: $entry-border-radius;
       position: fixed;
       top: 100px;
+
+      span:first-of-type {
+        font-weight: bold;
+      }
     }
   }
 }
