@@ -9,7 +9,8 @@
             [clj-time.format :as timef]
             [clojure.tools.logging :as log]
             [iwaswhere-web.fulltext-search :as ft]
-            [ubergraph.core :as uber]))
+            [ubergraph.core :as uber]
+            [matthiasn.systems-toolbox.component :as st]))
 
 (def data-path (or (System/getenv "DATA_PATH") "data"))
 (def daily-logs-path (str data-path "/daily-logs/"))
@@ -54,11 +55,12 @@
   "Handler function for persisting journal entry."
   [{:keys [current-state msg-payload]}]
   (let [entry-ts (:timestamp msg-payload)
-        new-state (ga/add-node current-state entry-ts msg-payload)]
-    (ft/add-to-index (:lucene-index current-state) msg-payload)
-    (append-daily-log msg-payload)
+        with-last-modified (merge msg-payload {:last-saved (st/now)})
+        new-state (ga/add-node current-state entry-ts with-last-modified)]
+    (ft/add-to-index (:lucene-index current-state) with-last-modified)
+    (append-daily-log with-last-modified)
     {:new-state    new-state
-     :emit-msg     [:entry/saved msg-payload]
+     :emit-msg     [:entry/saved with-last-modified]
      :send-to-self [[:state/stats-tags]
                     [:state/publish-current {}]]}))
 
