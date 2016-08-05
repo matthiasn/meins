@@ -1,3 +1,9 @@
+$completed: steelblue;
+$total: lighten($completed, 30);
+
+$completed-weekend: rgb(249,166,53);
+$total-weekend: lighten($completed-weekend, 30);
+
 #stats {
   flex: 0 0 auto;
   height: 180px;
@@ -18,6 +24,19 @@
 
       rect:hover {
         opacity: 0.5;
+      }
+
+      .completed {
+        fill: $completed;
+      }
+      .completed-weekend {
+          fill: $completed-weekend;
+      }
+      .total {
+        fill: $total;
+      }
+      .total-weekend {
+        fill: $total-weekend;
       }
     }
 

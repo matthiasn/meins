@@ -61,10 +61,36 @@
       [path "M 0 150 l 600 0 z"]
       [path "M 0 200 l 600 0 z"]]]))
 
+(defn bars
+  [indexed local k chart-h y-scale]
+  [:g
+   (for [[idx v] indexed]
+     (let [day-of-week (.weekday (js/moment. (:date-string v)))
+           weekend? (not (and (pos? day-of-week) (< day-of-week 6)))
+           h (* y-scale (k v))
+           x (* 10 idx)
+           y (- chart-h h)
+           mouse-enter-fn (fn [ev]
+                            (reset! local
+                                    {:mouse-over v
+                                     :mouse-pos  {:x (.-pageX ev)
+                                                  :y (.-pageY ev)}}))
+           mouse-leave-fn (fn [_ev]
+                            (when (= v (:mouse-over @local))
+                              (reset! local {})))]
+       ^{:key (str "pbar" k idx)}
+       [:rect {:class          (str (name k) (when weekend? "-weekend"))
+               :x              x
+               :y              y
+               :width          9
+               :height         h
+               :on-mouse-enter mouse-enter-fn
+               :on-mouse-leave mouse-leave-fn}]))])
+
 (defn pomodoro-bar-chart
-  [pomodoro-stats fill-weekday fill-weekend chart-h title y-scale]
+  [pomodoro-stats chart-h title y-scale]
   (let [local (rc/atom {})]
-    (fn [pomodoro-stats fill-weekday fill-weekend chart-h title y-scale]
+    (fn [pomodoro-stats chart-h title y-scale]
       (let [indexed (map-indexed (fn [idx [k v]] [idx v]) pomodoro-stats)]
         [:div
          [:svg
@@ -78,30 +104,8 @@
                    :style       {:font-weight :bold
                                  :font-size   24}}
             title]
-           (for [[idx v] indexed]
-             (let [day-of-week (.weekday (js/moment. (:date-string v)))
-                   fill (if (and (pos? day-of-week) (< day-of-week 6))
-                          fill-weekday
-                          fill-weekend)
-                   h (* y-scale (:total v))
-                   x (* 10 idx)
-                   y (- chart-h h)
-                   mouse-enter-fn (fn [ev]
-                                    (reset! local
-                                            {:mouse-over v
-                                             :mouse-pos {:x (.-pageX ev)
-                                                         :y (.-pageY ev)}}))
-                   mouse-leave-fn (fn [_ev]
-                                    (when (= v (:mouse-over @local))
-                                      (reset! local {})))]
-               ^{:key (str "pbar" (:total v) idx)}
-               [:rect {:x              x
-                       :y              y
-                       :fill           fill
-                       :width          9
-                       :height         h
-                       :on-mouse-enter mouse-enter-fn
-                       :on-mouse-leave mouse-leave-fn}]))
+           [bars indexed local :total chart-h y-scale]
+           [bars indexed local :completed chart-h y-scale]
            [path "M 0 50 l 600 0 z"]
            [path "M 0 100 l 600 0 z"]
            [path "M 0 150 l 600 0 z"]
@@ -125,10 +129,7 @@
         entries-map (:entries-map store-snapshot)
         entries (map (fn [ts] (get entries-map ts)) (:entries store-snapshot))]
     [:div.stats
-     [pomodoro-bar-chart pomodoro-stats "steelblue" "#cc5500" 250
-      "Pomodoros total" 10]
-     [bar-chart pomodoro-stats :completed "steelblue" "#cc5500" 250
-      "Pomodoros completed" 10]
+     [pomodoro-bar-chart pomodoro-stats 250 "Pomodoros" 10]
      [bar-chart activity-stats :total-exercise "steelblue" "#cc5500" 250
       "Activity minutes" 1]
      (when-let [stats (:stats store-snapshot)]
