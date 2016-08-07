@@ -24,7 +24,8 @@
 (defn line-points
   [indexed h]
   (let [point-strings (map (fn [[idx v]]
-                             (str (* 10 idx) "," (- h (* 10 v)))) indexed)]
+                             (str (* 10 idx) "," (- h (* 10 (- v 80)))))
+                           indexed)]
     (apply str (interpose " " point-strings))))
 
 (defn path
@@ -34,9 +35,14 @@
 
 (defn bar-chart
   [pomodoro-stats stats-key fill-weekday fill-weekend chart-h title y-scale]
-  (let [indexed (map-indexed (fn [idx [k v]] [idx v]) pomodoro-stats)]
+  (let [indexed (map-indexed (fn [idx [k v]] [idx v]) pomodoro-stats)
+        weights (map (fn [[k v]] [k (-> v :weight :value)]) indexed)
+        points (line-points (filter second weights) 250)]
     [:svg
      {:viewBox (str "0 0 600 " chart-h)}
+     [:g
+      [:polyline
+       {:fill :none :stroke :steelblue :stroke-width 2 :points points}]]
      [:g
       [:text {:x           300
               :y           32
@@ -75,9 +81,7 @@
                                     {:mouse-over v
                                      :mouse-pos  {:x (.-pageX ev)
                                                   :y (.-pageY ev)}}))
-           mouse-leave-fn (fn [_ev]
-                            (when (= v (:mouse-over @local))
-                              (reset! local {})))]
+           mouse-leave-fn #(when (= v (:mouse-over @local)) (reset! local {}))]
        ^{:key (str "pbar" k idx)}
        [:rect {:class          (str (name k) (when weekend? "-weekend"))
                :x              x
