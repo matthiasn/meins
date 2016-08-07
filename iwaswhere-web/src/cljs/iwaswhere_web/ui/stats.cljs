@@ -136,7 +136,9 @@
      (when-let [stats (:stats store-snapshot)]
        [:div (:entry-count stats) " entries, " (:node-count stats) " nodes, "
         (:edge-count stats) " edges, " (count (:hashtags cfg)) " hashtags, "
-        (count (:mentions cfg)) " people"])
+        (count (:mentions cfg)) " people, " (:open-tasks-cnt stats)
+        " open tasks, " (:backlog-cnt stats) " in backlog, "
+        (:completed-cnt stats) " completed."])
      (when-let [ms (get-in store-snapshot [:timing :query])]
        [:div.stats
         (str "Query with " (count entries)

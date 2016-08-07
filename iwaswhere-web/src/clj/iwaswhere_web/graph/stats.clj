@@ -36,9 +36,38 @@
                :total-exercise (apply + (map :total-exercise activities))}]
     {:emit-msg (with-meta [:stats/activity-day stats] msg-meta)}))
 
+(defn count-open-tasks
+  [current-state]
+  (count (:entries (gq/get-filtered-results
+                     current-state
+                     {:search-text "#task ~#done ~#backlog"
+                      :tags        #{"#task"}
+                      :not-tags    #{"#done" "#backlog"}
+                      :n           Integer/MAX_VALUE}))))
+
+(defn count-open-tasks-backlog
+  [current-state]
+  (count (:entries (gq/get-filtered-results
+                     current-state
+                     {:search-text "#task ~#done #backlog"
+                      :tags        #{"#task" "#backlog"}
+                      :not-tags    #{"#done"}
+                      :n           Integer/MAX_VALUE}))))
+
+(defn count-completed-tasks
+  [current-state]
+  (count (:entries (gq/get-filtered-results
+                     current-state
+                     {:search-text "#task #done"
+                      :tags        #{"#task" "#done"}
+                      :n           Integer/MAX_VALUE}))))
+
 (defn get-basic-stats
   "Generate some very basic stats about the graph size for display in UI."
   [current-state]
-  {:entry-count (count (:sorted-entries current-state))
-   :node-count  (count (:node-map (:graph current-state)))
-   :edge-count  (count (uber/find-edges (:graph current-state) {}))})
+  {:entry-count    (count (:sorted-entries current-state))
+   :node-count     (count (:node-map (:graph current-state)))
+   :edge-count     (count (uber/find-edges (:graph current-state) {}))
+   :open-tasks-cnt (count-open-tasks current-state)
+   :backlog-cnt    (count-open-tasks-backlog current-state)
+   :completed-cnt  (count-completed-tasks current-state)})

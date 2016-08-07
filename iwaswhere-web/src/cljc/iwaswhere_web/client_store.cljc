@@ -105,14 +105,6 @@
   {:new-state (update-in current-state [:cfg :lines-shortened]
                          #(if (< % 10) (inc %) 1))})
 
-#_
-(defn pomo-stats-fn
-  "Store received stats on component state."
-  [{:keys [current-state msg-payload]}]
-  (let [ds (:date-string msg-payload)
-        new-state (assoc-in current-state [:pomodoro-stats ds] msg-payload)]
-    {:new-state new-state}))
-
 (defn save-stats
   "Stores received stats on component state."
   [k]

@@ -1,6 +1,6 @@
 (ns iwaswhere-web.store
   "This namespace contains the functions necessary to instantiate the store-cmp,
-  which then holds the server side application state."
+   which then holds the server side application state."
   (:require [iwaswhere-web.files :as f]
             [taoensso.timbre.profiling :refer [p profile]]
             [iwaswhere-web.graph.query :as gq]
@@ -57,10 +57,10 @@
 
 (defn state-fn
   "Initial state function, creates state atom and then parses all files in
-  data directory into the component state.
-  Entries are stored as attributes of graph nodes, where the node itself is
-  timestamp of an entry. A sort order by descending timestamp is maintained
-  in a sorted set of the nodes."
+   data directory into the component state.
+   Entries are stored as attributes of graph nodes, where the node itself is
+   timestamp of an entry. A sort order by descending timestamp is maintained
+   in a sorted set of the nodes."
   [path]
   (fn
     [_put-fn]
@@ -68,7 +68,6 @@
     (let [entries-to-index (atom [])
           state (atom {:sorted-entries (sorted-set-by >)
                        :graph          (uber/graph)
-                       ;:lucene-index   (clucy/memory-index)
                        :lucene-index   ft/index
                        :client-queries {}
                        :hashtags       #{}

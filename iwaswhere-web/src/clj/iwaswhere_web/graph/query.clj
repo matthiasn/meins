@@ -173,7 +173,7 @@
 
 (defn get-filtered-results
   "Retrieve items to show in UI, also deliver all hashtags for autocomplete and
-  some basic stats."
+   some basic stats."
   [current-state query]
   (let [n (:n query)
         sort-by-upvotes? (:sort-by-upvotes query)
