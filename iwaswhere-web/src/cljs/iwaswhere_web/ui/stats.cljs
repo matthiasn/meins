@@ -129,9 +129,10 @@
         entries-map (:entries-map store-snapshot)
         entries (map (fn [ts] (get entries-map ts)) (:entries store-snapshot))]
     [:div.stats
-     [pomodoro-bar-chart pomodoro-stats 250 "Pomodoros" 10]
-     [bar-chart activity-stats :total-exercise "steelblue" "#cc5500" 250
-      "Activity minutes" 1]
+     [:div.charts
+      [pomodoro-bar-chart pomodoro-stats 250 "Pomodoros" 10]
+      [bar-chart activity-stats :total-exercise "steelblue" "#cc5500" 250
+       "Activity minutes" 1]]
      (when-let [stats (:stats store-snapshot)]
        [:div (:entry-count stats) " entries, " (:node-count stats) " nodes, "
         (:edge-count stats) " edges, " (count (:hashtags cfg)) " hashtags, "

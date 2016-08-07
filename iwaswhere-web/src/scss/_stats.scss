@@ -17,10 +17,16 @@ $total-weekend: lighten($completed-weekend, 30);
       font-size: 0.8em;
     }
 
+    .charts {
+      display: flex;
+      flex-flow: row;
+    }
+
     svg {
       margin: 5px;
       background-color: white;
       width: 300px;
+      height: 125px;
 
       rect:hover {
         opacity: 0.5;
