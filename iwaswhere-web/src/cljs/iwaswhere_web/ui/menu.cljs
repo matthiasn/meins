@@ -53,6 +53,7 @@
      [:span.fa.fa-plus-square] " new"]
     [:button {:on-click #(do (put-fn [:import/photos])
                              (put-fn [:import/geo])
+                             (put-fn [:import/weight])
                              (put-fn [:import/phone]))}
      [:span.fa.fa-map] " import"]]
    [:h1 "iWasWhere?"]

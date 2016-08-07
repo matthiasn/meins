@@ -177,7 +177,7 @@
           (if-not (neg? (:timestamp visit))
             (put-fn (with-meta [:entry/import visit] msg-meta))
             (log/warn "negative timestamp?" visit)))))
-    (catch Exception ex (log/error (str "Error while importing " filename) ex))))
+    (catch Exception ex (log/error "Error while importing " filename ex))))
 
 (defn import-geo
   "Imports geo data from respective directory.
@@ -189,6 +189,41 @@
       (let [filename (.getName file)]
         (log/info "Trying to import " filename)
         (import-visits-fn (io/reader file) put-fn msg-meta filename)))))
+
+(defn import-weight-csv-fn
+  [rdr put-fn msg-meta filename]
+  (try
+    (let [lines (line-seq rdr)]
+      (doseq [line (drop 1 lines)]
+        (let [parse-double #(when-not (empty? %) (Double/parseDouble %))
+              parsed (s/split (s/replace line "\"" "") #",")
+              w (parse-double (second parsed))
+              lbm (parse-double (get parsed 3))
+              fat (parse-double (get parsed 2))
+              dtz (t/default-time-zone)
+              f (tf/formatter "yyyy-MM-dd h:mm a" dtz)
+              entry {:timestamp    (c/to-long (tf/parse f (first parsed)))
+                     :md           (str "current #weight: " w
+                                        (when lbm (str " lbm: " lbm "%")))
+                     :tags         #{"#weight"}
+                     :measurements {:weight {:value w
+                                             :unit  :kg
+                                             :lbm   lbm
+                                             :fat   fat}}}]
+          (put-fn (with-meta [:entry/import entry] msg-meta)))))
+    (catch Exception ex (log/error "Error while importing " filename ex))))
+
+(defn import-weight-csv
+  "Imports weights csv data from respective directory."
+  [{:keys [put-fn msg-meta]}]
+  (let [files (file-seq (io/file (str f/data-path "/import")))]
+    (log/info "importing measurements")
+    (doseq [file (f/filter-by-name files #"withings.csv")]
+      (let [filename (.getName file)]
+        (log/info "Trying to import" filename)
+        (import-weight-csv-fn (io/reader file) put-fn msg-meta filename)))
+    {:send-to-self [[:state/stats-tags]
+                    [:state/publish-current {}]]}))
 
 (defn update-audio-tag
   [entry]
@@ -229,4 +264,5 @@
   {:cmp-id      cmp-id
    :handler-map {:import/photos import-media
                  :import/geo    import-geo
+                 :import/weight import-weight-csv
                  :import/phone  import-text-entries}})
