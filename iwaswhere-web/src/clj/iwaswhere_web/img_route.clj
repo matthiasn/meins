@@ -15,7 +15,7 @@
     (let [filename (str f/data-path "/images/" filename)
           file (io/file filename)
           exif (i/extract-exif file)
-          orientation (get exif "Orientation")
+          orientation (get exif "Orientation" "")
           rotate-fn (cond (s/includes? orientation "(Rotate 90 CW)")
                           (rotate-270-counter-clockwise-fn)
                           (s/includes? orientation "(Rotate 180)")
