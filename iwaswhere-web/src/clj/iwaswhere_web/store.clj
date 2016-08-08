@@ -111,4 +111,5 @@
                  :cmd/keep-alive         ka/keepalive-fn
                  :cmd/query-gc           ka/query-gc-fn
                  :stats/pomo-day-get     gs/get-pomodoro-day-stats
-                 :stats/activity-day-get gs/get-activity-day-stats}})
+                 :stats/activity-day-get gs/get-activity-day-stats
+                 :stats/tasks-day-get    gs/get-tasks-day-stats}})

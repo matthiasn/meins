@@ -4,6 +4,12 @@ $total: lighten($completed, 30);
 $completed-weekend: rgb(249,166,53);
 $total-weekend: lighten($completed-weekend, 30);
 
+$done: rgb(50,159,50);
+$done-weekend: lighten($done, 30);
+
+$tasks: rgb(188,30,30);
+$tasks-weekend: lighten($tasks, 30);
+
 #stats {
   flex: 0 0 auto;
   height: 180px;
@@ -43,6 +49,19 @@ $total-weekend: lighten($completed-weekend, 30);
       }
       .total-weekend {
         fill: $total-weekend;
+      }
+
+      .done {
+        fill: $done;
+      }
+      .done-weekend {
+        fill: $done-weekend;
+      }
+      .tasks {
+        fill: $tasks;
+      }
+      .tasks-weekend {
+        fill: $tasks-weekend;
       }
     }
 

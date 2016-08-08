@@ -32,6 +32,7 @@
                              :current-query  {}
                              :pomodoro-stats (sorted-map)
                              :activity-stats (sorted-map)
+                             :task-stats     (sorted-map)
                              :cfg            {:active             nil
                                               :linked-filter      {}
                                               :show-maps-for      #{}
@@ -123,8 +124,9 @@
    :handler-map       (merge cse/entry-handler-map
                              s/search-handler-map
                              {:state/new          new-state-fn
-                              :stats/pomo-day     (save-stats :pomodoro-stats) ; pomo-stats-fn
+                              :stats/pomo-day     (save-stats :pomodoro-stats)
                               :stats/activity-day (save-stats :activity-stats)
+                              :stats/tasks-day    (save-stats :task-stats)
                               :show/more          show-more-fn
                               :cmd/set-active     set-active-fn
                               :cmd/toggle-active  toggle-active-fn

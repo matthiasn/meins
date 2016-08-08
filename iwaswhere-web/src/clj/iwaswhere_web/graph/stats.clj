@@ -23,6 +23,20 @@
                :total-time  (apply + (map :completed-time pomodoro-nodes))}]
     {:emit-msg (with-meta [:stats/pomo-day stats] msg-meta)}))
 
+(defn get-tasks-day-stats
+  "Get pomodoro stats for specified day."
+  [{:keys [current-state msg-payload msg-meta]}]
+  (let [g (:graph current-state)
+        date-string (:date-string msg-payload)
+        day-nodes (gq/get-nodes-for-day g {:date-string date-string})
+        day-nodes-attrs (map #(uber/attrs g %) day-nodes)
+        task-nodes (filter #(contains? (:tags %) "#task") day-nodes-attrs)
+        done-nodes (filter #(contains? (:tags %) "#done") day-nodes-attrs)
+        stats {:date-string date-string
+               :tasks-cnt   (count task-nodes)
+               :done-cnt    (count done-nodes)}]
+    {:emit-msg (with-meta [:stats/tasks-day stats] msg-meta)}))
+
 (defn get-activity-day-stats
   "Get activity stats for specified day."
   [{:keys [current-state msg-payload msg-meta]}]

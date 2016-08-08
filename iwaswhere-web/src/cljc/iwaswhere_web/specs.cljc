@@ -185,6 +185,17 @@
   (s/keys :req-un [:iww.search/date-string
                    :activity-stats/total-exercise]))
 
+(s/def :stats/tasks-day-get
+  (s/keys :req-un [:iww.search/date-string]))
+
+(s/def :task-stats/tasks-cnt int-not-neg?)
+(s/def :task-stats/done-cnt int-not-neg?)
+
+(s/def :stats/tasks-day
+  (s/keys :req-un [:iww.search/date-string
+                   :task-stats/tasks-cnt
+                   :task-stats/done-cnt]))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Spec for :state/publish-current
 (s/def :iww.ws/sente-uid string?)
