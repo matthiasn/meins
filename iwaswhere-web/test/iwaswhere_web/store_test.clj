@@ -65,9 +65,11 @@
           (testing
             "entry added to graph"
             (is (contains? (:sorted-entries new-state) (:timestamp test-entry)))
-            ;; graph query also contains lists of comments and linked entries, which would be empty here
+            ;; graph query also contains lists of comments and linked entries,
+            ;; which would be empty here
             (is (= test-entry (-> (get (:entries-map res) (:timestamp test-entry))
                                   (dissoc :comments)
+                                  (dissoc :last-saved)
                                   (dissoc :linked-entries-list)))))
 
           (testing
@@ -85,12 +87,13 @@
               (with-open [reader (clojure.java.io/reader last-log)]
                 (let [last-line (last (line-seq reader))
                       parsed (clojure.edn/read-string last-line)]
-                  (is (= parsed test-entry))))))
+                  (is (= (dissoc parsed :last-saved) test-entry))))))
 
           (testing
             "handler emits saved message"
-            (is (= :entry/saved (first emit-msg)))
-            (is (= test-entry (second emit-msg)))))))))
+            (let [saved-msg (second emit-msg)]
+              (is (= :entry/saved (first emit-msg)))
+              (is (= test-entry (dissoc saved-msg :last-saved))))))))))
 
 (defn geo-entry-update-assertions
   "Common assertions in geo-entry-update-test, can be used with both the initial in-memory graph
@@ -99,9 +102,11 @@
   (testing
     "entry updated in graph"
     (is (contains? (:sorted-entries state) (:timestamp test-entry)))
-    ;; graph query also contains lists of comments and linked entries, which would be empty here
+    ;; graph query also contains lists of comments and linked entries,
+    ;; which would be empty here
     (is (= test-entry (-> (get (:entries-map res) (:timestamp test-entry))
                           (dissoc :comments)
+                          (dissoc :last-saved)
                           (dissoc :linked-entries-list)))))
 
   (testing
@@ -114,14 +119,16 @@
 
 (deftest geo-entry-update-test
   (testing
-    "Validates that handler properly updates and persists entry. In particular, if only the old
-     entry contained a particular tag, this orphan should be removed from database."
+    "Validates that handler properly updates and persists entry. In particular,
+     if only the old entry contained a particular tag, this orphan should be
+     removed from database."
     (let [test-ts (System/currentTimeMillis)
           {:keys [current-state logs-path]} (mk-test-state test-ts)
           test-entry (mk-test-entry test-ts)
-          updated-test-entry (merge test-entry {:tags     #{"#testing" "#new" "#entry"}
-                                                :md       "Some #testing #entry @me #new"
-                                                :mentions #{"@me"}})]
+          updated-test-entry (merge test-entry
+                                    {:tags     #{"#testing" "#new" "#entry"}
+                                     :md       "Some #testing #entry @me #new"
+                                     :mentions #{"@me"}})]
       (with-redefs [f/daily-logs-path logs-path]
         (let [{:keys [new-state]} (f/geo-entry-persist-fn {:current-state current-state
                                                            :msg-payload   test-entry})
@@ -143,12 +150,13 @@
               (with-open [reader (clojure.java.io/reader last-log)]
                 (let [last-line (last (line-seq reader))
                       parsed (clojure.edn/read-string last-line)]
-                  (is (= parsed updated-test-entry))))))
+                  (is (= (dissoc parsed :last-saved) updated-test-entry))))))
 
           (testing
             "handler emits updated message"
-            (is (= :entry/saved (first emit-msg)))
-            (is (= updated-test-entry (second emit-msg))))
+            (let [saved-msg (second emit-msg)]
+              (is (= :entry/saved (first emit-msg)))
+              (is (= updated-test-entry (dissoc saved-msg :last-saved)))))
 
           ;; test with graph reconstructed from disk
           (geo-entry-update-assertions state-from-disk res-from-disk updated-test-entry))))))
@@ -184,10 +192,12 @@
           test-entry (mk-test-entry test-ts)
           delete-msg {:timestamp (:timestamp test-entry) :deleted true}]
       (with-redefs [f/daily-logs-path logs-path]
-        (let [{:keys [new-state]} (f/geo-entry-persist-fn {:current-state current-state
-                                                           :msg-payload   some-test-entry})
-              {:keys [new-state]} (f/geo-entry-persist-fn {:current-state new-state
-                                                           :msg-payload   test-entry})
+        (let [{:keys [new-state]} (f/geo-entry-persist-fn
+                                    {:current-state current-state
+                                     :msg-payload   some-test-entry})
+              {:keys [new-state]} (f/geo-entry-persist-fn
+                                    {:current-state new-state
+                                     :msg-payload   test-entry})
               {:keys [new-state]} (f/trash-entry-fn {:current-state new-state
                                                      :msg-payload   delete-msg})
               res (gq/get-filtered-results new-state simple-query)

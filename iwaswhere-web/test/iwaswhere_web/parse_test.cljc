@@ -45,7 +45,7 @@
    :mentions    #{}
    :date-string nil
    :timestamp   nil
-   :n           15})
+   :n           50})
 
 (def fulltext-search
   {:search-text "\"travel AND aircraft\""
@@ -55,7 +55,7 @@
    :mentions    #{}
    :date-string nil
    :timestamp   nil
-   :n           15})
+   :n           50})
 
 (def open-tasks-search
   {:search-text "#task ~#done ~#backlog ~#outdated"
@@ -65,7 +65,7 @@
    :mentions    #{}
    :date-string nil
    :timestamp   nil
-   :n           15})
+   :n           50})
 
 (def tasks-done-search
   {:search-text "#task #done @myself"
@@ -75,7 +75,7 @@
    :mentions    #{"@myself"}
    :date-string nil
    :timestamp   nil
-   :n           15})
+   :n           50})
 
 (def day-search
   {:search-text "2016-06-07 #task #done @myself"
@@ -85,7 +85,7 @@
    :mentions    #{"@myself"}
    :date-string "2016-06-07"
    :timestamp   nil
-   :n           15})
+   :n           50})
 
 (def timestamp-search
   {:search-text "1465325998053"
@@ -95,7 +95,7 @@
    :mentions    #{}
    :date-string nil
    :timestamp   "1465325998053"
-   :n           15})
+   :n           50})
 
 (deftest parse-search-test
   (testing

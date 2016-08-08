@@ -11,7 +11,7 @@
 (defn get-stats
   "Retrieves pomodoro stats for the last n days."
   [stats-key put-fn n]
-  (doseq [ds (map n-days-go-fmt (range n))]
+  (doseq [ds (map n-days-go-fmt (reverse (range n)))]
     (put-fn [stats-key {:date-string ds}])))
 
 (defn line-chart
@@ -24,7 +24,7 @@
 (defn line-points
   [indexed h]
   (let [point-strings (map (fn [[idx v]]
-                             (str (* 10 idx) "," (- h (* 10 (- v 80)))))
+                             (str (* 10 idx) "," (- h (* 20 (- v 90)))))
                            indexed)]
     (apply str (interpose " " point-strings))))
 

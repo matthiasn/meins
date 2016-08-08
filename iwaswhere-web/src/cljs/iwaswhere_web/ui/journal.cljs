@@ -39,7 +39,7 @@
            (let [entry (assoc-in entry [:comments]
                                  (map (fn [ts] (get entries-map ts))
                                       (:comments entry)))]
-             ^{:key (:timestamp entry)}
+             ^{:key (str "linked-" (:timestamp entry))}
              [e/entry-with-comments entry cfg new-entries put-fn])))])))
 
 (defn journal-view
