@@ -14,18 +14,9 @@
   (doseq [ds (map n-days-go-fmt (reverse (range n)))]
     (put-fn [stats-key {:date-string ds}])))
 
-(defn line-chart
-  [points stroke]
-  [:svg
-   {:viewBox "0 0 600 200"}
-   [:polyline
-    {:fill :none :stroke stroke :stroke-width 1 :points points}]])
-
 (defn line-points
-  [indexed h]
-  (let [point-strings (map (fn [[idx v]]
-                             (str (* 10 idx) "," (- h (* 20 (- v 90)))))
-                           indexed)]
+  [indexed mapper]
+  (let [point-strings (map mapper indexed)]
     (apply str (interpose " " point-strings))))
 
 (defn path
@@ -38,6 +29,10 @@
   (let [day-of-week (.weekday (js/moment. date-string))]
     (not (and (pos? day-of-week) (< day-of-week 6)))))
 
+(defn weekend-class
+  [cls v]
+  (str cls (when (weekend? (:date-string v)) "-weekend")))
+
 (defn chart-title
   [title]
   [:text {:x           300
@@ -48,33 +43,6 @@
           :style       {:font-weight :bold
                         :font-size   24}}
    title])
-
-(defn bar-chart
-  [pomodoro-stats stats-key fill-weekday fill-weekend chart-h title y-scale]
-  (let [indexed (map-indexed (fn [idx [k v]] [idx v]) pomodoro-stats)
-        weights (map (fn [[k v]] [k (-> v :weight :value)]) indexed)
-        points (line-points (filter second weights) 250)]
-    [:svg
-     {:viewBox (str "0 0 600 " chart-h)}
-     [:g
-      [:polyline
-       {:fill :none :stroke :steelblue :stroke-width 2 :points points}]]
-     [:g
-      [chart-title title]
-      (for [[idx v] indexed]
-        (let [day-of-week (.weekday (js/moment. (:date-string v)))
-              fill (if (and (pos? day-of-week) (< day-of-week 6))
-                     fill-weekday
-                     fill-weekend)
-              h (* y-scale (stats-key v))
-              x (* 10 idx)
-              y (- chart-h h)]
-          ^{:key (str "pbar" stats-key idx)}
-          [:rect {:x x :y y :fill fill :width 9 :height h}]))
-      [path "M 0 50 l 600 0 z"]
-      [path "M 0 100 l 600 0 z"]
-      [path "M 0 150 l 600 0 z"]
-      [path "M 0 200 l 600 0 z"]]]))
 
 (defn mouse-enter-fn
   [local v]
@@ -89,20 +57,72 @@
   (fn [_ev]
     (when (= v (:mouse-over @local)) (reset! local {}))))
 
+(defn activity-weight-chart
+  [pomodoro-stats stats-key chart-h title y-scale]
+  (let [local (rc/atom {})]
+    (fn [pomodoro-stats stats-key chart-h title y-scale]
+      (let [indexed (map-indexed (fn [idx [k v]] [idx v]) pomodoro-stats)
+            weights (map (fn [[k v]] [k (-> v :weight :value)]) indexed)
+            weights (filter second weights)
+            mapper (fn [[idx v]]
+                     (str (+ 5 (* 10 idx)) "," (- chart-h (* 20 (- v 90)))))
+            points (line-points weights mapper)]
+        [:div
+         [:svg
+          {:viewBox (str "0 0 600 " chart-h)}
+          [:g
+           [:polyline
+            {:fill :none :stroke :steelblue :stroke-width 2 :points points}]]
+          [:g
+           [chart-title title]
+           (for [[idx v] (filter #(:weight (second %)) indexed)]
+             (let [mouse-enter-fn (mouse-enter-fn local v)
+                   mouse-leave-fn (mouse-leave-fn local v)]
+               ^{:key (str "weight" idx)}
+               [:circle {:cx             (+ (* 10 idx) 5)
+                         :cy             (- chart-h
+                                            (* 20 (- (:value (:weight v)) 90)))
+                         :r              4
+                         :stroke         :steelblue
+                         :stroke-width   1
+                         :fill           :lightblue
+                         :on-mouse-enter mouse-enter-fn
+                         :on-mouse-leave mouse-leave-fn}]))
+           (for [[idx v] indexed]
+             (let [h (* y-scale (stats-key v))
+                   mouse-enter-fn (mouse-enter-fn local v)
+                   mouse-leave-fn (mouse-leave-fn local v)]
+               ^{:key (str "pbar" stats-key idx)}
+               [:rect {:x              (* 10 idx)
+                       :y              (- chart-h h)
+                       :width          9
+                       :height         h
+                       :class          (weekend-class "activity" v)
+                       :on-mouse-enter mouse-enter-fn
+                       :on-mouse-leave mouse-leave-fn}]))
+           [path "M 0 50 l 600 0 z"]
+           [path "M 0 100 l 600 0 z"]
+           [path "M 0 150 l 600 0 z"]
+           [path "M 0 200 l 600 0 z"]]]
+         (when (:mouse-over @local)
+           [:div.mouse-over-info
+            {:style {:top  (- (:y (:mouse-pos @local)) 20)
+                     :left (+ (:x (:mouse-pos @local)) 20)}}
+            [:span (:date-string (:mouse-over @local))] [:br]
+            [:span "Total min: " (:total-exercise (:mouse-over @local))] [:br]
+            [:span "Weight: " (:value (:weight (:mouse-over @local)))]])]))))
+
 (defn bars
   [indexed local k chart-h y-scale]
   [:g
    (for [[idx v] indexed]
      (let [h (* y-scale (k v))
-           x (* 10 idx)
-           y (- chart-h h)
            mouse-enter-fn (mouse-enter-fn local v)
            mouse-leave-fn (mouse-leave-fn local v)]
        ^{:key (str "pbar" k idx)}
-       [:rect {:class          (str (name k) (when (weekend? (:date-string v))
-                                               "-weekend"))
-               :x              x
-               :y              y
+       [:rect {:class          (weekend-class (name k) v)
+               :x              (* 10 idx)
+               :y              (- chart-h h)
                :width          9
                :height         h
                :on-mouse-enter mouse-enter-fn
@@ -119,22 +139,26 @@
           [:g
            [chart-title "Tasks opened/closed"]
            (for [[idx v] indexed]
-               (let [h-tasks (* 5 (:tasks-cnt v))
-                     h-done (* 5 (:done-cnt v))
-                     x (* 10 idx)
-                     y-tasks (- chart-h h-tasks)
-                     y-done (- chart-h h-done)
-                     mouse-enter-fn (mouse-enter-fn local v)
-                     mouse-leave-fn (mouse-leave-fn local v)]
-                 ^{:key (str "tbar" (:date-string v) idx)}
-                 [:g {:on-mouse-enter mouse-enter-fn
-                      :on-mouse-leave mouse-leave-fn}
-                  [:rect {:x x :y y-tasks :width 4 :height h-tasks
-                          :class (str "tasks" (when (weekend? (:date-string v))
-                                                 "-weekend"))}]
-                  [:rect {:x (+ 5 x) :y y-done :width 4 :height h-done
-                          :class (str "done" (when (weekend? (:date-string v))
-                                                "-weekend"))}]]))
+             (let [h-tasks (* 5 (:tasks-cnt v))
+                   h-done (* 5 (:done-cnt v))
+                   x (* 10 idx)
+                   y-tasks (- chart-h h-tasks)
+                   y-done (- chart-h h-done)
+                   mouse-enter-fn (mouse-enter-fn local v)
+                   mouse-leave-fn (mouse-leave-fn local v)]
+               ^{:key (str "tbar" (:date-string v) idx)}
+               [:g {:on-mouse-enter mouse-enter-fn
+                    :on-mouse-leave mouse-leave-fn}
+                [:rect {:x      x
+                        :y      y-tasks
+                        :width  4
+                        :height h-tasks
+                        :class  (weekend-class "tasks" v)}]
+                [:rect {:x      (+ 5 x)
+                        :y      y-done
+                        :width  4
+                        :height h-done
+                        :class  (weekend-class "done" v)}]]))
            [path "M 0 50 l 600 0 z"]
            [path "M 0 100 l 600 0 z"]
            [path "M 0 150 l 600 0 z"]
@@ -185,8 +209,7 @@
     [:div.stats
      [:div.charts
       [pomodoro-bar-chart pomodoro-stats 250 "Pomodoros" 10]
-      [bar-chart activity-stats :total-exercise "steelblue" "#cc5500" 250
-       "Activity/Weight" 1]
+      [activity-weight-chart activity-stats :total-exercise 250 "Activity/Weight" 1]
       [tasks-chart task-stats 250]]
      (when-let [stats (:stats store-snapshot)]
        [:div (:entry-count stats) " entries, " (:node-count stats) " nodes, "

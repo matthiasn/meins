@@ -10,6 +10,9 @@ $done-weekend: lighten($done, 30);
 $tasks: rgb(188,30,30);
 $tasks-weekend: lighten($tasks, 30);
 
+$activity: steelblue;
+$activity-weekend: lighten($activity, 30);
+
 #stats {
   flex: 0 0 auto;
   height: 180px;
@@ -62,6 +65,12 @@ $tasks-weekend: lighten($tasks, 30);
       }
       .tasks-weekend {
         fill: $tasks-weekend;
+      }
+      .activity {
+        fill: $activity;
+      }
+      .activity-weekend {
+        fill: $activity-weekend;
       }
     }
 
