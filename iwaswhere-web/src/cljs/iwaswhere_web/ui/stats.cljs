@@ -71,23 +71,7 @@
          [:svg
           {:viewBox (str "0 0 600 " chart-h)}
           [:g
-           [:polyline
-            {:fill :none :stroke :steelblue :stroke-width 2 :points points}]]
-          [:g
            [chart-title title]
-           (for [[idx v] (filter #(:weight (second %)) indexed)]
-             (let [mouse-enter-fn (mouse-enter-fn local v)
-                   mouse-leave-fn (mouse-leave-fn local v)]
-               ^{:key (str "weight" idx)}
-               [:circle {:cx             (+ (* 10 idx) 5)
-                         :cy             (- chart-h
-                                            (* 20 (- (:value (:weight v)) 90)))
-                         :r              4
-                         :stroke         :steelblue
-                         :stroke-width   1
-                         :fill           :lightblue
-                         :on-mouse-enter mouse-enter-fn
-                         :on-mouse-leave mouse-leave-fn}]))
            (for [[idx v] indexed]
              (let [h (* y-scale (stats-key v))
                    mouse-enter-fn (mouse-enter-fn local v)
@@ -103,7 +87,23 @@
            [path "M 0 50 l 600 0 z"]
            [path "M 0 100 l 600 0 z"]
            [path "M 0 150 l 600 0 z"]
-           [path "M 0 200 l 600 0 z"]]]
+           [path "M 0 200 l 600 0 z"]]
+          [:g
+           [:polyline
+            {:fill :none :stroke :steelblue :stroke-width 2 :points points}]
+           (for [[idx v] (filter #(:weight (second %)) indexed)]
+             (let [mouse-enter-fn (mouse-enter-fn local v)
+                   mouse-leave-fn (mouse-leave-fn local v)]
+               ^{:key (str "weight" idx)}
+               [:circle {:cx             (+ (* 10 idx) 5)
+                         :cy             (- chart-h
+                                            (* 20 (- (:value (:weight v)) 90)))
+                         :r              4
+                         :stroke         :steelblue
+                         :stroke-width   1
+                         :fill           :lightblue
+                         :on-mouse-enter mouse-enter-fn
+                         :on-mouse-leave mouse-leave-fn}]))]]
          (when (:mouse-over @local)
            [:div.mouse-over-info
             {:style {:top  (- (:y (:mouse-pos @local)) 20)
