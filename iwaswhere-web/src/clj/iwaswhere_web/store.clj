@@ -102,6 +102,7 @@
   [cmp-id]
   {:cmp-id      cmp-id
    :state-fn    (state-fn f/daily-logs-path)
+   :opts        {:msgs-on-firehose true}
    :handler-map {:entry/import           f/entry-import-fn
                  :entry/update           f/geo-entry-persist-fn
                  :entry/trash            f/trash-entry-fn
