@@ -20,7 +20,6 @@
 (defn stats-tags-fn
   "Update client side state with stats and tags received from backend."
   [{:keys [current-state msg-payload]}]
-  (prn msg-payload)
   (let [new-state (-> current-state
                       (assoc-in [:cfg :hashtags] (:hashtags msg-payload))
                       (assoc-in [:stats] (:stats msg-payload))

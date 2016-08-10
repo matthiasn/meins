@@ -45,12 +45,19 @@
    title])
 
 (defn mouse-enter-fn
+  "Creates event handler for mouse-enter events on elements in a chart.
+   Takes a local atom and the value associated with the chart element.
+   Returns function which detects the mouse position from the event and
+   replaces :mouse-over key in local atom with v and :mouse-pos with the
+   mouse position in the event"
   [local v]
   (fn [ev]
-    (reset! local
-            {:mouse-over v
-             :mouse-pos  {:x (.-pageX ev)
-                          :y (.-pageY ev)}})))
+    (let [mouse-pos {:x (.-pageX ev) :y (.-pageY ev)}
+          update-fn (fn [state v]
+                      (-> state
+                          (assoc-in [:mouse-over] v)
+                          (assoc-in [:mouse-pos] mouse-pos)))]
+      (swap! local update-fn v))))
 
 (defn mouse-leave-fn
   [local v]
@@ -112,6 +119,56 @@
             [:span "Total min: " (:total-exercise (:mouse-over @local))] [:br]
             [:span "Weight: " (:value (:weight (:mouse-over @local)))]])]))))
 
+(defn tasks-chart
+  "Draws chart for opened and closed tasks, where the bars for the counts of
+   newly opened tasks are drawn above a horizontal line and those for closed
+   tasks below this line. The size of the the bars scales automatically
+   depending on the maximum count found in the data.
+   On mouse-over on any of the bars, the date and the values for the date are
+   shown in an info div next to the bars."
+  [task-stats chart-h]
+  (let [local (rc/atom {})]
+    (fn [task-stats chart-h]
+      (let [indexed (map-indexed (fn [idx [_k v]] [idx v]) task-stats)
+            max-cnt (apply max (map (fn [[_idx v]]
+                                      (max (:tasks-cnt v) (:done-cnt v)))
+                                    indexed))]
+        [:div
+         [:svg
+          {:viewBox (str "0 0 600 " chart-h)}
+          [:g
+           [chart-title "Tasks opened/closed"]
+           (for [[idx v] indexed]
+             (let [headline-reserved 50
+                   chart-h-half (/ (- chart-h headline-reserved) 2)
+                   y-scale (/ chart-h-half (or max-cnt 1))
+                   h-tasks (* y-scale (:tasks-cnt v))
+                   h-done (* y-scale (:done-cnt v))
+                   x (* 10 idx)
+                   mouse-enter-fn (mouse-enter-fn local v)
+                   mouse-leave-fn (mouse-leave-fn local v)]
+               ^{:key (str "tbar" (:date-string v) idx)}
+               [:g {:on-mouse-enter mouse-enter-fn
+                    :on-mouse-leave mouse-leave-fn}
+                [:rect {:x      x
+                        :y      (+ (- chart-h-half h-tasks) headline-reserved)
+                        :width  9
+                        :height h-tasks
+                        :class  (weekend-class "tasks" v)}]
+                [:rect {:x      x
+                        :y      (+ chart-h-half headline-reserved)
+                        :width  9
+                        :height h-done
+                        :class  (weekend-class "done" v)}]]))]]
+         (when (:mouse-over @local)
+           [:div.mouse-over-info
+            {:style {:top  (- (:y (:mouse-pos @local)) 20)
+                     :left (+ (:x (:mouse-pos @local)) 20)}}
+            [:span (:date-string (:mouse-over @local))] [:br]
+            [:span "Done: " (:done-cnt (:mouse-over @local))] [:br]
+            [:span "Created: " (:tasks-cnt (:mouse-over @local))]
+            [:br]])]))))
+
 (defn bars
   [indexed local k chart-h y-scale]
   [:g
@@ -127,49 +184,6 @@
                :height         h
                :on-mouse-enter mouse-enter-fn
                :on-mouse-leave mouse-leave-fn}]))])
-
-(defn tasks-chart
-  [task-stats chart-h]
-  (let [local (rc/atom {})]
-    (fn [task-stats chart-h]
-      (let [indexed (map-indexed (fn [idx [k v]] [idx v]) task-stats)]
-        [:div
-         [:svg
-          {:viewBox (str "0 0 600 " chart-h)}
-          [:g
-           [chart-title "Tasks opened/closed"]
-           (for [[idx v] indexed]
-             (let [h-tasks (* 5 (:tasks-cnt v))
-                   h-done (* 5 (:done-cnt v))
-                   x (* 10 idx)
-                   y-tasks (- chart-h h-tasks)
-                   y-done (- chart-h h-done)
-                   mouse-enter-fn (mouse-enter-fn local v)
-                   mouse-leave-fn (mouse-leave-fn local v)]
-               ^{:key (str "tbar" (:date-string v) idx)}
-               [:g {:on-mouse-enter mouse-enter-fn
-                    :on-mouse-leave mouse-leave-fn}
-                [:rect {:x      x
-                        :y      y-tasks
-                        :width  4
-                        :height h-tasks
-                        :class  (weekend-class "tasks" v)}]
-                [:rect {:x      (+ 5 x)
-                        :y      y-done
-                        :width  4
-                        :height h-done
-                        :class  (weekend-class "done" v)}]]))
-           [path "M 0 50 l 600 0 z"]
-           [path "M 0 100 l 600 0 z"]
-           [path "M 0 150 l 600 0 z"]
-           [path "M 0 200 l 600 0 z"]]]
-         (when (:mouse-over @local)
-           [:div.mouse-over-info
-            {:style {:top  (- (:y (:mouse-pos @local)) 20)
-                     :left (+ (:x (:mouse-pos @local)) 20)}}
-            [:span (:date-string (:mouse-over @local))] [:br]
-            [:span "Done: " (:done-cnt (:mouse-over @local))] [:br]
-            [:span "Created: " (:tasks-cnt (:mouse-over @local))] [:br]])]))))
 
 (defn pomodoro-bar-chart
   [pomodoro-stats chart-h title y-scale]
