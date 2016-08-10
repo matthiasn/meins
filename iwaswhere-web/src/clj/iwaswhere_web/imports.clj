@@ -152,7 +152,9 @@
                (when file-info
                  (put-fn (with-meta [:entry/import file-info] msg-meta))))
              (catch Exception ex (log/error (str "Error while importing "
-                                                 filename) ex)))))))
+                                                 filename) ex)))))
+    {:send-to-self [[:state/publish-current {}]
+                    [:state/stats-tags-make]]}))
 
 (defn double-ts-to-long [ts] (long (* ts 1000)))
 
@@ -222,8 +224,8 @@
       (let [filename (.getName file)]
         (log/info "Trying to import" filename)
         (import-weight-csv-fn (io/reader file) put-fn msg-meta filename)))
-    {:send-to-self [[:state/stats-tags]
-                    [:state/publish-current {}]]}))
+    {:send-to-self [[:state/publish-current {}]
+                    [:state/stats-tags-make]]}))
 
 (defn update-audio-tag
   [entry]
@@ -256,7 +258,9 @@
     (doseq [file (f/filter-by-name files #"text-entries.json")]
       (let [filename (.getName file)]
         (log/info "Trying to import " filename)
-        (import-text-entries-fn (io/reader file) put-fn msg-meta filename)))))
+        (import-text-entries-fn (io/reader file) put-fn msg-meta filename)))
+    {:send-to-self [[:state/publish-current {}]
+                    [:state/stats-tags-make]]}))
 
 (defn cmp-map
   "Generates component map for imports-cmp."

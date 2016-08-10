@@ -74,11 +74,11 @@
 
           (testing
             "hashtag was created for entry"
-            (is (= (:tags test-entry) (:hashtags res))))
+            (is (= (:tags test-entry) (gq/find-all-hashtags new-state))))
 
           (testing
             "mention was created for entry"
-            (is (= (:mentions test-entry) (:mentions res))))
+            (is (= (:mentions test-entry) (gq/find-all-mentions new-state))))
 
           (testing
             "log was appended by entry"
@@ -111,11 +111,11 @@
 
   (testing
     "hashtag was created for entry"
-    (is (= (:tags test-entry) (:hashtags res))))
+    (is (= (:tags test-entry) (gq/find-all-hashtags state))))
 
   (testing
     "mention was created for entry"
-    (is (= (:mentions test-entry) (:mentions res)))))
+    (is (= (:mentions test-entry) (gq/find-all-mentions state)))))
 
 (deftest geo-entry-update-test
   (testing
@@ -130,8 +130,9 @@
                                      :md       "Some #testing #entry @me #new"
                                      :mentions #{"@me"}})]
       (with-redefs [f/daily-logs-path logs-path]
-        (let [{:keys [new-state]} (f/geo-entry-persist-fn {:current-state current-state
-                                                           :msg-payload   test-entry})
+        (let [{:keys [new-state]} (f/geo-entry-persist-fn
+                                    {:current-state current-state
+                                     :msg-payload   test-entry})
               {:keys [new-state emit-msg]} (f/geo-entry-persist-fn
                                              {:current-state new-state
                                               :msg-payload   updated-test-entry})

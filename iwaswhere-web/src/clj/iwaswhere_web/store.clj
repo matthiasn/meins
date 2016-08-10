@@ -30,8 +30,8 @@
       (log/info "Query" sente-uid "took" ms-string)
       (log/info "Result size" (count (str res)))
       {:emit-msg res-msg})
-    {:send-to-self (map (fn [uid] [:state/publish-current {:sente-uid uid}])
-                        (keys (:client-queries current-state)))}))
+    {:send-to-self (mapv (fn [uid] [:state/publish-current {:sente-uid uid}])
+                         (keys (:client-queries current-state)))}))
 
 (defn state-get-fn
   "Handler function for retrieving current state. Updates filter for connected
@@ -48,12 +48,26 @@
                     (with-meta [:cmd/keep-alive] msg-meta)]}))
 
 (defn stats-tags-fn
-  "Precomputes stats and tags (they only change on insert anyway)."
+  "Precomputes stats and tags (they only change on insert anyway) and initiates
+   publication thereof to all connected clients."
   [{:keys [current-state]}]
-  {:new-state (-> current-state
-                  (assoc-in [:stats] (gs/get-basic-stats current-state))
-                  (assoc-in [:hashtags] (gq/find-all-hashtags current-state))
-                  (assoc-in [:mentions] (gq/find-all-mentions current-state)))})
+  (let [new-state
+        (-> current-state
+            (assoc-in [:stats] (gs/get-basic-stats current-state))
+            (assoc-in [:hashtags] (gq/find-all-hashtags current-state))
+            (assoc-in [:mentions] (gq/find-all-mentions current-state)))]
+    {:new-state    new-state
+     :send-to-self (mapv (fn [uid]
+                           (with-meta [:state/stats-tags-get] {:sente-uid uid}))
+                         (keys (:client-queries current-state)))}))
+
+(defn publish-stats-tags
+  "Publish stats and tags to client."
+  [{:keys [current-state msg-meta]}]
+  (let [stats-tags {:hashtags    (:hashtags current-state)
+                    :mentions    (:mentions current-state)
+                    :stats       (:stats current-state)}]
+    {:emit-msg (with-meta [:state/stats-tags stats-tags] msg-meta)}))
 
 (defn state-fn
   "Initial state function, creates state atom and then parses all files in
@@ -108,7 +122,8 @@
                  :entry/trash            f/trash-entry-fn
                  :state/publish-current  publish-state-fn
                  :state/get              state-get-fn
-                 :state/stats-tags       stats-tags-fn
+                 :state/stats-tags-make  stats-tags-fn
+                 :state/stats-tags-get   publish-stats-tags
                  :cmd/keep-alive         ka/keepalive-fn
                  :cmd/query-gc           ka/query-gc-fn
                  :stats/pomo-day-get     gs/get-pomodoro-day-stats

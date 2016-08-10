@@ -40,17 +40,20 @@
   {:entries             [(:timestamp test-entry)]
    :entries-map         {(:timestamp test-entry) test-entry}
    :linked-entries-list []
-   :hashtags            #{"#drama" "#hashtag" "#blah"}
-   :mentions            #{"@myself" "@me" "@I"}
-   :stats               {:entry-count 4118 :node-count 5636 :edge-count 28726}
    :duration-ms         19})
+
+(def stats-tags-from-backend
+  {:hashtags            #{"#drama" "#hashtag" "#blah"}
+   :mentions            #{"@myself" "@me" "@I"}
+   :stats               {:entry-count 4118 :node-count 5636 :edge-count 28726}})
 
 (def meta-from-backend
   {:server/ws-cmp     {:out-ts 1467748026835
                        :in-ts  1467748026845}
    :sente-uid         "b1ea383d-f1b1-42fe-9125-f5953e605cd7"
-   :cmp-seq           [:client/search-cmp :client/store-cmp :client/ws-cmp :server/store-cmp
-                       :server/store-cmp :server/ws-cmp :client/store-cmp]
+   :cmp-seq           [:client/search-cmp :client/store-cmp :client/ws-cmp
+                       :server/store-cmp :server/store-cmp :server/ws-cmp
+                       :client/store-cmp]
    :server/store-cmp  {:in-ts  1467748026835
                        :out-ts 1467748026845}
    :client/store-cmp  {:out-ts 1467748026813
@@ -77,10 +80,11 @@
    :md         ""})
 
 (deftest new-state-test
-  (let [current-state @(:state (store/initial-state-fn #()))
-        new-state (:new-state (store/new-state-fn {:current-state current-state
-                                                   :msg-payload   state-from-backend
-                                                   :msg-meta      meta-from-backend}))]
+  (let [current-state @(:state (store/initial-state-fn (fn [_put-fn])))
+        new-state (:new-state (store/new-state-fn
+                                {:current-state current-state
+                                 :msg-payload   state-from-backend
+                                 :msg-meta      meta-from-backend}))]
     (testing
       "entries are on new state"
       (is (= (:entries new-state) (:entries state-from-backend))))
@@ -88,34 +92,44 @@
       "entries map is on new state"
       (is (= (:entries-map new-state) (:entries-map state-from-backend))))
     (testing
-      "hashtags are on new state"
-      (is (= (:hashtags (:cfg new-state)) (:hashtags state-from-backend))))
-    (testing
-      "mentions are on new state"
-      (is (= (:mentions (:cfg new-state)) (:mentions state-from-backend))))
-    (testing
-      "stats are on new state"
-      (is (= (:stats new-state) (:stats state-from-backend))))
-    (testing
       "query duration is on new state"
       (is (= (:query (:timing new-state)) (:duration-ms state-from-backend)))
       (is (= (:rtt (:timing new-state)) 57)))))
 
+(deftest stats-tags-test
+  (let [current-state @(:state (store/initial-state-fn (fn [_put-fn])))
+        new-state (:new-state (store/stats-tags-fn
+                                {:current-state current-state
+                                 :msg-payload   stats-tags-from-backend
+                                 :msg-meta      meta-from-backend}))]
+    (testing
+      "hashtags are on new state"
+      (is (= (:hashtags (:cfg new-state)) (:hashtags stats-tags-from-backend))))
+    (testing
+      "mentions are on new state"
+      (is (= (:mentions (:cfg new-state)) (:mentions stats-tags-from-backend))))
+    (testing
+      "stats are on new state"
+      (is (= (:stats new-state) (:stats stats-tags-from-backend))))))
+
 (deftest set-active-test
   "Test that active entry is updated properly in store component state"
-  (let [current-state @(:state (store/initial-state-fn #()))
-        new-state (:new-state (store/set-active-fn {:current-state current-state
-                                                    :msg-payload   test-entry}))]
+  (let [current-state @(:state (store/initial-state-fn (fn [_put-fn])))
+        new-state (:new-state (store/set-active-fn
+                                {:current-state current-state
+                                 :msg-payload   test-entry}))]
     (testing
       "active entry is set"
       (is (= test-entry (:active (:cfg new-state)))))))
 
 (deftest show-more-test
   "Ensure that query is properly updated when more results are desired."
-  (let [current-state @(:state (store/initial-state-fn #()))
-        new-state (:new-state (search/update-query-fn {:current-state current-state
-                                                      :msg-payload   open-tasks-query}))
-        {:keys [:new-state emit-msg]} (store/show-more-fn {:current-state new-state})
+  (let [current-state @(:state (store/initial-state-fn (fn [_put-fn])))
+        new-state (:new-state (search/update-query-fn
+                                {:current-state current-state
+                                 :msg-payload   open-tasks-query}))
+        {:keys [:new-state emit-msg]} (store/show-more-fn
+                                        {:current-state new-state})
         updated-query (update-in open-tasks-query [:n] + 20)]
     (testing
       "query is properly updated, with increased number of results"
@@ -127,11 +141,13 @@
 
 (deftest toggle-key-test
   "toggle key messages flip boolean value"
-  (let [current-state @(:state (store/initial-state-fn #()))
-        new-state (:new-state (store/toggle-key-fn {:current-state current-state
-                                                    :msg-payload   {:path [:cfg :sort-by-upvotes]}}))
-        new-state2 (:new-state (store/toggle-key-fn {:current-state current-state
-                                                     :msg-payload   {:path [:some :crazy :long :path]}}))]
+  (let [current-state @(:state (store/initial-state-fn (fn [_put-fn])))
+        new-state (:new-state (store/toggle-key-fn
+                                {:current-state current-state
+                                 :msg-payload   {:path [:cfg :sort-by-upvotes]}}))
+        new-state2 (:new-state (store/toggle-key-fn
+                                 {:current-state current-state
+                                  :msg-payload   {:path [:some :crazy :long :path]}}))]
     (testing
       "before receiving toggle-key msg, key is false, as per initial state"
       (is (not (:sort-by-upvotes (:cfg current-state)))))
@@ -146,11 +162,13 @@
   "toggle key messages flip boolean value"
   (let [test-ts 1465059139281
         path [:cfg :show-maps-for]
-        current-state @(:state (store/initial-state-fn #()))
-        new-state (:new-state (store/toggle-set-fn {:current-state current-state
-                                                    :msg-payload   {:timestamp test-ts :path path}}))
-        new-state1 (:new-state (store/toggle-set-fn {:current-state new-state
-                                                     :msg-payload   {:timestamp test-ts :path path}}))]
+        current-state @(:state (store/initial-state-fn (fn [_put-fn])))
+        new-state (:new-state (store/toggle-set-fn
+                                {:current-state current-state
+                                 :msg-payload   {:timestamp test-ts :path path}}))
+        new-state1 (:new-state (store/toggle-set-fn
+                                 {:current-state new-state
+                                  :msg-payload   {:timestamp test-ts :path path}}))]
     (testing
       "cfg set is initially empty"
       (is (empty? (:show-maps-for (:cfg current-state)))))

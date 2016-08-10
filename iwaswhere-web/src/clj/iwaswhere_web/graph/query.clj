@@ -196,7 +196,4 @@
     {:entries     (map :timestamp entries)
      :entries-map (merge (into {} (map entry-mapper entries))
                          (into {} (map entry-mapper comments))
-                         (into {} (map entry-mapper linked-entries)))
-     :hashtags    (:hashtags current-state)
-     :mentions    (:mentions current-state)
-     :stats       (:stats current-state)}))
+                         (into {} (map entry-mapper linked-entries)))}))

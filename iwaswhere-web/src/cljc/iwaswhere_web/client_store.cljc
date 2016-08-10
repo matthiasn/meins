@@ -12,11 +12,18 @@
         new-state (-> current-state
                       (assoc-in [:entries] (:entries msg-payload))
                       (assoc-in [:entries-map] (:entries-map msg-payload))
-                      (assoc-in [:cfg :hashtags] (:hashtags msg-payload))
-                      (assoc-in [:stats] (:stats msg-payload))
                       (assoc-in [:timing] {:query (:duration-ms msg-payload)
                                            :rtt   (- (:in-ts store-meta)
-                                                     (:out-ts store-meta))})
+                                                     (:out-ts store-meta))}))]
+    {:new-state new-state}))
+
+(defn stats-tags-fn
+  "Update client side state with stats and tags received from backend."
+  [{:keys [current-state msg-payload]}]
+  (prn msg-payload)
+  (let [new-state (-> current-state
+                      (assoc-in [:cfg :hashtags] (:hashtags msg-payload))
+                      (assoc-in [:stats] (:stats msg-payload))
                       (assoc-in [:cfg :mentions] (:mentions msg-payload)))]
     {:new-state new-state}))
 
@@ -25,7 +32,7 @@
    backend, a map with temporary entries that are being edited but not saved
    yet, and sets that contain information for which entries to show the map,
    or the edit mode."
-  [_put-fn]
+  [put-fn]
   (let [initial-state (atom {:entries        []
                              :last-alive     (st/now)
                              :new-entries    @cse/new-entries-ls
@@ -45,6 +52,7 @@
                                               :mute               false
                                               :show-pvt           false
                                               :lines-shortened    3}})]
+    (put-fn [:state/stats-tags-get])
     {:state initial-state}))
 
 (defn toggle-set-fn
@@ -127,6 +135,7 @@
                               :stats/pomo-day     (save-stats :pomodoro-stats)
                               :stats/activity-day (save-stats :activity-stats)
                               :stats/tasks-day    (save-stats :task-stats)
+                              :state/stats-tags   stats-tags-fn
                               :show/more          show-more-fn
                               :cmd/set-active     set-active-fn
                               :cmd/toggle-active  toggle-active-fn

@@ -9,7 +9,7 @@
 
 (deftest update-query-test
   "Test that new query is updated properly in store component state"
-  (let [current-state @(:state (store/initial-state-fn #()))
+  (let [current-state @(:state (store/initial-state-fn (fn [_put-fn])))
         handler-res (search/update-query-fn {:current-state current-state
                                              :msg-payload   st/empty-query})
         new-state (:new-state handler-res)
@@ -45,7 +45,7 @@
 
 (deftest update-query-upvotes-test
   "Test that new query is sent properly, with :sort-by-upvotes set"
-  (let [current-state @(:state (store/initial-state-fn #()))
+  (let [current-state @(:state (store/initial-state-fn (fn [_put-fn])))
         handler-res (search/update-query-fn {:current-state current-state
                                              :msg-payload   st/open-tasks-query})
         new-state (:new-state handler-res)
@@ -77,7 +77,7 @@
   (let [location-hash (atom "")]
     (with-redefs [search/set-location-hash (fn [text]
                                              (reset! location-hash text))]
-      (let [current-state @(:state (store/initial-state-fn #()))
+      (let [current-state @(:state (store/initial-state-fn (fn [_put-fn])))
             new-state (:new-state (search/update-query-fn
                                     {:current-state current-state
                                      :msg-payload   st/open-tasks-query}))]

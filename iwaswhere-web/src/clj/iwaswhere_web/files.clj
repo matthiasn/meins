@@ -59,8 +59,8 @@
     (append-daily-log with-last-modified)
     {:new-state    new-state
      :emit-msg     [:entry/saved with-last-modified]
-     :send-to-self [[:state/stats-tags]
-                    [:state/publish-current {}]]}))
+     :send-to-self [[:state/publish-current {}]
+                    [:state/stats-tags-make]]}))
 
 (defn trash-entry-fn
   "Handler function for deleting journal entry."

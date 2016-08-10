@@ -8,10 +8,12 @@
 
 (deftest frontend-keepalive-test
   "The keepalive mechanism consists of two parts:
-    1) When a response to a :cmd/keep-alive message is received, the :last-alive timestamp is set
-    2) Every so often, the scheduler sends a message to check if :last-alive timestamp is too long
-       ago. In that case, we expect the component state to be reset to empty."
-  (let [current-state @(:state (cs/initial-state-fn #()))
+    1) When a response to a :cmd/keep-alive message is received, the :last-alive
+       timestamp is set
+    2) Every so often, the scheduler sends a message to check if :last-alive
+       timestamp is too long ago. In that case, we expect the component state to
+       be reset to empty."
+  (let [current-state @(:state (cs/initial-state-fn (fn [_put-fn])))
         new-state (:new-state (k/set-alive-fn {:current-state current-state}))]
 
     (testing ":last-alive timestamp set"

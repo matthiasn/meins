@@ -98,7 +98,8 @@
             tasks-not-done-query-uid (stc/make-uuid)
 
             new-state (reduce persist-reducer current-state test-entries)
-            new-state (reduce persist-reducer new-state (map st/mk-test-entry (range 100)))
+            new-state (reduce persist-reducer new-state
+                              (map st/mk-test-entry (range 100)))
 
             new-state (-> new-state
                           (add-query simple-query simple-query-uid)
@@ -147,8 +148,9 @@
 
         (testing
           "stats show expected numbers"
-          (let [res (-> (s/publish-state-fn {:current-state new-state
-                                             :msg-payload   {:sente-uid simple-query-uid}})
+          (let [res (-> (s/publish-stats-tags
+                          {:current-state new-state
+                           :msg-payload   {:sente-uid simple-query-uid}})
                         :emit-msg
                         second)
                 stats (:stats res)]
@@ -156,10 +158,12 @@
             (is (= (:node-count stats) 122))))
 
         (testing
-          "hashtags and mentions in results"
-          (let [res (-> (s/publish-state-fn {:current-state new-state
-                                             :msg-payload   {:sente-uid simple-query-uid}})
+          "hashtags and mentions in result of stats-tags publish fn"
+          (let [res (-> (s/publish-stats-tags
+                          {:current-state new-state
+                           :msg-payload   {:sente-uid simple-query-uid}})
                         :emit-msg
                         second)]
-            (is (= (:hashtags res) #{"#task" "#entry" "#test" "#done" "#completed" "#blah" "#new"}))
+            (is (= (:hashtags res) #{"#task" "#entry" "#test" "#done"
+                                     "#completed" "#blah" "#new"}))
             (is (= (:mentions res) #{"@myself" "@someone"}))))))))

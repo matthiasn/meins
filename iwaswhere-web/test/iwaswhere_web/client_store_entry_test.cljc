@@ -36,7 +36,7 @@
 (deftest new-entry-test
   "Test that local entry is properly set in state."
   (with-redefs [cse/new-entries-ls (atom {})]
-    (let [current-state @(:state (store/initial-state-fn #()))
+    (let [current-state @(:state (store/initial-state-fn (fn [_put-fn])))
           new-state (:new-state (cse/new-entry-fn {:current-state current-state
                                                    :msg-payload test-entry}))]
       (testing
@@ -50,11 +50,13 @@
 (deftest update-local-test
   "Test that local entry is properly attached to state."
   (with-redefs [cse/new-entries-ls (atom {})]
-    (let [current-state @(:state (store/initial-state-fn #()))
-          new-state (:new-state (cse/update-local-fn {:current-state current-state
-                                                      :msg-payload test-entry}))
-          new-state2 (:new-state (cse/update-local-fn {:current-state new-state
-                                                       :msg-payload entry-update}))]
+    (let [current-state @(:state (store/initial-state-fn (fn [_put-fn])))
+          new-state (:new-state (cse/update-local-fn
+                                  {:current-state current-state
+                                   :msg-payload test-entry}))
+          new-state2 (:new-state (cse/update-local-fn
+                                   {:current-state new-state
+                                    :msg-payload entry-update}))]
       (testing
         "pomodoro test entry in new-entries"
         (is (= test-entry (get-in new-state [:new-entries 1465059173965]))))
@@ -70,7 +72,7 @@
 (deftest geo-enrich-test
   "Test that local entry is properly attached to state."
   (with-redefs [cse/new-entries-ls (atom {})]
-    (let [current-state @(:state (store/initial-state-fn #()))
+    (let [current-state @(:state (store/initial-state-fn (fn [_put-fn])))
           new-state (:new-state (cse/update-local-fn
                                   {:current-state current-state
                                    :msg-payload test-entry}))
@@ -92,11 +94,13 @@
 (deftest remove-local-test
   "Test that local entry is properly removed from state after delete message."
   (with-redefs [cse/new-entries-ls (atom {})]
-    (let [current-state @(:state (store/initial-state-fn #()))
-          new-state (:new-state (cse/update-local-fn {:current-state current-state
-                                                      :msg-payload test-entry}))
-          new-state2 (:new-state (cse/remove-local-fn {:current-state new-state
-                                                       :msg-payload entry-update}))]
+    (let [current-state @(:state (store/initial-state-fn (fn [_put-fn])))
+          new-state (:new-state (cse/update-local-fn
+                                  {:current-state current-state
+                                   :msg-payload test-entry}))
+          new-state2 (:new-state (cse/remove-local-fn
+                                   {:current-state new-state
+                                    :msg-payload entry-update}))]
       (testing
         "pomodoro test entry in new-entries"
         (is (= test-entry (get-in new-state [:new-entries 1465059173965]))))
@@ -111,13 +115,13 @@
 (deftest entry-saved-test
   "New entry removed after backend confirms save."
   (with-redefs [cse/new-entries-ls (atom {})]
-    (let [current-state @(:state (store/initial-state-fn #()))
+    (let [current-state @(:state (store/initial-state-fn (fn [_put-fn])))
           new-state (:new-state (cse/update-local-fn
                                   {:current-state current-state
-                                                      :msg-payload test-entry}))
+                                   :msg-payload test-entry}))
           new-state2 (:new-state (cse/entry-saved-fn
                                    {:current-state new-state
-                                                      :msg-payload entry-update}))]
+                                    :msg-payload entry-update}))]
       (testing
         "test entry in new-entries"
         (is (= test-entry (get-in new-state [:new-entries 1465059173965]))))
@@ -139,19 +143,19 @@
   (let [play-counter (atom {"ticking-clock" 0 "ringer" 0})]
     (with-redefs [cse/new-entries-ls (atom {})
                   cse/play-audio (fn [id] (swap! play-counter update-in [id] inc))]
-      (let [current-state @(:state (store/initial-state-fn #()))
+      (let [current-state @(:state (store/initial-state-fn (fn [_put-fn])))
             new-state (:new-state (cse/update-local-fn
                                     {:current-state current-state
-                                                        :msg-payload test-entry}))
+                                     :msg-payload test-entry}))
             new-state1 (:new-state (cse/pomodoro-start-fn
                                      {:current-state new-state
-                                                           :msg-payload test-entry}))
+                                      :msg-payload test-entry}))
             new-state2 (:new-state (cse/pomodoro-inc-fn
                                      {:current-state new-state1
-                                                         :msg-payload pomodoro-inc-msg}))
+                                      :msg-payload pomodoro-inc-msg}))
             new-state3 (:new-state (cse/pomodoro-inc-fn
                                      {:current-state new-state2
-                                                         :msg-payload pomodoro-inc-msg}))]
+                                      :msg-payload pomodoro-inc-msg}))]
         (testing
           "pomodoro test entry in new-entries"
           (is (= test-entry (get-in new-state [:new-entries 1465059173965]))))
@@ -179,7 +183,7 @@
    started and and stopped."
   (with-redefs [cse/new-entries-ls (atom {})
                 cse/play-audio (fn [_id])]
-    (let [current-state @(:state (store/initial-state-fn #()))
+    (let [current-state @(:state (store/initial-state-fn (fn [_put-fn])))
           new-state (:new-state (cse/update-local-fn
                                   {:current-state current-state
                                    :msg-payload test-entry}))

@@ -22,7 +22,8 @@
               "text-entries.json" (i/import-text-entries-fn
                                     rdr put-fn {} filename)
               "visits.json" (i/import-visits-fn rdr put-fn {} filename)
-              (prn req))
+              (prn req)
+              (put-fn [:state/stats-tags-make]))
             "OK"))
         binary-post-fn
         (fn [dir filename req]
@@ -43,3 +44,4 @@
   [cmp-id]
   {:cmp-id   cmp-id
    :state-fn state-fn})
+

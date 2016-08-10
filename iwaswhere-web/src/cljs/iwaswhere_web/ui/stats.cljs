@@ -209,7 +209,8 @@
     [:div.stats
      [:div.charts
       [pomodoro-bar-chart pomodoro-stats 250 "Pomodoros" 10]
-      [activity-weight-chart activity-stats :total-exercise 250 "Activity/Weight" 1]
+      [activity-weight-chart activity-stats :total-exercise 250
+       "Activity/Weight" 1]
       [tasks-chart task-stats 250]]
      (when-let [stats (:stats store-snapshot)]
        [:div (:entry-count stats) " entries, " (:node-count stats) " nodes, "
@@ -238,6 +239,6 @@
   [cmp-id]
   (r/cmp-map {:cmp-id      cmp-id
               :init-fn     init-fn
-              :handler-map {:state/new update-stats}
+              :handler-map {:state/stats-tags update-stats}
               :view-fn     stats-view
               :dom-id      "stats"}))
