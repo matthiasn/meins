@@ -65,46 +65,57 @@
     (when (= v (:mouse-over @local)) (reset! local {}))))
 
 (defn activity-weight-chart
-  [pomodoro-stats stats-key chart-h title y-scale]
+  "Draws chart for daily activities vs weight. Weight is a line chart with
+   circles for each value, activites are represented as bars. On mouse-over
+   on top of bars or circles, a small info div next to the hovered item is
+   shown."
+  [stats chart-h]
   (let [local (rc/atom {})]
-    (fn [pomodoro-stats stats-key chart-h title y-scale]
-      (let [indexed (map-indexed (fn [idx [k v]] [idx v]) pomodoro-stats)
+    (fn [stats chart-h]
+      (let [headline-reserved 50
+            chart-h-half (/ (- chart-h headline-reserved) 2)
+            indexed (map-indexed (fn [idx [k v]] [idx v]) stats)
             weights (map (fn [[k v]] [k (-> v :weight :value)]) indexed)
             weights (filter second weights)
+            max-weight (or (apply max (map second weights)) 10)
+            min-weight (or (apply min (map second weights)) 1)
+            y-scale-weight (/ chart-h-half (- max-weight min-weight))
             mapper (fn [[idx v]]
-                     (str (+ 5 (* 10 idx)) "," (- chart-h (* 20 (- v 90)))))
-            points (line-points weights mapper)]
+                     (str (+ 5 (* 10 idx)) ","
+                          (- (+ chart-h-half headline-reserved)
+                             (* y-scale-weight (- v min-weight)))))
+            points (line-points weights mapper)
+            max-val (apply max (map (fn [[_idx v]] (:total-exercise v)) indexed))
+            y-scale (/ chart-h-half (or max-val 1))]
         [:div
          [:svg
           {:viewBox (str "0 0 600 " chart-h)}
           [:g
-           [chart-title title]
+           [chart-title "Activity/Weight"]
            (for [[idx v] indexed]
-             (let [h (* y-scale (stats-key v))
+             (let [h (* y-scale (:total-exercise v))
                    mouse-enter-fn (mouse-enter-fn local v)
                    mouse-leave-fn (mouse-leave-fn local v)]
-               ^{:key (str "pbar" stats-key idx)}
+               ^{:key (str "actbar" idx)}
                [:rect {:x              (* 10 idx)
                        :y              (- chart-h h)
                        :width          9
                        :height         h
                        :class          (weekend-class "activity" v)
                        :on-mouse-enter mouse-enter-fn
-                       :on-mouse-leave mouse-leave-fn}]))
-           [path "M 0 50 l 600 0 z"]
-           [path "M 0 100 l 600 0 z"]
-           [path "M 0 150 l 600 0 z"]
-           [path "M 0 200 l 600 0 z"]]
+                       :on-mouse-leave mouse-leave-fn}]))]
           [:g
            [:polyline
             {:fill :none :stroke :steelblue :stroke-width 2 :points points}]
            (for [[idx v] (filter #(:weight (second %)) indexed)]
-             (let [mouse-enter-fn (mouse-enter-fn local v)
-                   mouse-leave-fn (mouse-leave-fn local v)]
+             (let [w (:value (:weight v))
+                   mouse-enter-fn (mouse-enter-fn local v)
+                   mouse-leave-fn (mouse-leave-fn local v)
+                   cy (- (+ chart-h-half headline-reserved)
+                         (* y-scale-weight (- w min-weight)))]
                ^{:key (str "weight" idx)}
                [:circle {:cx             (+ (* 10 idx) 5)
-                         :cy             (- chart-h
-                                            (* 20 (- (:value (:weight v)) 90)))
+                         :cy             cy
                          :r              4
                          :stroke         :steelblue
                          :stroke-width   1
@@ -223,8 +234,7 @@
     [:div.stats
      [:div.charts
       [pomodoro-bar-chart pomodoro-stats 250 "Pomodoros" 10]
-      [activity-weight-chart activity-stats :total-exercise 250
-       "Activity/Weight" 1]
+      [activity-weight-chart activity-stats 250]
       [tasks-chart task-stats 250]]
      (when-let [stats (:stats store-snapshot)]
        [:div (:entry-count stats) " entries, " (:node-count stats) " nodes, "
