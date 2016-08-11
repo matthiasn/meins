@@ -71,6 +71,33 @@ $activity-weekend: lighten($activity, 30);
       .activity-weekend {
         fill: $activity-weekend;
       }
+
+      .lbm {
+        opacity: 0.5;
+        polyline {
+          stroke: grey;
+          stroke-width: 3;
+          fill: none;
+        }
+        circle {
+          stroke: grey;
+          stroke-width: 1;
+          fill: lightgrey;
+        }
+      }
+
+      .weight {
+        polyline {
+          stroke: steelblue;
+          stroke-width: 3;
+          fill: none;
+        }
+        circle {
+          stroke: steelblue;
+          stroke-width: 1;
+          fill: lightblue;
+        }
+      }
     }
 
     .mouse-over-info {
