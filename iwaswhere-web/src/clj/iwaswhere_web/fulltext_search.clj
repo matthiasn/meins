@@ -1,21 +1,30 @@
 (ns iwaswhere-web.fulltext-search
-  "Lucene-based full-text index. In memory and reconstructed on application startup."
+  "Lucene-based full-text index. In memory and reconstructed on application
+   startup."
   (:require [clucy.core :as clucy]))
 
 (defonce index (clucy/memory-index))
 
 (defn remove-from-index
   "Remove entry from index."
-  [index ts]
-  (clucy/search-and-delete index (str ts)))
+  [{:keys [msg-payload]}]
+  (let [ts (:timestamp msg-payload)]
+    (clucy/search-and-delete index (str ts))))
 
 (defn add-to-index
   "Adds entry to Lucene index. Removes older version of the same entry first."
-  [index entry]
-  (remove-from-index index (:timestamp entry))
-  (clucy/add index (select-keys entry [:timestamp :md])))
+  [{:keys [msg-payload]}]
+  (let [entry (select-keys msg-payload [:timestamp :md])]
+    (remove-from-index {:msg-payload entry})
+    (clucy/add index entry)))
 
 (defn search
   ""
   [query]
   (map #(Long. (:timestamp %)) (clucy/search index (:ft-search query) 1000)))
+
+(defn cmp-map
+  [cmp-id]
+  {:cmp-id      cmp-id
+   :handler-map {:ft/add    add-to-index
+                 :ft/remove remove-from-index}})

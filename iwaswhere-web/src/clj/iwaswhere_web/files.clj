@@ -55,10 +55,10 @@
   (let [entry-ts (:timestamp msg-payload)
         with-last-modified (merge msg-payload {:last-saved (st/now)})
         new-state (ga/add-node current-state entry-ts with-last-modified)]
-    (ft/add-to-index (:lucene-index current-state) with-last-modified)
     (append-daily-log with-last-modified)
     {:new-state    new-state
-     :emit-msg     [:entry/saved with-last-modified]
+     :emit-msg     [[:entry/saved with-last-modified]
+                    [:ft/add with-last-modified]]
      :send-to-self [[:state/publish-current {}]
                     [:state/stats-tags-make]]}))
 
@@ -70,4 +70,5 @@
     (log/info "Entry" entry-ts "marked as deleted.")
     (append-daily-log (merge msg-payload {:deleted true}))
     {:new-state    new-state
-     :send-to-self [:state/publish-current {}]}))
+     :send-to-self [:state/publish-current {}]
+     :emit-msg [:ft/remove {:timestamp entry-ts}]}))

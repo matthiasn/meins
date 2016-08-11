@@ -11,6 +11,7 @@
             [clojure.tools.logging :as log]
             [clj-pid.core :as pid]
             [iwaswhere-web.store :as st]
+            [iwaswhere-web.fulltext-search :as ft]
             [iwaswhere-web.upload :as up]
             [iwaswhere-web.imports :as i]))
 
@@ -30,12 +31,22 @@
     [[:cmd/init-comp #{(sente/cmp-map :server/ws-cmp idx/sente-map)
                        (i/cmp-map :server/imports-cmp)
                        (st/cmp-map :server/store-cmp)
-                       (up/cmp-map :server/upload-cmp)}]
-     [:cmd/route {:from :server/ws-cmp :to #{:server/store-cmp
-                                             :server/imports-cmp}}]
-     [:cmd/route {:from :server/imports-cmp :to :server/store-cmp}]
-     [:cmd/route {:from :server/upload-cmp :to :server/store-cmp}]
-     [:cmd/route {:from :server/store-cmp :to :server/ws-cmp}]]))
+                       (up/cmp-map :server/upload-cmp)
+                       (ft/cmp-map :server/ft-cmp)}]
+
+     [:cmd/route {:from :server/ws-cmp
+                  :to   #{:server/store-cmp
+                          :server/imports-cmp}}]
+
+     [:cmd/route {:from :server/imports-cmp
+                  :to   :server/store-cmp}]
+
+     [:cmd/route {:from :server/upload-cmp
+                  :to   :server/store-cmp}]
+
+     [:cmd/route {:from :server/store-cmp
+                  :to   #{:server/ws-cmp
+                          :server/ft-cmp}}]]))
 
 (defn -main
   "Starts the application from command line, saves and logs process ID. The

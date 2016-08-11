@@ -82,6 +82,9 @@
 (s/def :entry/saved entry-spec)
 (s/def :entry/import entry-spec)
 
+(s/def :ft/add entry-spec)
+(s/def :ft/remove timestamp-required-spec)
+
 ;; geo-enriched entries require a properly formed entry with latitude and longitude
 (s/def :entry/geo-enrich entry-w-geo-spec)
 

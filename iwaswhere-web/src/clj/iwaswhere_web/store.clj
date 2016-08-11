@@ -41,7 +41,7 @@
    contained in matching entries or any of their comments."
   [{:keys [current-state msg-payload msg-meta]}]
   (let [sente-uid (:sente-uid msg-meta)]
-    {:new-state    (update-in current-state [:client-queries sente-uid]
+    {:new-state (update-in current-state [:client-queries sente-uid]
                               merge msg-payload)
      :send-to-self [(with-meta [:state/publish-current {:sente-uid sente-uid}]
                                msg-meta)
@@ -75,47 +75,47 @@
    Entries are stored as attributes of graph nodes, where the node itself is
    timestamp of an entry. A sort order by descending timestamp is maintained
    in a sorted set of the nodes."
-  [path]
-  (fn
-    [_put-fn]
-    (fs/mkdirs f/daily-logs-path)
-    (let [entries-to-index (atom [])
-          state (atom {:sorted-entries (sorted-set-by >)
-                       :graph          (uber/graph)
-                       :lucene-index   ft/index
-                       :client-queries {}
-                       :hashtags       #{}
-                       :mentions       #{}
-                       :stats          {:entry-count 0
-                                        :node-count  0
-                                        :edge-count  0}})
-          files (file-seq (clojure.java.io/file path))]
-      (doseq [f (f/filter-by-name files #"\d{4}-\d{2}-\d{2}.jrn")]
-        (with-open [reader (clojure.java.io/reader f)]
-          (let [lines (line-seq reader)]
-            (doseq [line lines]
-              (let [parsed (clojure.edn/read-string line)
-                    ts (:timestamp parsed)]
-                (if (:deleted parsed)
-                  (swap! state ga/remove-node ts)
-                  (do (swap! entries-to-index conj
-                             (select-keys parsed [:timestamp :md]))
-                      (swap! state ga/add-node ts parsed))))))))
-      (future
-        (let [t (with-out-str
-                  (time (doseq [entry @entries-to-index]
-                          (ft/add-to-index (:lucene-index @state) entry))))]
-          (log/info "Indexed" (count @entries-to-index) "entries." t))
-        (reset! entries-to-index []))
-      ; nicer would be: send off :state/stats-tags message
-      (swap! state #(:new-state (stats-tags-fn {:current-state %})))
-      {:state state})))
+  [put-fn]
+  (fs/mkdirs f/daily-logs-path)
+  (let [entries-to-index (atom {})
+        state (atom {:sorted-entries (sorted-set-by >)
+                     :graph          (uber/graph)
+                     :lucene-index   ft/index
+                     :client-queries {}
+                     :hashtags       #{}
+                     :mentions       #{}
+                     :stats          {:entry-count 0
+                                      :node-count  0
+                                      :edge-count  0}})
+        files (file-seq (clojure.java.io/file f/daily-logs-path))]
+    (doseq [f (f/filter-by-name files #"\d{4}-\d{2}-\d{2}.jrn")]
+      (with-open [reader (clojure.java.io/reader f)]
+        (let [lines (line-seq reader)]
+          (doseq [line lines]
+            (let [parsed (clojure.edn/read-string line)
+                  ts (:timestamp parsed)]
+              (if (:deleted parsed)
+                (do (swap! state ga/remove-node ts)
+                    (swap! entries-to-index dissoc ts))
+                (do (swap! entries-to-index assoc-in [ts] parsed)
+                    (swap! state ga/add-node ts parsed))))))))
+    (future
+      (Thread/sleep 10000)
+      (log/info "Indexing started")
+      (let [t (with-out-str
+                (time (doseq [entry (vals @entries-to-index)]
+                        (put-fn [:ft/add entry]))))]
+        (log/info "Indexed" (count @entries-to-index) "entries." t))
+      (reset! entries-to-index []))
+    ; TODO: send off :state/stats-tags message
+    (swap! state #(:new-state (stats-tags-fn {:current-state %})))
+    {:state state}))
 
 (defn cmp-map
   "Generates component map for state-cmp."
   [cmp-id]
   {:cmp-id      cmp-id
-   :state-fn    (state-fn f/daily-logs-path)
+   :state-fn    state-fn
    :opts        {:msgs-on-firehose true}
    :handler-map {:entry/import           f/entry-import-fn
                  :entry/update           f/geo-entry-persist-fn
