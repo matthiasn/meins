@@ -46,6 +46,11 @@
       (swap! local update-fn v))))
 
 (defn mouse-leave-fn
+  "Creates event handler that removes the keys required for the info div
+   when leaving an element, such as a bar or circle in an SVG chart."
   [local v]
   (fn [_ev]
-    (when (= v (:mouse-over @local)) (reset! local {}))))
+    (when (= v (:mouse-over @local))
+      (swap! local (fn [state] (-> state
+                                   (dissoc :mouse-over)
+                                   (dissoc :mouse-pos)))))))

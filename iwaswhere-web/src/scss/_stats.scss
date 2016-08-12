@@ -36,6 +36,13 @@ $activity-weekend: lighten($activity, 30);
       background-color: white;
       height: 125px;
 
+      text {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
       rect:hover {
         opacity: 0.5;
       }

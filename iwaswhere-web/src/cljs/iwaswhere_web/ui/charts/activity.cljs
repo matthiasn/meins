@@ -4,7 +4,7 @@
 
 (defn weight-line
   "Draws line chart, for example for weight or LBM."
-  [indexed local y-start y-end cls val-k]
+  [indexed local y-start y-end cls val-k ctrl-x ctrl-y]
   (let [chart-h (- y-end y-start)
         vals (filter second (map (fn [[k v]] [k (-> v :weight val-k)])
                                  indexed))
@@ -15,20 +15,24 @@
                  (let [x (+ 5 (* 10 idx))
                        y (- (+ chart-h y-start) (* y-scale (- v min-val)))]
                    (str x "," y)))
-        points (cc/line-points vals mapper)]
+        points (cc/line-points vals mapper)
+        toggle-show #(swap! local update-in [val-k] not)]
     [:g {:class cls}
-     [:polyline {:points points}]
-     (for [[idx v] (filter #(:weight (second %)) indexed)]
-       (let [w (val-k (:weight v))
-             mouse-enter-fn (cc/mouse-enter-fn local v)
-             mouse-leave-fn (cc/mouse-leave-fn local v)
-             cy (- (+ chart-h y-start) (* y-scale (- w min-val)))]
-         ^{:key (str "weight" idx)}
-         [:circle {:cx             (+ (* 10 idx) 5)
-                   :cy             cy
-                   :r              4
-                   :on-mouse-enter mouse-enter-fn
-                   :on-mouse-leave mouse-leave-fn}]))]))
+     [:circle {:cx ctrl-x :cy ctrl-y :r 8 :on-click toggle-show}]
+     (when (val-k @local)
+       [:g
+        [:polyline {:points points}]
+        (for [[idx v] (filter #(:weight (second %)) indexed)]
+          (let [w (val-k (:weight v))
+                mouse-enter-fn (cc/mouse-enter-fn local v)
+                mouse-leave-fn (cc/mouse-leave-fn local v)
+                cy (- (+ chart-h y-start) (* y-scale (- w min-val)))]
+            ^{:key (str "weight" idx)}
+            [:circle {:cx             (+ (* 10 idx) 5)
+                      :cy             cy
+                      :r              4
+                      :on-mouse-enter mouse-enter-fn
+                      :on-mouse-leave mouse-leave-fn}]))])]))
 
 (defn activity-bars
   "Renders bars for each day's activity."
@@ -56,16 +60,17 @@
    on top of bars or circles, a small info div next to the hovered item is
    shown."
   [stats chart-h]
-  (let [local (rc/atom {})]
+  (let [local (rc/atom {:value true
+                        :lbm   false})]
     (fn [stats chart-h]
       (let [indexed (map-indexed (fn [idx [k v]] [idx v]) stats)]
         [:div
          [:svg
           {:viewBox (str "0 0 600 " chart-h)}
           [cc/chart-title "Weight/LBM/Activity"]
-          [activity-bars indexed local 170 250]
-          [weight-line indexed local 50 80 "lbm" :lbm]
-          [weight-line indexed local 90 160 "weight" :value]]
+          [activity-bars indexed local 160 250]
+          [weight-line indexed local 50 150 "lbm" :lbm 42 20]
+          [weight-line indexed local 50 150 "weight" :value 20 20]]
          (when (:mouse-over @local)
            [:div.mouse-over-info
             {:style {:top  (- (:y (:mouse-pos @local)) 20)
