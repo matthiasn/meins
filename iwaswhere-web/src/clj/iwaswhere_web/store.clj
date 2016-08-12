@@ -99,6 +99,7 @@
                     (swap! entries-to-index dissoc ts))
                 (do (swap! entries-to-index assoc-in [ts] parsed)
                     (swap! state ga/add-node ts parsed))))))))
+
     (future
       (Thread/sleep 10000)
       (log/info "Indexing started")

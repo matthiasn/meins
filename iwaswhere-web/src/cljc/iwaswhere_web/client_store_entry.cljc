@@ -49,14 +49,15 @@
   "Remove new entry from local when saving is confirmed by backend."
   [{:keys [current-state msg-payload]}]
   (let [ts (:timestamp msg-payload)
-        curr-local (get-in current-state [:new-entries ts])]
-    (when (= (:md curr-local) (:md msg-payload))
-      (let [new-state
-            (-> current-state
-                (update-in [:new-entries] dissoc ts)
-                (assoc-in [:entries-map ts] (merge curr-local msg-payload)))]
-        (update-local-storage new-state)
-        {:new-state new-state}))))
+        curr-local (get-in current-state [:new-entries ts])
+        new-state
+        (if (= (:md curr-local) (:md msg-payload))
+          (-> current-state
+              (update-in [:new-entries] dissoc ts)
+              (assoc-in [:entries-map ts] (merge curr-local msg-payload)))
+          current-state)]
+    (update-local-storage new-state)
+    {:new-state new-state}))
 
 (defn play-audio
   "Start playing audio element with provided DOM id."

@@ -45,8 +45,9 @@
   [test-ts]
   (let [test-daily-logs-path (str "./test-data/daily-logs/" test-ts "/")]
     (fs/mkdirs test-daily-logs-path)
-    {:current-state @(:state ((s/state-fn test-daily-logs-path) #()))
-     :logs-path     test-daily-logs-path}))
+    (with-redefs [f/daily-logs-path test-daily-logs-path]
+      {:current-state @(:state (s/state-fn (fn [_])))
+       :logs-path     test-daily-logs-path})))
 
 (deftest geo-entry-persist-test
   (testing
@@ -91,8 +92,9 @@
 
           (testing
             "handler emits saved message"
-            (let [saved-msg (second emit-msg)]
-              (is (= :entry/saved (first emit-msg)))
+            (let [entry-saved-msg (first emit-msg)
+                  saved-msg (second entry-saved-msg)]
+              (is (= :entry/saved (first entry-saved-msg)))
               (is (= test-entry (dissoc saved-msg :last-saved))))))))))
 
 (defn geo-entry-update-assertions
@@ -155,8 +157,9 @@
 
           (testing
             "handler emits updated message"
-            (let [saved-msg (second emit-msg)]
-              (is (= :entry/saved (first emit-msg)))
+            (let [entry-saved-msg (first emit-msg)
+                  saved-msg (second entry-saved-msg)]
+              (is (= :entry/saved (first entry-saved-msg)))
               (is (= updated-test-entry (dissoc saved-msg :last-saved)))))
 
           ;; test with graph reconstructed from disk

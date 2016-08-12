@@ -23,13 +23,14 @@
     (let [test-ts (stc/now)
           sente-uid (stc/make-uuid)
           current-state (:current-state (st/mk-test-state test-ts))
+          msg-meta {:sente-uid sente-uid}
           w-query (:new-state
                     (s/state-get-fn {:current-state current-state
                                      :msg-payload   st/simple-query
-                                     :msg-meta      {:sente-uid sente-uid}}))
+                                     :msg-meta      msg-meta}))
           {:keys [new-state emit-msg]} (k/keepalive-fn
                                          {:current-state w-query
-                                          :msg-meta      {:sente-uid sente-uid}})]
+                                          :msg-meta      msg-meta})]
       (testing
         "component state has recent last-seen timestamp for query"
         (is (< (- (get-in new-state [:client-queries sente-uid :last-seen])

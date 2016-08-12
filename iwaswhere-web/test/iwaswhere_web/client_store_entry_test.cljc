@@ -119,12 +119,16 @@
           new-state (:new-state (cse/update-local-fn
                                   {:current-state current-state
                                    :msg-payload test-entry}))
+          new-state (:new-state (cse/update-local-fn
+                                  {:current-state new-state
+                                   :msg-payload entry-update}))
           new-state2 (:new-state (cse/entry-saved-fn
                                    {:current-state new-state
                                     :msg-payload entry-update}))]
       (testing
         "test entry in new-entries"
-        (is (= test-entry (get-in new-state [:new-entries 1465059173965]))))
+        (is (= (merge test-entry entry-update)
+               (get-in new-state [:new-entries 1465059173965]))))
       (testing
         "entry update is removed from component state after receiving save
          confirmation"
