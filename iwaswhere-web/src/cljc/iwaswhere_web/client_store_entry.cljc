@@ -49,9 +49,14 @@
   "Remove new entry from local when saving is confirmed by backend."
   [{:keys [current-state msg-payload]}]
   (let [ts (:timestamp msg-payload)
-        new-state (update-in current-state [:new-entries] dissoc ts)]
-    (update-local-storage new-state)
-    {:new-state new-state}))
+        curr-local (get-in current-state [:new-entries ts])]
+    (when (= (:md curr-local) (:md msg-payload))
+      (let [new-state
+            (-> current-state
+                (update-in [:new-entries] dissoc ts)
+                (assoc-in [:entries-map ts] (merge curr-local msg-payload)))]
+        (update-local-storage new-state)
+        {:new-state new-state}))))
 
 (defn play-audio
   "Start playing audio element with provided DOM id."
@@ -74,13 +79,14 @@
               (update-local-storage new-state)
               {:new-state new-state
                :emit-msg  (when (not done?)
-                            [:cmd/schedule-new {:timeout 1000
-                                                :message [:cmd/pomodoro-inc {:timestamp ts}]}])})
+                            [:cmd/schedule-new
+                             {:timeout 1000
+                              :message [:cmd/pomodoro-inc {:timestamp ts}]}])})
           {:new-state current-state})))))
 
 (defn pomodoro-start-fn
-  "Start pomodoro for entry. Will toggle the :pomodoro-running status of the entry
-  and schedule an initial increment message."
+  "Start pomodoro for entry. Will toggle the :pomodoro-running status of the
+   entry and schedule an initial increment message."
   [{:keys [current-state msg-payload]}]
   (let [ts (:timestamp msg-payload)
         new-state (if (get-in current-state [:new-entries ts :pomodoro-running])
@@ -93,11 +99,12 @@
        :send-to-self [:cmd/pomodoro-inc {:timestamp ts}]})))
 
 (defn update-local-fn
-  "Update locally stored new entry changes from edit element."
+  "Update locally stored new entry with changes from edit element."
   [{:keys [current-state msg-payload]}]
   (let [ts (:timestamp msg-payload)
         saved-entry (get-in current-state [:new-entries ts])
-        new-state (assoc-in current-state [:new-entries ts] (merge saved-entry msg-payload))]
+        new-state (assoc-in current-state [:new-entries ts]
+                            (merge saved-entry msg-payload))]
     (update-local-storage new-state)
     {:new-state new-state}))
 

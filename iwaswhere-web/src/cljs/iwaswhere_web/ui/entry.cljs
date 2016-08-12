@@ -148,7 +148,7 @@
   [entry cfg put-fn edit-mode? info]
   (let [ts (:timestamp entry)
         show-map? (contains? (:show-maps-for cfg) ts)
-        toggle-edit #(if edit-mode? (put-fn [:entry/remove-local entry])
+        toggle-edit #(if edit-mode? () ;(put-fn [:entry/remove-local entry])
                                     (put-fn [:entry/update-local entry]))
         hashtags (:hashtags cfg)
         mentions (:mentions cfg)]
