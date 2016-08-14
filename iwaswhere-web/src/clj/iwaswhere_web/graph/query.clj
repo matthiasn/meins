@@ -171,6 +171,14 @@
         mentions (map #(:val (uber/attrs g {:mention %})) lmentions)]
     (set mentions)))
 
+(defn find-all-activities
+  "Finds all activities used in entries by finding the edges that originate from
+   the :activities node."
+  [current-state]
+  (let [g (:graph current-state)]
+    (set (map #(-> % :dest :name)
+              (uber/find-edges g {:src :activities})))))
+
 (defn get-filtered-results
   "Retrieve items to show in UI, also deliver all hashtags for autocomplete and
    some basic stats."

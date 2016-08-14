@@ -105,6 +105,11 @@
                               (put-fn [:cmd/set-opt
                                        {:timestamp ts
                                         :path      [:cfg :show-comments-for]}]))
+            add-activity #(put-fn [:entry/update-local
+                                   (assoc-in entry [:activity]
+                                             {:name ""
+                                              :duration-m 0
+                                              :exertion-level 5})])
             trash-entry #(if edit-mode?
                           (put-fn [:entry/remove-local {:timestamp ts}])
                           (put-fn [:entry/trash {:timestamp ts}]))
@@ -125,6 +130,8 @@
          [edit-icon toggle-edit edit-mode?]
          (when-not (:comment-for entry)
            [:span.fa.fa-clock-o.toggle {:on-click new-pomodoro}])
+         (when-not (:activity entry)
+           [:span.fa.fa-bicycle.toggle {:on-click add-activity}])
          (when-not (:comment-for entry)
            [:span.fa.fa-comment-o.toggle {:on-click create-comment}])
          (when (seq (:comments entry))
@@ -137,6 +144,45 @@
          (when-not (:comment-for entry)
            [new-link entry put-fn create-linked-entry])
          [trash-icon trash-entry]]))))
+
+(defn select-elem
+  "Render select element for the given options. On change, dispatch message
+   to change the local entry at the given path. When numeric? is set, coerces
+   the value to int."
+  [entry options path numeric? put-fn]
+  (let [ts (:timestamp entry)
+        select-handler (fn [ev]
+                         (let [selected (-> ev .-nativeEvent .-target .-value)
+                               coerced (if numeric?
+                                         (js/parseInt selected)
+                                         selected)]
+                           (put-fn [:entry/update-local
+                                    (assoc-in entry path coerced)])))]
+    [:select {:value     (get-in entry path)
+              :on-change select-handler}
+     [:option {:value ""} ""]
+     (for [opt options]
+       ^{:key (str ts opt)}
+       [:option {:value opt} opt])]))
+
+(defn activity-div
+  "In edit mode, allow editing of activities, otherwise show a summary."
+  [entry cfg put-fn edit-mode?]
+  (let [activities (:activities cfg)
+        ex-levels [1 2 3 4 5 6 7 8 9 10]
+        durations (range 0 185 5)]
+    (when-let [activity (:activity entry)]
+      (if edit-mode?
+        [:div
+         [:label "Activity:"]
+         [select-elem entry activities [:activity :name] false put-fn]
+         [:label "Duration:"]
+         [select-elem entry durations [:activity :duration-m] true put-fn]
+         [:label "Level:"]
+         [select-elem entry ex-levels [:activity :exertion-level] true put-fn]]
+        [:div "Physical activity: "
+         [:strong (:name activity)] " for " [:strong (:duration-m activity)]
+         " min, level " [:strong (:exertion-level activity)] "/10."]))))
 
 (defn journal-entry
   "Renders individual journal entry. Interaction with application state happens
@@ -176,11 +222,10 @@
      (if edit-mode?
        [e/editable-md-render entry hashtags mentions put-fn toggle-edit]
        [md/markdown-render entry cfg])
-     [m/image-view entry]
+     [activity-div entry cfg put-fn edit-mode?]
      [m/audioplayer-view entry]
+     [m/image-view entry]
      [m/videoplayer-view entry]
-     (when-let [activities (:activities entry)]
-       [:pre [:code (with-out-str (pp/pprint activities))]])
      (when-let [measurements (:measurements entry)]
        [:pre [:code (with-out-str (pp/pprint measurements))]])]))
 
@@ -197,19 +242,25 @@
         comments (:comments entry)
         comments (if (:show-pvt cfg) comments (filter u/pvt-filter comments))
         comments-map (into {} (map (fn [c] [(:timestamp c) c])) comments)
-        toggle-comments #(put-fn [:cmd/toggle {:timestamp ts :path [:cfg :show-comments-for]}])
-        local-comments (into {} (filter (fn [[_ts c]] (= (:comment-for c) (:timestamp entry)))
+        toggle-comments #(put-fn [:cmd/toggle
+                                  {:timestamp ts
+                                   :path [:cfg :show-comments-for]}])
+        local-comments (into {} (filter (fn [[_ts c]] (= (:comment-for c)
+                                                         (:timestamp entry)))
                                         new-entries))
-        all-comments (sort-by :timestamp (vals (merge comments-map local-comments)))
+        all-comments (sort-by :timestamp (vals (merge comments-map
+                                                      local-comments)))
         new-entries? (contains? new-entries ts)]
     [:div.entry-with-comments
-     [journal-entry entry cfg put-fn new-entries? (p/pomodoro-stats-view all-comments)]
+     [journal-entry entry cfg put-fn new-entries?
+      (p/pomodoro-stats-view all-comments)]
      (when (seq all-comments)
        (if (or (contains? (:show-comments-for cfg) ts) (seq local-comments))
          [:div.comments
           (for [comment all-comments]
             ^{:key (str "c" (:timestamp comment))}
-            [journal-entry comment cfg put-fn (contains? new-entries (:timestamp comment))])]
+            [journal-entry comment cfg put-fn
+             (contains? new-entries (:timestamp comment))])]
          [:div.show-comments {:on-click toggle-comments}
           (let [n (count comments)]
             [:span (str "show " n " comment" (when (> n 1) "s"))])]))]))

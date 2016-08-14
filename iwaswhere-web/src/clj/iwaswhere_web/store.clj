@@ -55,7 +55,8 @@
         (-> current-state
             (assoc-in [:stats] (gs/get-basic-stats current-state))
             (assoc-in [:hashtags] (gq/find-all-hashtags current-state))
-            (assoc-in [:mentions] (gq/find-all-mentions current-state)))]
+            (assoc-in [:mentions] (gq/find-all-mentions current-state))
+            (assoc-in [:activities] (gq/find-all-activities current-state)))]
     {:new-state    new-state
      :send-to-self (mapv (fn [uid]
                            (with-meta [:state/stats-tags-get] {:sente-uid uid}))
@@ -64,9 +65,10 @@
 (defn publish-stats-tags
   "Publish stats and tags to client."
   [{:keys [current-state msg-meta]}]
-  (let [stats-tags {:hashtags    (:hashtags current-state)
-                    :mentions    (:mentions current-state)
-                    :stats       (:stats current-state)}]
+  (let [stats-tags {:hashtags   (:hashtags current-state)
+                    :mentions   (:mentions current-state)
+                    :activities (:activities current-state)
+                    :stats      (:stats current-state)}]
     {:emit-msg (with-meta [:state/stats-tags stats-tags] msg-meta)}))
 
 (defn state-fn

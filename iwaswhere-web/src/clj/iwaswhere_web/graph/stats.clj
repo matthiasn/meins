@@ -47,10 +47,10 @@
         weight-nodes (sort-by #(-> % :measurements :weight :value)
                               (filter #(:weight (:measurements %))
                                       day-nodes-attrs))
-        activity-nodes (filter :activities day-nodes-attrs)
-        activities (map :activities activity-nodes)
+        activity-nodes (filter :activity day-nodes-attrs)
+        activities (map :activity activity-nodes)
         stats {:date-string    date-string
-               :total-exercise (apply + (map :total-exercise activities))
+               :total-exercise (apply + (map :duration-m activities))
                :weight         (:weight (:measurements (first weight-nodes)))}]
     {:emit-msg (with-meta [:stats/activity-day stats] msg-meta)}))
 
