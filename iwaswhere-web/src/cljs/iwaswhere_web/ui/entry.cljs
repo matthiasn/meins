@@ -6,7 +6,7 @@
             [iwaswhere-web.ui.pomodoro :as p]
             [cljsjs.moment]
             [iwaswhere-web.helpers :as h]
-            [iwaswhere-web.ui.utils :as u]
+            [iwaswhere-web.utils.misc :as u]
             [reagent.core :as r]
             [cljs.pprint :as pp]
             [clojure.set :as set]))

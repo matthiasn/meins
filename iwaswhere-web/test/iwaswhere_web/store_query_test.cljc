@@ -5,7 +5,9 @@
             [iwaswhere-web.files :as f]
             [iwaswhere-web.store-test :as st]
             [iwaswhere-web.store :as s]
-            [iwaswhere-web.store :as s]))
+            [iwaswhere-web.store :as s]
+            [clojure.set :as set]
+            [iwaswhere-web.utils.misc :as u]))
 
 (def simple-query
   {:search-text ""
@@ -164,6 +166,7 @@
                            :msg-payload   {:sente-uid simple-query-uid}})
                         :emit-msg
                         second)]
-            (is (= (:hashtags res) #{"#task" "#entry" "#test" "#done"
-                                     "#completed" "#blah" "#new"}))
+            (is (= (:hashtags res) (set/union u/private-tags
+                                              #{"#task" "#entry" "#test" "#done"
+                                                "#completed" "#blah" "#new"})))
             (is (= (:mentions res) #{"@myself" "@someone"}))))))))

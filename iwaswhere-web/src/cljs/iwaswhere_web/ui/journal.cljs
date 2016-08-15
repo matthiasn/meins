@@ -1,6 +1,6 @@
 (ns iwaswhere-web.ui.journal
   (:require [matthiasn.systems-toolbox-ui.reagent :as r]
-            [iwaswhere-web.ui.utils :as u]
+            [iwaswhere-web.utils.misc :as u]
             [iwaswhere-web.ui.entry :as e]
             [iwaswhere-web.utils.parse :as ps]
             [clojure.set :as set]))

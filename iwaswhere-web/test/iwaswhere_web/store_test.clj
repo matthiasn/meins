@@ -6,6 +6,7 @@
             [iwaswhere-web.graph.query :as gq]
             [me.raynes.fs :as fs]
             [iwaswhere-web.files :as f]
+            [iwaswhere-web.utils.misc :as u]
             [clojure.set :as set]))
 
 (def some-test-entry
@@ -75,7 +76,8 @@
 
           (testing
             "hashtag was created for entry"
-            (is (= (:tags test-entry) (gq/find-all-hashtags new-state))))
+            (is (= (set/union (:tags test-entry) u/private-tags)
+                   (gq/find-all-hashtags new-state))))
 
           (testing
             "mention was created for entry"
@@ -113,7 +115,8 @@
 
   (testing
     "hashtag was created for entry"
-    (is (= (:tags test-entry) (gq/find-all-hashtags state))))
+    (is (= (set/union (:tags test-entry) u/private-tags)
+           (gq/find-all-hashtags state))))
 
   (testing
     "mention was created for entry"

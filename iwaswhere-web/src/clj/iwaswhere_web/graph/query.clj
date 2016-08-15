@@ -10,7 +10,8 @@
             [clojure.tools.logging :as log]
             [clj-time.format :as timef]
             [clj-time.format :as ctf]
-            [clojure.core.reducers :as r]))
+            [clojure.core.reducers :as r]
+            [iwaswhere-web.utils.misc :as u]))
 
 (defn entries-filter-fn
   "Creates a filter function which ensures that all tags and mentions in the
@@ -160,7 +161,7 @@
   (let [g (:graph current-state)
         ltags (map #(-> % :dest :tag) (uber/find-edges g {:src :hashtags}))
         tags (map #(:val (uber/attrs g {:tag %})) ltags)]
-    (set tags)))
+    (set/union (set tags) u/private-tags)))
 
 (defn find-all-pvt-hashtags
   "Finds all hashtags used in entries by finding the edges that originate from

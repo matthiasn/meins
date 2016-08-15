@@ -1,6 +1,6 @@
 (ns iwaswhere-web.ui.search
   (:require [iwaswhere-web.helpers :as h]
-            [iwaswhere-web.ui.utils :as u]
+            [iwaswhere-web.utils.misc :as u]
             [iwaswhere-web.utils.parse :as p]
             [matthiasn.systems-toolbox-ui.reagent :as r]
             [clojure.string :as s]

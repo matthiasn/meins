@@ -3,7 +3,7 @@
    of a journal entry. This includes both a properly styled element for static
    content and the edit-mode view, with autosuggestions for tags and mentions."
   (:require [iwaswhere-web.helpers :as h]
-            [iwaswhere-web.ui.utils :as u]
+            [iwaswhere-web.utils.misc :as u]
             [iwaswhere-web.utils.parse :as p]
             [reagent.core :as r]
             [clojure.string :as s]))

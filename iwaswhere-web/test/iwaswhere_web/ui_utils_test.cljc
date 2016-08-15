@@ -4,7 +4,7 @@
    namespace."
   (:require #?(:clj  [clojure.test :refer [deftest testing is]]
                :cljs [cljs.test :refer-macros [deftest testing is]])
-            [iwaswhere-web.ui.utils :as u]))
+            [iwaswhere-web.utils.misc :as u]))
 
 (deftest duration-string-test
   (testing "test output for some different durations"

@@ -1,4 +1,4 @@
-(ns iwaswhere-web.ui.utils
+(ns iwaswhere-web.utils.misc
   (:require [clojure.string :as s]
             [clojure.set :as set]))
 
