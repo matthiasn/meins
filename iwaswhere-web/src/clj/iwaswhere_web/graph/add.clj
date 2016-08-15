@@ -5,22 +5,27 @@
             [clj-time.core :as ct]
             [clojure.string :as s]
             [clojure.set :as set]
-            [clojure.tools.logging :as log]))
+            [clojure.tools.logging :as log]
+            [iwaswhere-web.ui.utils :as u]))
 
 (defn add-hashtags
   "Add hashtag edges to graph for a new entry. When a hashtag exists already,
    an edge to the existing node will be added, otherwise a new hashtag node will
    be created."
   [graph entry]
-  (let [tags (:tags entry)]
+  (let [tags (set (:tags entry))
+        pvt-entry? (seq (set/intersection tags u/private-tags))
+        ht-parent (if pvt-entry? :pvt-hashtags :hashtags)
+        tag-type (if pvt-entry? :ptag :tag)]
     (reduce (fn [acc tag]
               (let [ltag (s/lower-case tag)]
                 (-> acc
-                    (uber/add-nodes :hashtags)
-                    (uber/add-nodes-with-attrs [{:tag ltag} {:val tag}])
+                    (uber/add-nodes ht-parent)
+                    (uber/add-nodes-with-attrs [{tag-type ltag} {:val tag}])
                     (uber/add-edges
-                      [{:tag ltag} (:timestamp entry) {:relationship :CONTAINS}]
-                      [:hashtags {:tag ltag} {:relationship :IS}]))))
+                      [{tag-type ltag} (:timestamp entry)
+                       {:relationship :CONTAINS}]
+                      [ht-parent {tag-type ltag} {:relationship :IS}]))))
             graph
             tags)))
 
@@ -109,7 +114,8 @@
           tags))
 
 (defn remove-node
-  "Removes node from graph and sorted set."
+  "Removes node from graph and sorted set if node for specified timestamp
+   exists."
   [current-state ts]
   (let [g (:graph current-state)]
     (if (uber/has-node? g ts)
@@ -119,8 +125,7 @@
             (update-in [:sorted-entries] disj ts)
             (remove-unused-tags (:mentions entry) :mention)
             (remove-unused-tags (:tags entry) :tag)))
-      (do (log/warn "remove-node cannot find node: " ts)
-          current-state))))
+      current-state)))
 
 (defn add-node
   "Adds node to both graph and the sorted set, which maintains the entries
@@ -128,21 +133,10 @@
   [current-state ts entry]
   (let [graph (:graph current-state)
         old-entry (when (uber/has-node? graph ts) (uber/attrs graph ts))
-        tags-not-in-new (set/difference (:tags old-entry) (:tags entry))
-        mentions-not-in-new (set/difference (:mentions old-entry)
-                                            (:mentions entry))
-        remove-tag-edges (fn [g tags k]
-                           (reduce
-                             #(uber/remove-edges %1 [(:timestamp entry) {k %2}])
-                             g
-                             tags))]
+        merged (merge old-entry entry)]
     (-> current-state
-        (update-in [:graph] #(uber/add-nodes-with-attrs % [ts (merge old-entry
-                                                                     entry)]))
-        (update-in [:graph] remove-tag-edges tags-not-in-new :tag)
-        (update-in [:graph] remove-tag-edges mentions-not-in-new :mention)
-        (remove-unused-tags tags-not-in-new :tag)
-        (remove-unused-tags mentions-not-in-new :mention)
+        (remove-node ts)
+        (update-in [:graph] #(uber/add-nodes-with-attrs % [ts merged]))
         (update-in [:graph] add-hashtags entry)
         (update-in [:graph] add-mentions entry)
         (update-in [:graph] add-linked entry)

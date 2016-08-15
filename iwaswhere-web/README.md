@@ -68,7 +68,7 @@ You can also run the platform-independent tests in the browser using `lein doo`,
 Inspecting the store component:
 
     (use 'iwaswhere-web.core)
-    (restart!)
+    (restart! switchboard)
     (def store (:cmp-state (:server/store-cmp (:components @(:cmp-state switchboard)))))
     (def g (:graph @store))
     

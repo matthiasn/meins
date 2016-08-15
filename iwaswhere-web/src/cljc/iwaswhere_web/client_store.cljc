@@ -22,6 +22,7 @@
   [{:keys [current-state msg-payload]}]
   (let [new-state (-> current-state
                       (assoc-in [:cfg :hashtags] (:hashtags msg-payload))
+                      (assoc-in [:cfg :pvt-hashtags] (:pvt-hashtags msg-payload))
                       (assoc-in [:stats] (:stats msg-payload))
                       (assoc-in [:cfg :activities] (:activities msg-payload))
                       (assoc-in [:cfg :mentions] (:mentions msg-payload)))]

@@ -8,7 +8,8 @@
             [iwaswhere-web.helpers :as h]
             [iwaswhere-web.ui.utils :as u]
             [reagent.core :as r]
-            [cljs.pprint :as pp]))
+            [cljs.pprint :as pp]
+            [clojure.set :as set]))
 
 (defn hashtags-mentions-list
   "Horizontally renders list with hashtags and mentions."
@@ -196,7 +197,11 @@
         show-map? (contains? (:show-maps-for cfg) ts)
         toggle-edit #(if edit-mode? () ;(put-fn [:entry/remove-local entry])
                                     (put-fn [:entry/update-local entry]))
+        show-pvt? (:show-pvt cfg)
         hashtags (:hashtags cfg)
+        pvt-hashtags (:pvt-hashtags cfg)
+        hashtags (if show-pvt? (set/union hashtags pvt-hashtags) hashtags)
+;        hashtags (:hashtags cfg)
         mentions (:mentions cfg)]
     [:div.entry
      [:div.header

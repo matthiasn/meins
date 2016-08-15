@@ -15,7 +15,7 @@
 (defn entries-filter-fn
   "Creates a filter function which ensures that all tags and mentions in the
    query are contained in the filtered entry or any of it's comments, and none
-    of the not-tags. Also allows filtering per day."
+   of the not-tags. Also allows filtering per day."
   [q graph]
   (fn [entry]
     (let [local-fmt (timef/with-zone (timef/formatters :year-month-day)
@@ -81,8 +81,9 @@
                              (uber/find-edges g {:src          {tag-type tag}
                                                  :relationship :CONTAINS})))))
         t-matched (map (mapper :tag) (map s/lower-case (:tags query)))
+        pt-matched (map (mapper :ptag) (map s/lower-case (:tags query)))
         m-matched (map (mapper :mention) (map s/lower-case (:mentions query)))]
-    (apply set/union (concat t-matched m-matched))))
+    (apply set/union (concat t-matched pt-matched m-matched))))
 
 (defn get-nodes-for-day
   "Extract matching timestamps for query."
@@ -159,6 +160,15 @@
   (let [g (:graph current-state)
         ltags (map #(-> % :dest :tag) (uber/find-edges g {:src :hashtags}))
         tags (map #(:val (uber/attrs g {:tag %})) ltags)]
+    (set tags)))
+
+(defn find-all-pvt-hashtags
+  "Finds all hashtags used in entries by finding the edges that originate from
+   the :hashtags node."
+  [current-state]
+  (let [g (:graph current-state)
+        ltags (map #(-> % :dest :ptag) (uber/find-edges g {:src :pvt-hashtags}))
+        tags (map #(:val (uber/attrs g {:ptag %})) ltags)]
     (set tags)))
 
 (defn find-all-mentions

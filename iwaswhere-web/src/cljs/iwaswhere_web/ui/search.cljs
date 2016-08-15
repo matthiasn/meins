@@ -3,14 +3,18 @@
             [iwaswhere-web.ui.utils :as u]
             [iwaswhere-web.utils.parse :as p]
             [matthiasn.systems-toolbox-ui.reagent :as r]
-            [clojure.string :as s]))
+            [clojure.string :as s]
+            [clojure.set :as set]))
 
 (defn search-view
   "Renders search component."
   [{:keys [observed local put-fn]}]
   (let [local-snapshot @local
         store-snapshot @observed
+        show-pvt? (:show-pvt (:cfg store-snapshot))
         hashtags (:hashtags (:cfg store-snapshot))
+        pvt-hashtags (:pvt-hashtags (:cfg store-snapshot))
+        hashtags (if show-pvt? (set/union hashtags pvt-hashtags) hashtags)
         mentions (:mentions (:cfg store-snapshot))
         on-input-fn #(put-fn [:search/update (p/parse-search (.. % -target -innerText))])
 
