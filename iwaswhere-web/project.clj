@@ -4,10 +4,10 @@
   :license {:name "GNU GENERAL PUBLIC LICENSE"
             :url  "http://www.gnu.org/licenses/gpl-3.0.en.html"}
   :dependencies [[org.clojure/clojure "1.9.0-alpha10"]
-                 [org.clojure/clojurescript "1.9.93"]
+                 [org.clojure/clojurescript "1.9.198"]
                  [org.clojure/tools.logging "0.3.1"]
                  [org.clojure/tools.namespace "0.2.11"]
-                 [com.taoensso/encore "2.74.0"]
+                 [com.taoensso/encore "2.75.0"]
                  [ch.qos.logback/logback-classic "1.1.7"]
                  [hiccup "1.0.5"]
                  [clj-pid "0.1.2"]
@@ -18,7 +18,7 @@
                  [cljsjs/moment "2.10.6-4"]
                  [cljsjs/leaflet "0.7.7-4"]
                  [com.drewnoakes/metadata-extractor "2.9.1"]
-                 [ubergraph "0.2.2"]
+                 [ubergraph "0.2.3"]
                  [camel-snake-kebab "0.4.0"]
                  [matthiasn/systems-toolbox "0.6.1-alpha4"]
                  [matthiasn/systems-toolbox-ui "0.6.1-alpha6"]
@@ -29,7 +29,7 @@
                  [clj.qrgen "0.4.0"]
                  [image-resizer "0.1.9"]
                  [org.webjars.bower/fontawesome "4.6.3"]
-                 [org.webjars.bower/normalize-css "3.0.3"]
+                 [org.webjars.bower/normalize-css "4.1.1"]
                  [org.webjars.bower/leaflet "0.7.7"]
                  [org.webjars.npm/github-com-mrkelly-lato "0.3.0"]
                  [alandipert/storage-atom "2.0.1"]]
@@ -50,7 +50,7 @@
             [com.jakemccrary/lein-test-refresh "0.16.0"]
             [test2junit "1.2.2"]
             [lein-doo "0.1.7"]
-            [lein-codox "0.9.5" :exclusions [org.clojure/clojure]]]
+            [lein-codox "0.9.6" :exclusions [org.clojure/clojure]]]
 
   :sass {:src "src/scss/"
          :dst "resources/public/css/"}

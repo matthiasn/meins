@@ -27,11 +27,8 @@
 (s/def :iww.entry/timestamp possible-timestamp?)
 (s/def :iww.entry/md string?)
 
-#?(:clj  (s/def :iww.entry/tags (s/coll-of (is-tag? "#")))
-   :cljs (s/def :iww.entry/tags (s/coll-of (is-tag? "#") #{})))
-
-#?(:clj  (s/def :iww.entry/mentions (s/coll-of (is-tag? "@")))
-   :cljs (s/def :iww.entry/mentions (s/coll-of (is-tag? "@") #{})))
+(s/def :iww.entry/tags (s/coll-of (is-tag? "#")))
+(s/def :iww.entry/mentions (s/coll-of (is-tag? "@")))
 
 (s/def :iww.entry/timezone (s/nilable string?))
 (s/def :iww.entry/utc-offset (number-in-range? -720 720))

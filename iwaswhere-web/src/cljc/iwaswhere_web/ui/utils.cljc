@@ -27,11 +27,12 @@
     (when (and dur (< dur 99999999))
       (str ", " (duration-string dur)))))
 
+(def private-tags #{"#pvt" "#private" "#nsfw" "#consumption"})
+
 (defn pvt-filter
   "Filter for entries that I consider private."
   [entry]
   (let [tags (set (map s/lower-case (:tags entry)))
-        private-tags #{"#pvt" "#private" "#nsfw"}
         matched (set/intersection tags private-tags)]
     (empty? matched)))
 
