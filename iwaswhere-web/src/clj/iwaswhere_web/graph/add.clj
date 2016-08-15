@@ -78,6 +78,21 @@
             [activity-node (:timestamp entry) {:relationship :CONTAINS}])))
     graph))
 
+(defn add-consumption
+  "When entry contains consumption, adds node for consumption type if not
+   existing.
+   Then connects entry to consumption type node. Does nothing when entry
+   contains no consumption."
+  [graph entry]
+  (if-let [consumption (:consumption entry)]
+    (let [consumption-node {:type :consumption-types :name (:name consumption)}]
+      (-> graph
+          (uber/add-nodes :consumption-types consumption-node)
+          (uber/add-edges
+            [:consumption-types consumption-node]
+            [consumption-node (:timestamp entry) {:relationship :CONTAINS}])))
+    graph))
+
 (defn add-parent-ref
   "Adds an edge to parent node when :comment-for key on the entry exists."
   [graph entry]
@@ -142,5 +157,6 @@
         (update-in [:graph] add-linked entry)
         (update-in [:graph] add-timeline-tree entry)
         (update-in [:graph] add-activity entry)
+        (update-in [:graph] add-consumption entry)
         (update-in [:graph] add-parent-ref entry)
         (update-in [:sorted-entries] conj ts))))

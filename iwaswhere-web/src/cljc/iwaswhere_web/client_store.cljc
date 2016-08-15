@@ -25,6 +25,8 @@
                       (assoc-in [:cfg :pvt-hashtags] (:pvt-hashtags msg-payload))
                       (assoc-in [:stats] (:stats msg-payload))
                       (assoc-in [:cfg :activities] (:activities msg-payload))
+                      (assoc-in [:cfg :consumption-types]
+                                (:consumption-types msg-payload))
                       (assoc-in [:cfg :mentions] (:mentions msg-payload)))]
     {:new-state new-state}))
 

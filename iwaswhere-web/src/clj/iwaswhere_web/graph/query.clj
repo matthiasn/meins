@@ -190,6 +190,14 @@
     (set (map #(-> % :dest :name)
               (uber/find-edges g {:src :activities})))))
 
+(defn find-all-consumption-types
+  "Finds all consumption types used in entries by finding the edges that
+   originate from the :consumption-types node."
+  [current-state]
+  (let [g (:graph current-state)]
+    (set (map #(-> % :dest :name)
+              (uber/find-edges g {:src :consumption-types})))))
+
 (defn get-filtered-results
   "Retrieve items to show in UI, also deliver all hashtags for autocomplete and
    some basic stats."

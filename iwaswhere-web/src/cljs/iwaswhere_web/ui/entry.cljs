@@ -111,13 +111,23 @@
                                              {:name ""
                                               :duration-m 0
                                               :exertion-level 5})])
+            add-consumption
+            (fn [_ev]
+              (put-fn [:entry/update-local
+                       (-> entry
+                           (assoc-in [:consumption]
+                                     {:name     ""
+                                      :quantity 0})
+                           (update-in [:tags] conj "#consumption")
+                           (update-in [:md] #(str % "some #consumption")))]))
             trash-entry #(if edit-mode?
                           (put-fn [:entry/remove-local {:timestamp ts}])
                           (put-fn [:entry/trash {:timestamp ts}]))
             upvotes (:upvotes entry)
             upvote-fn (fn [op]
                         #(put-fn [:entry/update
-                                  (update-in entry [:upvotes] op)]))]
+                                  (update-in entry [:upvotes] op)]))
+            show-pvt? (:show-pvt cfg)]
         [:div {:on-mouse-enter #(reset! visible true)
                :on-mouse-leave hide-fn
                :style          {:opacity (if (or edit-mode? @visible) 1 0)}}
@@ -133,6 +143,8 @@
            [:span.fa.fa-clock-o.toggle {:on-click new-pomodoro}])
          (when-not (:activity entry)
            [:span.fa.fa-bicycle.toggle {:on-click add-activity}])
+         (when (and show-pvt? (not (:consumption entry)))
+           [:span.fa.fa-coffee.toggle {:on-click add-consumption}])
          (when-not (:comment-for entry)
            [:span.fa.fa-comment-o.toggle {:on-click create-comment}])
          (when (seq (:comments entry))
@@ -185,6 +197,22 @@
          [:strong (:name activity)] " for " [:strong (:duration-m activity)]
          " min, level " [:strong (:exertion-level activity)] "/10."]))))
 
+(defn consumption-div
+  "In edit mode, allow editing of consumption, otherwise show a summary."
+  [entry cfg put-fn edit-mode?]
+  (let [consumption-types (:consumption-types cfg)
+        quantities (range 0 10)]
+    (when-let [consumption (:consumption entry)]
+      (if edit-mode?
+        [:div
+         [:label "Consumption:"]
+         [select-elem entry consumption-types [:consumption :name] false put-fn]
+         [:label "Quantity:"]
+         [select-elem entry quantities [:consumption :quantity] true put-fn]]
+        [:div "Consumption: "
+         [:strong (:name consumption)] ", quantity "
+         [:strong (:quantity consumption)]]))))
+
 (defn journal-entry
   "Renders individual journal entry. Interaction with application state happens
    via messages that are sent to the store component, for example for toggling
@@ -201,7 +229,6 @@
         hashtags (:hashtags cfg)
         pvt-hashtags (:pvt-hashtags cfg)
         hashtags (if show-pvt? (set/union hashtags pvt-hashtags) hashtags)
-;        hashtags (:hashtags cfg)
         mentions (:mentions cfg)]
     [:div.entry
      [:div.header
@@ -228,6 +255,8 @@
        [e/editable-md-render entry hashtags mentions put-fn toggle-edit]
        [md/markdown-render entry cfg])
      [activity-div entry cfg put-fn edit-mode?]
+     (when show-pvt?
+       [consumption-div entry cfg put-fn edit-mode?])
      [m/audioplayer-view entry]
      [m/image-view entry]
      [m/videoplayer-view entry]
