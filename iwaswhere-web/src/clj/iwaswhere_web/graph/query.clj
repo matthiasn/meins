@@ -8,7 +8,6 @@
             [clojure.string :as s]
             [clojure.set :as set]
             [clojure.tools.logging :as log]
-            [clj-time.format :as timef]
             [clj-time.format :as ctf]
             [clojure.core.reducers :as r]
             [iwaswhere-web.utils.misc :as u]))
@@ -19,9 +18,9 @@
    of the not-tags. Also allows filtering per day."
   [q graph]
   (fn [entry]
-    (let [local-fmt (timef/with-zone (timef/formatters :year-month-day)
+    (let [local-fmt (ctf/with-zone (ctf/formatters :year-month-day)
                                      (ct/default-time-zone))
-          entry-day (timef/unparse local-fmt (ctc/from-long (:timestamp entry)))
+          entry-day (ctf/unparse local-fmt (ctc/from-long (:timestamp entry)))
           q-day (:date-string q)
           day-match? (= q-day entry-day)
 

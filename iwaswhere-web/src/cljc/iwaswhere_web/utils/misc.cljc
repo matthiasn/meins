@@ -53,3 +53,11 @@
         ^{:key (str key-prefix tag)}
         [:div {:on-click #(tag-replace-fn current-tag tag)}
          [:span {:class css-class} tag]])]]))
+
+(defn double-ts-to-long [ts] (long (* ts 1000)))
+
+(defn visit-timestamps
+  "Parse arrival and departure timestamp as milliseconds since epoch."
+  [entry]
+  {:arrival-ts   (double-ts-to-long (:arrival-timestamp entry))
+   :departure-ts (double-ts-to-long (:departure-timestamp entry))})

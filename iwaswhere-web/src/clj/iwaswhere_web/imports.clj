@@ -11,7 +11,8 @@
             [clj-time.format :as tf]
             [clojure.tools.logging :as log]
             [clojure.java.io :as io]
-            [clojure.string :as s])
+            [clojure.string :as s]
+            [iwaswhere-web.utils.misc :as u])
   (:import [com.drew.imaging ImageMetadataReader]))
 
 (defn dms-to-dd
@@ -156,16 +157,13 @@
     {:send-to-self [[:state/publish-current {}]
                     [:state/stats-tags-make]]}))
 
-(defn double-ts-to-long [ts] (long (* ts 1000)))
-
 (defn import-visits-fn
   [rdr put-fn msg-meta filename]
   (try
     (let [lines (line-seq rdr)]
       (doseq [line lines]
         (let [raw-visit (cc/parse-string line #(keyword (s/replace % "_" "-")))
-              arrival-ts (double-ts-to-long (:arrival-timestamp raw-visit))
-              departure-ts (double-ts-to-long (:departure-timestamp raw-visit))
+              {:keys [arrival-ts departure-ts]} (u/visit-timestamps raw-visit)
               dur (-> (- departure-ts arrival-ts)
                       (/ 6000)
                       (Math/floor)
@@ -245,7 +243,7 @@
                        (m/add-tags-mentions)
                        (update-in [:tags] conj "#import")
                        (update-audio-tag)
-                       (update-in [:timestamp] double-ts-to-long))]
+                       (update-in [:timestamp] u/double-ts-to-long))]
                (put-fn (with-meta [:entry/import entry] msg-meta))))))
        (catch Exception ex (log/error (str "Error while importing "
                                            filename) ex))))

@@ -3,10 +3,15 @@
   (:require [ubergraph.core :as uber]
             [clj-time.coerce :as ctc]
             [clj-time.core :as ct]
+            [clj-time.format :as ctf]
             [clojure.string :as s]
             [clojure.set :as set]
             [clojure.tools.logging :as log]
-            [iwaswhere-web.ui.utils :as u]))
+            [iwaswhere-web.utils.misc :as u]
+            [iwaswhere-web.graph.query :as gq]
+            [iwaswhere-web.specs :as specs]
+            [clj-time.coerce :as c]
+            [clj-time.core :as t]))
 
 (defn add-hashtags
   "Add hashtag edges to graph for a new entry. When a hashtag exists already,
@@ -115,6 +120,27 @@
             graph
             linked-entries)))
 
+(defn add-linked-visit
+  "Adds linked entry when the entry has been captured during a visit."
+  [g entry]
+  (let [ts (:timestamp entry)
+        ts-dt (c/from-long ts)
+        q {:date-string (ctf/unparse (ctf/formatters :year-month-day) ts-dt)}
+        same-day-entry-ids (gq/get-nodes-for-day g q)
+        same-day-entries (filterv :departure-date
+                                  (mapv #(uber/attrs g %) same-day-entry-ids))
+        filter-fn (fn [other-entry]
+                    (let [{:keys [arrival-ts departure-ts]}
+                          (u/visit-timestamps other-entry)]
+                      (and (< ts departure-ts) (> ts arrival-ts)
+                           (specs/possible-timestamp? departure-ts))))
+        matching-visit (first (filterv filter-fn same-day-entries))]
+    (if matching-visit
+      (let [linked-ts (:timestamp matching-visit)]
+        (uber/add-edges g [(:timestamp entry) linked-ts
+                           {:relationship :LINKED}]))
+      g)))
+
 (defn remove-unused-tags
   "Checks for orphan tags and removes them. Orphan tags would occur when
    deleting the last entry that contains a specific tag. Takes the state, a list
@@ -158,5 +184,6 @@
         (update-in [:graph] add-timeline-tree entry)
         (update-in [:graph] add-activity entry)
         (update-in [:graph] add-consumption entry)
+        (update-in [:graph] add-linked-visit entry)
         (update-in [:graph] add-parent-ref entry)
         (update-in [:sorted-entries] conj ts))))
