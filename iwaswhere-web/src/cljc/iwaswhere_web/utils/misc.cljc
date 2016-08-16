@@ -1,6 +1,7 @@
 (ns iwaswhere-web.utils.misc
   (:require [clojure.string :as s]
-            [clojure.set :as set]))
+            [clojure.set :as set]
+            [iwaswhere-web.specs :as specs]))
 
 (defn duration-string
   "Format duration string from seconds."
@@ -54,10 +55,15 @@
         [:div {:on-click #(tag-replace-fn current-tag tag)}
          [:span {:class css-class} tag]])]]))
 
-(defn double-ts-to-long [ts] (long (* ts 1000)))
+(defn double-ts-to-long
+  [ts]
+  (when (and ts (number? ts))
+    (long (* ts 1000))))
 
 (defn visit-timestamps
   "Parse arrival and departure timestamp as milliseconds since epoch."
   [entry]
-  {:arrival-ts   (double-ts-to-long (:arrival-timestamp entry))
-   :departure-ts (double-ts-to-long (:departure-timestamp entry))})
+  (let [departure-ts (let [ms (double-ts-to-long (:departure-timestamp entry))]
+                       (when (specs/possible-timestamp? ms) ms))]
+    {:arrival-ts  (double-ts-to-long (:arrival-timestamp entry))
+     :departure-ts departure-ts}))

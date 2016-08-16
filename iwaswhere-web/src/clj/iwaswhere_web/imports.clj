@@ -164,15 +164,16 @@
       (doseq [line lines]
         (let [raw-visit (cc/parse-string line #(keyword (s/replace % "_" "-")))
               {:keys [arrival-ts departure-ts]} (u/visit-timestamps raw-visit)
-              dur (-> (- departure-ts arrival-ts)
-                      (/ 6000)
-                      (Math/floor)
-                      (/ 10))
+              dur (when departure-ts
+                    (-> (- departure-ts arrival-ts)
+                        (/ 6000)
+                        (Math/floor)
+                        (/ 10)))
               visit (merge raw-visit
                            {:timestamp arrival-ts
-                            :md        (if (> dur 9999)
-                                         "No departure recorded #visit"
-                                         (str "Duration: " dur "m #visit"))
+                            :md        (if dur
+                                         (str "Duration: " dur "m #visit")
+                                         "No departure recorded #visit")
                             :tags      #{"#visit" "#import"}})]
           (if-not (neg? (:timestamp visit))
             (put-fn (with-meta [:entry/import visit] msg-meta))

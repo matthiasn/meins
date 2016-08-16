@@ -123,22 +123,22 @@
 (defn add-linked-visit
   "Adds linked entry when the entry has been captured during a visit."
   [g entry]
-  (let [ts (:timestamp entry)
-        ts-dt (c/from-long ts)
-        q {:date-string (ctf/unparse (ctf/formatters :year-month-day) ts-dt)}
-        same-day-entry-ids (gq/get-nodes-for-day g q)
-        same-day-entries (filterv :departure-date
-                                  (mapv #(uc/attrs g %) same-day-entry-ids))
-        filter-fn (fn [other-entry]
-                    (let [{:keys [arrival-ts departure-ts]}
-                          (u/visit-timestamps other-entry)]
-                      (and (< ts departure-ts) (> ts arrival-ts)
-                           (specs/possible-timestamp? departure-ts))))
-        matching-visit (first (filterv filter-fn same-day-entries))]
-    (if matching-visit
-      (let [linked-ts (:timestamp matching-visit)]
-        (uc/add-edges g [(:timestamp entry) linked-ts
-                         {:relationship :LINKED}]))
+  (let [{:keys [arrival-ts departure-ts]} (u/visit-timestamps entry)]
+    (if departure-ts
+      (let [ts (:timestamp entry)
+            ts-dt (c/from-long ts)
+            q {:date-string (ctf/unparse (ctf/formatters :year-month-day) ts-dt)}
+            same-day-entry-ids (gq/get-nodes-for-day g q)
+            same-day-entries (mapv #(uc/attrs g %) same-day-entry-ids)
+            filter-fn (fn [other-entry]
+                        (let [other-ts (:timestamp other-entry)]
+                          (and (< other-ts departure-ts)
+                               (> other-ts arrival-ts))))
+            matching-entries (filterv filter-fn same-day-entries)
+            matching-entry-ids (mapv :timestamp matching-entries)
+            reducing-fn (fn [g match]
+                          (uc/add-edges g [ts match {:relationship :LINKED}]))]
+        (reduce reducing-fn g matching-entry-ids))
       g)))
 
 (defn remove-unused-tags
