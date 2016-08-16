@@ -1,6 +1,6 @@
 (ns iwaswhere-web.graph.add
   "Functions for adding new entries."
-  (:require [ubergraph.core :as uber]
+  (:require [ubergraph.core :as uc]
             [clj-time.coerce :as ctc]
             [clj-time.core :as ct]
             [clj-time.format :as ctf]
@@ -25,9 +25,9 @@
     (reduce (fn [acc tag]
               (let [ltag (s/lower-case tag)]
                 (-> acc
-                    (uber/add-nodes ht-parent)
-                    (uber/add-nodes-with-attrs [{tag-type ltag} {:val tag}])
-                    (uber/add-edges
+                    (uc/add-nodes ht-parent)
+                    (uc/add-nodes-with-attrs [{tag-type ltag} {:val tag}])
+                    (uc/add-edges
                       [{tag-type ltag} (:timestamp entry)
                        {:relationship :CONTAINS}]
                       [ht-parent {tag-type ltag} {:relationship :IS}]))))
@@ -44,9 +44,9 @@
       (fn [acc mention]
         (let [lmention (s/lower-case mention)]
           (-> acc
-              (uber/add-nodes :mentions)
-              (uber/add-nodes-with-attrs [{:mention lmention} {:val mention}])
-              (uber/add-edges
+              (uc/add-nodes :mentions)
+              (uc/add-nodes-with-attrs [{:mention lmention} {:val mention}])
+              (uc/add-edges
                 [{:mention lmention} (:timestamp entry) {:relationship :CONTAINS}]
                 [:mentions {:mention lmention} {:relationship :IS}]))))
       graph
@@ -64,10 +64,10 @@
         month-node {:type :timeline/month :year year :month month}
         day-node {:type :timeline/day :year year :month month :day (ct/day dt)}]
     (-> graph
-        (uber/add-nodes year-node month-node day-node)
-        (uber/add-edges [year-node month-node]
-                        [month-node day-node]
-                        [day-node (:timestamp entry) {:relationship :DATE}]))))
+        (uc/add-nodes year-node month-node day-node)
+        (uc/add-edges [year-node month-node]
+                      [month-node day-node]
+                      [day-node (:timestamp entry) {:relationship :DATE}]))))
 
 (defn add-activity
   "When entry contains activity, adds node for activity if not existing.
@@ -77,8 +77,8 @@
   (if-let [activity (:activity entry)]
     (let [activity-node {:type :activity :name (:name activity)}]
       (-> graph
-          (uber/add-nodes :activities activity-node)
-          (uber/add-edges
+          (uc/add-nodes :activities activity-node)
+          (uc/add-edges
             [:activities activity-node]
             [activity-node (:timestamp entry) {:relationship :CONTAINS}])))
     graph))
@@ -92,8 +92,8 @@
   (if-let [consumption (:consumption entry)]
     (let [consumption-node {:type :consumption-types :name (:name consumption)}]
       (-> graph
-          (uber/add-nodes :consumption-types consumption-node)
-          (uber/add-edges
+          (uc/add-nodes :consumption-types consumption-node)
+          (uc/add-edges
             [:consumption-types consumption-node]
             [consumption-node (:timestamp entry) {:relationship :CONTAINS}])))
     graph))
@@ -102,7 +102,7 @@
   "Adds an edge to parent node when :comment-for key on the entry exists."
   [graph entry]
   (if-let [comment-for (:comment-for entry)]
-    (uber/add-edges graph [(:timestamp entry) comment-for {:relationship :COMMENT}])
+    (uc/add-edges graph [(:timestamp entry) comment-for {:relationship :COMMENT}])
     graph))
 
 (defn add-linked
@@ -112,9 +112,9 @@
   [graph entry]
   (let [linked-entries (:linked-entries entry)]
     (reduce (fn [acc linked-entry]
-              (if (uber/has-node? graph linked-entry)
-                (uber/add-edges acc
-                  [(:timestamp entry) linked-entry {:relationship :LINKED}])
+              (if (uc/has-node? graph linked-entry)
+                (uc/add-edges acc [(:timestamp entry) linked-entry
+                                   {:relationship :LINKED}])
                 (do (log/warn "Linked node does not exist, skipping" linked-entry)
                     acc)))
             graph
@@ -128,7 +128,7 @@
         q {:date-string (ctf/unparse (ctf/formatters :year-month-day) ts-dt)}
         same-day-entry-ids (gq/get-nodes-for-day g q)
         same-day-entries (filterv :departure-date
-                                  (mapv #(uber/attrs g %) same-day-entry-ids))
+                                  (mapv #(uc/attrs g %) same-day-entry-ids))
         filter-fn (fn [other-entry]
                     (let [{:keys [arrival-ts departure-ts]}
                           (u/visit-timestamps other-entry)]
@@ -137,36 +137,37 @@
         matching-visit (first (filterv filter-fn same-day-entries))]
     (if matching-visit
       (let [linked-ts (:timestamp matching-visit)]
-        (uber/add-edges g [(:timestamp entry) linked-ts
-                           {:relationship :LINKED}]))
+        (uc/add-edges g [(:timestamp entry) linked-ts
+                         {:relationship :LINKED}]))
       g)))
 
 (defn remove-unused-tags
   "Checks for orphan tags and removes them. Orphan tags would occur when
-   deleting the last entry that contains a specific tag. Takes the state, a list
+   deleting the last entry that contains a specific tag. Takes the state, a set
    of tags, and the tag type, such as :tags or :mentions."
-  [state tags k]
-  (reduce (fn [state t]
-            (if (empty? (uber/find-edges
-                          (:graph state) {:src {k t} :relationship :CONTAINS}))
-              (update-in state [:graph] #(uber/remove-nodes % {k t}))
-              state))
-          state
-          tags))
+  [graph tags k]
+  (reduce
+    (fn [g tag]
+      (let [ltag (s/lower-case tag)]
+        (if (empty? (uc/find-edges g {:src {k ltag} :relationship :CONTAINS}))
+          (uc/remove-nodes g {k ltag})
+          g)))
+    graph
+    tags))
 
 (defn remove-node
   "Removes node from graph and sorted set if node for specified timestamp
    exists."
   [current-state ts]
   (let [g (:graph current-state)]
-    (if (uber/has-node? g ts)
-      (let [entry (uber/attrs g ts)]
+    (if (uc/has-node? g ts)
+      (let [entry (uc/attrs g ts)]
         (-> current-state
-            (update-in [:graph] #(uber/remove-nodes % ts))
+            (update-in [:graph] uc/remove-nodes ts)
             (update-in [:sorted-entries] disj ts)
-            (remove-unused-tags (:mentions entry) :mention)
-            (remove-unused-tags (:tags entry) :tag)))
-
+            (update-in [:graph] remove-unused-tags (:mentions entry) :mention)
+            (update-in [:graph] remove-unused-tags (:tags entry) :tag)
+            (update-in [:graph] remove-unused-tags (:tags entry) :ptag)))
       (do (log/warn "remove-node cannot find node: " ts)
           current-state))))
 
@@ -175,23 +176,21 @@
    sorted by timestamp."
   [current-state ts entry]
   (let [graph (:graph current-state)
-        old-entry (when (uber/has-node? graph ts) (uber/attrs graph ts))
+        old-entry (when (uc/has-node? graph ts) (uc/attrs graph ts))
         merged (merge old-entry entry)
-        tags-not-in-new (set/difference (:tags old-entry) (:tags entry))
-        mentions-not-in-new (set/difference (:mentions old-entry)
-                                            (:mentions entry))
+        old-tags (:tags old-entry)
+        old-mentions (:mentions old-entry)
         remove-tag-edges (fn [g tags k]
-                           (reduce
-                             #(uber/remove-edges %1 [(:timestamp entry) {k %2}])
-                             g
-                             tags))]
+                           (let [reducing-fn
+                                 (fn [g ltag] (uc/remove-edges g [ts {k ltag}]))]
+                             (reduce reducing-fn g (map s/lower-case tags))))]
     (-> current-state
-        ;(remove-node ts)
-        (update-in [:graph] remove-tag-edges tags-not-in-new :tag)
-        (update-in [:graph] remove-tag-edges mentions-not-in-new :mention)
-        (remove-unused-tags tags-not-in-new :tag)
-        (remove-unused-tags mentions-not-in-new :mention)
-        (update-in [:graph] #(uber/add-nodes-with-attrs % [ts merged]))
+        (update-in [:graph] remove-tag-edges old-tags :tag)
+        (update-in [:graph] remove-tag-edges old-tags :ptag)
+        (update-in [:graph] remove-tag-edges old-mentions :mention)
+        (update-in [:graph] remove-unused-tags old-tags :tag)
+        (update-in [:graph] remove-unused-tags old-mentions :mention)
+        (update-in [:graph] uc/add-nodes-with-attrs [ts merged])
         (update-in [:graph] add-hashtags entry)
         (update-in [:graph] add-mentions entry)
         (update-in [:graph] add-linked entry)

@@ -70,5 +70,6 @@
     (log/info "Entry" entry-ts "marked as deleted.")
     (append-daily-log (merge msg-payload {:deleted true}))
     {:new-state    new-state
-     :send-to-self [:state/publish-current {}]
-     :emit-msg [:ft/remove {:timestamp entry-ts}]}))
+     :send-to-self [[:state/publish-current {}]
+                    [:state/stats-tags-make]]
+     :emit-msg     [:ft/remove {:timestamp entry-ts}]}))
