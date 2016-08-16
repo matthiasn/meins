@@ -1,6 +1,5 @@
-sudo: required
-dist: trusty
 before_install: cd iwaswhere-web
 language: clojure
+script: lein doo phantom cljs-test once
 jdk:
   - oraclejdk8
