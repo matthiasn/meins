@@ -166,7 +166,9 @@
             (update-in [:sorted-entries] disj ts)
             (remove-unused-tags (:mentions entry) :mention)
             (remove-unused-tags (:tags entry) :tag)))
-      current-state)))
+
+      (do (log/warn "remove-node cannot find node: " ts)
+          current-state))))
 
 (defn add-node
   "Adds node to both graph and the sorted set, which maintains the entries
@@ -174,9 +176,21 @@
   [current-state ts entry]
   (let [graph (:graph current-state)
         old-entry (when (uber/has-node? graph ts) (uber/attrs graph ts))
-        merged (merge old-entry entry)]
+        merged (merge old-entry entry)
+        tags-not-in-new (set/difference (:tags old-entry) (:tags entry))
+        mentions-not-in-new (set/difference (:mentions old-entry)
+                                            (:mentions entry))
+        remove-tag-edges (fn [g tags k]
+                           (reduce
+                             #(uber/remove-edges %1 [(:timestamp entry) {k %2}])
+                             g
+                             tags))]
     (-> current-state
-        (remove-node ts)
+        ;(remove-node ts)
+        (update-in [:graph] remove-tag-edges tags-not-in-new :tag)
+        (update-in [:graph] remove-tag-edges mentions-not-in-new :mention)
+        (remove-unused-tags tags-not-in-new :tag)
+        (remove-unused-tags mentions-not-in-new :mention)
         (update-in [:graph] #(uber/add-nodes-with-attrs % [ts merged]))
         (update-in [:graph] add-hashtags entry)
         (update-in [:graph] add-mentions entry)
