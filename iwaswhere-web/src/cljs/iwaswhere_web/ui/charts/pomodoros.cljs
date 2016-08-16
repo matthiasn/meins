@@ -35,9 +35,7 @@
            [cc/path "M 0 150 l 600 0 z"]
            [cc/path "M 0 200 l 600 0 z"]]]
          (when (:mouse-over @local)
-           [:div.mouse-over-info
-            {:style {:top  (- (:y (:mouse-pos @local)) 20)
-                     :left (+ (:x (:mouse-pos @local)) 20)}}
+           [:div.mouse-over-info (cc/info-div-pos @local)
             [:span (:date-string (:mouse-over @local))] [:br]
             [:span "Total: " (:total (:mouse-over @local))] [:br]
             [:span "Completed: " (:completed (:mouse-over @local))] [:br]

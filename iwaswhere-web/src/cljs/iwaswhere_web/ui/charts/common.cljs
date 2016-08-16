@@ -54,3 +54,17 @@
       (swap! local (fn [state] (-> state
                                    (dissoc :mouse-over)
                                    (dissoc :mouse-pos)))))))
+
+(defn info-div-pos
+  "Determines position for info div in chart, depending on position on page.
+   Avoids going so low or far to the right on the page that the div would be
+   cut off."
+  [snapshot]
+  (let [mouse-pos (:mouse-pos snapshot)
+        mouse-x (:x mouse-pos)
+        page-w (.-scrollWidth (.-body js/document))
+        page-h (.-scrollHeight (.-body js/document))]
+    {:style {:top  (min (:y mouse-pos) (- page-h 80))
+             :left (if (< (- page-w mouse-x) 120)
+                     (- mouse-x 100)
+                     (+ mouse-x 20))}}))

@@ -44,9 +44,7 @@
                         :height h-done
                         :class  (cc/weekend-class "done" v)}]]))]]
          (when (:mouse-over @local)
-           [:div.mouse-over-info
-            {:style {:top  (- (:y (:mouse-pos @local)) 20)
-                     :left (+ (:x (:mouse-pos @local)) 20)}}
+           [:div.mouse-over-info (cc/info-div-pos @local)
             [:span (:date-string (:mouse-over @local))] [:br]
             [:span "Done: " (:done-cnt (:mouse-over @local))] [:br]
             [:span "Created: " (:tasks-cnt (:mouse-over @local))]

@@ -72,9 +72,7 @@
           [weight-line indexed local 50 150 "lbm" :lbm 42 20]
           [weight-line indexed local 50 150 "weight" :value 20 20]]
          (when (:mouse-over @local)
-           [:div.mouse-over-info
-            {:style {:top  (- (:y (:mouse-pos @local)) 20)
-                     :left (+ (:x (:mouse-pos @local)) 20)}}
+           [:div.mouse-over-info (cc/info-div-pos @local)
             [:span (:date-string (:mouse-over @local))] [:br]
             [:span "Total min: " (:total-exercise (:mouse-over @local))] [:br]
             [:span "Weight: " (:value (:weight (:mouse-over @local)))] [:br]
