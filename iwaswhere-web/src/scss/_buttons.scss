@@ -1,3 +1,5 @@
+@import "variables.scss";
+
 .btn {
   padding: 1px 5px;
   color: white;
@@ -37,12 +39,12 @@ button {
   white-space: nowrap;
 }
 
-.button-primary {
-  background-color: #0078e7;
+.menu-new {
+  background-color: $menu-new-btn;
 }
 
 .show-more-btn {
-  background-color: #1f8dd6;
+  background-color: $show-more;
   color: whitesmoke;
   font-size: 0.8em;
   padding: 1px 5px;
@@ -54,7 +56,7 @@ button {
   color: white;
   font-size: 0.8em;
   cursor: pointer;
-  background-color: rgb(202, 60, 60);
+  background-color: $delete-warning;
 }
 
 .show-more {
@@ -64,7 +66,7 @@ button {
 a, a:visited {
   text-decoration: none;
   font-weight: 400;
-  color: #006c91;
+  color: $link-color;
   outline: none!important;
 }
 
@@ -87,7 +89,7 @@ a, a:visited {
 }
 
 a .toggle {
-  color: #576364;
+  color: $toggle-btn;
 }
 
 .upvotes {

@@ -1,16 +1,11 @@
-$font-color: #576364;
-$body-background-color: #EEE;
-$green: #4CAF50;
-$red: rgb(202, 60, 60);
-$hashtag-blue: rgb(66, 184, 221);
-$entry-border-radius: 0.3em;
+@import "variables.scss";
 
 body {
   color: $font-color;
   background-color: $body-background-color;
   font-size: 12px;
   font-weight: 300;
-  font-family: "Lato", sans-serif;
+  font-family: $font-family;
   overflow: hidden;
 }
 

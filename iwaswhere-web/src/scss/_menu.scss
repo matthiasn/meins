@@ -1,3 +1,5 @@
+@import "variables.scss";
+
 #header {
   width: 100%;
   flex: 0 0 auto;
@@ -10,7 +12,7 @@
   align-items: center;
   justify-content: space-between;
 
-  background-color: #2d3e50;
+  background-color: $menu-bg;
   padding: 0 110px 0 20px;
 
   img {

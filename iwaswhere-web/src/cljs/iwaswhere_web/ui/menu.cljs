@@ -49,7 +49,7 @@
   [{:keys [observed put-fn]}]
   [:div.menu-header
    [:div
-    [:button.button-primary {:on-click (h/new-entry-fn put-fn {})}
+    [:button.menu-new {:on-click (h/new-entry-fn put-fn {})}
      [:span.fa.fa-plus-square] " new"]
     [:button {:on-click #(do (put-fn [:import/photos])
                              (put-fn [:import/geo])

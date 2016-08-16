@@ -1,10 +1,8 @@
+@import "variables.scss";
+
 .entry-with-comments {
-  margin: 3px 0 3px 0;
-  border-color: darken($hashtag-blue, 25%);
-  border-style: solid;
-  border-width: 1px;
+  margin: 5px 0 5px 0;
   background: white;
-  border-radius: $entry-border-radius;
 }
 
 .entry {
@@ -12,9 +10,7 @@
   //font-family: "redacted_scriptregular";
 
   .active {
-    border-color: green;
-    border-style: solid;
-    border-width: 2px;
+    border: 2px solid green;
   }
 
   .more {
@@ -40,7 +36,7 @@
   }
 
   .edit-md pre code {
-    font-family: "Lato", sans-serif;
+    font-family: $font-family;
     outline: none;
   }
 
@@ -49,7 +45,7 @@
   }
 
   .entry .mention-link {
-    color: #007d4e;
+    color: $mention-link;
     font-weight: bold;
   }
 
@@ -150,10 +146,6 @@
   }
   .entry:nth-child(odd) {
     background-color: lighten($hashtag-blue, 40%);
-  }
-  .entry:last-child {
-    border-bottom-right-radius: $entry-border-radius;
-    border-bottom-left-radius: $entry-border-radius;
   }
 }
 

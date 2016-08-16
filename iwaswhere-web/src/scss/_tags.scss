@@ -1,3 +1,5 @@
+@import "variables.scss";
+
 .hashtags {
   padding: 0 0 1px 0;
   display: flex;
@@ -15,7 +17,7 @@
 }
 
 .not-tag {
-  background-color: rgb(221, 77, 55);
+  background-color: $not-tag;
 }
 
 .suggestions {
@@ -40,5 +42,5 @@
   padding: 1px 5px;
   color: white;
   font-size: 0.8em;
-  background-color: rgb(55, 201, 154);
+  background-color: $mention-color;
 }

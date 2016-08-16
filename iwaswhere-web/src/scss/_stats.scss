@@ -1,3 +1,6 @@
+@import "variables.scss";
+
+$chart-bg: white;
 $completed: steelblue;
 $total: lighten($completed, 30);
 
@@ -16,9 +19,9 @@ $activity-weekend: lighten($activity, 30);
 #stats {
   flex: 0 0 auto;
   height: 180px;
-  background-color: #eaeaea;
+  background-color: $stats-bg-color;
   overflow-y: auto;
-  padding: 5px;
+  padding: 2px;
 
   .stats {
     button {
@@ -32,8 +35,8 @@ $activity-weekend: lighten($activity, 30);
     }
 
     svg {
-      margin: 5px;
-      background-color: white;
+      margin: 3px;
+      background-color: $chart-bg;
       height: 125px;
 
       text {
@@ -110,10 +113,8 @@ $activity-weekend: lighten($activity, 30);
     .mouse-over-info {
       padding: 5px;
       background-color: white;
-      border-color: darken($hashtag-blue, 25%);
-      border-style: solid;
-      border-width: 1px;
-      border-radius: $entry-border-radius;
+      border: 1px solid darken($hashtag-blue, 25%);
+      border-radius: $info-border-radius;
       position: fixed;
       top: 100px;
 
