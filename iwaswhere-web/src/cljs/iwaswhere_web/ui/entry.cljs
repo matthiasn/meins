@@ -295,7 +295,7 @@
             ^{:key (str "c" (:timestamp comment))}
             [journal-entry comment cfg put-fn
              (contains? new-entries (:timestamp comment))])]
-         [:div.show-comments {:on-click       toggle-comments
-                              :on-mouse-enter toggle-comments}
+         [:div.show-comments
           (let [n (count comments)]
-            [:span (str "show " n " comment" (when (> n 1) "s"))])]))]))
+            [:span {:on-click toggle-comments :on-mouse-enter toggle-comments}
+             (str "show " n " comment" (when (> n 1) "s"))])]))]))
