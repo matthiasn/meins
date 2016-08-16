@@ -7,6 +7,8 @@
             [iwaswhere-web.files :as f]
             [iwaswhere-web.img-route :as ir]))
 
+(defn stylesheet [url] [:link {:href url :rel "stylesheet"}])
+
 (defn index-page
   "Generates index page HTML with the specified page title."
   [_]
@@ -16,15 +18,14 @@
      [:head
       [:meta {:name "viewport" :content "width=device-width, initial-scale=1"}]
       [:title "iWasWhere"]
-      [:link {:href "/webjars/normalize-css/4.1.1/normalize.css"
-              :media "screen" :rel "stylesheet"}]
-      [:link {:href "/webjars/github-com-mrkelly-lato/0.3.0/css/lato.css"
-              :media "screen" :rel "stylesheet"}]
-      [:link {:href "/webjars/fontawesome/4.6.3/css/font-awesome.css"
-              :media "screen" :rel "stylesheet"}]
-      [:link {:href "/webjars/leaflet/0.7.7/dist/leaflet.css"
-              :media "screen" :rel "stylesheet"}]
-      [:link {:href "/css/iwaswhere.css" :media "screen" :rel "stylesheet"}]]
+      ; Download from https://github.com/christiannaths/Redacted-Font
+      ; then uncomment in _entry.scss and recompile CSS for redacted fron
+      #_(stylesheet "/redacted-font/fonts/web/stylesheet.css")
+      (stylesheet "/webjars/normalize-css/4.1.1/normalize.css")
+      (stylesheet "/webjars/github-com-mrkelly-lato/0.3.0/css/lato.css")
+      (stylesheet "/webjars/fontawesome/4.6.3/css/font-awesome.css")
+      (stylesheet "/webjars/leaflet/0.7.7/dist/leaflet.css")
+      (stylesheet "/css/iwaswhere.css")]
      [:body
       [:div.flex-container
        [:div#header]
