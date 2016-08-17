@@ -1,7 +1,7 @@
 (ns iwaswhere-web.graph.query
   "this namespace manages interactions with the graph data structure, which
   holds all entries and their connections."
-  (:require [ubergraph.core :as uber]
+  (:require [ubergraph.core :as uc]
             [iwaswhere-web.fulltext-search :as ft]
             [clj-time.coerce :as ctc]
             [clj-time.core :as ct]
@@ -19,7 +19,7 @@
   [q graph]
   (fn [entry]
     (let [local-fmt (ctf/with-zone (ctf/formatters :year-month-day)
-                                     (ct/default-time-zone))
+                                   (ct/default-time-zone))
           entry-day (ctf/unparse local-fmt (ctc/from-long (:timestamp entry)))
           q-day (:date-string q)
           day-match? (= q-day entry-day)
@@ -32,7 +32,7 @@
           q-mentions (set (map s/lower-case (:mentions q)))
 
           entry-tags (set (map s/lower-case (:tags entry)))
-          entry-comments (map #(uber/attrs graph  %) (:comments entry))
+          entry-comments (map #(uc/attrs graph %) (:comments entry))
           entry-comments-tags (apply set/union (map :tags entry-comments))
           tags (set (map s/lower-case (set/union entry-tags entry-comments-tags)))
 
@@ -58,7 +58,7 @@
         upvotes-y (get y :upvotes 0)]
     (if-not (= upvotes-x upvotes-y)
       (clojure.lang.Util/compare upvotes-y upvotes-x)
-      (if (pos? upvotes-x)    ; when entries have upvotes, sort oldest on top
+      (if (pos? upvotes-x)      ; when entries have upvotes, sort oldest on top
         (clojure.lang.Util/compare (:timestamp x) (:timestamp y))
         (clojure.lang.Util/compare (:timestamp y) (:timestamp x))))))
 
@@ -66,8 +66,8 @@
   "Extract all comments for entry."
   [entry g n]
   (merge entry
-         {:comments (->> (flatten (uber/find-edges g {:dest n
-                                                      :relationship :COMMENT}))
+         {:comments (->> (flatten (uc/find-edges g {:dest         n
+                                                    :relationship :COMMENT}))
                          (remove :mirror?)
                          (map :src)
                          (sort))}))
@@ -78,8 +78,8 @@
   (let [mapper (fn [tag-type]
                  (fn [tag]
                    (set (map :dest
-                             (uber/find-edges g {:src          {tag-type tag}
-                                                 :relationship :CONTAINS})))))
+                             (uc/find-edges g {:src          {tag-type tag}
+                                               :relationship :CONTAINS})))))
         t-matched (map (mapper :tag) (map s/lower-case (:tags query)))
         pt-matched (map (mapper :ptag) (map s/lower-case (:tags query)))
         m-matched (map (mapper :mention) (map s/lower-case (:mentions query)))]
@@ -89,16 +89,16 @@
   "Extract matching timestamps for query."
   [g query]
   (let [dt (ctf/parse (ctf/formatters :year-month-day) (:date-string query))]
-    (set (map :dest (uber/find-edges g {:src          {:type  :timeline/day
-                                                       :year  (ct/year dt)
-                                                       :month (ct/month dt)
-                                                       :day   (ct/day dt)}
-                                        :relationship :DATE})))))
+    (set (map :dest (uc/find-edges g {:src          {:type  :timeline/day
+                                                     :year  (ct/year dt)
+                                                     :month (ct/month dt)
+                                                     :day   (ct/day dt)}
+                                      :relationship :DATE})))))
 
 (defn get-linked-entries
   "Extract all linked entries for entry, including their comments."
   [entry g n sort-by-upvotes?]
-  (let [linked (->> (flatten (uber/find-edges g {:src n :relationship :LINKED}))
+  (let [linked (->> (flatten (uc/find-edges g {:src n :relationship :LINKED}))
                     ;(remove :mirror?)
                     (map :dest)
                     (sort))]
@@ -115,8 +115,8 @@
   (let [sort-by-upvotes? (:sort-by-upvotes query)
         g (:graph current-state)
         mapper-fn (fn [n]
-                    (if (uber/has-node? g n)
-                      (-> (uber/attrs g n)
+                    (if (uc/has-node? g n)
+                      (-> (uc/attrs g n)
                           (get-comments g n)
                           (get-linked-entries g n sort-by-upvotes?))
                       (log/warn "extract-sorted-entries can't find node: " n)))
@@ -146,8 +146,8 @@
   [current-state entry-timestamps]
   (map (fn [n]
          (let [g (:graph current-state)]
-           (if (uber/has-node? g n)
-             (let [entry (uber/attrs g n)]
+           (if (uc/has-node? g n)
+             (let [entry (uc/attrs g n)]
                (when (empty? entry) (log/warn "empty node:" entry))
                entry)
              (log/warn "extract-entries-by-ts can't find node: " n))))
@@ -158,8 +158,8 @@
    the :hashtags node."
   [current-state]
   (let [g (:graph current-state)
-        ltags (map #(-> % :dest :tag) (uber/find-edges g {:src :hashtags}))
-        tags (map #(:val (uber/attrs g {:tag %})) ltags)]
+        ltags (map #(-> % :dest :tag) (uc/find-edges g {:src :hashtags}))
+        tags (map #(:val (uc/attrs g {:tag %})) ltags)]
     (set/union (set tags) u/private-tags)))
 
 (defn find-all-pvt-hashtags
@@ -167,8 +167,8 @@
    the :hashtags node."
   [current-state]
   (let [g (:graph current-state)
-        ltags (map #(-> % :dest :ptag) (uber/find-edges g {:src :pvt-hashtags}))
-        tags (map #(:val (uber/attrs g {:ptag %})) ltags)]
+        ltags (map #(-> % :dest :ptag) (uc/find-edges g {:src :pvt-hashtags}))
+        tags (map #(:val (uc/attrs g {:ptag %})) ltags)]
     (set tags)))
 
 (defn find-all-mentions
@@ -177,8 +177,8 @@
   [current-state]
   (let [g (:graph current-state)
         lmentions (map #(-> % :dest :mention)
-                       (uber/find-edges g {:src :mentions}))
-        mentions (map #(:val (uber/attrs g {:mention %})) lmentions)]
+                       (uc/find-edges g {:src :mentions}))
+        mentions (map #(:val (uc/attrs g {:mention %})) lmentions)]
     (set mentions)))
 
 (defn find-all-activities
@@ -187,7 +187,7 @@
   [current-state]
   (let [g (:graph current-state)]
     (set (map #(-> % :dest :name)
-              (uber/find-edges g {:src :activities})))))
+              (uc/find-edges g {:src :activities})))))
 
 (defn find-all-consumption-types
   "Finds all consumption types used in entries by finding the edges that
@@ -195,7 +195,7 @@
   [current-state]
   (let [g (:graph current-state)]
     (set (map #(-> % :dest :name)
-              (uber/find-edges g {:src :consumption-types})))))
+              (uc/find-edges g {:src :consumption-types})))))
 
 (defn get-filtered-results
   "Retrieve items to show in UI, also deliver all hashtags for autocomplete and
@@ -223,3 +223,13 @@
      :entries-map (merge (into {} (map entry-mapper entries))
                          (into {} (map entry-mapper comments))
                          (into {} (map entry-mapper linked-entries)))}))
+
+(defn find-entry
+  "Find single entry."
+  [{:keys [current-state msg-payload]}]
+  (let [g (:graph current-state)
+        ts (:timestamp msg-payload)]
+    (if (uc/has-node? g ts)
+      (let [entry (uc/attrs g ts)]
+        {:emit-msg [:entry/found (uc/attrs g ts)]})
+      (log/warn "cannot find node: " ts))))

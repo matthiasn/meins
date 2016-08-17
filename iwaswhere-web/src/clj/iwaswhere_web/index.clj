@@ -55,6 +55,6 @@
   "Configuration map for sente-cmp."
   {:index-page-fn index-page
    :routes-fn     routes-fn
-   :relay-types   #{:cmd/keep-alive-res :entry/saved :state/new
+   :relay-types   #{:cmd/keep-alive-res :entry/saved :entry/found :state/new
                     :stats/pomo-day :stats/activity-day :stats/tasks-day
                     :state/stats-tags}})

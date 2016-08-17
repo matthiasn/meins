@@ -22,22 +22,26 @@
         before-cursor (h/string-before-cursor (:search-text (:current-query @observed)))
         [curr-tag f-tags] (p/autocomplete-tags before-cursor "#" hashtags)
         [curr-mention f-mentions] (p/autocomplete-tags before-cursor "@" mentions)
-        tag-replace-fn (fn [curr-tag tag]
-                         (let [curr-tag-regex (js/RegExp (str curr-tag "(?!" p/tag-char-cls ")") "i")
-                               search-text (:search-text (:current-query @observed))
-                               new-search (p/parse-search (s/replace search-text curr-tag-regex tag))]
-                           (swap! local assoc-in [:current-query] new-search)
-                           (put-fn [:search/update new-search])))
+
+        tag-replace-fn
+        (fn [curr-tag tag]
+          (let [curr-tag-regex (js/RegExp (str curr-tag "(?!" p/tag-char-cls ")") "i")
+                search-text (:search-text (:current-query @observed))
+                new-search (p/parse-search (s/replace search-text curr-tag-regex tag))]
+            (swap! local assoc-in [:current-query] new-search)
+            (put-fn [:search/update new-search])))
         get-tags #(% (:current-query @local))
-        on-keydown-fn (fn [ev]
-                        (let [key-code (.. ev -keyCode)]
-                          (when (= key-code 9)          ; TAB key pressed
-                            (when (and curr-tag (seq f-tags))
-                              (tag-replace-fn curr-tag (first f-tags)))
-                            (when (and curr-mention (seq f-mentions))
-                              (tag-replace-fn curr-mention (first f-mentions)))
-                            (.setTimeout js/window (fn [] (h/focus-on-end (.-target ev))) 50)
-                            (.preventDefault ev))))]
+
+        on-keydown-fn
+        (fn [ev]
+          (let [key-code (.. ev -keyCode)]
+            (when (= key-code 9)          ; TAB key pressed
+              (when (and curr-tag (seq f-tags))
+                (tag-replace-fn curr-tag (first f-tags)))
+              (when (and curr-mention (seq f-mentions))
+                (tag-replace-fn curr-mention (first f-mentions)))
+              (.setTimeout js/window (fn [] (h/focus-on-end (.-target ev))) 50)
+              (.preventDefault ev))))]
     [:div.search
      [:div.hashtags
       (for [tag (get-tags :tags)]

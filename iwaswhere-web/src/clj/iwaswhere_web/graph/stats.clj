@@ -21,7 +21,7 @@
                                                     (:planned-dur %)))
                                            pomodoro-nodes))
                :total-time  (apply + (map :completed-time pomodoro-nodes))}]
-    {:emit-msg (with-meta [:stats/pomo-day stats] msg-meta)}))
+    {:emit-msg [:stats/pomo-day stats]}))
 
 (defn get-tasks-day-stats
   "Get pomodoro stats for specified day."
@@ -35,7 +35,7 @@
         stats {:date-string date-string
                :tasks-cnt   (count task-nodes)
                :done-cnt    (count done-nodes)}]
-    {:emit-msg (with-meta [:stats/tasks-day stats] msg-meta)}))
+    {:emit-msg [:stats/tasks-day stats]}))
 
 (defn get-activity-day-stats
   "Get activity stats for specified day."
@@ -52,7 +52,7 @@
         stats {:date-string    date-string
                :total-exercise (apply + (map :duration-m activities))
                :weight         (:weight (:measurements (first weight-nodes)))}]
-    {:emit-msg (with-meta [:stats/activity-day stats] msg-meta)}))
+    {:emit-msg [:stats/activity-day stats]}))
 
 (defn count-open-tasks
   [current-state]

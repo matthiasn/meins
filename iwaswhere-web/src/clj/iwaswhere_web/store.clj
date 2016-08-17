@@ -74,7 +74,7 @@
                     :activities        (:activities current-state)
                     :consumption-types (:consumption-types current-state)
                     :stats             (:stats current-state)}]
-    {:emit-msg (with-meta [:state/stats-tags stats-tags] msg-meta)}))
+    {:emit-msg [:state/stats-tags stats-tags]}))
 
 (defn state-fn
   "Initial state function, creates state atom and then parses all files in
@@ -126,6 +126,7 @@
    :state-fn    state-fn
    :opts        {:msgs-on-firehose true}
    :handler-map {:entry/import           f/entry-import-fn
+                 :entry/find             gq/find-entry
                  :entry/update           f/geo-entry-persist-fn
                  :entry/trash            f/trash-entry-fn
                  :state/publish-current  publish-state-fn

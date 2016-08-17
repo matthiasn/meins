@@ -14,9 +14,9 @@
 
 (defonce switchboard (sb/component :client/switchboard))
 
-(def sente-cfg {:relay-types #{:state/get :cmd/keep-alive :entry/update
-                               :entry/trash :import/geo :import/photos
-                               :import/phone :stats/pomo-day-get
+(def sente-cfg {:relay-types #{:state/get :entry/update :entry/find :entry/trash
+                               :import/geo :import/photos :import/phone
+                               :cmd/keep-alive :stats/pomo-day-get
                                :stats/activity-day-get :stats/tasks-day-get
                                :state/stats-tags-get :import/weight}})
 

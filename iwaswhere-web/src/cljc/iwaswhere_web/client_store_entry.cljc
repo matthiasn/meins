@@ -30,7 +30,8 @@
 (defn new-entry-fn
   "Create locally stored new entry for further edit."
   [{:keys [current-state msg-payload]}]
-  (let [new-state (assoc-in current-state [:new-entries (:timestamp msg-payload)] msg-payload)]
+  (let [ts  (:timestamp msg-payload)
+        new-state (assoc-in current-state [:new-entries ts] msg-payload)]
     (update-local-storage new-state)
     {:new-state new-state}))
 
@@ -40,7 +41,8 @@
   [{:keys [current-state msg-payload]}]
   (let [ts (:timestamp msg-payload)
         local-entry (get-in current-state [:new-entries ts])
-        new-state (update-in current-state [:new-entries ts] #(merge msg-payload %))]
+        new-state (update-in current-state [:new-entries ts] #(merge msg-payload
+                                                                     %))]
     (when local-entry
       (update-local-storage new-state)
       {:new-state new-state})))
@@ -65,8 +67,8 @@
   #?(:cljs (.play (.getElementById js/document id))))
 
 (defn pomodoro-inc-fn
-  "Increments completed time of entry. Plays next tick sound and schedules a new increment
-  message. Finally plays completion sound."
+  "Increments completed time of entry. Plays next tick sound and schedules a new
+   increment message. Finally plays completion sound."
   [{:keys [current-state msg-payload]}]
   (let [ts (:timestamp msg-payload)
         new-state (update-in current-state [:new-entries ts :completed-time] inc)]
@@ -117,8 +119,16 @@
     (update-local-storage new-state)
     {:new-state new-state}))
 
+(defn found-entry-fn
+  "Save retrieved entry in entries-map."
+  [{:keys [current-state msg-payload]}]
+  (let [ts  (:timestamp msg-payload)
+        new-state (assoc-in current-state [:entries-map ts] msg-payload)]
+    {:new-state new-state}))
+
 (def entry-handler-map
   {:entry/new          new-entry-fn
+   :entry/found        found-entry-fn
    :entry/geo-enrich   geo-enrich-fn
    :entry/update-local update-local-fn
    :entry/remove-local remove-local-fn
