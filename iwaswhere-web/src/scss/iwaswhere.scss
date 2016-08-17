@@ -35,7 +35,8 @@ body {
    From: http://simurai.com/blog/2011/07/26/webkit-scrollbar */
 ::-webkit-scrollbar {
   -webkit-appearance: none;
-  width: 7px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-thumb {

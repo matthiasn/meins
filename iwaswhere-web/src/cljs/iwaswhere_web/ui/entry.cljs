@@ -270,7 +270,7 @@
    content component used in edit mode also sends a modified entry to the store
    component, which is useful for displaying updated hashtags, or also for
    showing the warning that the entry is not saved yet."
-  [entry cfg new-entries put-fn]
+  [entry cfg new-entries put-fn entries-map]
   (let [ts (:timestamp entry)
         entry (or (get new-entries ts) entry)
         comments (:comments entry)
@@ -298,4 +298,25 @@
          [:div.show-comments
           (let [n (count comments)]
             [:span {:on-click toggle-comments :on-mouse-enter toggle-comments}
-             (str "show " n " comment" (when (> n 1) "s"))])]))]))
+             (str "show " n " comment" (when (> n 1) "s"))])]))
+
+     ; TODO: move thumbnails section in separate function
+     (let [linked-entries-set (set (:linked-entries-list entry))
+           with-imgs (filter
+                       :img-file
+                       (map (fn [ts]
+                              (let [entry (get entries-map ts)]
+                                (or
+                                  entry
+                                  (let [missing-entry {:timestamp ts}]
+                                    (put-fn [:entry/find missing-entry])
+                                    missing-entry))))
+                            linked-entries-set))
+           filtered (if (:show-pvt cfg)
+                      with-imgs
+                      (filter u/pvt-filter with-imgs))]
+       [:div.thumbnails
+        (for [img-entry filtered]
+          ^{:key (str "thumbnail" ts (:img-file img-entry))}
+          [:div
+           [m/image-view img-entry "?width=300"]])])]))

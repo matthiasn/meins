@@ -40,7 +40,7 @@
                                  (map (fn [ts] (get entries-map ts))
                                       (:comments entry)))]
              ^{:key (str "linked-" (:timestamp entry))}
-             [e/entry-with-comments entry cfg new-entries put-fn])))])))
+             [e/entry-with-comments entry cfg new-entries put-fn entries-map])))])))
 
 (defn journal-view
   "Renders journal div, one entry per item, with map if geo data exists in the
@@ -79,7 +79,7 @@
                                                 (:timestamp %))))
                           (vals new-entries))]
         ^{:key (:timestamp entry)}
-        [e/entry-with-comments entry cfg new-entries put-fn])
+        [e/entry-with-comments entry cfg new-entries put-fn entries-map])
       (for [entry (filter #(not (contains? linked-entries-set (:timestamp %)))
                           filtered-entries)]
         (when (with-comments? entry)
@@ -87,7 +87,7 @@
                                 (map (fn [ts] (get entries-map ts))
                                      (:comments entry)))]
             ^{:key (:timestamp entry)}
-            [e/entry-with-comments entry cfg new-entries put-fn])))
+            [e/entry-with-comments entry cfg new-entries put-fn entries-map])))
       (when (and show-context? (seq entries))
         (let [show-more #(put-fn [:show/more])]
           [:div.show-more {:on-click show-more :on-mouse-over show-more}
