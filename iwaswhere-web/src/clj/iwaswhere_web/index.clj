@@ -55,6 +55,7 @@
   "Configuration map for sente-cmp."
   {:index-page-fn index-page
    :routes-fn     routes-fn
+   :port          8765
    :relay-types   #{:cmd/keep-alive-res :entry/saved :entry/found :state/new
                     :stats/pomo-day :stats/activity-day :stats/tasks-day
                     :state/stats-tags}})
