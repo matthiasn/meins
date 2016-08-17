@@ -1,9 +1,10 @@
-(ns iwaswhere-web.ui.charts.common)
+(ns iwaswhere-web.ui.charts.common
+  (:require [clojure.string :as s]))
 
 (defn line-points
   [indexed mapper]
   (let [point-strings (map mapper indexed)]
-    (apply str (interpose " " point-strings))))
+    (s/join " " point-strings)))
 
 (defn path
   "Renders path with the given path description attribute."

@@ -64,7 +64,7 @@
         linked-entries-set (set (:linked-entries-list active-entry))
         linked-entries (map (fn [ts]
                               (let [entry (get entries-map ts)]
-                                (if entry
+                                (or
                                   entry
                                   (let [missing-entry {:timestamp ts}]
                                     (put-fn [:entry/find missing-entry])

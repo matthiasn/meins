@@ -67,7 +67,7 @@
                               (>= (count lines) lines-shortened))
               md-string (if shortened?
                           (let [lines (take lines-shortened lines)]
-                            (apply str (interpose "\n" lines)))
+                            (s/join "\n" lines))
                           md-string)
               tags-xform (mk-format-tags-xform entry show-hashtags?)
               html (md-to-html md-string :custom-transformers [tags-xform])]

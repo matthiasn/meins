@@ -196,7 +196,7 @@
   (try
     (let [lines (line-seq rdr)]
       (doseq [line (drop 1 lines)]
-        (let [parse-double #(when-not (empty? %) (Double/parseDouble %))
+        (let [parse-double #(when (seq %) (Double/parseDouble %))
               parsed (s/split (s/replace line "\"" "") #",")
               w (parse-double (second parsed))
               lbm (parse-double (get parsed 3))
@@ -238,7 +238,7 @@
   [rdr put-fn msg-meta filename]
   (try (let [lines (line-seq rdr)]
          (doseq [line lines]
-           (when-not (empty? line)
+           (when (seq line)
              (let [entry
                    (-> (cc/parse-string line #(keyword (s/replace % "_" "-")))
                        (m/add-tags-mentions)

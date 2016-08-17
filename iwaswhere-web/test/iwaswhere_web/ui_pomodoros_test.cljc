@@ -219,7 +219,7 @@
 (deftest pomodoro-header-test
   (let [fake-start-fn #()]
     (testing "renders nothing when entry not of type :pomodoro"
-      (is (= (p/pomodoro-header empty-test-entry fake-start-fn false) nil)))
+      (is (nil? (p/pomodoro-header empty-test-entry fake-start-fn false))))
 
     (testing "renders just the icon when not started"
       (is (= (p/pomodoro-header test-entry fake-start-fn false)
