@@ -62,7 +62,7 @@
         (let [show-hashtags? (:show-hashtags cfg)
               lines-shortened (:lines-shortened cfg)
               lines (s/split-lines md-string)
-              shortened? (>= (count lines) lines-shortened)
+              shortened? (and @show-shortened (>= (count lines) lines-shortened))
               md-string (if shortened?
                           (let [lines (take lines-shortened lines)]
                             (s/join "\n" lines))

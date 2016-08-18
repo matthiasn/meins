@@ -85,6 +85,12 @@
                      test-entry3 cfg-show-hashtags))
            [:div {:dangerouslySetInnerHTML {:__html "<p>Some test with <a href='/##unordered-list'>#unordered-list</a>:</p>"}}])))
 
+  (testing "renders unordered list in test-entry3 as expected, all lines"
+    (with-redefs [m/initial-atom (atom false)]
+      (is (= (second ((m/markdown-render test-entry3 cfg-show-hashtags)
+                       test-entry3 cfg-show-hashtags))
+             [:div {:dangerouslySetInnerHTML {:__html "<p>Some test with <a href='/##unordered-list'>#unordered-list</a>:</p><ul><li>line 1</li><li>line 2</li><li>line 3</li><li>line 4</li></ul>"}}]))))
+
   (testing "multiple hashtags in a row are rendered correctly"
     (is (= (second ((m/markdown-render test-entry4 cfg-show-hashtags)
                      test-entry4 cfg-show-hashtags))
