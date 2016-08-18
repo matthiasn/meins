@@ -197,25 +197,30 @@
     (set (map #(-> % :dest :name)
               (uc/find-edges g {:src :consumption-types})))))
 
+(defn comments-linked-for-entry
+  "Enrich entry with comments and linked entries."
+  [graph sort-by-upvotes?]
+  (fn [entry]
+    (let [ts (:timestamp entry)]
+      (-> entry
+          (get-comments graph ts)
+          (get-linked-entries graph ts sort-by-upvotes?)))))
+
 (defn get-filtered-results
   "Retrieve items to show in UI, also deliver all hashtags for autocomplete and
    some basic stats."
   [current-state query]
   (let [n (:n query)
         sort-by-upvotes? (:sort-by-upvotes query)
-        graph (:graph current-state)
+        g (:graph current-state)
         entry-mapper (fn [entry] [(:timestamp entry) entry])
-        entries (take n (filter (entries-filter-fn query graph)
+        entries (take n (filter (entries-filter-fn query g)
                                 (extract-sorted-entries current-state query)))
         comment-timestamps (set (flatten (map :comments entries)))
         linked-entries (extract-entries-by-ts current-state
                          (set (flatten (map :linked-entries-list entries))))
-        linked-entries (map (fn [entry]
-                              (let [ts (:timestamp entry)]
-                                (-> entry
-                                    (get-comments graph ts)
-                                    (get-linked-entries graph ts sort-by-upvotes?))))
-                            linked-entries)
+        comments-linked-mapper (comments-linked-for-entry g sort-by-upvotes?)
+        linked-entries (map comments-linked-mapper linked-entries)
         linked-comments-ts (set (flatten (map :comments linked-entries)))
         comments (extract-entries-by-ts current-state
                    (set/union comment-timestamps linked-comments-ts))]
@@ -230,6 +235,7 @@
   (let [g (:graph current-state)
         ts (:timestamp msg-payload)]
     (if (uc/has-node? g ts)
-      (let [entry (uc/attrs g ts)]
-        {:emit-msg [:entry/found (uc/attrs g ts)]})
+      (let [comments-linked-mapper (comments-linked-for-entry g false)
+            entry (comments-linked-mapper (uc/attrs g ts))]
+        {:emit-msg [:entry/found entry]})
       (log/warn "cannot find node: " ts))))

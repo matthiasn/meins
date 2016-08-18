@@ -268,12 +268,7 @@
   [entry entries-map cfg put-fn]
   (let [ts (:timestamp entry)
         linked-entries-set (set (:linked-entries-list entry))
-        get-or-retrieve (fn [ts]
-                          (let [entry (get entries-map ts)]
-                            (or entry
-                                (let [missing-entry {:timestamp ts}]
-                                  (put-fn [:entry/find missing-entry])
-                                missing-entry))))
+        get-or-retrieve (u/find-missing-entry entries-map put-fn)
         with-imgs (filter :img-file (map get-or-retrieve linked-entries-set))
         filtered (if (:show-pvt cfg) with-imgs (filter u/pvt-filter with-imgs))]
     [:div.thumbnails

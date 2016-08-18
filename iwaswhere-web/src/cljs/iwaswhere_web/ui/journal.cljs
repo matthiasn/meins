@@ -5,11 +5,21 @@
             [iwaswhere-web.utils.parse :as ps]
             [clojure.set :as set]))
 
-(defn linked-entries-filter
+(defn find-missing-entry
+  [entries-map put-fn]
+  (fn [ts]
+    (let [entry (get entries-map ts)]
+      (or entry
+          (let [missing-entry {:timestamp ts}]
+            (put-fn [:entry/find missing-entry])
+            missing-entry)))))
+
+(defn linked-filter-fn
   "Filter linked entries by search."
-  [entries-map linked-filter]
+  [entries-map linked-filter put-fn]
   (fn [entry]
-    (let [comments (map #(get entries-map %) (:comments entry))
+    (let [comments-mapper (find-missing-entry entries-map put-fn)
+          comments (map comments-mapper (:comments entry))
           combined-tags (reduce #(set/union %1 (:tags %2)) (:tags entry)
                                 comments)]
       (and (set/subset? (:tags linked-filter) combined-tags)
@@ -20,15 +30,13 @@
   "Renders linked entries in right side column, filtered by local search."
   [linked-entries entries-map new-entries cfg put-fn]
   (when linked-entries
-    (let [on-input-fn #(let [linked-filter (ps/parse-search
-                                             (.. % -target -innerText))]
-                        (put-fn [:linked-filter/set linked-filter]))
+    (let [on-input-fn #(put-fn [:linked-filter/set
+                                (ps/parse-search (.. % -target -innerText))])
           linked-entries (if (:show-pvt cfg)
                            linked-entries
                            (filter u/pvt-filter linked-entries))
-          linked-entries (filter (linked-entries-filter entries-map
-                                                        (:linked-filter cfg))
-                                 linked-entries)]
+          filter-fn (linked-filter-fn entries-map (:linked-filter cfg) put-fn)
+          linked-entries (filter filter-fn linked-entries)]
       [:div.journal-entries
        (when (:active cfg)
          [:div.search-field {:content-editable true :on-input on-input-fn}
@@ -62,14 +70,8 @@
         active-entry (get (:entries-map store-snapshot)
                           (:active (:cfg store-snapshot)))
         linked-entries-set (set (:linked-entries-list active-entry))
-        linked-entries (map (fn [ts]
-                              (let [entry (get entries-map ts)]
-                                (or
-                                  entry
-                                  (let [missing-entry {:timestamp ts}]
-                                    (put-fn [:entry/find missing-entry])
-                                    missing-entry))))
-                            linked-entries-set)]
+        linked-mapper (find-missing-entry entries-map put-fn)
+        linked-entries (map linked-mapper linked-entries-set)]
     [:div.journal
      [:div.journal-entries
       (for [entry (filter #(and (not (:comment-for %))
