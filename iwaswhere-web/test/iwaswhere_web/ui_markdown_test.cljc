@@ -30,7 +30,6 @@
    :timezone "Europe/Berlin"
    :utc-offset -120
    :longitude 9.9
-   :comment-for 1465262689763
    :latitude 53.1
    :timestamp 1465263270878
    :md "Some test with #unordered-list:\n\n* line 1\n* line 2\n* line 3\n* line 4\n"})
@@ -81,8 +80,7 @@
                      test-entry2 cfg-hide-hashtags))
            [:div {:dangerouslySetInnerHTML {:__html "<p>New <a href='/##task'>task</a>: count the time spent <a href='/##interacting'>interacting</a> with the <a href='/##UI'>UI</a> when no <a href='/##pomodoro'>pomodoro</a> is running. Mouse-over and key <a href='/##events'>events</a> should be a good indicator for that. When nothing happens longer than x, don't extend the current period of activity but rather close the last one at the last <a href='/##timestamp'>timestamp</a> and create a new period of activity. I like that. Not all work can possibly happen in <a href='/##pomodoros'>pomodoros</a>, and it would be a waste of data to not capture that time.  <a class='mention-link' href='/#@myself'>myself</a> </p>"}}])))
 
-  (testing "renders unordered list in test-entry3 as expected, first line only
-            initially because of :comment-for"
+  (testing "renders unordered list in test-entry3 as expected, first line only"
     (is (= (second ((m/markdown-render test-entry3 cfg-show-hashtags)
                      test-entry3 cfg-show-hashtags))
            [:div {:dangerouslySetInnerHTML {:__html "<p>Some test with <a href='/##unordered-list'>#unordered-list</a>:</p>"}}])))
