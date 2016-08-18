@@ -3,6 +3,7 @@
   (:require [clojure.pprint :as pp]
             [iwaswhere-web.files :as f]
             [iwaswhere-web.migrations :as m]
+            [iwaswhere-web.specs :as specs]
             [clj-time.coerce :as c]
             [clj-time.core :as t]
             [cheshire.core :as cc]
@@ -141,8 +142,7 @@
   [{:keys [put-fn msg-meta]}]
   (let [files (file-seq (io/file (str f/data-path "/import")))]
     (log/info "importing media files")
-    (doseq [file (f/filter-by-name files
-                                   #"[ A-Za-z0-9_]+.(jpg|JPG|PNG|png|m4v|m4a)")]
+    (doseq [file (f/filter-by-name files specs/media-file-regex)]
       (let [filename (.getName file)]
         (log/info "Trying to import " filename)
         (try (let [[_ file-type] (re-find #"^.*\.([a-z0-9]{3})$" filename)

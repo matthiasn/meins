@@ -21,7 +21,6 @@
 
 (defn namespaced-keyword? [k] (and (keyword? k) (namespace k)))
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;  Journal Entry Specs
 (s/def :iww.entry/timestamp possible-timestamp?)
@@ -39,6 +38,12 @@
 (s/def :iww.entry/planned-dur (s/and integer? pos?))
 (s/def :iww.entry/planned-dur (s/and integer? pos?))
 (s/def :iww.entry/interruptions (s/and integer? #(<= 0 %)))
+
+(def media-file-regex #"[ A-Za-z0-9_]+.(jpg|JPG|PNG|png|m4v|m4a)")
+(def valid-filename? #(re-find media-file-regex %))
+(s/def :iww.entry/audio-file valid-filename?)
+(s/def :iww.entry/img-file valid-filename?)
+(s/def :iww.entry/video-file valid-filename?)
 
 (def entry-spec
   "basic entry, with only timestamp and markdown text mandatory"
@@ -68,7 +73,10 @@
                    :iww.entry/completed-time
                    :iww.entry/interruptions
                    :iww.entry/timezone
-                   :iww.entry/utc-offset]))
+                   :iww.entry/utc-offset
+                   :iww.entry/audio-file
+                   :iww.entry/img-file
+                   :iww.entry/video-file]))
 
 (def timestamp-required-spec (s/keys :req-un [:iww.entry/timestamp]))
 
@@ -117,7 +125,8 @@
 (s/def :iww.search/tags :iww.entry/tags)
 (s/def :iww.search/not-tags :iww.search/tags)
 (s/def :iww.search/mentions :iww.entry/mentions)
-(s/def :iww.search/date-string (s/nilable #(re-find #"[0-9]{4}-[0-9]{2}-[0-9]{2}" %)))
+(s/def :iww.search/date-string
+  (s/nilable #(re-find #"[0-9]{4}-[0-9]{2}-[0-9]{2}" %)))
 (s/def :iww.search/timestamp (s/nilable #(re-find #"[0-9]{13}" %)))
 (s/def :iww.search/n pos-int?)
 
