@@ -61,10 +61,8 @@
       (when-let [md-string (:md entry)]
         (let [show-hashtags? (:show-hashtags cfg)
               lines-shortened (:lines-shortened cfg)
-              is-comment? (:comment-for entry)
               lines (s/split-lines md-string)
-              shortened? (and @show-shortened is-comment?
-                              (>= (count lines) lines-shortened))
+              shortened? (>= (count lines) lines-shortened)
               md-string (if shortened?
                           (let [lines (take lines-shortened lines)]
                             (s/join "\n" lines))
