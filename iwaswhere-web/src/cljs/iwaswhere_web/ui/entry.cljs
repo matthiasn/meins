@@ -263,6 +263,24 @@
      (when-let [measurements (:measurements entry)]
        [:pre [:code (with-out-str (pp/pprint measurements))]])]))
 
+(defn thumbnails
+  "Renders thumbnails of photos in linked entries. Respects private entries."
+  [entry entries-map cfg put-fn]
+  (let [ts (:timestamp entry)
+        linked-entries-set (set (:linked-entries-list entry))
+        get-or-retrieve (fn [ts]
+                          (let [entry (get entries-map ts)]
+                            (or entry
+                                (let [missing-entry {:timestamp ts}]
+                                  (put-fn [:entry/find missing-entry])
+                                missing-entry))))
+        with-imgs (filter :img-file (map get-or-retrieve linked-entries-set))
+        filtered (if (:show-pvt cfg) with-imgs (filter u/pvt-filter with-imgs))]
+    [:div.thumbnails
+     (for [img-entry filtered]
+       ^{:key (str "thumbnail" ts (:img-file img-entry))}
+       [:div [m/image-view img-entry "?width=300"]])]))
+
 (defn entry-with-comments
   "Renders individual journal entry. Interaction with application state happens
    via messages that are sent to the store component, for example for toggling
@@ -299,24 +317,4 @@
           (let [n (count comments)]
             [:span {:on-click toggle-comments :on-mouse-enter toggle-comments}
              (str "show " n " comment" (when (> n 1) "s"))])]))
-
-     ; TODO: move thumbnails section in separate function
-     (let [linked-entries-set (set (:linked-entries-list entry))
-           with-imgs (filter
-                       :img-file
-                       (map (fn [ts]
-                              (let [entry (get entries-map ts)]
-                                (or
-                                  entry
-                                  (let [missing-entry {:timestamp ts}]
-                                    (put-fn [:entry/find missing-entry])
-                                    missing-entry))))
-                            linked-entries-set))
-           filtered (if (:show-pvt cfg)
-                      with-imgs
-                      (filter u/pvt-filter with-imgs))]
-       [:div.thumbnails
-        (for [img-entry filtered]
-          ^{:key (str "thumbnail" ts (:img-file img-entry))}
-          [:div
-           [m/image-view img-entry "?width=300"]])])]))
+     [thumbnails entry entries-map cfg put-fn]]))
