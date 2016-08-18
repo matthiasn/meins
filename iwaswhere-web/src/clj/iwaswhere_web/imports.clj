@@ -102,8 +102,7 @@
                     (st/now))
         target-filename (str timestamp "-" filename)]
     (fs/rename rel-path (str f/data-path "/images/" target-filename))
-    {:raw-exif  exif
-     :timestamp timestamp
+    {:timestamp timestamp
      :latitude  (dms-to-dd exif "GPS Latitude" "GPS Latitude Ref")
      :longitude (dms-to-dd exif "GPS Longitude" "GPS Longitude Ref")
      :img-file  target-filename
