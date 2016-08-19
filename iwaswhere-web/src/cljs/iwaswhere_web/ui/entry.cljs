@@ -134,7 +134,7 @@
          [:span.fa.toggle
           {:on-click (upvote-fn inc)
            :class    (if (pos? upvotes) "fa-thumbs-up" "fa-thumbs-o-up")}]
-         (when (pos? upvotes) [:span.upvotes " " upvotes])
+         (when (pos? upvotes) [:span.upvotes upvotes])
          (when (pos? upvotes)
            [:span.fa.fa-thumbs-down.toggle {:on-click (upvote-fn dec)}])
          (when map? [:span.fa.fa-map-o.toggle {:on-click toggle-map}])
@@ -261,7 +261,12 @@
      [m/image-view entry]
      [m/videoplayer-view entry]
      (when-let [measurements (:measurements entry)]
-       [:pre [:code (with-out-str (pp/pprint measurements))]])]))
+       [:pre [:code (with-out-str (pp/pprint measurements))]])
+     (when-let [upvotes (:upvotes entry)]
+       (when (pos? upvotes)
+         [:div
+          [:span.fa.fa-thumbs-up]
+          [:span.upvotes upvotes]]))]))
 
 (defn thumbnails
   "Renders thumbnails of photos in linked entries. Respects private entries."
