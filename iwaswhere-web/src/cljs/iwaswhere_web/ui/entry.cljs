@@ -119,7 +119,7 @@
                                      {:name     ""
                                       :quantity 0})
                            (update-in [:tags] conj "#consumption")
-                           (update-in [:md] #(str % "some #consumption ")))]))
+                           (update-in [:md] #(str % " #consumption ")))]))
             trash-entry #(if edit-mode?
                           (put-fn [:entry/remove-local {:timestamp ts}])
                           (put-fn [:entry/trash {:timestamp ts}]))
