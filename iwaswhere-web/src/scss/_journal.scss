@@ -7,6 +7,11 @@
   min-height: 0;
 }
 
+.tabs-container {
+  display: flex;
+  flex-flow: column;
+}
+
 .tabs-view {
   display: flex;
   flex-flow: row;
@@ -26,10 +31,19 @@
 }
 
 .journal-entries {
+  display: flex;
+  flex-flow: column;
   flex: 1;
   flex-basis: 0;
   padding: 0 0.2em 1em 0;
   margin-right: 0.3em;
   overflow-x: hidden;
   overflow-y: scroll;
+}
+
+.new-entries {
+  flex-flow: column;
+  flex-grow: 1;
+  margin: 1em 25% 0 1em;
+  max-width: 500px;
 }

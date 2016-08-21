@@ -33,12 +33,14 @@
   (when linked-entries
     (let [query-id (:query-id local-cfg)
           on-input-fn #(put-fn [:linked-filter/set
-                                {:search (ps/parse-search (.. % -target -innerText))
+                                {:search (ps/parse-search
+                                           (.. % -target -innerText))
                                  :query-id query-id}])
           linked-entries (if (:show-pvt cfg)
                            linked-entries
                            (filter u/pvt-filter linked-entries))
-          filter-fn (linked-filter-fn entries-map (query-id (:linked-filter cfg)) put-fn)
+          linked-filter (query-id (:linked-filter cfg))
+          filter-fn (linked-filter-fn entries-map linked-filter put-fn)
           linked-entries (filter filter-fn linked-entries)]
       [:div.journal-entries
        (when (query-id (:active cfg))
@@ -51,7 +53,8 @@
                                  (map (fn [ts] (get entries-map ts))
                                       (:comments entry)))]
              ^{:key (str "linked-" (:timestamp entry))}
-             [e/entry-with-comments entry cfg new-entries put-fn entries-map local-cfg])))])))
+             [e/entry-with-comments
+              entry cfg new-entries put-fn entries-map local-cfg])))])))
 
 (defn journal-view
   "Renders journal div, one entry per item, with map if geo data exists in the
@@ -79,13 +82,6 @@
         linked-entries (map linked-mapper linked-entries-set)]
     [:div.journal
      [:div.journal-entries
-      (for [entry (filter #(and
-                            (not (:comment-for %))
-                            (not (contains? entries-map (:timestamp %)))
-                            (not (contains? linked-entries-set (:timestamp %))))
-                          (vals new-entries))]
-        ^{:key (:timestamp entry)}
-        [e/entry-with-comments entry cfg new-entries put-fn entries-map local-cfg])
       (for [entry (filter #(not (contains? linked-entries-set (:timestamp %)))
                           filtered-entries)]
         (when (with-comments? entry)
@@ -93,12 +89,14 @@
                                 (map (fn [ts] (get entries-map ts))
                                      (:comments entry)))]
             ^{:key (:timestamp entry)}
-            [e/entry-with-comments entry cfg new-entries put-fn entries-map local-cfg])))
+            [e/entry-with-comments
+             entry cfg new-entries put-fn entries-map local-cfg])))
       (when (and show-context? (seq entries))
         (let [show-more #(put-fn [:show/more {:query-id query-id}])]
           [:div.show-more {:on-click show-more :on-mouse-over show-more}
            [:span.show-more-btn [:span.fa.fa-plus-square] " show more"]]))]
-     (linked-entries-view linked-entries entries-map new-entries cfg put-fn local-cfg)]))
+     [linked-entries-view
+      linked-entries entries-map new-entries cfg put-fn local-cfg]]))
 
 (defn tab-view
   [{:keys [observed put-fn] :as cmp-map} query-id]
@@ -107,11 +105,33 @@
      [search/search-field-view store-snapshot put-fn query-id]
      [journal-view cmp-map query-id]]))
 
+(defn new-entries-view
+  "Renders view for creating new entries at the top of the page."
+  [store-snapshot local-cfg put-fn]
+  (let [
+        cfg (:cfg store-snapshot)
+        entries-map (:entries-map store-snapshot)
+        new-entries (:new-entries store-snapshot)]
+
+    [:div.new-entries
+     (for [entry (filter #(and
+                           (not (:comment-for %))
+                           (not (contains? entries-map (:timestamp %))))
+                         (vals new-entries))]
+       ^{:key (:timestamp entry)}
+       [e/entry-with-comments entry
+        cfg new-entries put-fn entries-map local-cfg])]))
+
 (defn tabs-view
+  "Renders a split view, with new entries at the top."
   [{:keys [observed put-fn] :as cmp-map}]
-  [:div.tabs-view
-   [tab-view cmp-map :query-1]
-   [tab-view cmp-map :query-2]])
+  (let [store-snapshot @observed
+        local-cfg {}]
+    [:div.tabs-container
+     [new-entries-view store-snapshot local-cfg put-fn]
+     [:div.tabs-view
+      [tab-view cmp-map :query-1]
+      [tab-view cmp-map :query-2]]]))
 
 (defn cmp-map
   [cmp-id]
