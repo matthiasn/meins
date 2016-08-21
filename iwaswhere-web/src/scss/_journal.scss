@@ -7,16 +7,27 @@
   min-height: 0;
 }
 
+.tabs-view {
+  display: flex;
+  flex-flow: row;
+}
+
+.tab-view {
+  display: flex;
+  flex: 1;
+  flex-flow: column;
+  flex-basis: 0;
+}
+
 .journal {
   display: flex;
   flex-flow: row;
   padding-left: 1em;
-  min-height: 0;
 }
 
 .journal-entries {
   flex: 1;
-  height: inherit;
+  flex-basis: 0;
   padding: 0 0.2em 1em 0;
   margin-right: 0.3em;
   overflow-x: hidden;

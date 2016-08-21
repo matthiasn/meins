@@ -12,7 +12,8 @@
    :mentions    #{}
    :date-string nil
    :timestamp   nil
-   :n           40})
+   :n           40
+   :query-id    :query-1})
 
 (def open-tasks-query
   {:search-text "#task ~#done "
@@ -21,7 +22,8 @@
    :mentions    #{}
    :date-string nil
    :timestamp   nil
-   :n           40})
+   :n           40
+   :query-id    :query-1})
 
 (def test-entry
   {:mentions       #{}
@@ -40,7 +42,8 @@
   {:entries             [(:timestamp test-entry)]
    :entries-map         {(:timestamp test-entry) test-entry}
    :linked-entries-list []
-   :duration-ms         19})
+   :duration-ms         19
+   :query-id            :query-1})
 
 (def stats-tags-from-backend
   {:hashtags            #{"#drama" "#hashtag" "#blah"}
@@ -87,7 +90,8 @@
                                  :msg-meta      meta-from-backend}))]
     (testing
       "entries are on new state"
-      (is (= (:entries new-state) (:entries state-from-backend))))
+      (is (= (get-in new-state [:results :query-1 :entries])
+             (:entries state-from-backend))))
     (testing
       "entries map is on new state"
       (is (= (:entries-map new-state) (:entries-map state-from-backend))))
@@ -115,12 +119,14 @@
 (deftest set-active-test
   "Test that active entry is updated properly in store component state"
   (let [current-state @(:state (store/initial-state-fn (fn [_put-fn])))
-        new-state (:new-state (store/set-active-fn
+        ts (:timestamp test-entry)
+        new-state (:new-state (store/toggle-active-fn
                                 {:current-state current-state
-                                 :msg-payload   test-entry}))]
+                                 :msg-payload   {:timestamp ts
+                                                 :query-id  :query-1}}))]
     (testing
       "active entry is set"
-      (is (= test-entry (:active (:cfg new-state)))))))
+      (is (= ts (:query-1 (:active (:cfg new-state))))))))
 
 (deftest show-more-test
   "Ensure that query is properly updated when more results are desired."
@@ -129,11 +135,12 @@
                                 {:current-state current-state
                                  :msg-payload   open-tasks-query}))
         {:keys [:new-state emit-msg]} (store/show-more-fn
-                                        {:current-state new-state})
+                                        {:current-state new-state
+                                         :msg-payload   {:query-id :query-1}})
         updated-query (update-in open-tasks-query [:n] + 20)]
     (testing
       "query is properly updated, with increased number of results"
-      (is (= updated-query (:current-query new-state))))
+      (is (= updated-query (:query-1 (:current-query new-state)))))
     (testing
       "emits correct query message"
       (is (= :state/get (first emit-msg)))

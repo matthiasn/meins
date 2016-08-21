@@ -85,12 +85,12 @@
 (defn entry-actions
   "Entry-related action buttons. Hidden by default, become visible when mouse
    hovers over element, stays visible for a little while after mose leaves."
-  [entry cfg put-fn edit-mode? toggle-edit]
+  [entry cfg put-fn edit-mode? toggle-edit local-cfg]
   (let [visible (r/atom false)
         hide-fn (fn [_ev]
                   (.setTimeout js/window #(reset! visible false) 60000))]
     (fn
-      [entry cfg put-fn edit-mode? toggle-edit]
+      [entry cfg put-fn edit-mode? toggle-edit local-cfg]
       (let [ts (:timestamp entry)
             map? (:latitude entry)
             toggle-map #(put-fn [:cmd/toggle
@@ -220,7 +220,7 @@
    content component used in edit mode also sends a modified entry to the store
    component, which is useful for displaying updated hashtags, or also for
    showing the warning that the entry is not saved yet."
-  [entry cfg put-fn edit-mode? info]
+  [entry cfg put-fn edit-mode? info local-cfg]
   (let [ts (:timestamp entry)
         show-map? (contains? (:show-maps-for cfg) ts)
         toggle-edit #(if edit-mode? () ;(put-fn [:entry/remove-local entry])
@@ -244,11 +244,13 @@
       [:div
        (when (seq (:linked-entries-list entry))
          (let [entry-active? (= (:active cfg) (:timestamp entry))
-               set-active-fn #(put-fn [:cmd/toggle-active (:timestamp entry)])]
+               set-active-fn #(put-fn [:cmd/toggle-active
+                                       {:timestamp (:timestamp entry)
+                                        :query-id (:query-id local-cfg)}])]
            [:span.link-btn {:on-click set-active-fn
                             :class    (when entry-active? "active")}
             (str " linked: " (count (:linked-entries-list entry)))]))]
-      [entry-actions entry cfg put-fn edit-mode? toggle-edit]]
+      [entry-actions entry cfg put-fn edit-mode? toggle-edit local-cfg]]
      [hashtags-mentions-list entry]
      [l/leaflet-map entry (or show-map? (:show-all-maps cfg))]
      (if edit-mode?
@@ -288,7 +290,7 @@
    content component used in edit mode also sends a modified entry to the store
    component, which is useful for displaying updated hashtags, or also for
    showing the warning that the entry is not saved yet."
-  [entry cfg new-entries put-fn entries-map]
+  [entry cfg new-entries put-fn entries-map local-cfg]
   (let [ts (:timestamp entry)
         entry (or (get new-entries ts) entry)
         comments (:comments entry)
@@ -305,14 +307,14 @@
         new-entries? (contains? new-entries ts)]
     [:div.entry-with-comments
      [journal-entry entry cfg put-fn new-entries?
-      (p/pomodoro-stats-view all-comments)]
+      (p/pomodoro-stats-view all-comments) local-cfg]
      (when (seq all-comments)
        (if (or (contains? (:show-comments-for cfg) ts) (seq local-comments))
          [:div.comments
           (for [comment all-comments]
             ^{:key (str "c" (:timestamp comment))}
             [journal-entry comment cfg put-fn
-             (contains? new-entries (:timestamp comment))])]
+             (contains? new-entries (:timestamp comment)) nil local-cfg])]
          [:div.show-comments
           (let [n (count comments)]
             [:span {:on-click toggle-comments :on-mouse-enter toggle-comments}

@@ -6,6 +6,8 @@
 
   .thumbnails {
     display: flex;
+    // TODO: fix hack with max-width
+    max-width: 300px;
     overflow-y: auto;
 
     img {

@@ -2,6 +2,7 @@
   (:require [matthiasn.systems-toolbox-ui.reagent :as r]
             [iwaswhere-web.utils.misc :as u]
             [iwaswhere-web.ui.entry :as e]
+            [iwaswhere-web.ui.search :as search]
             [iwaswhere-web.utils.parse :as ps]
             [clojure.set :as set]))
 
@@ -28,19 +29,21 @@
 
 (defn linked-entries-view
   "Renders linked entries in right side column, filtered by local search."
-  [linked-entries entries-map new-entries cfg put-fn]
+  [linked-entries entries-map new-entries cfg put-fn local-cfg]
   (when linked-entries
-    (let [on-input-fn #(put-fn [:linked-filter/set
-                                (ps/parse-search (.. % -target -innerText))])
+    (let [query-id (:query-id local-cfg)
+          on-input-fn #(put-fn [:linked-filter/set
+                                {:search (ps/parse-search (.. % -target -innerText))
+                                 :query-id query-id}])
           linked-entries (if (:show-pvt cfg)
                            linked-entries
                            (filter u/pvt-filter linked-entries))
-          filter-fn (linked-filter-fn entries-map (:linked-filter cfg) put-fn)
+          filter-fn (linked-filter-fn entries-map (query-id (:linked-filter cfg)) put-fn)
           linked-entries (filter filter-fn linked-entries)]
       [:div.journal-entries
-       (when (:active cfg)
+       (when (query-id (:active cfg))
          [:div.search-field {:content-editable true :on-input on-input-fn}
-          (:search-text (:linked-filter cfg))])
+          (:search-text (query-id (:linked-filter cfg)))])
        (for [entry linked-entries]
          (when (and (not (:comment-for entry))
                     (or (:new-entry entry) (:show-context cfg)))
@@ -48,16 +51,18 @@
                                  (map (fn [ts] (get entries-map ts))
                                       (:comments entry)))]
              ^{:key (str "linked-" (:timestamp entry))}
-             [e/entry-with-comments entry cfg new-entries put-fn entries-map])))])))
+             [e/entry-with-comments entry cfg new-entries put-fn entries-map local-cfg])))])))
 
 (defn journal-view
   "Renders journal div, one entry per item, with map if geo data exists in the
    entry."
-  [{:keys [observed put-fn]}]
+  [{:keys [observed put-fn]} query-id]
   (let [store-snapshot @observed
         cfg (:cfg store-snapshot)
+        local-cfg {:query-id query-id}
+        results (query-id (:results store-snapshot))
         entries-map (:entries-map store-snapshot)
-        entries (map (fn [ts] (get entries-map ts)) (:entries store-snapshot))
+        entries (map (fn [ts] (get entries-map ts)) (:entries results))
         show-pvt? (:show-pvt cfg)
         filtered-entries (if show-pvt? entries (filter u/pvt-filter entries))
         new-entries (:new-entries store-snapshot)
@@ -67,21 +72,20 @@
                                                  (not (:comment-for entry)))
                                             (not comments-w-entries?))
                                         (or (:new-entry entry) show-context?)))
-        active-entry (get (:entries-map store-snapshot)
-                          (:active (:cfg store-snapshot)))
+        active-id (-> store-snapshot :cfg :active query-id)
+        active-entry (get entries-map active-id)
         linked-entries-set (set (:linked-entries-list active-entry))
         linked-mapper (find-missing-entry entries-map put-fn)
         linked-entries (map linked-mapper linked-entries-set)]
     [:div.journal
      [:div.journal-entries
-      (for [entry (filter #(and (not (:comment-for %))
-                                (not (contains? (:entries-map store-snapshot)
-                                                (:timestamp %)))
-                                (not (contains? linked-entries-set
-                                                (:timestamp %))))
+      (for [entry (filter #(and
+                            (not (:comment-for %))
+                            (not (contains? entries-map (:timestamp %)))
+                            (not (contains? linked-entries-set (:timestamp %))))
                           (vals new-entries))]
         ^{:key (:timestamp entry)}
-        [e/entry-with-comments entry cfg new-entries put-fn entries-map])
+        [e/entry-with-comments entry cfg new-entries put-fn entries-map local-cfg])
       (for [entry (filter #(not (contains? linked-entries-set (:timestamp %)))
                           filtered-entries)]
         (when (with-comments? entry)
@@ -89,15 +93,28 @@
                                 (map (fn [ts] (get entries-map ts))
                                      (:comments entry)))]
             ^{:key (:timestamp entry)}
-            [e/entry-with-comments entry cfg new-entries put-fn entries-map])))
+            [e/entry-with-comments entry cfg new-entries put-fn entries-map local-cfg])))
       (when (and show-context? (seq entries))
-        (let [show-more #(put-fn [:show/more])]
+        (let [show-more #(put-fn [:show/more {:query-id query-id}])]
           [:div.show-more {:on-click show-more :on-mouse-over show-more}
            [:span.show-more-btn [:span.fa.fa-plus-square] " show more"]]))]
-     (linked-entries-view linked-entries entries-map new-entries cfg put-fn)]))
+     (linked-entries-view linked-entries entries-map new-entries cfg put-fn local-cfg)]))
+
+(defn tab-view
+  [{:keys [observed put-fn] :as cmp-map} query-id]
+  (let [store-snapshot @observed]
+    [:div.tab-view
+     [search/search-field-view store-snapshot put-fn query-id]
+     [journal-view cmp-map query-id]]))
+
+(defn tabs-view
+  [{:keys [observed put-fn] :as cmp-map}]
+  [:div.tabs-view
+   [tab-view cmp-map :query-1]
+   [tab-view cmp-map :query-2]])
 
 (defn cmp-map
   [cmp-id]
   (r/cmp-map {:cmp-id  cmp-id
-              :view-fn journal-view
+              :view-fn tabs-view
               :dom-id  "journal"}))

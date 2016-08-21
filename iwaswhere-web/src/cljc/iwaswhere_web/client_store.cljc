@@ -8,10 +8,12 @@
 (defn new-state-fn
   "Update client side state with list of journal entries received from backend."
   [{:keys [current-state msg-payload msg-meta]}]
-  (let [store-meta (:client/store-cmp msg-meta)
+  (let [query-id (:query-id msg-payload)
+        store-meta (:client/store-cmp msg-meta)
+        entries (:entries msg-payload)
         new-state (-> current-state
-                      (assoc-in [:entries] (:entries msg-payload))
-                      (assoc-in [:entries-map] (:entries-map msg-payload))
+                      (assoc-in [:results query-id :entries] entries)
+                      (update-in [:entries-map] merge (:entries-map msg-payload))
                       (assoc-in [:timing] {:query (:duration-ms msg-payload)
                                            :rtt   (- (:in-ts store-meta)
                                                      (:out-ts store-meta))}))]
@@ -87,27 +89,24 @@
 (defn show-more-fn
   "Runs previous query but with more results. Also updates the number to show in
    the UI."
-  [{:keys [current-state]}]
-  (let [current-query (:current-query current-state)
+  [{:keys [current-state msg-payload]}]
+  (let [query-id (:query-id msg-payload)
+        current-query (merge (query-id (:current-query current-state))
+                             msg-payload)
         new-query (update-in current-query [:n] + 20)
-        new-state (assoc-in current-state [:current-query] new-query)]
+        new-state (assoc-in current-state [:current-query query-id] new-query)]
     {:new-state new-state
      :emit-msg  [:state/get new-query]}))
-
-(defn set-active-fn
-  "Sets entry in payload as the active entry for which to show linked entries."
-  [{:keys [current-state msg-payload]}]
-  {:new-state (assoc-in current-state [:cfg :active] msg-payload)
-   :emit-msg  s/update-location-hash-msg})
 
 (defn toggle-active-fn
   "Sets entry in payload as the active entry for which to show linked entries."
   [{:keys [current-state msg-payload]}]
-  (let [currently-active (get-in current-state [:cfg :active])]
-    {:new-state (assoc-in current-state [:cfg :active]
-                          (if (= currently-active msg-payload)
+  (let [{:keys [timestamp query-id]} msg-payload
+        currently-active (get-in current-state [:cfg :active query-id])]
+    {:new-state (assoc-in current-state [:cfg :active query-id]
+                          (if (= currently-active timestamp)
                             nil
-                            msg-payload))
+                            timestamp))
      :emit-msg  s/update-location-hash-msg}))
 
 (defn toggle-lines
@@ -140,7 +139,6 @@
                               :stats/tasks-day    (save-stats :task-stats)
                               :state/stats-tags   stats-tags-fn
                               :show/more          show-more-fn
-                              :cmd/set-active     set-active-fn
                               :cmd/toggle-active  toggle-active-fn
                               :cmd/toggle         toggle-set-fn
                               :cmd/set-opt        set-conj-fn

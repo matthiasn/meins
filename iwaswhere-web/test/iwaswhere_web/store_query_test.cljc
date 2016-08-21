@@ -16,7 +16,8 @@
    :mentions    #{}
    :date-string nil
    :timestamp   nil
-   :n           40})
+   :n           40
+   :query-id    :query-1})
 
 (def no-results-query
   {:search-text "some #not-existing-tag"
@@ -77,6 +78,7 @@
   (-> (s/publish-state-fn {:current-state current-state
                            :msg-payload   {:sente-uid client-id}})
       :emit-msg   ; get published messages
+      first       ; 1st message
       second      ; msg-payload
       :entries))
 
@@ -116,12 +118,15 @@
 
         (testing
           "client queries associated with proper connection IDs"
-          (is (= (get client-queries simple-query-uid) simple-query))
-          (is (= (get client-queries tasks-done-query-uid) tasks-done-query)))
+          (is (= (get-in client-queries [simple-query-uid :queries :query-1])
+                 simple-query))
+          (is (= (get-in client-queries [tasks-done-query-uid :queries :query-1])
+                 tasks-done-query)))
 
         (testing
           "client queries with not-tags properly re-formatted"
-          (is (= (get client-queries tasks-not-done-query-uid)
+          (is (= (get-in client-queries
+                         [tasks-not-done-query-uid :queries :query-1])
                  (merge tasks-not-done-query {:not-tags #{"#done" "#backlog"}}))))
 
         (testing

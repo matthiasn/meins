@@ -46,19 +46,6 @@
       (dissoc :pomodoro-running)
       (dissoc :linked-entries-list)))
 
-(defn query-from-search-hash
-  "Get query from location hash for current page."
-  [put-fn]
-  (let [search-hash (subs (js/decodeURIComponent (aget js/window "location" "hash")) 1)
-        split-str (s/split search-hash #"\|")
-        search (str (first split-str))]
-    (when-let [active-entry (js/parseInt (second split-str))]
-      (when (number? active-entry)
-        (put-fn [:cmd/set-active active-entry])))
-    (when-let [linked-filter (get split-str 2)]
-      (put-fn [:linked-filter/set (p/parse-search linked-filter)]))
-    (p/parse-search search)))
-
 (defn string-before-cursor
   "Determine the substring right before the cursor of the current selection. Only returns that
   substring if it is from current node's text, as otherwise this would listen to selections

@@ -67,7 +67,7 @@
         [:div
          [:svg
           {:viewBox (str "0 0 600 " chart-h)}
-          [cc/chart-title "Weight/LBM/Activity"]
+          [cc/chart-title "keep eating slowly"]
           [activity-bars indexed local 160 250]
           [weight-line indexed local 50 150 "lbm" :lbm 42 20]
           [weight-line indexed local 50 150 "weight" :value 20 20]]

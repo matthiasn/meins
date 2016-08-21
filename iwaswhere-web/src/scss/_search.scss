@@ -1,14 +1,14 @@
 @import "variables.scss";
 
-#search {
-  flex: 0 0 auto;
-}
-
 .search {
   padding: 5px 1em 0.5em 1em;
-  margin-right: 90px;
   flex-flow: column;
   display: flex;
+  flex: 0 0 auto;
+
+  .hashtags {
+    height: 20px;
+  }
 }
 
 .search-field {

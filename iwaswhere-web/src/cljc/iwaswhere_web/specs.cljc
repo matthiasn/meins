@@ -100,8 +100,9 @@
 (s/def :entry/trash timestamp-required-spec)
 (s/def :cmd/pomodoro-inc timestamp-required-spec)
 (s/def :cmd/pomodoro-start timestamp-required-spec)
-(s/def :cmd/set-active number?)
-(s/def :cmd/toggle-active number?)
+
+(s/def :cmd/toggle-active (s/keys :req-un [:set-active/timestamp
+                                           :set-active/query-id]))
 (s/def :cmd/toggle timestamp-required-spec)
 
 
@@ -116,9 +117,6 @@
 (s/def :cmd/set-opt (s/keys :req-un [:iww.cfg/path
                                      :iww.entry/timestamp]))
 
-;; message expected to not have a payload
-(s/def :show/more nil?)
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Search Spec
 (s/def :iww.search/search-text string?)
@@ -129,21 +127,25 @@
   (s/nilable #(re-find #"[0-9]{4}-[0-9]{2}-[0-9]{2}" %)))
 (s/def :iww.search/timestamp (s/nilable #(re-find #"[0-9]{13}" %)))
 (s/def :iww.search/n pos-int?)
+(s/def :iww.search/query-id keyword?)
 
-(def search-spec
-  "spec for search, all fields mandatory"
+(s/def :iww.search/search
   (s/keys :req-un [:iww.search/search-text
                    :iww.search/date-string
                    :iww.search/n
                    :iww.search/tags
                    :iww.search/not-tags
                    :iww.search/mentions
-                   :iww.search/timestamp]))
+                   :iww.search/timestamp]
+          :opt-un [:iww.search/query-id]))
 
-(s/def :search/update search-spec)
-(s/def :state/get search-spec)
+(s/def :search/update :iww.search/search)
+(s/def :state/get :iww.search/search)
 
-(s/def :linked-filter/set search-spec)
+(s/def :show/more (s/keys :req-un [:iww.search/query-id]))
+
+(s/def :linked-filter/set (s/keys :req-un [:iww.search/search
+                                           :iww.search/query-id]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Search Result Spec
@@ -226,7 +228,9 @@
 ;; map with entries as values
 (s/def :iww.client-state/new-entries (s/map-of possible-timestamp? entry-spec))
 
-(s/def :iww.client-state.cfg/active (s/nilable number?))
+(s/def :iww.client-state.cfg/active
+  (s/nilable (s/map-of keyword? possible-timestamp?)))
+
 (s/def :iww.client-state.cfg/show-maps-for set?)
 (s/def :iww.client-state.cfg/show-comments-for set?)
 (s/def :iww.client-state.cfg/sort-by-upvotes boolean?)

@@ -1,7 +1,6 @@
 (ns iwaswhere-web.core
   (:require [iwaswhere-web.specs]
             [iwaswhere-web.client-store :as store]
-            [iwaswhere-web.ui.search :as s]
             [iwaswhere-web.ui.stats :as stats]
             [iwaswhere-web.ui.menu :as m]
             [iwaswhere-web.ui.journal :as jrn]
@@ -29,7 +28,6 @@
     switchboard
     [[:cmd/init-comp
       #{(sente/cmp-map :client/ws-cmp sente-cfg) ; WebSocket communication
-        (s/cmp-map :client/search-cmp)           ; UI component for search
         (m/cmp-map :client/menu-cmp)             ; UI component for menu
         (jrn/cmp-map :client/journal-cmp)        ; UI component for journal
         (store/cmp-map :client/store-cmp)        ; Data store component
@@ -37,22 +35,31 @@
         (stats/cmp-map :client/stats-cmp)        ; UI component for stats
         }]
 
-     [:cmd/route {:from #{:client/store-cmp :client/search-cmp :client/stats-cmp
-                          :client/journal-cmp :client/menu-cmp}
+     [:cmd/route {:from #{:client/store-cmp
+                          :client/stats-cmp
+                          :client/journal-cmp
+                          :client/menu-cmp}
                   :to   :client/ws-cmp}]
 
-     [:cmd/route {:from #{:client/ws-cmp :client/search-cmp
-                          :client/journal-cmp :client/menu-cmp}
+     [:cmd/route {:from #{:client/ws-cmp
+                          :client/journal-cmp
+                          :client/menu-cmp}
                   :to   :client/store-cmp}]
 
      [:cmd/observe-state {:from :client/store-cmp
-                          :to   #{:client/journal-cmp :client/search-cmp
-                                  :client/menu-cmp :client/stats-cmp}}]
+                          :to   #{:client/journal-cmp
+                                  :client/menu-cmp
+                                  :client/stats-cmp}}]
 
-     [:cmd/route {:from :client/ws-cmp :to :client/stats-cmp}]
-     [:cmd/route {:from :client/store-cmp :to :client/scheduler-cmp}]
-     [:cmd/route {:from :client/scheduler-cmp :to #{:client/store-cmp
-                                                    :client/ws-cmp}}]])
+     [:cmd/route {:from :client/ws-cmp
+                  :to   :client/stats-cmp}]
+
+     [:cmd/route {:from :client/store-cmp
+                  :to   :client/scheduler-cmp}]
+
+     [:cmd/route {:from :client/scheduler-cmp
+                  :to   #{:client/store-cmp
+                          :client/ws-cmp}}]])
   (ka/init-keepalive! switchboard))
 
 (init!)

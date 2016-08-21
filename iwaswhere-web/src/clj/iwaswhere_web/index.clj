@@ -29,7 +29,6 @@
      [:body
       [:div.flex-container
        [:div#header]
-       [:div#search]
        [:div#journal]
        [:div#stats]]
       ;; Currently, from http://www.orangefreesounds.com/old-clock-ringing-short/
