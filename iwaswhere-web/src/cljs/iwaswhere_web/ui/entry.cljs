@@ -59,28 +59,46 @@
 
 (defn new-link
   "Renders input for adding link entry."
-  [entry put-fn create-linked-entry]
-  (let [visible (r/atom false)
+  [entry put-fn cfg create-linked-entry]
+  (let [local (r/atom {:visible     false
+                       :last-linked nil})
+        toggle-visible #(swap! local update-in [:visible] not)
         keydown-fn
         (fn [ev]
           (when (= (.-keyCode ev) 13)
             (let [link (re-find #"[0-9]{13}" (.-value (.-target ev)))
-                  entry-links (:linked-entries entry)
-                  linked-entries (conj entry-links (long link))
+                  linked-entries (conj (:linked-entries entry) (long link))
                   new-entry (h/clean-entry
                               (merge entry {:linked-entries linked-entries}))]
               (when link
                 (put-fn [:entry/update new-entry])
-                (swap! visible not)))))]
-    (fn [entry put-fn create-linked-entry]
-      [:span.new-link-btn
-       [:span.fa.fa-link.toggle {:on-click #(swap! visible not)}]
-       (when @visible
-         [:span.new-link
-          [:span.fa.fa-plus-square
-           {:on-click #(do (create-linked-entry) (swap! visible not))}]
-          [:input {:on-click    #(.stopPropagation %)
-                   :on-key-down keydown-fn}]])])))
+                (swap! local update-in [:visible] not)))))
+
+        on-drag-start (fn [ev]
+                        (let [dt (.-dataTransfer ev)]
+                          (put-fn [:cmd/set-dragged entry])
+                          (aset dt "effectAllowed" "move")
+                          (aset dt "dropEffect" "link")))]
+    (fn [entry put-fn cfg create-linked-entry]
+      (let [on-drag-over
+            (fn [ev]
+              (let [ts (:currently-dragged cfg)
+                    new-entry (update-in entry [:linked-entries] #(set (conj % ts)))]
+                (when (and (not= ts (:last-linked @local))
+                           (not= ts (:timestamp entry)))
+                  (put-fn [:entry/update (h/clean-entry new-entry)]))
+                (swap! local assoc-in [:last-linked] ts)))]
+        [:span.new-link-btn
+         [:span.fa.fa-link.toggle {:on-click      toggle-visible
+                                   :draggable     true
+                                   :on-drag-start on-drag-start
+                                   :on-drag-over  on-drag-over}]
+         (when (:visible @local)
+           [:span.new-link
+            [:span.fa.fa-plus-square
+             {:on-click #(do (create-linked-entry) (toggle-visible))}]
+            [:input {:on-click    #(.stopPropagation %)
+                     :on-key-down keydown-fn}]])]))))
 
 (defn entry-actions
   "Entry-related action buttons. Hidden by default, become visible when mouse
@@ -129,6 +147,7 @@
                                   (update-in entry [:upvotes] op)]))
             show-pvt? (:show-pvt cfg)]
         [:div {:on-mouse-enter #(reset! visible true)
+               :on-drag-over   #(do (hide-fn nil) (reset! visible true))
                :on-mouse-leave hide-fn
                :style          {:opacity (if (or edit-mode? @visible) 1 0)}}
          [:span.fa.toggle
@@ -155,7 +174,7 @@
            [:a {:href (str "/#" ts) :target "_blank"}
             [:span.fa.fa-external-link.toggle]])
          (when-not (:comment-for entry)
-           [new-link entry put-fn create-linked-entry])
+           [new-link entry put-fn cfg create-linked-entry])
          [trash-icon trash-entry]]))))
 
 (defn select-elem

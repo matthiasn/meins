@@ -124,6 +124,13 @@
           new-state (assoc-in current-state [k ds] msg-payload)]
       {:new-state new-state})))
 
+(defn set-currently-dragged
+  "Set the currently dragged entry for drag and drop."
+  [{:keys [current-state msg-payload]}]
+  (let [ts (:timestamp msg-payload)
+        new-state (assoc-in current-state [:cfg :currently-dragged] ts)]
+    {:new-state new-state}))
+
 (defn cmp-map
   "Creates map for the component which holds the client-side application state."
   [cmp-id]
@@ -142,6 +149,7 @@
                               :cmd/toggle-active  toggle-active-fn
                               :cmd/toggle         toggle-set-fn
                               :cmd/set-opt        set-conj-fn
+                              :cmd/set-dragged    set-currently-dragged
                               :cmd/toggle-key     toggle-key-fn
                               :cmd/keep-alive     ka/reset-fn
                               :cmd/keep-alive-res ka/set-alive-fn

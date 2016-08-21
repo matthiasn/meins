@@ -89,6 +89,8 @@
 (s/def :entry/find timestamp-required-spec)
 (s/def :entry/found entry-spec)
 
+(s/def :cmd/set-dragged timestamp-required-spec)
+
 (s/def :ft/add entry-spec)
 (s/def :ft/remove timestamp-required-spec)
 
