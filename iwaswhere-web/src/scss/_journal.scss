@@ -22,6 +22,8 @@
   flex: 1;
   flex-flow: column;
   flex-basis: 0;
+  // TODO: fix this hack
+  max-width: 50%;
 }
 
 .journal {
