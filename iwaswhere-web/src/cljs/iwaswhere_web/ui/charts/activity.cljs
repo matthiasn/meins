@@ -45,14 +45,15 @@
            h (* y-scale (:total-exercise v))
            mouse-enter-fn (cc/mouse-enter-fn local v)
            mouse-leave-fn (cc/mouse-leave-fn local v)]
-       ^{:key (str "actbar" idx)}
-       [:rect {:x              (* 10 idx)
-               :y              (- y-end h)
-               :width          9
-               :height         h
-               :class          (cc/weekend-class "activity" v)
-               :on-mouse-enter mouse-enter-fn
-               :on-mouse-leave mouse-leave-fn}]))])
+       (when (pos? max-val)
+         ^{:key (str "actbar" idx)}
+         [:rect {:x              (* 10 idx)
+                 :y              (- y-end h)
+                 :width          9
+                 :height         h
+                 :class          (cc/weekend-class "activity" v)
+                 :on-mouse-enter mouse-enter-fn
+                 :on-mouse-leave mouse-leave-fn}])))])
 
 (defn activity-weight-chart
   "Draws chart for daily activities vs weight. Weight is a line chart with
