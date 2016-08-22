@@ -2,7 +2,8 @@
   (:require #?(:cljs [alandipert.storage-atom :refer [local-storage]])
     [matthiasn.systems-toolbox.component :as st]))
 
-(def update-location-hash-msg [:cmd/schedule-new {:timeout 5000 :message [:search/set-hash]}])
+(def update-location-hash-msg [:cmd/schedule-new
+                               {:timeout 5000 :message [:search/set-hash]}])
 
 (defn update-query-fn
   "Update query in client state, with resetting the active entry in the linked
