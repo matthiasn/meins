@@ -8,8 +8,12 @@
 
 (defn search-field-view
   [snapshot put-fn query-id]
-  (let [local (rc/atom {})]
-    (fn [snapshot put-fn]
+  (let [local (rc/atom {:current-query (p/parse-search "")})
+        update-search (fn [] (put-fn [:search/update
+                                       (merge {:query-id query-id}
+                                              (:current-query @local))]))]
+    (update-search)
+    (fn [snapshot put-fn query-id]
       (let [get-tags #(% (:current-query @local))
             local-snapshot @local
             before-cursor (h/string-before-cursor
@@ -25,16 +29,14 @@
                           (let [search (p/parse-search
                                          (aget ev "target" "innerText"))]
                             (swap! local assoc-in [:current-query] search)
-                            (put-fn [:search/update (merge {:query-id query-id}
-                                                           search)])))
+                            (update-search)))
             tag-replace-fn
             (fn [curr-tag tag]
               (let [curr-tag-regex (js/RegExp (str curr-tag "(?!" p/tag-char-cls ")") "i")
                     search-text (:search-text (:current-query @local))
                     new-search (p/parse-search (s/replace search-text curr-tag-regex tag))]
                 (swap! local assoc-in [:current-query] new-search)
-                (put-fn [:search/update (merge {:query-id query-id}
-                                               new-search)])))
+                (update-search)))
             on-keydown-fn
             (fn [ev]
               (let [key-code (.. ev -keyCode)]
