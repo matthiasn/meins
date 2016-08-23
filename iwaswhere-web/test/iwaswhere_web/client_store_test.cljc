@@ -140,7 +140,7 @@
         updated-query (update-in open-tasks-query [:n] + 20)]
     (testing
       "query is properly updated, with increased number of results"
-      (is (= updated-query (:query-1 (:current-query new-state)))))
+      (is (= updated-query (:query-1 (:queries (:query-cfg new-state))))))
     (testing
       "emits correct query message"
       (is (= :state/get (first emit-msg)))

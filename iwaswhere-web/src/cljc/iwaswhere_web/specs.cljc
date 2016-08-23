@@ -225,7 +225,6 @@
 (s/def :iww.client-state/entries (s/* possible-timestamp?))
 (s/def :iww.client-state/entries-map (s/map-of possible-timestamp? entry-spec))
 (s/def :iww.client-state/last-alive possible-timestamp?)
-(s/def :iww.client-state/current-query map?)
 
 ;; map with entries as values
 (s/def :iww.client-state/new-entries (s/map-of possible-timestamp? entry-spec))
@@ -252,9 +251,23 @@
                    :iww.client-state.cfg/show-context
                    :iww.client-state.cfg/show-pvt]))
 
+(s/def :iww.query-cfg/active keyword?)
+(s/def :iww.query-cfg/all (s/coll-of keyword?))
+
+(s/def :iww.query-cfg/tab-group
+  (s/keys :req-un [:iww.query-cfg/active
+                   :iww.query-cfg/all]))
+
+(s/def :iww.query-cfg/queries (s/map-of keyword? :iww.search/search))
+(s/def :iww.query-cfg/tab-groups (s/map-of keyword? :iww.query-cfg/tab-group))
+
+(s/def :iww.client-state/query-cfg
+  (s/keys :req-un [:iww.query-cfg/queries
+                   :iww.query-cfg/tab-groups]))
+
 (s/def :state/client-store-spec
   (s/keys :req-un [:iww.client-state/entries
                    :iww.client-state/last-alive
                    :iww.client-state/new-entries
-                   :iww.client-state/current-query
+                   :iww.client-state/query-cfg
                    :iww.client-state/cfg]))

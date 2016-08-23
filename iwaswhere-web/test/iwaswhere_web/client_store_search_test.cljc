@@ -22,7 +22,7 @@
                                   :msg-payload   st/open-tasks-query}))]
     (testing
       "query is set locally"
-      (is (= st/empty-query (:query-1 (:current-query new-state)))))
+      (is (= st/empty-query (:query-1 (:queries (:query-cfg new-state))))))
     (testing
       "query is sent, with additional :sort-by-upvotes key"
       (is (= (merge st/empty-query {:sort-by-upvotes nil})
@@ -40,8 +40,7 @@
              (:query-1 (:active (:cfg new-state1))))))
     (testing
       "query is updated"
-      (is (= st/open-tasks-query (:query-1 (:current-query new-state2)))))
-
+      (is (= st/open-tasks-query (:query-1 (:queries (:query-cfg new-state2))))))
     (testing
       "active entry not set after updating query"
       (is (not (:active new-state2))))))
@@ -59,7 +58,7 @@
                                               :msg-payload   st/open-tasks-query})]
     (testing
       "query is set locally"
-      (is (= st/open-tasks-query (:query-1 (:current-query new-state)))))
+      (is (= st/open-tasks-query (:query-1 (:queries (:query-cfg new-state))))))
     (testing
       "query is sent, with additional but false :sort-by-upvotes key"
       (is (= (merge st/open-tasks-query {:sort-by-upvotes nil})

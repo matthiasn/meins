@@ -7,7 +7,7 @@
 
 (defn search-field-view
   [snapshot put-fn query-id]
-  (let [current-query (query-id (:current-query snapshot))
+  (let [current-query (query-id (:queries (:query-cfg snapshot)))
         update-search-fn (fn [search-str]
                            (put-fn [:search/update
                                     (merge {:query-id query-id}

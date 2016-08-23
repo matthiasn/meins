@@ -101,7 +101,7 @@
       linked-entries entries-map new-entries cfg put-fn local-cfg]]))
 
 (defn tab-view
-  [{:keys [observed put-fn] :as cmp-map} query-id]
+  [{:keys [observed put-fn] :as cmp-map} query-id tabs-group]
   (let [store-snapshot @observed]
     [:div.tab-view
      [search/search-field-view store-snapshot put-fn query-id]
@@ -110,11 +110,9 @@
 (defn new-entries-view
   "Renders view for creating new entries at the top of the page."
   [store-snapshot local-cfg put-fn]
-  (let [
-        cfg (:cfg store-snapshot)
+  (let [cfg (:cfg store-snapshot)
         entries-map (:entries-map store-snapshot)
         new-entries (:new-entries store-snapshot)]
-
     [:div.new-entries
      (for [entry (filter #(and
                            (not (:comment-for %))
@@ -132,8 +130,8 @@
     [:div.tabs-container
      [new-entries-view store-snapshot local-cfg put-fn]
      [:div.tabs-view
-      [tab-view cmp-map :query-1]
-      [tab-view cmp-map :query-2]]]))
+      [tab-view cmp-map :query-1 :left]
+      [tab-view cmp-map :query-2 :right]]]))
 
 (defn cmp-map
   [cmp-id]

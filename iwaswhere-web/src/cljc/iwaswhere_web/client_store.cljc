@@ -42,7 +42,7 @@
   (let [initial-state (atom {:entries        []
                              :last-alive     (st/now)
                              :new-entries    @cse/new-entries-ls
-                             :current-query  @s/queries
+                             :query-cfg      @s/query-cfg
                              :pomodoro-stats (sorted-map)
                              :activity-stats (sorted-map)
                              :task-stats     (sorted-map)
@@ -59,7 +59,7 @@
                                               :show-pvt           false
                                               :lines-shortened    3}})]
     (put-fn [:state/stats-tags-get])
-    (doseq [[_id q] (:current-query @initial-state)]
+    (doseq [[_id q] (:queries (:query-cfg @initial-state))]
       (put-fn [:state/get q]))
     {:state initial-state}))
 
@@ -93,11 +93,10 @@
   "Runs previous query but with more results. Also updates the number to show in
    the UI."
   [{:keys [current-state msg-payload]}]
-  (let [query-id (:query-id msg-payload)
-        current-query (merge (query-id (:current-query current-state))
-                             msg-payload)
-        new-query (update-in current-query [:n] + 20)
-        new-state (assoc-in current-state [:current-query query-id] new-query)]
+  (let [query-path [:query-cfg :queries (:query-id msg-payload)]
+        merged (merge (get-in current-state query-path) msg-payload)
+        new-query (update-in merged [:n] + 20)
+        new-state (assoc-in current-state query-path new-query)]
     {:new-state new-state
      :emit-msg  [:state/get new-query]}))
 
