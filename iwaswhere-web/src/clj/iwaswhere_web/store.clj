@@ -71,7 +71,8 @@
         query-id (:query-id msg-payload)
         update-path [:client-queries sente-uid :queries query-id]
         new-state (update-in current-state update-path merge msg-payload)
-        publish-msg [:state/publish-current {:sente-uid sente-uid}]]
+        publish-msg [:state/publish-current {:sente-uid sente-uid
+                                             :query-id  query-id}]]
     {:new-state new-state
      :send-to-self [(with-meta publish-msg msg-meta)
                     (with-meta [:cmd/keep-alive] msg-meta)]}))

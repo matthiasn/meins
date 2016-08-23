@@ -42,7 +42,7 @@
   (let [initial-state (atom {:entries        []
                              :last-alive     (st/now)
                              :new-entries    @cse/new-entries-ls
-                             :current-query  {}
+                             :current-query  @s/queries
                              :pomodoro-stats (sorted-map)
                              :activity-stats (sorted-map)
                              :task-stats     (sorted-map)
@@ -59,6 +59,8 @@
                                               :show-pvt           false
                                               :lines-shortened    3}})]
     (put-fn [:state/stats-tags-get])
+    (doseq [[_id q] (:current-query @initial-state)]
+      (put-fn [:state/get q]))
     {:state initial-state}))
 
 (defn toggle-set-fn
