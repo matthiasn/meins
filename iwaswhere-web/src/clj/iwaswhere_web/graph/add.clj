@@ -189,20 +189,25 @@
         remove-tag-edges (fn [g tags k]
                            (let [reducing-fn
                                  (fn [g ltag] (uc/remove-edges g [ts {k ltag}]))]
-                             (reduce reducing-fn g (map s/lower-case tags))))]
+                             (reduce reducing-fn g (map s/lower-case tags))))
+
+        media-tags (set (filter identity [(when (:img-file entry) "#photo")
+                                          (when (:audio-file entry) "#audio")
+                                          (when (:video entry) "#video")]))
+        new-entry (update-in merged [:tags] #(set/union (set %) media-tags))]
     (-> current-state
         (update-in [:graph] remove-tag-edges old-tags :tag)
         (update-in [:graph] remove-tag-edges old-tags :ptag)
         (update-in [:graph] remove-tag-edges old-mentions :mention)
         (update-in [:graph] remove-unused-tags old-tags :tag)
         (update-in [:graph] remove-unused-tags old-mentions :mention)
-        (update-in [:graph] uc/add-nodes-with-attrs [ts merged])
-        (add-hashtags entry)
-        (update-in [:graph] add-mentions entry)
-        (update-in [:graph] add-linked entry)
-        (update-in [:graph] add-timeline-tree entry)
-        (update-in [:graph] add-activity entry)
-        (update-in [:graph] add-consumption entry)
-        (update-in [:graph] add-linked-visit entry)
-        (update-in [:graph] add-parent-ref entry)
+        (update-in [:graph] uc/add-nodes-with-attrs [ts new-entry])
+        (add-hashtags new-entry)
+        (update-in [:graph] add-mentions new-entry)
+        (update-in [:graph] add-linked new-entry)
+        (update-in [:graph] add-timeline-tree new-entry)
+        (update-in [:graph] add-activity new-entry)
+        (update-in [:graph] add-consumption new-entry)
+        (update-in [:graph] add-linked-visit new-entry)
+        (update-in [:graph] add-parent-ref new-entry)
         (update-in [:sorted-entries] conj ts))))
