@@ -12,7 +12,8 @@
             [clojure.tools.logging :as log]
             [me.raynes.fs :as fs]
             [iwaswhere-web.fulltext-search :as ft]
-            [clojure.pprint :as pp]))
+            [clojure.pprint :as pp]
+            [clojure.edn :as edn]))
 
 (defn publish-state-fn
   "Publishes current state, as filtered for the respective clients. Sends to
@@ -84,6 +85,7 @@
             (assoc-in [:stats] (gs/get-basic-stats current-state))
             (assoc-in [:hashtags] (gq/find-all-hashtags current-state))
             (assoc-in [:pvt-hashtags] (gq/find-all-pvt-hashtags current-state))
+            (assoc-in [:pvt-displayed] (:pvt-displayed (:cfg current-state)))
             (assoc-in [:mentions] (gq/find-all-mentions current-state))
             (assoc-in [:activities] (gq/find-all-activities current-state))
             (assoc-in [:consumption-types]
@@ -98,6 +100,7 @@
   [{:keys [current-state msg-meta]}]
   (let [stats-tags {:hashtags          (:hashtags current-state)
                     :pvt-hashtags      (:pvt-hashtags current-state)
+                    :pvt-displayed     (:pvt-displayed current-state)
                     :mentions          (:mentions current-state)
                     :activities        (:activities current-state)
                     :consumption-types (:consumption-types current-state)
@@ -112,9 +115,12 @@
    in a sorted set of the nodes."
   [put-fn]
   (fs/mkdirs f/daily-logs-path)
-  (let [entries-to-index (atom {})
+  (let [conf-filepath (str f/data-path "/conf.edn")
+        conf (edn/read-string (slurp conf-filepath))
+        entries-to-index (atom {})
         state (atom {:sorted-entries (sorted-set-by >)
                      :graph          (uber/graph)
+                     :cfg            conf
                      :lucene-index   ft/index
                      :client-queries {}
                      :hashtags       #{}

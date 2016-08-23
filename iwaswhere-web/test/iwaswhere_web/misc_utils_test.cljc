@@ -55,13 +55,16 @@
    :timestamp      1465059173965
    :md             "Something #nsfw"})
 
+(def pvt-test-conf {:pvt-hashtags #{"#pvt" "#private" "#nsfw" "#consumption"}})
+
 (deftest pvt-filter-test
   (testing "properly detects privacy status of entries"
-    (is (u/pvt-filter test-entry))
-    (is (u/pvt-filter test-entry2))
-    (is (not (u/pvt-filter pvt-entry)))
-    (is (not (u/pvt-filter pvt-entry2)))
-    (is (not (u/pvt-filter pvt-entry3)))))
+    (let [pvt-filter-fn (u/pvt-filter pvt-test-conf)]
+      (is (pvt-filter-fn test-entry))
+      (is (pvt-filter-fn test-entry2))
+      (is (not (pvt-filter-fn pvt-entry)))
+      (is (not (pvt-filter-fn pvt-entry2)))
+      (is (not (pvt-filter-fn pvt-entry3))))))
 
 (deftest double-ts-to-long-test
   (testing "correctly converts number"

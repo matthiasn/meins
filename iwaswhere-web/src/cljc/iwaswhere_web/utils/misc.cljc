@@ -28,14 +28,17 @@
     (when (and dur (< dur 99999999))
       (str ", " (duration-string dur)))))
 
-(def private-tags #{"#pvt" "#private" "#nsfw" "#consumption"})
-
 (defn pvt-filter
-  "Filter for entries that I consider private."
-  [entry]
-  (let [tags (set (map s/lower-case (:tags entry)))
-        matched (set/intersection tags private-tags)]
-    (empty? matched)))
+  "Filter for entries considered private."
+  [cfg]
+  (fn
+    [entry]
+    (let [tags (set (map s/lower-case (:tags entry)))
+          private-tags (:pvt-hashtags cfg)
+          hashtags (:hashtags cfg)
+          only-pvt-tags (set/difference private-tags hashtags)
+          matched (set/intersection tags only-pvt-tags)]
+      (empty? matched))))
 
 (defn suggestions
   "Renders suggestions for hashtags or mentions if either occurs before the

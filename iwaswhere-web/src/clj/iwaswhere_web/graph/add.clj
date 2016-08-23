@@ -16,23 +16,28 @@
 (defn add-hashtags
   "Add hashtag edges to graph for a new entry. When a hashtag exists already,
    an edge to the existing node will be added, otherwise a new hashtag node will
-   be created."
-  [graph entry]
-  (let [tags (set (:tags entry))
-        pvt-entry? (seq (set/intersection tags u/private-tags))
+   be created.
+   When any of the private tags occur, the entry is considered private, and all
+   the tags will be added to the private tags in the graph."
+  [current-state entry]
+  (let [graph (:graph current-state)
+        cfg (:cfg current-state)
+        tags (set (:tags entry))
+        pvt-tags (set/union (:pvt-displayed cfg) (:pvt-tags cfg))
+        pvt-entry? (seq (set/intersection tags pvt-tags))
         ht-parent (if pvt-entry? :pvt-hashtags :hashtags)
-        tag-type (if pvt-entry? :ptag :tag)]
-    (reduce (fn [acc tag]
-              (let [ltag (s/lower-case tag)]
-                (-> acc
-                    (uc/add-nodes ht-parent)
-                    (uc/add-nodes-with-attrs [{tag-type ltag} {:val tag}])
-                    (uc/add-edges
-                      [{tag-type ltag} (:timestamp entry)
-                       {:relationship :CONTAINS}]
-                      [ht-parent {tag-type ltag} {:relationship :IS}]))))
-            graph
-            tags)))
+        tag-type (if pvt-entry? :ptag :tag)
+        tag-add-fn
+        (fn [g tag]
+          (let [ltag (s/lower-case tag)]
+            (-> g
+                (uc/add-nodes ht-parent)
+                (uc/add-nodes-with-attrs [{tag-type ltag} {:val tag}])
+                (uc/add-edges
+                  [{tag-type ltag} (:timestamp entry)
+                   {:relationship :CONTAINS}]
+                  [ht-parent {tag-type ltag} {:relationship :IS}]))))]
+    (assoc-in current-state [:graph] (reduce tag-add-fn graph tags))))
 
 (defn add-mentions
   "Add mention edges to graph for a new entry. When a mentioned person exists
@@ -176,6 +181,7 @@
    sorted by timestamp."
   [current-state ts entry]
   (let [graph (:graph current-state)
+        cfg (:cfg current-state)
         old-entry (when (uc/has-node? graph ts) (uc/attrs graph ts))
         merged (merge old-entry entry)
         old-tags (:tags old-entry)
@@ -191,7 +197,7 @@
         (update-in [:graph] remove-unused-tags old-tags :tag)
         (update-in [:graph] remove-unused-tags old-mentions :mention)
         (update-in [:graph] uc/add-nodes-with-attrs [ts merged])
-        (update-in [:graph] add-hashtags entry)
+        (add-hashtags entry)
         (update-in [:graph] add-mentions entry)
         (update-in [:graph] add-linked entry)
         (update-in [:graph] add-timeline-tree entry)

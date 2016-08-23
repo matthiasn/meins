@@ -66,6 +66,8 @@
     :timestamp 1450998400000
     :md        "And yet another completed #task - #done"}])
 
+(def private-tags #{"#pvt" "#private" "#nsfw" "#consumption"})
+
 (defn persist-reducer
   "Reducing function for adding entries to component state."
   [acc entry]
@@ -171,7 +173,7 @@
                            :msg-payload   {:sente-uid simple-query-uid}})
                         :emit-msg
                         second)]
-            (is (= (:hashtags res) (set/union u/private-tags
-                                              #{"#task" "#entry" "#test" "#done"
-                                                "#completed" "#blah" "#new"})))
+            (is (= (:hashtags res) #{"#task" "#entry" "#test" "#done"
+                                     "#completed" "#blah" "#new"}))
+            (is (= (:pvt-displayed res) private-tags))
             (is (= (:mentions res) #{"@myself" "@someone"}))))))))

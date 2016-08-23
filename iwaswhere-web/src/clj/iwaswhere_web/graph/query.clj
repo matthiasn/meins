@@ -155,21 +155,26 @@
 
 (defn find-all-hashtags
   "Finds all hashtags used in entries by finding the edges that originate from
-   the :hashtags node."
+   the :hashtags node. Merges the tags in the :pvt-displayed key of the config
+   files, as those are the private keys that should be available in the
+   autosuggestions."
   [current-state]
   (let [g (:graph current-state)
         ltags (map #(-> % :dest :tag) (uc/find-edges g {:src :hashtags}))
-        tags (map #(:val (uc/attrs g {:tag %})) ltags)]
-    (set/union (set tags) u/private-tags)))
+        tags (map #(:val (uc/attrs g {:tag %})) ltags)
+        cfg (:cfg current-state)]
+    (set tags)))
 
 (defn find-all-pvt-hashtags
-  "Finds all hashtags used in entries by finding the edges that originate from
-   the :hashtags node."
+  "Finds all private hashtags. Private hashtags are either those used
+   exclusively in entries marked private, or the tags in the config key
+   :pvt-tags."
   [current-state]
-  (let [g (:graph current-state)
+  (let [cfg (:cfg current-state)
+        g (:graph current-state)
         ltags (map #(-> % :dest :ptag) (uc/find-edges g {:src :pvt-hashtags}))
         tags (map #(:val (uc/attrs g {:ptag %})) ltags)]
-    (set tags)))
+    (set/union (set tags) (:pvt-tags cfg))))
 
 (defn find-all-mentions
   "Finds all hashtags used in entries by finding the edges that originate from

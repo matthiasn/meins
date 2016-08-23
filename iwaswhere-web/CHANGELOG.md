@@ -1,6 +1,13 @@
 # Change Log
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [0.1.11] - 2016-08-23
+### Changed
+- split view
+- configurable pvt tags
+- activity chart
+- open/completed tasks chart
+
 ## [0.1.10] - 2016-08-04
 ### Changed
 - basic pomodoro stats

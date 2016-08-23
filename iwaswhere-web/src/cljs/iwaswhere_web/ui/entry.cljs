@@ -246,6 +246,7 @@
                                     (put-fn [:entry/update-local entry]))
         show-pvt? (:show-pvt cfg)
         hashtags (:hashtags cfg)
+        hashtags (set/union (:hashtags cfg) (:pvt-displayed cfg))
         pvt-hashtags (:pvt-hashtags cfg)
         hashtags (if show-pvt? (set/union hashtags pvt-hashtags) hashtags)
         mentions (:mentions cfg)]
@@ -296,7 +297,9 @@
         linked-entries-set (set (:linked-entries-list entry))
         get-or-retrieve (u/find-missing-entry entries-map put-fn)
         with-imgs (filter :img-file (map get-or-retrieve linked-entries-set))
-        filtered (if (:show-pvt cfg) with-imgs (filter u/pvt-filter with-imgs))]
+        filtered (if (:show-pvt cfg)
+                   with-imgs
+                   (filter (u/pvt-filter cfg) with-imgs))]
     [:div.thumbnails
      (for [img-entry filtered]
        ^{:key (str "thumbnail" ts (:img-file img-entry))}
@@ -313,7 +316,9 @@
   (let [ts (:timestamp entry)
         entry (or (get new-entries ts) entry)
         comments (:comments entry)
-        comments (if (:show-pvt cfg) comments (filter u/pvt-filter comments))
+        comments (if (:show-pvt cfg)
+                   comments
+                   (filter (u/pvt-filter cfg) comments))
         comments-map (into {} (map (fn [c] [(:timestamp c) c])) comments)
         toggle-comments #(put-fn [:cmd/toggle
                                   {:timestamp ts

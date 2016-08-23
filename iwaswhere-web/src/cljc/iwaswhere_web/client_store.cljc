@@ -25,6 +25,7 @@
   (let [new-state (-> current-state
                       (assoc-in [:cfg :hashtags] (:hashtags msg-payload))
                       (assoc-in [:cfg :pvt-hashtags] (:pvt-hashtags msg-payload))
+                      (assoc-in [:cfg :pvt-displayed] (:pvt-displayed msg-payload))
                       (assoc-in [:stats] (:stats msg-payload))
                       (assoc-in [:cfg :activities] (:activities msg-payload))
                       (assoc-in [:cfg :consumption-types]

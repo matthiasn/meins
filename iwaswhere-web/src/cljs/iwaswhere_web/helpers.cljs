@@ -17,8 +17,8 @@
                               :longitude (.-longitude coords)})])))))
 
 (defn new-entry-fn
-  "Create a new, empty entry. The opts map is merged last with the generated entry, thus keys can
-  be overwritten here.
+  "Create a new, empty entry. The opts map is merged last with the generated
+   entry, thus keys can be overwritten here.
   Caveat: the timezone detection currently only works in Chrome. My Firefox 46.0.1 strictly refused
   to tell me a timezone when calling 'Intl.DateTimeFormat().resolvedOptions()', which would be
   according to standards but unfortunately the timeZone is always undefined."
@@ -47,9 +47,9 @@
       (dissoc :linked-entries-list)))
 
 (defn string-before-cursor
-  "Determine the substring right before the cursor of the current selection. Only returns that
-  substring if it is from current node's text, as otherwise this would listen to selections
-  outside the element as well."
+  "Determine the substring right before the cursor of the current selection.
+   Only returns that substring if it is from current node's text, as otherwise
+   this would listen to selections outside the element as well."
   [comp-str]
   (let [selection (.getSelection js/window)
         cursor-pos (.-anchorOffset selection)
@@ -60,8 +60,8 @@
       "")))
 
 (defn focus-on-end
-  "Focus on the provided element, and then places the caret in the last position of the element's
-   contents"
+  "Focus on the provided element, and then places the caret in the last position
+   of the element's contents."
   [el]
   (.focus el)
   (doto (.createFromNodeContents goog.dom.Range el)

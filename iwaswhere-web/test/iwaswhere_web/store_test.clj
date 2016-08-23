@@ -50,6 +50,8 @@
       {:current-state @(:state (s/state-fn (fn [_])))
        :logs-path     test-daily-logs-path})))
 
+(def private-tags #{"#pvt" "#private" "#nsfw" "#consumption"})
+
 (deftest geo-entry-persist-test
   (testing
     "Validates that handler properly adds entry and persists entry, including
@@ -76,7 +78,7 @@
 
           (testing
             "hashtag was created for entry"
-            (is (= (set/union (:tags test-entry) u/private-tags)
+            (is (= (:tags test-entry)
                    (gq/find-all-hashtags new-state))))
 
           (testing
@@ -115,8 +117,7 @@
 
   (testing
     "hashtag was created for entry"
-    (is (= (set/union (:tags test-entry) u/private-tags)
-           (gq/find-all-hashtags state))))
+    (is (= (:tags test-entry) (gq/find-all-hashtags state))))
 
   (testing
     "mention was created for entry"

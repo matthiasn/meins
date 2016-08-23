@@ -38,7 +38,7 @@
                                  :query-id query-id}])
           linked-entries (if (:show-pvt cfg)
                            linked-entries
-                           (filter u/pvt-filter linked-entries))
+                           (filter (u/pvt-filter cfg) linked-entries))
           linked-filter (query-id (:linked-filter cfg))
           filter-fn (linked-filter-fn entries-map linked-filter put-fn)
           linked-entries (filter filter-fn linked-entries)]
@@ -67,7 +67,9 @@
         entries-map (:entries-map store-snapshot)
         entries (map (fn [ts] (get entries-map ts)) (:entries results))
         show-pvt? (:show-pvt cfg)
-        filtered-entries (if show-pvt? entries (filter u/pvt-filter entries))
+        filtered-entries (if show-pvt?
+                           entries
+                           (filter (u/pvt-filter cfg) entries))
         new-entries (:new-entries store-snapshot)
         show-context? (:show-context cfg)
         comments-w-entries? (:comments-w-entries cfg)

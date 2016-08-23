@@ -231,7 +231,7 @@
 (s/def :iww.client-state/new-entries (s/map-of possible-timestamp? entry-spec))
 
 (s/def :iww.client-state.cfg/active
-  (s/nilable (s/map-of keyword? possible-timestamp?)))
+  (s/nilable (s/map-of keyword? (s/nilable possible-timestamp?))))
 
 (s/def :iww.client-state.cfg/show-maps-for set?)
 (s/def :iww.client-state.cfg/show-comments-for set?)
