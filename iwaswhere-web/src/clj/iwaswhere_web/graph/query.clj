@@ -69,7 +69,7 @@
          {:comments (->> (flatten (uc/find-edges g {:dest         n
                                                     :relationship :COMMENT}))
                          (remove :mirror?)
-                         (map :src)
+                         (mapv :src)
                          (sort))}))
 
 (defn get-tags-mentions-matches
@@ -100,7 +100,7 @@
   [entry g n sort-by-upvotes?]
   (let [linked (->> (flatten (uc/find-edges g {:src n :relationship :LINKED}))
                     ;(remove :mirror?)
-                    (map :dest)
+                    (mapv :dest)
                     (sort))]
     (merge entry {:linked-entries-list (if sort-by-upvotes?
                                          (sort compare-w-upvotes linked)
@@ -216,23 +216,12 @@
    some basic stats."
   [current-state query]
   (let [n (:n query)
-        sort-by-upvotes? (:sort-by-upvotes query)
         g (:graph current-state)
         entry-mapper (fn [entry] [(:timestamp entry) entry])
         entries (take n (filter (entries-filter-fn query g)
-                                (extract-sorted-entries current-state query)))
-        comment-timestamps (set (flatten (map :comments entries)))
-        linked-entries (extract-entries-by-ts current-state
-                         (set (flatten (map :linked-entries-list entries))))
-        comments-linked-mapper (comments-linked-for-entry g sort-by-upvotes?)
-        linked-entries (map comments-linked-mapper linked-entries)
-        linked-comments-ts (set (flatten (map :comments linked-entries)))
-        comments (extract-entries-by-ts current-state
-                   (set/union comment-timestamps linked-comments-ts))]
+                                (extract-sorted-entries current-state query)))]
     {:entries     (map :timestamp entries)
-     :entries-map (merge (into {} (map entry-mapper entries))
-                         (into {} (map entry-mapper comments))
-                         (into {} (map entry-mapper linked-entries)))}))
+     :entries-map (into {} (map entry-mapper entries))}))
 
 (defn find-entry
   "Find single entry."

@@ -6,20 +6,11 @@
             [iwaswhere-web.utils.parse :as ps]
             [clojure.set :as set]))
 
-(defn find-missing-entry
-  [entries-map put-fn]
-  (fn [ts]
-    (let [entry (get entries-map ts)]
-      (or entry
-          (let [missing-entry {:timestamp ts}]
-            (put-fn [:entry/find missing-entry])
-            missing-entry)))))
-
 (defn linked-filter-fn
   "Filter linked entries by search."
   [entries-map linked-filter put-fn]
   (fn [entry]
-    (let [comments-mapper (find-missing-entry entries-map put-fn)
+    (let [comments-mapper (u/find-missing-entry entries-map put-fn)
           comments (map comments-mapper (:comments entry))
           combined-tags (reduce #(set/union %1 (:tags %2)) (:tags entry)
                                 comments)]
@@ -80,7 +71,7 @@
         active-id (-> store-snapshot :cfg :active query-id)
         active-entry (get entries-map active-id)
         linked-entries-set (set (:linked-entries-list active-entry))
-        linked-mapper (find-missing-entry entries-map put-fn)
+        linked-mapper (u/find-missing-entry entries-map put-fn)
         linked-entries (map linked-mapper linked-entries-set)]
     [:div.journal
      [:div.journal-entries
@@ -88,8 +79,8 @@
                           filtered-entries)]
         (when (with-comments? entry)
           (let [entry (assoc-in entry [:comments]
-                                (map (fn [ts] (get entries-map ts))
-                                     (:comments entry)))]
+                                (mapv (u/find-missing-entry entries-map put-fn)
+                                      (:comments entry)))]
             ^{:key (:timestamp entry)}
             [e/entry-with-comments
              entry cfg new-entries put-fn entries-map local-cfg])))
