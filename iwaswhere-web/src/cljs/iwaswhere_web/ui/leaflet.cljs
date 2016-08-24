@@ -28,9 +28,9 @@
 
 (defn leaflet-map
   "Helper for showing map when exists and desired."
-  [entry show?]
-  (when show?
-    (when-let [lat (:latitude entry)]
-      [leaflet-component {:id  (str "map" (:timestamp entry))
-                          :lat lat
-                          :lon (:longitude entry)}])))
+  [entry show? local-cfg]
+  (let [{:keys [latitude longitude timestamp]} entry]
+    (when (and show? latitude)
+      [leaflet-component {:id  (str "map" timestamp (:query-id local-cfg))
+                          :lat latitude
+                          :lon longitude}])))

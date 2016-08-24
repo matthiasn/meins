@@ -97,8 +97,9 @@
         (let [show-more #(put-fn [:show/more {:query-id query-id}])]
           [:div.show-more {:on-click show-more :on-mouse-over show-more}
            [:span.show-more-btn [:span.fa.fa-plus-square] " show more"]]))]
-     [linked-entries-view
-      linked-entries entries-map new-entries cfg put-fn local-cfg]]))
+     (when active-entry
+       [linked-entries-view
+        linked-entries entries-map new-entries cfg put-fn local-cfg])]))
 
 (defn tab-view
   [{:keys [observed put-fn] :as cmp-map} query-id tabs-group]

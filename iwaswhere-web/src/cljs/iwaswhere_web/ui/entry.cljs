@@ -272,7 +272,7 @@
             (str " linked: " (count (:linked-entries-list entry)))]))]
       [entry-actions entry cfg put-fn edit-mode? toggle-edit local-cfg]]
      [hashtags-mentions-list entry]
-     [l/leaflet-map entry (or show-map? (:show-all-maps cfg))]
+     [l/leaflet-map entry (or show-map? (:show-all-maps cfg)) local-cfg]
      (if edit-mode?
        [e/editable-md-render entry hashtags mentions put-fn toggle-edit]
        [md/markdown-render entry cfg])
@@ -323,9 +323,8 @@
         toggle-comments #(put-fn [:cmd/toggle
                                   {:timestamp ts
                                    :path [:cfg :show-comments-for]}])
-        local-comments (into {} (filter (fn [[_ts c]] (= (:comment-for c)
-                                                         (:timestamp entry)))
-                                        new-entries))
+        comments-filter (fn [[_ts c]] (= (:comment-for c) (:timestamp entry)))
+        local-comments (into {} (filter comments-filter new-entries))
         all-comments (sort-by :timestamp (vals (merge comments-map
                                                       local-comments)))
         new-entries? (contains? new-entries ts)]
