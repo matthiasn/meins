@@ -238,18 +238,20 @@
 (s/def :iww.client-state.cfg/show-all-maps boolean?)
 (s/def :iww.client-state.cfg/show-hashtags boolean?)
 (s/def :iww.client-state.cfg/comments-w-entries boolean?)
-(s/def :iww.client-state.cfg/show-context boolean?)
 (s/def :iww.client-state.cfg/show-pvt boolean?)
+(s/def :iww.client-state.cfg/mute boolean?)
+(s/def :iww.client-state.cfg/redacted boolean?)
 (s/def :iww.client-state/cfg
   (s/keys :req-un [:iww.client-state.cfg/active
                    :iww.client-state.cfg/show-maps-for
-                   :iww.client-state.cfg/show-comments-for
-                   :iww.client-state.cfg/sort-by-upvotes
+                   :iww.client-state.cfg/show-comments-for]
+          :opt-un [:iww.client-state.cfg/sort-by-upvotes
                    :iww.client-state.cfg/show-all-maps
-                   :iww.client-state.cfg/show-hashtags
                    :iww.client-state.cfg/comments-w-entries
-                   :iww.client-state.cfg/show-context
-                   :iww.client-state.cfg/show-pvt]))
+                   :iww.client-state.cfg/show-pvt
+                   :iww.client-state.cfg/mute
+                   :iww.client-state.cfg/redacted
+                   :iww.client-state.cfg/show-hashtags]))
 
 (s/def :iww.query-cfg/active keyword?)
 (s/def :iww.query-cfg/all (s/coll-of keyword?))

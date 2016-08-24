@@ -51,11 +51,11 @@
    :md         "This test case is to prevent a regression where the #formatting was messed if one tag was a substring of another. #format"})
 
 (def cfg-show-hashtags
-  {:show-hashtags   true
+  {:hide-hashtags   false
    :lines-shortened 1})
 
 (def cfg-hide-hashtags
-  {:show-hashtags   false
+  {:hide-hashtags   true
    :lines-shortened 1})
 
 (defn third [x] (first (next (next x))))

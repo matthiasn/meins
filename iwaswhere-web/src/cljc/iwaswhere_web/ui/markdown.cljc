@@ -59,7 +59,7 @@
   (let [show-shortened initial-atom]
     (fn [entry cfg]
       (when-let [md-string (:md entry)]
-        (let [show-hashtags? (:show-hashtags cfg)
+        (let [show-hashtags? (not (:hide-hashtags cfg))
               lines-shortened (:lines-shortened cfg)
               lines (s/split-lines md-string)
               shortened? (and @show-shortened (>= (count lines) lines-shortened))

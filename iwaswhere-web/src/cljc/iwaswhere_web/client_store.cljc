@@ -33,6 +33,24 @@
                       (assoc-in [:cfg :mentions] (:mentions msg-payload)))]
     {:new-state new-state}))
 
+(def default-config
+  {:active             nil
+   :linked-filter      {}
+   :show-context       true
+   :show-maps-for      #{}
+   :show-comments-for  #{}
+   :split-view         true
+   :thumbnails         true
+   :lines-shortened    3
+   :toggle-options     [{:option :show-pvt :cls "fa-user-secret"}
+                        {:option :redacted :cls "fa-eye"}
+                        {:option :comments-w-entries :cls "fa-comments"}
+                        {:option :mute :cls "fa-volume-off"}
+                        {:option :hide-hashtags :cls "fa-hashtag"}
+                        {:option :show-all-maps :cls "fa-map-o"}
+                        {:option :thumbnails :cls "fa-photo"}
+                        {:option :split-view :cls "fa-columns"}]})
+
 (defn initial-state-fn
   "Creates the initial component state atom. Holds a list of entries from the
    backend, a map with temporary entries that are being edited but not saved
@@ -46,20 +64,7 @@
                              :pomodoro-stats (sorted-map)
                              :activity-stats (sorted-map)
                              :task-stats     (sorted-map)
-                             :cfg            {:active             nil
-                                              :linked-filter      {}
-                                              :show-maps-for      #{}
-                                              :show-comments-for  #{}
-                                              :sort-by-upvotes    false
-                                              :show-all-maps      false
-                                              :show-hashtags      true
-                                              :comments-w-entries true
-                                              :show-context       true
-                                              :redacted           false
-                                              :thumbnails         true
-                                              :mute               false
-                                              :show-pvt           false
-                                              :lines-shortened    3}})]
+                             :cfg            default-config})]
     (put-fn [:state/stats-tags-get])
     (doseq [[_id q] (:queries (:query-cfg @initial-state))]
       (put-fn [:state/get q]))
