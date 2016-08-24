@@ -94,8 +94,9 @@
 
 (defn tab-view
   [{:keys [observed put-fn] :as cmp-map} query-id tabs-group]
-  (let [store-snapshot @observed]
-    [:div.tab-view
+  (let [store-snapshot @observed
+        cfg (:cfg store-snapshot)]
+    [:div.tab-view {:class (when (:split-view cfg) "split-view")}
      [search/search-field-view store-snapshot put-fn query-id]
      [journal-view cmp-map query-id]]))
 
@@ -118,12 +119,14 @@
   "Renders a split view, with new entries at the top."
   [{:keys [observed put-fn] :as cmp-map}]
   (let [store-snapshot @observed
-        local-cfg {}]
+        local-cfg {}
+        cfg (:cfg store-snapshot)]
     [:div.tabs-container
      [new-entries-view store-snapshot local-cfg put-fn]
      [:div.tabs-view
       [tab-view cmp-map :query-1 :left]
-      [tab-view cmp-map :query-2 :right]]]))
+      (when (:split-view cfg)
+        [tab-view cmp-map :query-2 :right])]]))
 
 (defn cmp-map
   [cmp-id]
