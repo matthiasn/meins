@@ -13,16 +13,15 @@
 
 (defn hashtags-mentions-list
   "Horizontally renders list with hashtags and mentions."
-  [entry]
-  (let [tags (:tags entry)
-        mentions (:mentions entry)]
-    [:div.hashtags
-     (for [mention mentions]
-       ^{:key (str "tag-" mention)}
-       [:span.mention mention])
-     (for [hashtag tags]
-       ^{:key (str "tag-" hashtag)}
-       [:span.hashtag hashtag])]))
+  [entry cfg]
+  [:div.hashtags
+   (when (:redacted cfg) {:class "redacted"})
+   (for [mention (:mentions entry)]
+     ^{:key (str "tag-" mention)}
+     [:span.mention mention])
+   (for [hashtag (:tags entry)]
+     ^{:key (str "tag-" hashtag)}
+     [:span.hashtag hashtag])])
 
 (defn trash-icon
   "Renders a trash icon, which transforms into a warning button that needs to be
@@ -271,7 +270,7 @@
                             :class    (when entry-active? "active")}
             (str " linked: " (count (:linked-entries-list entry)))]))]
       [entry-actions entry cfg put-fn edit-mode? toggle-edit local-cfg]]
-     [hashtags-mentions-list entry]
+     [hashtags-mentions-list entry cfg]
      [l/leaflet-map entry (or show-map? (:show-all-maps cfg)) local-cfg]
      (if edit-mode?
        [e/editable-md-render entry hashtags mentions put-fn toggle-edit]
@@ -342,4 +341,4 @@
           (let [n (count comments)]
             [:span {:on-click toggle-comments :on-mouse-enter toggle-comments}
              (str "show " n " comment" (when (> n 1) "s"))])]))
-     [thumbnails entry entries-map cfg put-fn]]))
+     (when (:thumbnails cfg) [thumbnails entry entries-map cfg put-fn])]))

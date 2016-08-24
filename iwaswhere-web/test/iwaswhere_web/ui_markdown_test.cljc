@@ -58,45 +58,47 @@
   {:show-hashtags   false
    :lines-shortened 1})
 
+(defn third [x] (first (next (next x))))
+
 (deftest markdown-render-test
   ""
   (testing "renders test-entry as expected, with #"
-    (is (= (second ((m/markdown-render test-entry cfg-show-hashtags)
+    (is (= (third ((m/markdown-render test-entry cfg-show-hashtags)
                      test-entry cfg-show-hashtags))
            [:div {:dangerouslySetInnerHTML {:__html "<p>Moving to <a href='/##cljc'>#cljc</a></p>"}}])))
 
   (testing "renders test-entry as expected, without #"
-    (is (= (second ((m/markdown-render test-entry cfg-hide-hashtags)
+    (is (= (third ((m/markdown-render test-entry cfg-hide-hashtags)
                      test-entry cfg-hide-hashtags))
            [:div {:dangerouslySetInnerHTML {:__html "<p>Moving to <a href='/##cljc'>cljc</a></p>"}}])))
 
   (testing "renders more complex test-entry2 as expected, with #"
-    (is (= (second ((m/markdown-render test-entry2 cfg-show-hashtags)
+    (is (= (third ((m/markdown-render test-entry2 cfg-show-hashtags)
                      test-entry2 cfg-show-hashtags))
            [:div {:dangerouslySetInnerHTML {:__html "<p>New <a href='/##task'>#task</a>: count the time spent <a href='/##interacting'>#interacting</a> with the <a href='/##UI'>#UI</a> when no <a href='/##pomodoro'>#pomodoro</a> is running. Mouse-over and key <a href='/##events'>#events</a> should be a good indicator for that. When nothing happens longer than x, don't extend the current period of activity but rather close the last one at the last <a href='/##timestamp'>#timestamp</a> and create a new period of activity. I like that. Not all work can possibly happen in <a href='/##pomodoros'>#pomodoros</a>, and it would be a waste of data to not capture that time.  <a class='mention-link' href='/#@myself'>@myself</a> </p>"}}])))
 
   (testing "renders more complex test-entry2 as expected, without #"
-    (is (= (second ((m/markdown-render test-entry2 cfg-hide-hashtags)
+    (is (= (third ((m/markdown-render test-entry2 cfg-hide-hashtags)
                      test-entry2 cfg-hide-hashtags))
            [:div {:dangerouslySetInnerHTML {:__html "<p>New <a href='/##task'>task</a>: count the time spent <a href='/##interacting'>interacting</a> with the <a href='/##UI'>UI</a> when no <a href='/##pomodoro'>pomodoro</a> is running. Mouse-over and key <a href='/##events'>events</a> should be a good indicator for that. When nothing happens longer than x, don't extend the current period of activity but rather close the last one at the last <a href='/##timestamp'>timestamp</a> and create a new period of activity. I like that. Not all work can possibly happen in <a href='/##pomodoros'>pomodoros</a>, and it would be a waste of data to not capture that time.  <a class='mention-link' href='/#@myself'>myself</a> </p>"}}])))
 
   (testing "renders unordered list in test-entry3 as expected, first line only"
-    (is (= (second ((m/markdown-render test-entry3 cfg-show-hashtags)
+    (is (= (third ((m/markdown-render test-entry3 cfg-show-hashtags)
                      test-entry3 cfg-show-hashtags))
            [:div {:dangerouslySetInnerHTML {:__html "<p>Some test with <a href='/##unordered-list'>#unordered-list</a>:</p>"}}])))
 
   (testing "renders unordered list in test-entry3 as expected, all lines"
     (with-redefs [m/initial-atom (atom false)]
-      (is (= (second ((m/markdown-render test-entry3 cfg-show-hashtags)
+      (is (= (third ((m/markdown-render test-entry3 cfg-show-hashtags)
                        test-entry3 cfg-show-hashtags))
              [:div {:dangerouslySetInnerHTML {:__html "<p>Some test with <a href='/##unordered-list'>#unordered-list</a>:</p><ul><li>line 1</li><li>line 2</li><li>line 3</li><li>line 4</li></ul>"}}]))))
 
   (testing "multiple hashtags in a row are rendered correctly"
-    (is (= (second ((m/markdown-render test-entry4 cfg-show-hashtags)
+    (is (= (third ((m/markdown-render test-entry4 cfg-show-hashtags)
                      test-entry4 cfg-show-hashtags))
            [:div {:dangerouslySetInnerHTML {:__html "<p>This test case is to prevent a regression where multiple hashtags in a row were not properly formatted. <a href='/##tag1'>#tag1</a> <a href='/##tag2'>#tag2</a> <a href='/##tag3'>#tag3</a></p>"}}])))
 
   (testing "hashtags can be a substring of another hashtag"
-    (is (= (second ((m/markdown-render test-entry5 cfg-show-hashtags)
+    (is (= (third ((m/markdown-render test-entry5 cfg-show-hashtags)
                      test-entry5 cfg-show-hashtags))
            [:div {:dangerouslySetInnerHTML {:__html "<p>This test case is to prevent a regression where the <a href='/##formatting'>#formatting</a> was messed if one tag was a substring of another. <a href='/##format'>#format</a></p>"}}]))))

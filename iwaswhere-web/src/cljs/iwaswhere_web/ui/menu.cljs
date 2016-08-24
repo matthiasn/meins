@@ -10,13 +10,15 @@
         toggle-all-maps #(put-fn [:cmd/toggle-key {:path [:cfg :show-all-maps]}])
         show-tags? (:show-hashtags cfg)
         toggle-tags #(put-fn [:cmd/toggle-key {:path [:cfg :show-hashtags]}])
-        show-context? (:show-context cfg)
-        toggle-context #(put-fn [:cmd/toggle-key {:path [:cfg :show-context]}])
+        show-redacted? (:redacted cfg)
+        toggle-redacted #(put-fn [:cmd/toggle-key {:path [:cfg :redacted]}])
         comments-w-entries? (:comments-w-entries cfg)
         toggle-comments-w-entries #(put-fn [:cmd/toggle-key
                                             {:path [:cfg :comments-w-entries]}])
         show-pvt? (:show-pvt cfg)
         toggle-pvt #(put-fn [:cmd/toggle-key {:path [:cfg :show-pvt]}])
+        show-thumbnails? (:thumbnails cfg)
+        toggle-thumbnails #(put-fn [:cmd/toggle-key {:path [:cfg :thumbnails]}])
         mute? (:mute cfg)
         toggle-mute #(put-fn [:cmd/toggle-key {:path [:cfg :mute]}])
         sort-by-upvotes? (:sort-by-upvotes cfg)
@@ -31,7 +33,7 @@
      [:span.fa.fa-user-secret.toggle
       {:class (when-not show-pvt? "inactive") :on-click toggle-pvt}]
      [:span.fa.fa-eye.toggle
-      {:class (when-not show-context? "inactive") :on-click toggle-context}]
+      {:class (when show-redacted? "inactive") :on-click toggle-redacted}]
      [:span.fa.fa-comments.toggle
       {:class (when-not comments-w-entries? "inactive")
        :on-click toggle-comments-w-entries}]
@@ -40,9 +42,13 @@
      [:span.fa.fa-hashtag.toggle
       {:class (when-not show-tags? "inactive") :on-click toggle-tags}]
      [:span.fa.toggle
-      {:class (if show-all-maps? "fa-map" "fa-map-o") :on-click toggle-all-maps}]
+      {:class    (if show-all-maps? "fa-map" "fa-map-o")
+       :on-click toggle-all-maps}]
      [:span.fa.fa-ellipsis-h.toggle
-      {:on-click #(put-fn [:cmd/toggle-lines])}]]))
+      {:on-click #(put-fn [:cmd/toggle-lines])}]
+     [:span.fa.fa-photo.toggle
+      {:class    (when-not show-thumbnails? "inactive")
+       :on-click toggle-thumbnails}]]))
 
 (defn new-import-view
   "Renders component for rendering new and import buttons."

@@ -55,6 +55,8 @@
                                               :show-hashtags      true
                                               :comments-w-entries true
                                               :show-context       true
+                                              :redacted           false
+                                              :thumbnails         true
                                               :mute               false
                                               :show-pvt           false
                                               :lines-shortened    3}})]

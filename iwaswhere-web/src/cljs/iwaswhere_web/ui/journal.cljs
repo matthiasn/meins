@@ -93,7 +93,7 @@
             ^{:key (:timestamp entry)}
             [e/entry-with-comments
              entry cfg new-entries put-fn entries-map local-cfg])))
-      (when (and show-context? (seq entries))
+      (when (seq entries)
         (let [show-more #(put-fn [:show/more {:query-id query-id}])]
           [:div.show-more {:on-click show-more :on-mouse-over show-more}
            [:span.show-more-btn [:span.fa.fa-plus-square] " show more"]]))]

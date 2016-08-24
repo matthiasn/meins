@@ -7,8 +7,6 @@
 
   .thumbnails {
     display: flex;
-    // TODO: fix hack with max-width
-    max-width: 300px;
     overflow-y: auto;
 
     img {
@@ -19,7 +17,6 @@
 
 .entry {
   padding: 0.5em 0.8em 0.2em 0.8em;
-  //font-family: "redacted_scriptregular";
 
   .active {
     border: 2px solid green;
@@ -181,4 +178,9 @@
 
 .markdown h1:first-child {
   margin-top: 0;
+}
+
+.redacted {
+  font-family: "redacted_scriptregular";
+  line-height: 1.2em;
 }

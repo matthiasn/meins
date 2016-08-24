@@ -70,6 +70,7 @@
               tags-xform (mk-format-tags-xform entry show-hashtags?)
               html (md-to-html md-string :custom-transformers [tags-xform])]
           [:div
+           (when (:redacted cfg) {:class "redacted"})
            [:div {:dangerouslySetInnerHTML {:__html html}}]
            (when shortened?
              [:span.more {:on-mouse-enter #(swap! show-shortened not)}
