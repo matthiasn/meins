@@ -3,6 +3,7 @@
   (:require #?(:clj  [clojure.test :refer [deftest testing is]]
                :cljs [cljs.test :refer-macros [deftest testing is]])
             [iwaswhere-web.client-store :as store]
+            [iwaswhere-web.client-store-cfg :as c]
             [iwaswhere-web.client-store-search :as search]))
 
 (def empty-query
@@ -108,10 +109,10 @@
                                  :msg-meta      meta-from-backend}))]
     (testing
       "hashtags are on new state"
-      (is (= (:hashtags (:cfg new-state)) (:hashtags stats-tags-from-backend))))
+      (is (= (:hashtags (:options new-state)) (:hashtags stats-tags-from-backend))))
     (testing
       "mentions are on new state"
-      (is (= (:mentions (:cfg new-state)) (:mentions stats-tags-from-backend))))
+      (is (= (:mentions (:options new-state)) (:mentions stats-tags-from-backend))))
     (testing
       "stats are on new state"
       (is (= (:stats new-state) (:stats stats-tags-from-backend))))))
@@ -149,10 +150,10 @@
 (deftest toggle-key-test
   "toggle key messages flip boolean value"
   (let [current-state @(:state (store/initial-state-fn (fn [_put-fn])))
-        new-state (:new-state (store/toggle-key-fn
+        new-state (:new-state (c/toggle-key-fn
                                 {:current-state current-state
                                  :msg-payload   {:path [:cfg :sort-by-upvotes]}}))
-        new-state2 (:new-state (store/toggle-key-fn
+        new-state2 (:new-state (c/toggle-key-fn
                                  {:current-state current-state
                                   :msg-payload   {:path [:some :crazy :long :path]}}))]
     (testing
@@ -170,10 +171,10 @@
   (let [test-ts 1465059139281
         path [:cfg :show-maps-for]
         current-state @(:state (store/initial-state-fn (fn [_put-fn])))
-        new-state (:new-state (store/toggle-set-fn
+        new-state (:new-state (c/toggle-set-fn
                                 {:current-state current-state
                                  :msg-payload   {:timestamp test-ts :path path}}))
-        new-state1 (:new-state (store/toggle-set-fn
+        new-state1 (:new-state (c/toggle-set-fn
                                  {:current-state new-state
                                   :msg-payload   {:timestamp test-ts :path path}}))]
     (testing

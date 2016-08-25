@@ -3,7 +3,8 @@
     [matthiasn.systems-toolbox.component :as st]
     [iwaswhere-web.keepalive :as ka]
     [iwaswhere-web.client-store-entry :as cse]
-    [iwaswhere-web.client-store-search :as s]))
+    [iwaswhere-web.client-store-search :as s]
+    [iwaswhere-web.client-store-cfg :as c]))
 
 (defn new-state-fn
   "Update client side state with list of journal entries received from backend."
@@ -22,34 +23,16 @@
 (defn stats-tags-fn
   "Update client side state with stats and tags received from backend."
   [{:keys [current-state msg-payload]}]
-  (let [new-state (-> current-state
-                      (assoc-in [:cfg :hashtags] (:hashtags msg-payload))
-                      (assoc-in [:cfg :pvt-hashtags] (:pvt-hashtags msg-payload))
-                      (assoc-in [:cfg :pvt-displayed] (:pvt-displayed msg-payload))
-                      (assoc-in [:stats] (:stats msg-payload))
-                      (assoc-in [:cfg :activities] (:activities msg-payload))
-                      (assoc-in [:cfg :consumption-types]
-                                (:consumption-types msg-payload))
-                      (assoc-in [:cfg :mentions] (:mentions msg-payload)))]
+  (let [new-state
+        (-> current-state
+            (assoc-in [:options :hashtags] (:hashtags msg-payload))
+            (assoc-in [:options :pvt-hashtags] (:pvt-hashtags msg-payload))
+            (assoc-in [:options :pvt-displayed] (:pvt-displayed msg-payload))
+            (assoc-in [:options :activities] (:activities msg-payload))
+            (assoc-in [:options :consumption-types] (:consumption-types msg-payload))
+            (assoc-in [:options :mentions] (:mentions msg-payload))
+            (assoc-in [:stats] (:stats msg-payload)))]
     {:new-state new-state}))
-
-(def default-config
-  {:active             nil
-   :linked-filter      {}
-   :show-context       true
-   :show-maps-for      #{}
-   :show-comments-for  #{}
-   :split-view         true
-   :thumbnails         true
-   :lines-shortened    3
-   :toggle-options     [{:option :show-pvt :cls "fa-user-secret"}
-                        {:option :redacted :cls "fa-eye"}
-                        {:option :comments-w-entries :cls "fa-comments"}
-                        {:option :mute :cls "fa-volume-off"}
-                        {:option :hide-hashtags :cls "fa-hashtag"}
-                        {:option :show-all-maps :cls "fa-map-o"}
-                        {:option :thumbnails :cls "fa-photo"}
-                        {:option :split-view :cls "fa-columns"}]})
 
 (defn initial-state-fn
   "Creates the initial component state atom. Holds a list of entries from the
@@ -64,37 +47,11 @@
                              :pomodoro-stats (sorted-map)
                              :activity-stats (sorted-map)
                              :task-stats     (sorted-map)
-                             :cfg            default-config})]
+                             :cfg            @c/app-cfg})]
     (put-fn [:state/stats-tags-get])
     (doseq [[_id q] (:queries (:query-cfg @initial-state))]
       (put-fn [:state/get q]))
     {:state initial-state}))
-
-(defn toggle-set-fn
-  "Toggles for example the visibility of a map or the edit mode for an individual
-  journal entry. Requires the key to exist on the application state as a set."
-  [{:keys [current-state msg-payload]}]
-  (let [path (:path msg-payload)
-        timestamp (:timestamp msg-payload)
-        new-state (if (contains? (get-in current-state path) timestamp)
-                    (update-in current-state path disj timestamp)
-                    (update-in current-state path conj timestamp))]
-    {:new-state new-state}))
-
-(defn set-conj-fn
-  "Like toggle-set-fn but only adds timestamp to set specified in path.
-   Noop if already in there."
-  [{:keys [current-state msg-payload]}]
-  (let [path (:path msg-payload)
-        ts (:timestamp msg-payload)
-        new-state (update-in current-state path conj ts)]
-    {:new-state new-state}))
-
-(defn toggle-key-fn
-  "Toggles config key."
-  [{:keys [current-state msg-payload]}]
-  (let [path (:path msg-payload)]
-    {:new-state (update-in current-state path not)}))
 
 (defn show-more-fn
   "Runs previous query but with more results. Also updates the number to show in
@@ -118,13 +75,6 @@
                             timestamp))
      :emit-msg  s/update-location-hash-msg}))
 
-(defn toggle-lines
-  "Toggle number of lines to show when comments are shortend. Cycles from
-   one to ten."
-  [{:keys [current-state]}]
-  {:new-state (update-in current-state [:cfg :lines-shortened]
-                         #(if (< % 10) (inc %) 1))})
-
 (defn save-stats
   "Stores received stats on component state."
   [k]
@@ -132,13 +82,6 @@
     (let [ds (:date-string msg-payload)
           new-state (assoc-in current-state [k ds] msg-payload)]
       {:new-state new-state})))
-
-(defn set-currently-dragged
-  "Set the currently dragged entry for drag and drop."
-  [{:keys [current-state msg-payload]}]
-  (let [ts (:timestamp msg-payload)
-        new-state (assoc-in current-state [:cfg :currently-dragged] ts)]
-    {:new-state new-state}))
 
 (defn cmp-map
   "Creates map for the component which holds the client-side application state."
@@ -155,11 +98,12 @@
                               :stats/tasks-day    (save-stats :task-stats)
                               :state/stats-tags   stats-tags-fn
                               :show/more          show-more-fn
+                              :cfg/save           c/save-cfg
                               :cmd/toggle-active  toggle-active-fn
-                              :cmd/toggle         toggle-set-fn
-                              :cmd/set-opt        set-conj-fn
-                              :cmd/set-dragged    set-currently-dragged
-                              :cmd/toggle-key     toggle-key-fn
+                              :cmd/toggle         c/toggle-set-fn
+                              :cmd/set-opt        c/set-conj-fn
+                              :cmd/set-dragged    c/set-currently-dragged
+                              :cmd/toggle-key     c/toggle-key-fn
                               :cmd/keep-alive     ka/reset-fn
                               :cmd/keep-alive-res ka/set-alive-fn
-                              :cmd/toggle-lines   toggle-lines})})
+                              :cmd/toggle-lines   c/toggle-lines})})

@@ -43,7 +43,7 @@
   :jvm-opts ["-XX:-OmitStackTraceInFastThrow"]
 
   :plugins [[lein-cljsbuild "1.1.4"]
-            [lein-figwheel "0.5.4-7" :exclusions [org.clojure/clojure]]
+            [lein-figwheel "0.5.6" :exclusions [org.clojure/clojure]]
             [lein-sassy "1.0.7"
              :exclusions [org.clojure/clojure org.codehaus.plexus/plexus-utils]]
             [com.jakemccrary/lein-test-refresh "0.16.0"]
@@ -80,7 +80,6 @@
 
     {:id           "release"
      :source-paths ["src/cljc" "src/cljs"]
-     :figwheel     true
      :compiler     {:main          "iwaswhere-web.core"
                     :asset-path    "js/build"
                     ;:elide-asserts true
@@ -91,5 +90,6 @@
     {:id           "cljs-test"
      :source-paths ["src" "test"]
      :compiler     {:output-to     "out/testable.js"
+                    :output-dir    "out/"
                     :main          iwaswhere-web.runner
                     :optimizations :advanced}}]})

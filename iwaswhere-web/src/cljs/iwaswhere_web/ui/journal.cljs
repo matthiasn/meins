@@ -51,24 +51,24 @@
   "Renders journal div, one entry per item, with map if geo data exists in the
    entry."
   [{:keys [observed put-fn]} query-id]
-  (let [store-snapshot @observed
-        cfg (:cfg store-snapshot)
+  (let [snapshot @observed
+        cfg (merge (:cfg snapshot) (:options snapshot))
         local-cfg {:query-id query-id}
-        results (query-id (:results store-snapshot))
-        entries-map (:entries-map store-snapshot)
+        results (query-id (:results snapshot))
+        entries-map (:entries-map snapshot)
         entries (map (fn [ts] (get entries-map ts)) (:entries results))
         show-pvt? (:show-pvt cfg)
         filtered-entries (if show-pvt?
                            entries
                            (filter (u/pvt-filter cfg) entries))
-        new-entries (:new-entries store-snapshot)
+        new-entries (:new-entries snapshot)
         show-context? (:show-context cfg)
         comments-w-entries? (:comments-w-entries cfg)
         with-comments? (fn [entry] (and (or (and comments-w-entries?
                                                  (not (:comment-for entry)))
                                             (not comments-w-entries?))
                                         (or (:new-entry entry) show-context?)))
-        active-id (-> store-snapshot :cfg :active query-id)
+        active-id (-> snapshot :cfg :active query-id)
         active-entry (get entries-map active-id)
         linked-entries-set (set (:linked-entries-list active-entry))
         linked-mapper (u/find-missing-entry entries-map put-fn)

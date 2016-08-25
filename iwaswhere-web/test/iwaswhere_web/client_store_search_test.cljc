@@ -5,6 +5,7 @@
                :cljs [cljs.test :refer-macros [deftest testing is]])
                     [iwaswhere-web.client-store :as store]
                     [iwaswhere-web.client-store-search :as search]
+                    [iwaswhere-web.client-store-cfg :as c]
                     [iwaswhere-web.client-store-test :as st]))
 
 (deftest update-query-test
@@ -22,7 +23,7 @@
                                   :msg-payload   st/open-tasks-query}))]
     (testing
       "query is set locally"
-      (is (= st/empty-query (:query-1 (:queries (:query-cfg new-state))))))
+      (is (= st/empty-query (-> new-state :query-cfg :queries :query-1))))
     (testing
       "query is sent, with additional :sort-by-upvotes key"
       (is (= (merge st/empty-query {:sort-by-upvotes nil})
@@ -40,7 +41,8 @@
              (:query-1 (:active (:cfg new-state1))))))
     (testing
       "query is updated"
-      (is (= st/open-tasks-query (:query-1 (:queries (:query-cfg new-state2))))))
+      (is (= st/open-tasks-query
+             (-> new-state2 :query-cfg :queries :query-1))))
     (testing
       "active entry not set after updating query"
       (is (not (:active new-state2))))))
@@ -51,14 +53,16 @@
         handler-res (search/update-query-fn {:current-state current-state
                                              :msg-payload   st/open-tasks-query})
         new-state (:new-state handler-res)
-        new-state1 (:new-state (store/toggle-key-fn
+        new-state1 (:new-state (c/toggle-key-fn
                                  {:current-state new-state
                                   :msg-payload   {:path [:sort-by-upvotes]}}))
-        handler-res1 (search/update-query-fn {:current-state new-state1
-                                              :msg-payload   st/open-tasks-query})]
+        handler-res1 (search/update-query-fn
+                       {:current-state new-state1
+                        :msg-payload   st/open-tasks-query})]
     (testing
       "query is set locally"
-      (is (= st/open-tasks-query (:query-1 (:queries (:query-cfg new-state))))))
+      (is (= st/open-tasks-query
+             (-> new-state :query-cfg :queries :query-1))))
     (testing
       "query is sent, with additional but false :sort-by-upvotes key"
       (is (= (merge st/open-tasks-query {:sort-by-upvotes nil})

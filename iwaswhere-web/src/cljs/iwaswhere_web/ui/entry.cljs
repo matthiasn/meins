@@ -244,7 +244,6 @@
         toggle-edit #(if edit-mode? () ;(put-fn [:entry/remove-local entry])
                                     (put-fn [:entry/update-local entry]))
         show-pvt? (:show-pvt cfg)
-        hashtags (:hashtags cfg)
         hashtags (set/union (:hashtags cfg) (:pvt-displayed cfg))
         pvt-hashtags (:pvt-hashtags cfg)
         hashtags (if show-pvt? (set/union hashtags pvt-hashtags) hashtags)

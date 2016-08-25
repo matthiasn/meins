@@ -1,6 +1,6 @@
 (ns iwaswhere-web.client-store-search
   (:require #?(:cljs [alandipert.storage-atom :as sa])
-    [matthiasn.systems-toolbox.component :as st]))
+    [iwaswhere-web.client-store-cfg :as c]))
 
 (def initial-query-cfg
   {:queries    {}
@@ -21,7 +21,7 @@
    entries view."
   [{:keys [current-state msg-payload]}]
   (let [query-id (:query-id msg-payload)
-        query-path  [:query-cfg :queries query-id]
+        query-path [:query-cfg :queries query-id]
         new-state (assoc-in current-state query-path msg-payload)
         sort-by-upvotes? (:sort-by-upvotes current-state)
         query-msg (merge msg-payload {:sort-by-upvotes sort-by-upvotes?})]

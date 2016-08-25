@@ -232,6 +232,21 @@
 (s/def :iww.client-state.cfg/active
   (s/nilable (s/map-of keyword? (s/nilable possible-timestamp?))))
 
+
+(s/def :iww.query-cfg/active keyword?)
+(s/def :iww.query-cfg/all (s/coll-of keyword?))
+
+(s/def :iww.query-cfg/tab-group
+  (s/keys :req-un [:iww.query-cfg/active
+                   :iww.query-cfg/all]))
+
+(s/def :iww.query-cfg/queries (s/map-of keyword? :iww.search/search))
+(s/def :iww.query-cfg/tab-groups (s/map-of keyword? :iww.query-cfg/tab-group))
+
+(s/def :iww.client-state/query-cfg
+  (s/keys :req-un [:iww.query-cfg/queries
+                   :iww.query-cfg/tab-groups]))
+
 (s/def :iww.client-state.cfg/show-maps-for set?)
 (s/def :iww.client-state.cfg/show-comments-for set?)
 (s/def :iww.client-state.cfg/sort-by-upvotes boolean?)
@@ -252,20 +267,6 @@
                    :iww.client-state.cfg/mute
                    :iww.client-state.cfg/redacted
                    :iww.client-state.cfg/show-hashtags]))
-
-(s/def :iww.query-cfg/active keyword?)
-(s/def :iww.query-cfg/all (s/coll-of keyword?))
-
-(s/def :iww.query-cfg/tab-group
-  (s/keys :req-un [:iww.query-cfg/active
-                   :iww.query-cfg/all]))
-
-(s/def :iww.query-cfg/queries (s/map-of keyword? :iww.search/search))
-(s/def :iww.query-cfg/tab-groups (s/map-of keyword? :iww.query-cfg/tab-group))
-
-(s/def :iww.client-state/query-cfg
-  (s/keys :req-un [:iww.query-cfg/queries
-                   :iww.query-cfg/tab-groups]))
 
 (s/def :state/client-store-spec
   (s/keys :req-un [:iww.client-state/entries
