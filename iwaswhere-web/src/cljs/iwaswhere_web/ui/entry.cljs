@@ -313,7 +313,8 @@
   [entry cfg new-entries put-fn entries-map local-cfg]
   (let [ts (:timestamp entry)
         entry (or (get new-entries ts) entry)
-        comments (:comments entry)
+        comments-set (set (:comments entry))
+        comments (mapv (u/find-missing-entry entries-map put-fn) comments-set)
         comments (if (:show-pvt cfg)
                    comments
                    (filter (u/pvt-filter cfg) comments))

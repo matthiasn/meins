@@ -11,7 +11,7 @@
   [entries-map linked-filter put-fn]
   (fn [entry]
     (let [comments-mapper (u/find-missing-entry entries-map put-fn)
-          comments (map comments-mapper (:comments entry))
+          comments (mapv comments-mapper (:comments entry))
           combined-tags (reduce #(set/union %1 (:tags %2)) (:tags entry)
                                 comments)]
       (and (set/subset? (:tags linked-filter) combined-tags)
@@ -40,12 +40,9 @@
        (for [entry linked-entries]
          (when (and (not (:comment-for entry))
                     (or (:new-entry entry) (:show-context cfg)))
-           (let [entry (assoc-in entry [:comments]
-                                 (map (fn [ts] (get entries-map ts))
-                                      (:comments entry)))]
-             ^{:key (str "linked-" (:timestamp entry))}
-             [e/entry-with-comments
-              entry cfg new-entries put-fn entries-map local-cfg])))])))
+           ^{:key (str "linked-" (:timestamp entry))}
+           [e/entry-with-comments
+            entry cfg new-entries put-fn entries-map local-cfg]))])))
 
 (defn journal-view
   "Renders journal div, one entry per item, with map if geo data exists in the
@@ -78,12 +75,9 @@
       (for [entry (filter #(not (contains? linked-entries-set (:timestamp %)))
                           filtered-entries)]
         (when (with-comments? entry)
-          (let [entry (assoc-in entry [:comments]
-                                (mapv (u/find-missing-entry entries-map put-fn)
-                                      (:comments entry)))]
-            ^{:key (:timestamp entry)}
-            [e/entry-with-comments
-             entry cfg new-entries put-fn entries-map local-cfg])))
+          ^{:key (:timestamp entry)}
+          [e/entry-with-comments
+           entry cfg new-entries put-fn entries-map local-cfg]))
       (when (seq entries)
         (let [show-more #(put-fn [:show/more {:query-id query-id}])]
           [:div.show-more {:on-click show-more :on-mouse-over show-more}
@@ -102,10 +96,10 @@
 
 (defn new-entries-view
   "Renders view for creating new entries at the top of the page."
-  [store-snapshot local-cfg put-fn]
-  (let [cfg (:cfg store-snapshot)
-        entries-map (:entries-map store-snapshot)
-        new-entries (:new-entries store-snapshot)]
+  [snapshot local-cfg put-fn]
+  (let [cfg (merge (:cfg snapshot) (:options snapshot))
+        entries-map (:entries-map snapshot)
+        new-entries (:new-entries snapshot)]
     [:div.new-entries
      (for [entry (filter #(and
                            (not (:comment-for %))
