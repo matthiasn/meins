@@ -18,7 +18,7 @@
                  [cljsjs/moment "2.10.6-4"]
                  [cljsjs/leaflet "0.7.7-4"]
                  [com.drewnoakes/metadata-extractor "2.9.1"]
-                 [ubergraph "0.2.3"]
+                 [ubergraph "0.3.0"]
                  [camel-snake-kebab "0.4.0"]
                  [matthiasn/systems-toolbox "0.6.1-alpha6"]
                  [matthiasn/systems-toolbox-ui "0.6.1-alpha8"]
