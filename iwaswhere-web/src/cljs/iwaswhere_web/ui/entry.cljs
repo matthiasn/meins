@@ -261,9 +261,10 @@
         [:div info])
       [:div
        (when (seq (:linked-entries-list entry))
-         (let [entry-active? (= (:active cfg) (:timestamp entry))
+         (let [ts (:timestamp entry)
+               entry-active? (contains? (set (vals (:active cfg))) ts)
                set-active-fn #(put-fn [:cmd/toggle-active
-                                       {:timestamp (:timestamp entry)
+                                       {:timestamp ts
                                         :query-id (:query-id local-cfg)}])]
            [:span.link-btn {:on-click set-active-fn
                             :class    (when entry-active? "active")}
@@ -292,16 +293,18 @@
   "Renders thumbnails of photos in linked entries. Respects private entries."
   [entry entries-map cfg put-fn]
   (let [ts (:timestamp entry)
+        entry-active? (contains? (set (vals (:active cfg))) (:timestamp entry))
         linked-entries-set (set (:linked-entries-list entry))
         get-or-retrieve (u/find-missing-entry entries-map put-fn)
         with-imgs (filter :img-file (map get-or-retrieve linked-entries-set))
         filtered (if (:show-pvt cfg)
                    with-imgs
                    (filter (u/pvt-filter cfg) with-imgs))]
-    [:div.thumbnails
-     (for [img-entry filtered]
-       ^{:key (str "thumbnail" ts (:img-file img-entry))}
-       [:div [m/image-view img-entry "?width=300"]])]))
+    (when-not entry-active?
+      [:div.thumbnails
+       (for [img-entry filtered]
+         ^{:key (str "thumbnail" ts (:img-file img-entry))}
+         [:div [m/image-view img-entry "?width=300"]])])))
 
 (defn entry-with-comments
   "Renders individual journal entry. Interaction with application state happens
