@@ -1,16 +1,17 @@
 @import "variables.scss";
 
 .entry-with-comments {
-  margin: 5px 0 5px 0;
+  margin: 0.15em 0 0.15em 0;
   background: white;
   height: inherit;
 
   .thumbnails {
     display: flex;
     overflow-y: auto;
+    margin: 0 4px;
 
     img {
-      height: 150px;
+      height: 100px;
     }
   }
 }

@@ -5,14 +5,33 @@
             [clojure.string :as s]
             [clojure.set :as set]))
 
+(defn tags-view
+  "Renders a row with tags, if any in current query."
+  [current-query]
+  (let [get-tags #(% current-query)
+        tags (get-tags :tags)
+        not-tags (get-tags :not-tags)
+        mentions (get-tags :mentions)]
+    (when (or (seq tags) (seq not-tags) (seq mentions))
+      [:div.hashtags
+       (for [tag tags]
+         ^{:key (str "search-" tag)}
+         [:span.hashtag tag])
+       (for [tag not-tags]
+         ^{:key (str "search-n" tag)}
+         [:span.hashtag.not-tag tag])
+       (for [tag mentions]
+         ^{:key (str "search-" tag)}
+         [:span.mention tag])])))
+
 (defn search-field-view
+  "Renders search field for current tab."
   [snapshot put-fn query-id]
   (let [current-query (query-id (:queries (:query-cfg snapshot)))
         update-search-fn (fn [search-str]
                            (put-fn [:search/update
                                     (merge {:query-id query-id}
                                            (p/parse-search search-str))]))
-        get-tags #(% current-query)
         before-cursor (h/string-before-cursor (:search-text current-query))
         cfg (:cfg snapshot)
         options (:options snapshot)
@@ -40,16 +59,7 @@
               ;(.setTimeout js/window (fn [] (h/focus-on-end (.-target ev))) 50)
               (.preventDefault ev))))]
     [:div.search
-     [:div.hashtags
-      (for [tag (get-tags :tags)]
-        ^{:key (str "search-" tag)}
-        [:span.hashtag tag])
-      (for [tag (get-tags :not-tags)]
-        ^{:key (str "search-n" tag)}
-        [:span.hashtag.not-tag tag])
-      (for [tag (get-tags :mentions)]
-        ^{:key (str "search-" tag)}
-        [:span.mention tag])]
+     [tags-view current-query]
      [:div.search-field {:content-editable true
                          :on-input         on-input-fn
                          :on-key-down      on-keydown-fn}

@@ -29,7 +29,7 @@
      [:body
       [:div.flex-container
        [:div#header]
-       [:div#journal]
+       [:div#content]
        [:div#stats]]
       ;; Currently, from http://www.orangefreesounds.com/old-clock-ringing-short/
       ;; TODO: record own alarm clock

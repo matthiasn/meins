@@ -2,13 +2,6 @@
   (:require #?(:cljs [alandipert.storage-atom :as sa])
     [matthiasn.systems-toolbox.component :as st]))
 
-(def initial-query-cfg
-  {:queries    {}
-   :tab-groups {:left  {:active :query-1
-                        :all    #{:query-1}}
-                :right {:active :query-2
-                        :all    #{:query-2}}}})
-
 (def default-config
   {:active            nil
    :linked-filter     {}
@@ -25,8 +18,7 @@
                        {:option :hide-hashtags :cls "fa-hashtag"}
                        {:option :show-all-maps :cls "fa-map-o"}
                        {:option :thumbnails :cls "fa-photo"}
-                       {:option :split-view :cls "fa-columns"}]
-   :query-cfg         initial-query-cfg})
+                       {:option :split-view :cls "fa-columns"}]})
 
 #?(:clj  (defonce app-cfg (atom default-config))
    :cljs (defonce app-cfg (sa/local-storage (atom default-config)

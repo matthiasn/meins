@@ -130,6 +130,7 @@
 (s/def :iww.search/timestamp (s/nilable #(re-find #"[0-9]{13}" %)))
 (s/def :iww.search/n pos-int?)
 (s/def :iww.search/query-id keyword?)
+(s/def :iww.search/tab-group keyword?)
 
 (s/def :iww.search/search
   (s/keys :req-un [:iww.search/search-text
@@ -148,6 +149,11 @@
 
 (s/def :linked-filter/set (s/keys :req-un [:iww.search/search
                                            :iww.search/query-id]))
+
+(s/def :search/add (s/keys :req-un [:iww.search/tab-group]))
+(s/def :search/set-active (s/keys :req-un [:iww.search/tab-group
+                                           :iww.search/query-id]))
+(s/def :search/remove :search/set-active)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Search Result Spec
@@ -233,7 +239,7 @@
   (s/nilable (s/map-of keyword? (s/nilable possible-timestamp?))))
 
 
-(s/def :iww.query-cfg/active keyword?)
+(s/def :iww.query-cfg/active (s/nilable keyword?))
 (s/def :iww.query-cfg/all (s/coll-of keyword?))
 
 (s/def :iww.query-cfg/tab-group

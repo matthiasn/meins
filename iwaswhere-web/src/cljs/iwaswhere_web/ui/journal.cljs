@@ -4,7 +4,8 @@
             [iwaswhere-web.ui.entry :as e]
             [iwaswhere-web.ui.search :as search]
             [iwaswhere-web.utils.parse :as ps]
-            [clojure.set :as set]))
+            [clojure.set :as set]
+            [clojure.string :as s]))
 
 (defn linked-filter-fn
   "Filter linked entries by search."
@@ -85,45 +86,3 @@
      (when active-entry
        [linked-entries-view
         linked-entries entries-map new-entries cfg put-fn local-cfg])]))
-
-(defn tab-view
-  [{:keys [observed put-fn] :as cmp-map} query-id tabs-group]
-  (let [store-snapshot @observed
-        cfg (:cfg store-snapshot)]
-    [:div.tab-view {:class (when (:split-view cfg) "split-view")}
-     [search/search-field-view store-snapshot put-fn query-id]
-     [journal-view cmp-map query-id]]))
-
-(defn new-entries-view
-  "Renders view for creating new entries at the top of the page."
-  [snapshot local-cfg put-fn]
-  (let [cfg (merge (:cfg snapshot) (:options snapshot))
-        entries-map (:entries-map snapshot)
-        new-entries (:new-entries snapshot)]
-    [:div.new-entries
-     (for [entry (filter #(and
-                           (not (:comment-for %))
-                           (not (contains? entries-map (:timestamp %))))
-                         (vals new-entries))]
-       ^{:key (:timestamp entry)}
-       [e/entry-with-comments entry
-        cfg new-entries put-fn entries-map local-cfg])]))
-
-(defn tabs-view
-  "Renders a split view, with new entries at the top."
-  [{:keys [observed put-fn] :as cmp-map}]
-  (let [store-snapshot @observed
-        local-cfg {}
-        cfg (:cfg store-snapshot)]
-    [:div.tabs-container
-     [new-entries-view store-snapshot local-cfg put-fn]
-     [:div.tabs-view
-      [tab-view cmp-map :query-1 :left]
-      (when (:split-view cfg)
-        [tab-view cmp-map :query-2 :right])]]))
-
-(defn cmp-map
-  [cmp-id]
-  (r/cmp-map {:cmp-id  cmp-id
-              :view-fn tabs-view
-              :dom-id  "journal"}))

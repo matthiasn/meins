@@ -1,14 +1,13 @@
 @import "variables.scss";
 
 .hashtags {
-  padding: 0 0 1px 0;
   display: flex;
   flex-flow: row;
   flex-wrap: wrap;
 }
 
 .hashtag {
-  margin: 3px 5px 1px 0;
+  margin: 2px 5px 1px 0;
   padding: 1px 5px;
   color: white;
   font-size: 0.8em;

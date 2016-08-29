@@ -7,21 +7,23 @@
   min-height: 0;
 }
 
-.tabs-container {
+.split-window-container {
   display: flex;
   flex-flow: column;
 }
 
-.tabs-view {
+.split-windows-view {
   display: flex;
   flex-flow: row;
 }
 
-.tab-view {
+.split-window-view {
   display: flex;
   flex: 1;
   flex-flow: column;
   flex-basis: 0;
+  margin-left: 0.5em;
+  background-color: $tab-bg;
   }
 
 .split-view {
@@ -29,10 +31,35 @@
   max-width: 50%;
 }
 
+.tabs-header {
+  display: flex;
+  flex: 0 0 auto;
+  background-color: $body-background-color;
+
+  .tab-item {
+    display: flex;
+    background-color: white;
+    padding: 0.3em 0.5em;
+    margin: 0.4em 2px 0 0;
+    cursor: pointer;
+
+    .fa {
+      margin-left: 5px;
+      color: #AAA;
+      cursor: default;
+    }
+  }
+
+  .active {
+    border-bottom: 2px inset $green;
+    font-weight: bold;
+  }
+}
+
 .journal {
   display: flex;
   flex-flow: row;
-  padding-left: 1em;
+  padding-left: 0.3em;
 }
 
 .journal-entries {
@@ -40,8 +67,7 @@
   flex-flow: column;
   flex: 1;
   flex-basis: 0;
-  padding: 0 0.2em 1em 0;
-  margin-right: 0.3em;
+  padding: 0 0 1em 0;
   overflow-x: hidden;
   overflow-y: scroll;
 }
@@ -49,6 +75,6 @@
 .new-entries {
   flex-flow: column;
   flex-grow: 1;
-  margin: 1em 25% 0 1em;
+  margin: 0.6em 25% 0.2em 0.4em;
   max-width: 500px;
 }
