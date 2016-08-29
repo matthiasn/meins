@@ -55,7 +55,8 @@
         cursor-pos (.-anchorOffset selection)
         anchor-node (aget selection "anchorNode")
         node-value (str (when anchor-node (aget anchor-node "nodeValue")) "")]
-    (if (not= -1 (.indexOf (str comp-str) node-value))
+    (if (and (not= -1 (.indexOf (str comp-str) node-value))
+             (pos? cursor-pos))
       (subs node-value 0 cursor-pos)
       "")))
 
