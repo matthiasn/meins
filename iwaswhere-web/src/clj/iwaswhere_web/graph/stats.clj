@@ -32,9 +32,11 @@
         day-nodes-attrs (map #(uber/attrs g %) day-nodes)
         task-nodes (filter #(contains? (:tags %) "#task") day-nodes-attrs)
         done-nodes (filter #(contains? (:tags %) "#done") day-nodes-attrs)
+        closed-nodes (filter #(contains? (:tags %) "#closed") day-nodes-attrs)
         stats {:date-string date-string
                :tasks-cnt   (count task-nodes)
-               :done-cnt    (count done-nodes)}]
+               :done-cnt    (count done-nodes)
+               :closed-cnt  (count closed-nodes)}]
     {:emit-msg [:stats/tasks-day stats]}))
 
 (defn get-activity-day-stats
@@ -58,9 +60,9 @@
   [current-state]
   (count (:entries (gq/get-filtered-results
                      current-state
-                     {:search-text "#task ~#done ~#backlog"
+                     {:search-text "#task ~#done ~#backlog ~#closed"
                       :tags        #{"#task"}
-                      :not-tags    #{"#done" "#backlog"}
+                      :not-tags    #{"#done" "#backlog" "#closed"}
                       :n           Integer/MAX_VALUE}))))
 
 (defn count-open-tasks-backlog

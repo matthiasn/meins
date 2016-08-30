@@ -28,6 +28,7 @@
                      y-scale (/ chart-h-half (or max-cnt 1))
                      h-tasks (* y-scale (:tasks-cnt v))
                      h-done (* y-scale (:done-cnt v))
+                     h-closed (* (/ y-scale 2) (:closed-cnt v))
                      x (* 10 idx)
                      mouse-enter-fn (cc/mouse-enter-fn local v)
                      mouse-leave-fn (cc/mouse-leave-fn local v)]
@@ -43,10 +44,15 @@
                           :y      (+ chart-h-half headline-reserved)
                           :width  9
                           :height h-done
-                          :class  (cc/weekend-class "done" v)}]])))]]
+                          :class  (cc/weekend-class "done" v)}]
+                  [:rect {:x      x
+                          :y      (- chart-h h-closed)
+                          :width  9
+                          :height h-closed
+                          :class  (cc/weekend-class "closed" v)}]])))]]
          (when (:mouse-over @local)
            [:div.mouse-over-info (cc/info-div-pos @local)
             [:span (:date-string (:mouse-over @local))] [:br]
+            [:span "Created: " (:tasks-cnt (:mouse-over @local))] [:br]
             [:span "Done: " (:done-cnt (:mouse-over @local))] [:br]
-            [:span "Created: " (:tasks-cnt (:mouse-over @local))]
-            [:br]])]))))
+            [:span "Closed: " (:closed-cnt (:mouse-over @local))] [:br]])]))))

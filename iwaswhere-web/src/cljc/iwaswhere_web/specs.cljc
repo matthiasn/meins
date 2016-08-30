@@ -213,11 +213,13 @@
 
 (s/def :task-stats/tasks-cnt int-not-neg?)
 (s/def :task-stats/done-cnt int-not-neg?)
+(s/def :task-stats/closed-cnt int-not-neg?)
 
 (s/def :stats/tasks-day
   (s/keys :req-un [:iww.search/date-string
                    :task-stats/tasks-cnt
-                   :task-stats/done-cnt]))
+                   :task-stats/done-cnt
+                   :task-stats/closed-cnt]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Spec for :state/publish-current
