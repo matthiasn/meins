@@ -42,6 +42,8 @@
   :main iwaswhere-web.core
   :jvm-opts ["-XX:-OmitStackTraceInFastThrow"]
 
+  :profiles {:uberjar {:aot :all}}
+
   :plugins [[lein-cljsbuild "1.1.4"]
             [lein-figwheel "0.5.6" :exclusions [org.clojure/clojure]]
             [lein-sassy "1.0.7"

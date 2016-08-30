@@ -121,7 +121,7 @@
                           (get-linked-entries g n sort-by-upvotes?))
                       (log/warn "extract-sorted-entries can't find node: " n)))
         sort-fn #(into (sorted-set-by >) %)
-        matched-entries (cond
+        matched-ids (cond
                           ; set with timestamps matching tags and mentions
                           (or (seq (:tags query)) (seq (:mentions query)))
                           (sort-fn (get-tags-mentions-matches g query))
@@ -136,7 +136,10 @@
                                                  (get-nodes-for-day g query))
                           ; set with all timestamps (leads to full scan)
                           :else (:sorted-entries current-state))
-        entries (map mapper-fn matched-entries)]
+        matched-entries (mapv mapper-fn matched-ids)
+        parent-ids (filterv identity (mapv :comment-for matched-entries))
+        parents (mapv mapper-fn parent-ids)
+        entries (flatten [matched-entries parents])]
     (if sort-by-upvotes?
       (sort compare-w-upvotes entries)
       entries)))
