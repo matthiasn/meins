@@ -18,7 +18,8 @@
                        {:option :hide-hashtags :cls "fa-hashtag"}
                        {:option :show-all-maps :cls "fa-map-o"}
                        {:option :thumbnails :cls "fa-photo"}
-                       {:option :split-view :cls "fa-columns"}]})
+                       {:option :split-view :cls "fa-columns"}
+                       {:option :qr-code :cls "fa-qrcode"}]})
 
 #?(:clj  (defonce app-cfg (atom default-config))
    :cljs (defonce app-cfg (sa/local-storage (atom default-config)

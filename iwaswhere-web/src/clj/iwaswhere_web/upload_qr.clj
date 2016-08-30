@@ -23,7 +23,7 @@
     (mapcat ip-extract (filter ip-filter (enumeration-seq ifc)))))
 
 (def address-qr-route
-  (GET "/upload-address.png" []
+  (GET "/upload-address/:uuid/qrcode.png" [_uuid]
     (qr/as-input-stream
       (let [ip (ffirst (ips))]
         (qr/from (str "http://" ip ":" up/upload-port "/upload/")
