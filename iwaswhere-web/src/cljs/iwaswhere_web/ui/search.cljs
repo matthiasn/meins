@@ -61,7 +61,6 @@
                     (tag-replace-fn curr-mention (first f-mentions)))
                   ;(.setTimeout js/window (fn [] (h/focus-on-end (.-target ev))) 50)
                   (.preventDefault ev))))]
-        (prn "focused" @focused)
         [:div.search
          [tags-view current-query]
          [:div.search-field {:content-editable true

@@ -61,7 +61,7 @@
                            (filter (u/pvt-filter cfg) entries))
         new-entries (:new-entries snapshot)
         show-context? (:show-context cfg)
-        comments-w-entries? (:comments-w-entries cfg)
+        comments-w-entries? (not (:comments-standalone cfg))
         with-comments? (fn [entry] (and (or (and comments-w-entries?
                                                  (not (:comment-for entry)))
                                             (not comments-w-entries?))

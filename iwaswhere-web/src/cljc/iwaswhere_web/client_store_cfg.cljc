@@ -13,7 +13,7 @@
    :lines-shortened   3
    :toggle-options    [{:option :show-pvt :cls "fa-user-secret"}
                        {:option :redacted :cls "fa-eye"}
-                       {:option :comments-w-entries :cls "fa-comments"}
+                       {:option :comments-standalone :cls "fa-comments"}
                        {:option :mute :cls "fa-volume-off"}
                        {:option :hide-hashtags :cls "fa-hashtag"}
                        {:option :show-all-maps :cls "fa-map-o"}
