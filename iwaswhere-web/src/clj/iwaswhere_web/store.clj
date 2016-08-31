@@ -52,9 +52,12 @@
    :sente-uid, otherwise sends to all clients."
   [{:keys [current-state msg-payload msg-meta]}]
   (if-let [sente-uid (:sente-uid msg-payload)]
-    (let [queries (get-in current-state [:client-queries sente-uid :queries])
+    (let [query-id (:query-id msg-payload)
+          queries (get-in current-state [:client-queries sente-uid :queries])
+          queries (if query-id {query-id (query-id queries)} queries)
           msg-meta  (merge msg-meta {:sente-uid sente-uid})
-          get-results (run-query current-state (merge msg-meta {:sente-uid sente-uid}))
+          get-results (run-query current-state (merge msg-meta
+                                                      {:sente-uid sente-uid}))
           results (mapv get-results queries)]
       {:emit-msg results})
     {:send-to-self (mapv (fn [uid] [:state/publish-current {:sente-uid uid}])
