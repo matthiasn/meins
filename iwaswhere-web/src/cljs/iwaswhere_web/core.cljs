@@ -54,7 +54,7 @@
      [:cmd/route {:from :client/ws-cmp
                   :to   :client/stats-cmp}]
 
-     [:cmd/route {:from :client/store-cmp
+     [:cmd/route {:from #{:client/store-cmp :client/menu-cmp}
                   :to   :client/scheduler-cmp}]
 
      [:cmd/route {:from :client/scheduler-cmp

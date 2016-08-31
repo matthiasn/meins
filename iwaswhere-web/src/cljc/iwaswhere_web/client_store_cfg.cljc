@@ -22,10 +22,14 @@
   (reset! app-cfg (:cfg current-state)))
 
 (defn toggle-key-fn
-  "Toggles config key."
+  "Toggles config key. If reset key is set, changes the value in path to the
+   specified value, rather than applying the 'not' function."
   [{:keys [current-state msg-payload]}]
-  (let [path (:path msg-payload)]
-    {:new-state    (update-in current-state path not)
+  (let [{:keys [path reset-to]} msg-payload
+        new-state (if reset-to
+                    (assoc-in current-state path reset-to)
+                    (update-in current-state path not))]
+    {:new-state    new-state
      :send-to-self [:cfg/save]}))
 
 (defn toggle-lines

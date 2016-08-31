@@ -20,8 +20,7 @@
    {:option :hide-hashtags :cls "fa-hashtag"}
    {:option :show-all-maps :cls "fa-map-o"}
    {:option :thumbnails :cls "fa-photo"}
-   {:option :split-view :cls "fa-columns"}
-   {:option :qr-code :cls "fa-qrcode"}])
+   {:option :split-view :cls "fa-columns"}])
 
 (defn cfg-view
   "Renders component for toggling display of options such as maps, comments.
@@ -34,10 +33,18 @@
   (let [cfg (:cfg snapshot)
         sort-by-upvotes? (:sort-by-upvotes cfg)
         toggle-upvotes
-        #(let [query (merge (:current-query snapshot)
-                            {:sort-by-upvotes (not sort-by-upvotes?)})]
-          (put-fn [:cmd/toggle-key {:path [:cfg :sort-by-upvotes]}])
-          (put-fn [:state/get query]))]
+        (fn [_ev]
+          (let [query (merge (:current-query snapshot)
+                             {:sort-by-upvotes (not sort-by-upvotes?)})]
+            (put-fn [:cmd/toggle-key {:path [:cfg :sort-by-upvotes]}])
+            (put-fn [:state/get query])))
+        toggle-qr-code
+        (fn [_ev]
+          (let [msg {:path [:cfg :qr-code]}
+                reset-msg (merge msg {:reset-to false})]
+            (put-fn [:cmd/schedule-new {:timeout 20000
+                                        :message [:cmd/toggle-key reset-msg]}])
+            (put-fn [:cmd/toggle-key msg])))]
     [:div
      [:span.fa.fa-thumbs-up.toggle
       {:class    (when-not sort-by-upvotes? "inactive")
@@ -45,6 +52,8 @@
      (for [option toggle-options]
        ^{:key (str "toggle" (:cls option))}
        [toggle-option-view option cfg put-fn])
+     [:span.fa.fa-qrcode.toggle
+      {:on-click toggle-qr-code :class (when-not (:qr-code cfg) "inactive")}]
      [:span.fa.fa-ellipsis-h.toggle
       {:on-click #(put-fn [:cmd/toggle-lines])}]]))
 
