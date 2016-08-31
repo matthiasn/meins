@@ -10,16 +10,7 @@
    :show-comments-for #{}
    :split-view        true
    :thumbnails        true
-   :lines-shortened   3
-   :toggle-options    [{:option :show-pvt :cls "fa-user-secret"}
-                       {:option :redacted :cls "fa-eye"}
-                       {:option :comments-standalone :cls "fa-comments"}
-                       {:option :mute :cls "fa-volume-off"}
-                       {:option :hide-hashtags :cls "fa-hashtag"}
-                       {:option :show-all-maps :cls "fa-map-o"}
-                       {:option :thumbnails :cls "fa-photo"}
-                       {:option :split-view :cls "fa-columns"}
-                       {:option :qr-code :cls "fa-qrcode"}]})
+   :lines-shortened   3})
 
 #?(:clj  (defonce app-cfg (atom default-config))
    :cljs (defonce app-cfg (sa/local-storage (atom default-config)

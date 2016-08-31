@@ -12,8 +12,24 @@
      {:class    (str cls (when-not show-option? " inactive"))
       :on-click toggle-option}]))
 
+(def toggle-options
+  [{:option :show-pvt :cls "fa-user-secret"}
+   {:option :redacted :cls "fa-eye"}
+   {:option :comments-standalone :cls "fa-comments"}
+   {:option :mute :cls "fa-volume-off"}
+   {:option :hide-hashtags :cls "fa-hashtag"}
+   {:option :show-all-maps :cls "fa-map-o"}
+   {:option :thumbnails :cls "fa-photo"}
+   {:option :split-view :cls "fa-columns"}
+   {:option :qr-code :cls "fa-qrcode"}])
+
 (defn cfg-view
-  "Renders component for toggling display of maps, comments, ..."
+  "Renders component for toggling display of options such as maps, comments.
+   The options, with their respective config key and Font-Awesome icon classes
+   are defined in the toggle-options vector above. The value for each is then
+   set on the application's config, which is persisted in localstorage.
+   The default is always false, as initially the key would not be defined at
+   all (unless set in default-config)."
   [snapshot put-fn]
   (let [cfg (:cfg snapshot)
         sort-by-upvotes? (:sort-by-upvotes cfg)
@@ -24,33 +40,45 @@
           (put-fn [:state/get query]))]
     [:div
      [:span.fa.fa-thumbs-up.toggle
-      {:class (when-not sort-by-upvotes? "inactive") :on-click toggle-upvotes}]
-     (for [option (:toggle-options cfg)]
+      {:class    (when-not sort-by-upvotes? "inactive")
+       :on-click toggle-upvotes}]
+     (for [option toggle-options]
        ^{:key (str "toggle" (:cls option))}
        [toggle-option-view option cfg put-fn])
      [:span.fa.fa-ellipsis-h.toggle
       {:on-click #(put-fn [:cmd/toggle-lines])}]]))
 
 (defn new-import-view
+  "Renders new and import buttons."
+  [put-fn]
+  [:div
+   [:button.menu-new {:on-click (h/new-entry-fn put-fn {})}
+    [:span.fa.fa-plus-square] " new"]
+   [:button {:on-click #(do (put-fn [:import/photos])
+                            (put-fn [:import/geo])
+                            (put-fn [:import/weight])
+                            (put-fn [:import/phone]))}
+    [:span.fa.fa-map] " import"]])
+
+(defn upload-view
+  "Renders QR-code with upload address."
+  [cfg]
+  (when (:qr-code cfg)
+    [:img {:src (str "/upload-address/" (stc/make-uuid) "/qrcode.png")}]))
+
+(defn menu-view
   "Renders component for rendering new and import buttons."
   [{:keys [observed put-fn]}]
-  (let [snapshot @observed]
+  (let [snapshot @observed
+        cfg (:cfg snapshot)]
     [:div.menu-header
-     [:div
-      [:button.menu-new {:on-click (h/new-entry-fn put-fn {})}
-       [:span.fa.fa-plus-square] " new"]
-      [:button {:on-click #(do (put-fn [:import/photos])
-                               (put-fn [:import/geo])
-                               (put-fn [:import/weight])
-                               (put-fn [:import/phone]))}
-       [:span.fa.fa-map] " import"]]
+     [new-import-view put-fn]
      [:h1 "iWasWhere?"]
      [cfg-view snapshot put-fn]
-     (when (:qr-code (:cfg snapshot))
-       [:img {:src (str "/upload-address/" (stc/make-uuid) "/qrcode.png")}])]))
+     [upload-view cfg]]))
 
 (defn cmp-map
   [cmp-id]
   (r/cmp-map {:cmp-id  cmp-id
-              :view-fn new-import-view
+              :view-fn menu-view
               :dom-id  "header"}))
