@@ -17,7 +17,8 @@
                       (update-in [:entries-map] merge (:entries-map msg-payload))
                       (assoc-in [:timing] {:query (:duration-ms msg-payload)
                                            :rtt   (- (:in-ts store-meta)
-                                                     (:out-ts store-meta))}))]
+                                                     (:out-ts store-meta))
+                                           :count (count entries)}))]
     {:new-state new-state}))
 
 (defn stats-tags-fn

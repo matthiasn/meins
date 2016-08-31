@@ -19,29 +19,24 @@
 (defn stats-view
   "Renders stats component."
   [{:keys [observed]}]
-  (let [store-snapshot @observed
-        pomodoro-stats (:pomodoro-stats store-snapshot)
-        activity-stats (:activity-stats store-snapshot)
-        task-stats (:task-stats store-snapshot)
-        cfg (:cfg store-snapshot)
-        entries-map (:entries-map store-snapshot)
-        entries (map (fn [ts] (get entries-map ts)) (:entries store-snapshot))]
+  (let [snapshot @observed
+        {:keys [cfg pomodoro-stats activity-stats task-stats stats]} snapshot]
     [:div.stats
      [:div.charts
       [cp/pomodoro-bar-chart pomodoro-stats 250 "Pomodoros" 10]
       [ca/activity-weight-chart activity-stats 250]
       [ct/tasks-chart task-stats 250]]
-     (when-let [stats (:stats store-snapshot)]
+     (when stats
        [:div (:entry-count stats) " entries, " (:node-count stats) " nodes, "
         (:edge-count stats) " edges, " (count (:hashtags cfg)) " hashtags, "
         (count (:mentions cfg)) " people, " (:open-tasks-cnt stats)
         " open tasks, " (:backlog-cnt stats) " in backlog, "
         (:completed-cnt stats) " completed."])
-     (when-let [ms (get-in store-snapshot [:timing :query])]
+     (when-let [ms (get-in snapshot [:timing :query])]
        [:div.stats
-        (str "Query with " (count entries)
+        (str "Query with " (get-in snapshot [:timing :count])
              " results completed in " ms ", RTT "
-             (get-in store-snapshot [:timing :rtt]) " ms")])]))
+             (get-in snapshot [:timing :rtt]) " ms")])]))
 
 (defn init-fn
   ""
