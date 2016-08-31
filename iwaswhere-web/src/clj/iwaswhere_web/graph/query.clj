@@ -65,21 +65,21 @@
 (defn get-comments
   "Extract all comments for entry."
   [entry g n]
-  (merge entry
-         {:comments (->> (flatten (uc/find-edges g {:dest         n
-                                                    :relationship :COMMENT}))
+  (let [edges (uc/find-edges g {:dest n :relationship :COMMENT})
+        comment-ids (->> (flatten edges)
                          (remove :mirror?)
-                         (mapv :src)
-                         (sort))}))
+                         (map :src)
+                         (sort))]
+    (merge entry {:comments (vec comment-ids)})))
 
 (defn get-tags-mentions-matches
   "Extract matching timestamps for query."
   [g query]
   (let [mapper (fn [tag-type]
                  (fn [tag]
-                   (set (map :dest
-                             (uc/find-edges g {:src          {tag-type tag}
-                                               :relationship :CONTAINS})))))
+                   (let [q {:src {tag-type tag} :relationship :CONTAINS}
+                         edges (uc/find-edges g q)]
+                     (set (map :dest edges)))))
         t-matched (map (mapper :tag) (map s/lower-case (:tags query)))
         pt-matched (map (mapper :ptag) (map s/lower-case (:tags query)))
         m-matched (map (mapper :mention) (map s/lower-case (:mentions query)))]
@@ -98,13 +98,14 @@
 (defn get-linked-entries
   "Extract all linked entries for entry, including their comments."
   [entry g n sort-by-upvotes?]
-  (let [linked (->> (flatten (uc/find-edges g {:src n :relationship :LINKED}))
-                    ;(remove :mirror?)
-                    (mapv :dest)
-                    (sort))]
-    (merge entry {:linked-entries-list (if sort-by-upvotes?
-                                         (sort compare-w-upvotes linked)
-                                         linked)})))
+  (let [sort-fn (fn [ids]
+                  (if sort-by-upvotes?
+                    (sort compare-w-upvotes ids)
+                    (sort ids)))
+        linked (->> (flatten (uc/find-edges g {:src n :relationship :LINKED}))
+                    (map :dest)
+                    (sort-fn))]
+    (merge entry {:linked-entries-list (vec linked)})))
 
 (defn extract-sorted-entries
   "Extracts nodes and their properties in descending timestamp order by looking
@@ -136,9 +137,9 @@
                                                  (get-nodes-for-day g query))
                           ; set with all timestamps (leads to full scan)
                           :else (:sorted-entries current-state))
-        matched-entries (mapv mapper-fn matched-ids)
-        parent-ids (filterv identity (mapv :comment-for matched-entries))
-        parents (mapv mapper-fn parent-ids)
+        matched-entries (map mapper-fn matched-ids)
+        parent-ids (filter identity (map :comment-for matched-entries))
+        parents (map mapper-fn parent-ids)
         entries (flatten [matched-entries parents])]
     (if sort-by-upvotes?
       (sort compare-w-upvotes entries)
