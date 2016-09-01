@@ -121,7 +121,7 @@
                           (get-comments g n)
                           (get-linked-entries g n sort-by-upvotes?))
                       (log/warn "extract-sorted-entries can't find node: " n)))
-        sort-fn #(into (sorted-set-by >) %)
+        sort-fn #(into (sorted-set-by (if (:sort-asc query) < >)) %)
         matched-ids (cond
                           ; set with timestamps matching tags and mentions
                           (or (seq (:tags query)) (seq (:mentions query)))

@@ -26,7 +26,8 @@
       (is (= st/empty-query (-> new-state :query-cfg :queries :query-1))))
     (testing
       "query is sent, with additional :sort-by-upvotes key"
-      (is (= (merge st/empty-query {:sort-by-upvotes nil})
+      (is (= (merge st/empty-query {:sort-by-upvotes nil
+                                    :sort-asc        nil})
              (second (first (:emit-msg handler-res))))))
     (testing
       "location change message is scheduled on change"
@@ -65,12 +66,14 @@
              (-> new-state :query-cfg :queries :query-1))))
     (testing
       "query is sent, with additional but false :sort-by-upvotes key"
-      (is (= (merge st/open-tasks-query {:sort-by-upvotes nil})
+      (is (= (merge st/open-tasks-query {:sort-by-upvotes nil
+                                         :sort-asc        nil})
              (second (first (:emit-msg handler-res))))))
     (testing
       "query is sent after upvotes-toggle, with additional :sort-by-upvotes key
        being true"
-      (is (= (merge st/open-tasks-query {:sort-by-upvotes true})
+      (is (= (merge st/open-tasks-query {:sort-by-upvotes true
+                                         :sort-asc        nil})
              (second (first (:emit-msg handler-res1))))))
     (testing
       "location change message is scheduled on change"

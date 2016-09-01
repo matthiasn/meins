@@ -20,7 +20,8 @@
    {:option :hide-hashtags :cls "fa-hashtag"}
    {:option :show-all-maps :cls "fa-map-o"}
    {:option :thumbnails :cls "fa-photo"}
-   {:option :split-view :cls "fa-columns"}])
+   {:option :split-view :cls "fa-columns"}
+   {:option :sort-asc :cls " fa-sort-asc"}])
 
 (defn cfg-view
   "Renders component for toggling display of options such as maps, comments.
