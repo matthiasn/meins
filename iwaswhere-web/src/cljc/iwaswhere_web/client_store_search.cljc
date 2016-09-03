@@ -74,7 +74,7 @@
         query-path [:query-cfg :queries]
         new-state (-> current-state
                       (update-in all-path disj query-id)
-                      (update-in active-path #(if (= % query-id) nil %))
+                      (update-in active-path #(when-not (= % query-id) %))
                       (update-in query-path dissoc query-id)
                       (update-in [:results] dissoc query-id))]
     (reset! query-cfg (:query-cfg new-state))

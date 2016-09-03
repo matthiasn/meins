@@ -17,7 +17,8 @@
                                           :message [:cmd/query-gc]
                                           :repeat true
                                           :initial true}]}]
-     [:cmd/route {:from :server/scheduler-cmp :to :server/store-cmp}]]))
+     [:cmd/route {:from :server/scheduler-cmp :to :server/store-cmp}]
+     [:cmd/route {:from :server/store-cmp :to :server/scheduler-cmp}]]))
 
 (defn keepalive-fn
   "Mark client in the stored queries as recently seen to prevent it from being

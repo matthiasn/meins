@@ -19,7 +19,6 @@
   (r/create-class
     {:component-did-mount #(let [el (r/dom-node %)]
                             (reset! edit-elem-atom el)
-                            #_
                             (h/focus-on-end el))
      :reagent-render      (fn [md update-temp-fn on-keydown-fn edit-elem-atom]
                             [:code {:content-editable true

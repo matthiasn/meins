@@ -58,7 +58,7 @@
   {:hide-hashtags   true
    :lines-shortened 1})
 
-(defn third [x] (first (next (next x))))
+(defn third [x] (first (nnext x)))
 
 (deftest markdown-render-test
   ""
