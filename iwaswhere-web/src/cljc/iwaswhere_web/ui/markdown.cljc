@@ -5,7 +5,7 @@
    edit-mode view, with autosuggestions for tags and mentions."
   (:require [markdown.core :as md]
             [clojure.string :as s]
-            #?(:cljs [reagent.core :as rc])))
+    #?(:cljs [reagent.core :as rc])))
 
 (def tag-char-class "[\\w\\-\\u00C0-\\u017F]")
 
@@ -49,29 +49,44 @@
      state]))
 
 (def md-to-html #?(:clj md/md-to-html-string :cljs md/md->html))
-(def initial-atom #?(:clj (atom true) :cljs (rc/atom true)))
+(def initial {:show-shortened   true
+              :recently-clicked false})
+(def initial-atom #?(:clj (atom initial) :cljs (rc/atom initial)))
 
 (defn markdown-render
   "Renders a markdown div using :dangerouslySetInnerHTML. Not that dangerous
    here since application is only running locally, so in doubt we could only
    harm ourselves. Returns nil when entry does not contain markdown text."
-  [entry cfg]
-  (let [show-shortened initial-atom]
-    (fn [entry cfg]
-      (when-let [md-string (:md entry)]
-        (let [show-hashtags? (not (:hide-hashtags cfg))
-              lines-shortened (:lines-shortened cfg)
-              lines (s/split-lines md-string)
-              shortened? (and @show-shortened (>= (count lines) lines-shortened))
-              md-string (if shortened?
-                          (let [lines (take lines-shortened lines)]
-                            (s/join "\n" lines))
-                          md-string)
-              tags-xform (mk-format-tags-xform entry show-hashtags?)
-              html (md-to-html md-string :custom-transformers [tags-xform])]
-          [:div
-           (when (:redacted cfg) {:class "redacted"})
-           [:div {:dangerouslySetInnerHTML {:__html html}}]
-           (when shortened?
-             [:span.more {:on-mouse-enter #(swap! show-shortened not)}
-              "[...]"])])))))
+  [entry cfg toggle-edit]
+  (fn [entry cfg toggle-edit]
+    (when-let [md-string (:md entry)]
+      (let [show-hashtags? (not (:hide-hashtags cfg))
+            lines-shortened (:lines-shortened cfg)
+            lines (s/split-lines md-string)
+            shortened? (and (:show-shortened @initial-atom)
+                            (>= (count lines) lines-shortened))
+            md-string (if shortened?
+                        (let [lines (take lines-shortened lines)]
+                          (s/join "\n" lines))
+                        md-string)
+            tags-xform (mk-format-tags-xform entry show-hashtags?)
+            html (md-to-html md-string :custom-transformers [tags-xform])
+
+            on-click-fn
+            (fn [_ev]
+              (when (:recently-clicked @initial-atom)
+                (toggle-edit))
+              (swap! initial-atom update-in [:recently-clicked] not)
+              #?(:cljs
+                 (.setTimeout
+                   js/window
+                   (fn []
+                     (swap! initial-atom assoc-in [:recently-clicked] false))
+                   500)))]
+        [:div {:on-click on-click-fn}
+         (when (:redacted cfg) {:class "redacted"})
+         [:div {:dangerouslySetInnerHTML {:__html html}}]
+         (when shortened?
+           [:span.more
+            {:on-mouse-enter #(swap! initial-atom update-in [:show-shortened] not)}
+            "[...]"])]))))

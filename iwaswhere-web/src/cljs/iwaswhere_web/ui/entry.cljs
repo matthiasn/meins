@@ -306,7 +306,7 @@
      [l/leaflet-map entry (or show-map? (:show-all-maps cfg)) local-cfg]
      (if edit-mode?
        [e/editable-md-render entry hashtags mentions put-fn toggle-edit]
-       [md/markdown-render entry cfg])
+       [md/markdown-render entry cfg toggle-edit])
      [activity-div entry cfg put-fn edit-mode?]
      [sleep-div entry put-fn edit-mode?]
      (when show-pvt?
