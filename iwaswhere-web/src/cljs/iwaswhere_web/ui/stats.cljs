@@ -25,7 +25,9 @@
         (:edge-count stats) " edges, " (count (:hashtags options)) " hashtags, "
         (count (:mentions options)) " people, " (:open-tasks-cnt stats)
         " open tasks, " (:backlog-cnt stats) " in backlog, "
-        (:completed-cnt stats) " completed."])
+        (:completed-cnt stats) " completed, "
+        (:import-cnt stats) " tagged #import, "
+        (:new-cnt stats) " tagged #new."])
      (when-let [ms (get-in snapshot [:timing :query])]
        [:div.stats
         (str "Query with " (get-in snapshot [:timing :count])

@@ -66,41 +66,27 @@
             stats (into {} (mapv (stats-mapper g) msg-payload))]
         (put-fn (with-meta [msg-type stats] msg-meta))))))
 
-(defn count-open-tasks
-  [current-state]
-  (count (set (:entries (gq/get-filtered-results
-                          current-state
-                          {:search-text "#task ~#done ~#backlog ~#closed"
-                           :tags        #{"#task"}
-                           :not-tags    #{"#done" "#backlog" "#closed"}
-                           :n           Integer/MAX_VALUE})))))
-
-(defn count-open-tasks-backlog
-  [current-state]
-  (count (set (:entries (gq/get-filtered-results
-                          current-state
-                          {:search-text "#task ~#done #backlog"
-                           :tags        #{"#task" "#backlog"}
-                           :not-tags    #{"#done"}
-                           :n           Integer/MAX_VALUE})))))
-
-(defn count-completed-tasks
-  [current-state]
-  (count (set (:entries (gq/get-filtered-results
-                          current-state
-                          {:search-text "#task #done"
-                           :tags        #{"#task" "#done"}
-                           :n           Integer/MAX_VALUE})))))
+(defn res-count
+  "Count results for specified query."
+  [current-state query]
+  (let [res (gq/get-filtered-results
+              current-state
+              (merge {:n Integer/MAX_VALUE} query))]
+    (count (set (:entries res)))))
 
 (defn get-basic-stats
   "Generate some very basic stats about the graph size for display in UI."
-  [current-state]
-  {:entry-count    (count (:sorted-entries current-state))
-   :node-count     (count (:node-map (:graph current-state)))
-   :edge-count     (count (uber/find-edges (:graph current-state) {}))
-   :open-tasks-cnt (count-open-tasks current-state)
-   :backlog-cnt    (count-open-tasks-backlog current-state)
-   :completed-cnt  (count-completed-tasks current-state)})
+  [state]
+  {:entry-count    (count (:sorted-entries state))
+   :node-count     (count (:node-map (:graph state)))
+   :edge-count     (count (uber/find-edges (:graph state) {}))
+   :open-tasks-cnt (res-count state {:tags     #{"#task"}
+                                     :not-tags #{"#done" "#backlog" "#closed"}})
+   :backlog-cnt    (res-count state {:tags     #{"#task" "#backlog"}
+                                     :not-tags #{"#done"}})
+   :completed-cnt  (res-count state {:tags #{"#task" "#done"}})
+   :import-cnt     (res-count state {:tags #{"#import"}})
+   :new-cnt        (res-count state {:tags #{"#new"}})})
 
 (defn make-stats-tags
   "Generate stats and tags from current-state."
