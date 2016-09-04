@@ -23,7 +23,7 @@
                                     rdr put-fn {} filename)
               "visits.json" (i/import-visits-fn rdr put-fn {} filename)
               (prn req)
-              (put-fn [:state/stats-tags-make]))
+              (put-fn [:state/stats-tags-get]))
             "OK"))
         binary-post-fn
         (fn [dir filename req]

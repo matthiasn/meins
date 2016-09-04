@@ -60,7 +60,7 @@
      :emit-msg     [[:entry/saved with-last-modified]
                     [:ft/add with-last-modified]
                     [:cmd/schedule-new {:timeout 2000
-                                        :message [:state/stats-tags-make]}]]
+                                        :message [:state/stats-tags-get]}]]
      :send-to-self [[:state/publish-current {}]]}))
 
 (defn trash-entry-fn
@@ -72,5 +72,5 @@
     (append-daily-log (merge msg-payload {:deleted true}))
     {:new-state    new-state
      :send-to-self [[:state/publish-current {}]
-                    [:state/stats-tags-make]]
+                    [:state/stats-tags-get]]
      :emit-msg     [:ft/remove {:timestamp entry-ts}]}))

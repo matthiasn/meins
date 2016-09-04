@@ -20,7 +20,7 @@
   "Renders stats component."
   [{:keys [observed]}]
   (let [snapshot @observed
-        {:keys [cfg pomodoro-stats activity-stats task-stats stats]} snapshot]
+        {:keys [options pomodoro-stats activity-stats task-stats stats]} snapshot]
     [:div.stats
      [:div.charts
       [cp/pomodoro-bar-chart pomodoro-stats 250 "Pomodoros" 10]
@@ -28,8 +28,8 @@
       [ct/tasks-chart task-stats 250]]
      (when stats
        [:div (:entry-count stats) " entries, " (:node-count stats) " nodes, "
-        (:edge-count stats) " edges, " (count (:hashtags cfg)) " hashtags, "
-        (count (:mentions cfg)) " people, " (:open-tasks-cnt stats)
+        (:edge-count stats) " edges, " (count (:hashtags options)) " hashtags, "
+        (count (:mentions options)) " people, " (:open-tasks-cnt stats)
         " open tasks, " (:backlog-cnt stats) " in backlog, "
         (:completed-cnt stats) " completed."])
      (when-let [ms (get-in snapshot [:timing :query])]

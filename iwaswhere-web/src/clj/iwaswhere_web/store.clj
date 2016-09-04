@@ -80,37 +80,6 @@
      :send-to-self [(with-meta publish-msg msg-meta)
                     (with-meta [:cmd/keep-alive] msg-meta)]}))
 
-(defn stats-tags-fn
-  "Precomputes stats and tags (they only change on insert anyway) and initiates
-   publication thereof to all connected clients."
-  [{:keys [current-state]}]
-  (let [new-state
-        (-> current-state
-            (assoc-in [:stats] (gs/get-basic-stats current-state))
-            (assoc-in [:hashtags] (gq/find-all-hashtags current-state))
-            (assoc-in [:pvt-hashtags] (gq/find-all-pvt-hashtags current-state))
-            (assoc-in [:pvt-displayed] (:pvt-displayed (:cfg current-state)))
-            (assoc-in [:mentions] (gq/find-all-mentions current-state))
-            (assoc-in [:activities] (gq/find-all-activities current-state))
-            (assoc-in [:consumption-types]
-                      (gq/find-all-consumption-types current-state)))]
-    {:new-state    new-state
-     :send-to-self (mapv (fn [uid]
-                           (with-meta [:state/stats-tags-get] {:sente-uid uid}))
-                         (keys (:client-queries current-state)))}))
-
-(defn publish-stats-tags
-  "Publish stats and tags to client."
-  [{:keys [current-state msg-meta]}]
-  (let [stats-tags {:hashtags          (:hashtags current-state)
-                    :pvt-hashtags      (:pvt-hashtags current-state)
-                    :pvt-displayed     (:pvt-displayed current-state)
-                    :mentions          (:mentions current-state)
-                    :activities        (:activities current-state)
-                    :consumption-types (:consumption-types current-state)
-                    :stats             (:stats current-state)}]
-    {:emit-msg [:state/stats-tags stats-tags]}))
-
 (defn state-fn
   "Initial state function, creates state atom and then parses all files in
    data directory into the component state.
@@ -154,7 +123,7 @@
         (log/info "Indexed" (count @entries-to-index) "entries." t))
       (reset! entries-to-index []))
     ; TODO: send off :state/stats-tags message
-    (swap! state #(:new-state (stats-tags-fn {:current-state %})))
+    (swap! state #(:new-state (gs/stats-tags-fn {:current-state %})))
     {:state state}))
 
 (defn cmp-map
@@ -169,8 +138,7 @@
                  :entry/trash            f/trash-entry-fn
                  :state/publish-current  publish-state-fn
                  :state/get              state-get-fn
-                 :state/stats-tags-make  stats-tags-fn
-                 :state/stats-tags-get   publish-stats-tags
+                 :state/stats-tags-get  gs/stats-tags-fn
                  :cmd/keep-alive         ka/keepalive-fn
                  :cmd/query-gc           ka/query-gc-fn
                  :stats/pomo-day-get     gs/get-pomodoro-day-stats

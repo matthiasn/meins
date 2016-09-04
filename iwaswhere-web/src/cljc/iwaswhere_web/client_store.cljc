@@ -49,9 +49,9 @@
                              :activity-stats (sorted-map)
                              :task-stats     (sorted-map)
                              :cfg            @c/app-cfg})]
-    (put-fn [:state/stats-tags-get])
     (doseq [[_id q] (:queries (:query-cfg @initial-state))]
       (put-fn [:state/get q]))
+    (put-fn [:state/stats-tags-get])
     {:state initial-state}))
 
 (defn show-more-fn

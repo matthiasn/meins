@@ -7,7 +7,8 @@
             [me.raynes.fs :as fs]
             [iwaswhere-web.files :as f]
             [iwaswhere-web.utils.misc :as u]
-            [clojure.set :as set]))
+            [clojure.set :as set]
+            [iwaswhere-web.graph.stats :as gs]))
 
 (def some-test-entry
   {:mentions   #{"@SantaClaus"}
@@ -63,7 +64,6 @@
         (let [{:keys [new-state emit-msg]}
               (f/geo-entry-persist-fn {:current-state current-state
                                        :msg-payload   test-entry})
-              {:keys [new-state]} (s/stats-tags-fn {:current-state new-state})
               res (gq/get-filtered-results new-state simple-query)]
 
           (testing
@@ -142,7 +142,7 @@
               {:keys [new-state emit-msg]} (f/geo-entry-persist-fn
                                              {:current-state new-state
                                               :msg-payload   updated-test-entry})
-              {:keys [new-state]} (s/stats-tags-fn {:current-state new-state})
+              {:keys [new-state]} (gs/stats-tags-fn {:current-state new-state})
               res (gq/get-filtered-results new-state simple-query)
 
               state-from-disk (:current-state (mk-test-state test-ts))

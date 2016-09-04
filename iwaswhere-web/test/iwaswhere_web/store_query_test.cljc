@@ -7,7 +7,9 @@
             [iwaswhere-web.store :as s]
             [iwaswhere-web.store :as s]
             [clojure.set :as set]
-            [iwaswhere-web.utils.misc :as u]))
+            [iwaswhere-web.graph.stats :as gs]
+            [iwaswhere-web.utils.misc :as u]
+            [iwaswhere-web.graph.stats :as gs]))
 
 (def simple-query
   {:search-text ""
@@ -115,7 +117,7 @@
                           (add-query tasks-done-query tasks-done-query-uid)
                           (add-query tasks-not-done-query tasks-not-done-query-uid))
 
-            {:keys [new-state]} (s/stats-tags-fn {:current-state new-state})
+            {:keys [new-state]} (gs/stats-tags-fn {:current-state new-state})
             client-queries (:client-queries new-state)]
 
         (testing
@@ -157,22 +159,14 @@
 
         (testing
           "stats show expected numbers"
-          (let [res (-> (s/publish-stats-tags
-                          {:current-state new-state
-                           :msg-payload   {:sente-uid simple-query-uid}})
-                        :emit-msg
-                        second)
+          (let [res (gs/make-stats-tags new-state)
                 stats (:stats res)]
             (is (= (:entry-count stats) 105))
             (is (= (:node-count stats) 122))))
 
         (testing
           "hashtags and mentions in result of stats-tags publish fn"
-          (let [res (-> (s/publish-stats-tags
-                          {:current-state new-state
-                           :msg-payload   {:sente-uid simple-query-uid}})
-                        :emit-msg
-                        second)]
+          (let [res (gs/make-stats-tags new-state)]
             (is (= (:hashtags res) #{"#task" "#entry" "#test" "#done"
                                      "#completed" "#blah" "#new"}))
             (is (= (:pvt-displayed res) private-tags))
