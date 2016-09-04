@@ -80,9 +80,8 @@
   "Stores received stats on component state."
   [k]
   (fn [{:keys [current-state msg-payload]}]
-    (let [ds (:date-string msg-payload)
-          new-state (assoc-in current-state [k ds] msg-payload)]
-      {:new-state new-state})))
+    (let [day-stats (into (sorted-map) msg-payload)]
+      {:new-state (assoc-in current-state [k] day-stats)})))
 
 (defn cmp-map
   "Creates map for the component which holds the client-side application state."
@@ -93,18 +92,18 @@
    :state-spec        :state/client-store-spec
    :handler-map       (merge cse/entry-handler-map
                              s/search-handler-map
-                             {:state/new          new-state-fn
-                              :stats/pomo-day     (save-stats :pomodoro-stats)
-                              :stats/activity-day (save-stats :activity-stats)
-                              :stats/tasks-day    (save-stats :task-stats)
-                              :state/stats-tags   stats-tags-fn
-                              :show/more          show-more-fn
-                              :cfg/save           c/save-cfg
-                              :cmd/toggle-active  toggle-active-fn
-                              :cmd/toggle         c/toggle-set-fn
-                              :cmd/set-opt        c/set-conj-fn
-                              :cmd/set-dragged    c/set-currently-dragged
-                              :cmd/toggle-key     c/toggle-key-fn
-                              :cmd/keep-alive     ka/reset-fn
-                              :cmd/keep-alive-res ka/set-alive-fn
-                              :cmd/toggle-lines   c/toggle-lines})})
+                             {:state/new           new-state-fn
+                              :stats/pomo-days     (save-stats :pomodoro-stats)
+                              :stats/activity-days (save-stats :activity-stats)
+                              :stats/tasks-days    (save-stats :task-stats)
+                              :state/stats-tags    stats-tags-fn
+                              :show/more           show-more-fn
+                              :cfg/save            c/save-cfg
+                              :cmd/toggle-active   toggle-active-fn
+                              :cmd/toggle          c/toggle-set-fn
+                              :cmd/set-opt         c/set-conj-fn
+                              :cmd/set-dragged     c/set-currently-dragged
+                              :cmd/toggle-key      c/toggle-key-fn
+                              :cmd/keep-alive      ka/reset-fn
+                              :cmd/keep-alive-res  ka/set-alive-fn
+                              :cmd/toggle-lines    c/toggle-lines})})

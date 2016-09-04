@@ -132,15 +132,14 @@
   {:cmp-id      cmp-id
    :state-fn    state-fn
    :opts        {:msgs-on-firehose true}
-   :handler-map {:entry/import           f/entry-import-fn
-                 :entry/find             gq/find-entry
-                 :entry/update           f/geo-entry-persist-fn
-                 :entry/trash            f/trash-entry-fn
-                 :state/publish-current  publish-state-fn
-                 :state/get              state-get-fn
-                 :state/stats-tags-get  gs/stats-tags-fn
-                 :cmd/keep-alive         ka/keepalive-fn
-                 :cmd/query-gc           ka/query-gc-fn
-                 :stats/pomo-day-get     gs/get-pomodoro-day-stats
-                 :stats/activity-day-get gs/get-activity-day-stats
-                 :stats/tasks-day-get    gs/get-tasks-day-stats}})
+   :handler-map (merge
+                  gs/stats-handler-map
+                  {:entry/import          f/entry-import-fn
+                   :entry/find            gq/find-entry
+                   :entry/update          f/geo-entry-persist-fn
+                   :entry/trash           f/trash-entry-fn
+                   :state/publish-current publish-state-fn
+                   :state/get             state-get-fn
+                   :state/stats-tags-get  gs/stats-tags-fn
+                   :cmd/keep-alive        ka/keepalive-fn
+                   :cmd/query-gc          ka/query-gc-fn})})

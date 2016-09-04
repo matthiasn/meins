@@ -10,12 +10,6 @@
 (defn n-days-go [n] (.subtract (js/moment.) n "d"))
 (defn n-days-go-fmt [n] (.format (n-days-go n) ymd-format))
 
-(defn get-stats
-  "Retrieves pomodoro stats for the last n days."
-  [stats-key put-fn n]
-  (doseq [ds (map n-days-go-fmt (reverse (range n)))]
-    (put-fn [stats-key {:date-string ds}])))
-
 (defn stats-view
   "Renders stats component."
   [{:keys [observed]}]
@@ -42,6 +36,12 @@
   ""
   [{:keys [local observed put-fn]}]
   (let []))
+
+(defn get-stats
+  "Retrieves pomodoro stats for the last n days."
+  [stats-key put-fn n]
+  (let [days (map n-days-go-fmt (reverse (range n)))]
+    (put-fn [stats-key (mapv (fn [d] {:date-string d}) days)])))
 
 (defn update-stats
   [{:keys [put-fn]}]
