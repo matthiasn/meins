@@ -247,6 +247,31 @@
          [:strong (:quality-level sleep)] "/10. "
          [:strong (:interruptions sleep)] " interruptions."]))))
 
+(defn girth-div
+  "In edit mode, allow editing of body measurement, otherwise show a summary."
+  [entry put-fn edit-mode?]
+  (let [girth-cm (range 85 100 1)
+        girth-mm (range 0 10 1)
+        girth (:girth (:measurements entry))]
+    (when (and edit-mode?
+               (contains? (:tags entry) "#girth")
+               (not girth))
+      (put-fn [:entry/update-local
+               (assoc-in entry [:measurements :girth] {:abdominal-cm 0
+                                                       :abdominal-mm 0})]))
+    (when girth
+      (if edit-mode?
+        [:div
+         [:label "Abdominal girth:"]
+         [select-elem
+          entry girth-cm [:measurements :girth :abdominal-cm] true put-fn]
+         [:label "cm"]
+         [select-elem
+          entry girth-mm [:measurements :girth :abdominal-mm] true put-fn]
+         [:label "mm"]]
+        [:div "Abdominal girth: "
+         [:strong (:abdominal-cm girth) "." (:abdominal-mm girth)] " cm. "]))))
+
 (defn consumption-div
   "In edit mode, allow editing of consumption, otherwise show a summary."
   [entry cfg put-fn edit-mode?]
@@ -309,6 +334,7 @@
        [md/markdown-render entry cfg toggle-edit])
      [activity-div entry cfg put-fn edit-mode?]
      [sleep-div entry put-fn edit-mode?]
+     [girth-div entry put-fn edit-mode?]
      (when show-pvt?
        [consumption-div entry cfg put-fn edit-mode?])
      [m/audioplayer-view entry]

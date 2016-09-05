@@ -36,7 +36,7 @@
            [cc/path "M 0 200 l 600 0 z"]]]
          (when (:mouse-over @local)
            [:div.mouse-over-info (cc/info-div-pos @local)
-            [:span (:date-string (:mouse-over @local))] [:br]
-            [:span "Total: " (:total (:mouse-over @local))] [:br]
-            [:span "Completed: " (:completed (:mouse-over @local))] [:br]
-            [:span "Started: " (:started (:mouse-over @local))] [:br]])]))))
+            [:div (:date-string (:mouse-over @local))]
+            [:div "Total: " (:total (:mouse-over @local))]
+            [:div "Completed: " (:completed (:mouse-over @local))]
+            [:div "Started: " (:started (:mouse-over @local))]])]))))

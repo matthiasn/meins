@@ -51,8 +51,9 @@
                           :height h-closed
                           :class  (cc/weekend-class "closed" v)}]])))]]
          (when (:mouse-over @local)
-           [:div.mouse-over-info (cc/info-div-pos @local)
-            [:span (:date-string (:mouse-over @local))] [:br]
-            [:span "Created: " (:tasks-cnt (:mouse-over @local))] [:br]
-            [:span "Done: " (:done-cnt (:mouse-over @local))] [:br]
-            [:span "Closed: " (:closed-cnt (:mouse-over @local))] [:br]])]))))
+           (let [closed-cnt (:closed-cnt (:mouse-over @local))]
+             [:div.mouse-over-info (cc/info-div-pos @local)
+              [:div (:date-string (:mouse-over @local))]
+              [:div "Created: " (:tasks-cnt (:mouse-over @local))]
+              [:div "Done: " (:done-cnt (:mouse-over @local))]
+              (when (pos? closed-cnt) [:div "Closed: " closed-cnt])]))]))))

@@ -52,8 +52,14 @@
           activity-nodes (filter :activity day-nodes-attrs)
           activities (map :activity activity-nodes)
           weight (-> weight-nodes first :measurements :weight)
+          girth-vals (->> day-nodes-attrs
+                          (map #(:girth (:measurements %)))
+                          (filter identity)
+                          (map #(+ (* (:abdominal-cm %) 10) (:abdominal-mm %))))
+          girth (when (seq girth-vals) (apply min girth-vals))
           day-stats {:date-string    date-string
                      :weight         weight
+                     :girth          girth
                      :total-exercise (apply + (map :duration-m activities))}]
       [date-string day-stats])))
 

@@ -117,6 +117,19 @@ $activity-weekend: lighten($activity, 30);
           fill: lightblue;
         }
       }
+
+      .girth {
+        polyline {
+          stroke: $done;
+          stroke-width: 3;
+          fill: none;
+        }
+        circle {
+          stroke: $done;
+          stroke-width: 1;
+          fill: lighten($done, 20);
+        }
+      }
     }
 
     .mouse-over-info {
@@ -127,7 +140,7 @@ $activity-weekend: lighten($activity, 30);
       position: fixed;
       top: 100px;
 
-      span:first-of-type {
+      div:first-of-type {
         font-weight: bold;
       }
     }
