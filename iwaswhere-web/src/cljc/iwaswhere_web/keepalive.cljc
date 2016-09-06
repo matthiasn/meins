@@ -1,7 +1,8 @@
 (ns iwaswhere-web.keepalive
   (:require [matthiasn.systems-toolbox.switchboard :as sb]
             [matthiasn.systems-toolbox.component :as st]
-            [matthiasn.systems-toolbox.scheduler :as sched]))
+            [matthiasn.systems-toolbox.scheduler :as sched]
+            [clojure.pprint :as pp]))
 
 ;; Server side
 (defn restart-keepalive!
@@ -47,6 +48,19 @@
         new-state (assoc-in current-state [:client-queries] alive-filters)]
     {:new-state new-state}))
 
+(defn update-client-queries
+  "Updates queries for client by removing all queries that don't exist
+   for the client. Also sets those queries that are currently active by being
+   in the foreground."
+  [{:keys [current-state msg-payload msg-meta]}]
+  (let [{:keys [query-ids active-queries]} msg-payload
+        client-path [:client-queries (:sente-uid msg-meta)]
+        queries-path (conj client-path :queries)
+        active-path (conj client-path :active)
+        new-state (-> current-state
+                      (update-in queries-path select-keys query-ids)
+                      (assoc-in active-path active-queries))]
+    {:new-state new-state}))
 
 ;; Client side
 (defn init-keepalive!
@@ -63,9 +77,19 @@
 
 (defn set-alive-fn
   "Set :last-alive key whenever a keepalive response message was received by
-   the backend."
+   the backend. Emits message with the currently existing and active queries."
   [{:keys [current-state]}]
-  {:new-state (assoc-in current-state [:last-alive] (st/now))})
+  (let [query-cfg (-> current-state :query-cfg)
+        query-ids (set (keys (:queries query-cfg)))
+        active-queries (->> query-cfg
+                            :tab-groups
+                            vals
+                            (map :active)
+                            (filter identity)
+                            set)]
+    {:new-state (assoc-in current-state [:last-alive] (st/now))
+     :emit-msg  [:keep-alive/queries {:query-ids      query-ids
+                                      :active-queries active-queries}]}))
 
 (defn reset-fn
   "Reset local state when last message from backend was seen more than 10

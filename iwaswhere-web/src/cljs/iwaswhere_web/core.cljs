@@ -17,7 +17,8 @@
                                :import/geo :import/photos :import/phone
                                :cmd/keep-alive :stats/pomo-day-get
                                :stats/activity-day-get :stats/tasks-day-get
-                               :state/stats-tags-get :import/weight}})
+                               :state/stats-tags-get :import/weight
+                               :keep-alive/queries}})
 
 (defn init!
   "Initializes client-side system by sending messages to the switchboard for

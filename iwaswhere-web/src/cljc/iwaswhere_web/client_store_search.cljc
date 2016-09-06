@@ -80,9 +80,19 @@
     (reset! query-cfg (:query-cfg new-state))
     {:new-state new-state}))
 
+(defn show-more-fn
+  "Runs previous query but with more results. Also updates the number to show in
+   the UI."
+  [{:keys [current-state msg-payload]}]
+  (let [query-path [:query-cfg :queries (:query-id msg-payload)]
+        merged (merge (get-in current-state query-path) msg-payload)
+        new-query (update-in merged [:n] + 20)]
+    {:send-to-self [:search/update new-query]}))
+
 (def search-handler-map
   {:search/update     update-query-fn
    :search/set-active set-active-query
    :search/add        add-query
    :search/remove     remove-query
+   :show/more         show-more-fn
    :linked-filter/set set-linked-filter})

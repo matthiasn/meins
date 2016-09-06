@@ -80,3 +80,18 @@
       (is (= (second (:emit-msg handler-res1))
              [:cmd/schedule-new {:timeout 5000
                                  :message [:search/set-hash]}])))))
+
+(deftest show-more-test
+  "Ensure that query is properly updated when more results are desired."
+  (let [current-state @(:state (store/initial-state-fn (fn [_put-fn])))
+        new-state (:new-state (search/update-query-fn
+                                {:current-state current-state
+                                 :msg-payload   st/open-tasks-query}))
+        {:keys [send-to-self]} (search/show-more-fn
+                                 {:current-state new-state
+                                  :msg-payload   {:query-id :query-1}})
+        updated-query (second send-to-self)
+        expected-query (update-in st/open-tasks-query [:n] + 20)]
+    (testing
+      "send properly updated query, with increased number of results"
+      (is (= updated-query expected-query)))))

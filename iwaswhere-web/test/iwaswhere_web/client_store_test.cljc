@@ -129,24 +129,6 @@
       "active entry is set"
       (is (= ts (:query-1 (:active (:cfg new-state))))))))
 
-(deftest show-more-test
-  "Ensure that query is properly updated when more results are desired."
-  (let [current-state @(:state (store/initial-state-fn (fn [_put-fn])))
-        new-state (:new-state (search/update-query-fn
-                                {:current-state current-state
-                                 :msg-payload   open-tasks-query}))
-        {:keys [:new-state emit-msg]} (store/show-more-fn
-                                        {:current-state new-state
-                                         :msg-payload   {:query-id :query-1}})
-        updated-query (update-in open-tasks-query [:n] + 20)]
-    (testing
-      "query is properly updated, with increased number of results"
-      (is (= updated-query (:query-1 (:queries (:query-cfg new-state))))))
-    (testing
-      "emits correct query message"
-      (is (= :state/get (first emit-msg)))
-      (is (= updated-query (second emit-msg))))))
-
 (deftest toggle-key-test
   "toggle key messages flip boolean value"
   (let [current-state @(:state (store/initial-state-fn (fn [_put-fn])))

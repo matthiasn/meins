@@ -54,17 +54,6 @@
     (put-fn [:state/stats-tags-get])
     {:state initial-state}))
 
-(defn show-more-fn
-  "Runs previous query but with more results. Also updates the number to show in
-   the UI."
-  [{:keys [current-state msg-payload]}]
-  (let [query-path [:query-cfg :queries (:query-id msg-payload)]
-        merged (merge (get-in current-state query-path) msg-payload)
-        new-query (update-in merged [:n] + 20)
-        new-state (assoc-in current-state query-path new-query)]
-    {:new-state new-state
-     :emit-msg  [:state/get new-query]}))
-
 (defn toggle-active-fn
   "Sets entry in payload as the active entry for which to show linked entries."
   [{:keys [current-state msg-payload]}]
@@ -97,7 +86,6 @@
                               :stats/activity-days (save-stats :activity-stats)
                               :stats/tasks-days    (save-stats :task-stats)
                               :state/stats-tags    stats-tags-fn
-                              :show/more           show-more-fn
                               :cfg/save            c/save-cfg
                               :cmd/toggle-active   toggle-active-fn
                               :cmd/toggle          c/toggle-set-fn

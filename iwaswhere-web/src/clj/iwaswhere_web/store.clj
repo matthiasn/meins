@@ -142,4 +142,5 @@
                    :state/get             state-get-fn
                    :state/stats-tags-get  gs/stats-tags-fn
                    :cmd/keep-alive        ka/keepalive-fn
+                   :keep-alive/queries    ka/update-client-queries
                    :cmd/query-gc          ka/query-gc-fn})})
