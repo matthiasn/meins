@@ -60,7 +60,8 @@
               (assoc-in [:entries-map ts] (merge curr-local msg-payload)))
           current-state)]
     (update-local-storage new-state)
-    {:new-state new-state}))
+    {:new-state new-state
+     :send-to-self [:search/refresh]}))
 
 (defn play-audio
   "Start playing audio element with provided DOM id."

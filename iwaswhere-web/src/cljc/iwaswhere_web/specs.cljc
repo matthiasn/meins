@@ -166,8 +166,9 @@
                    :iww.search-stats/node-count
                    :iww.search-stats/edge-count]))
 
-;(s/def :iww.search-result/entries (s/* entry-spec))
-(s/def :iww.search-result/entries (s/* possible-timestamp?))
+(s/def :iww.search-result/entries-seq (s/* possible-timestamp?))
+(s/def :iww.search-result/entries
+  (s/map-of keyword? :iww.search-result/entries-seq) )
 (s/def :iww.search-result/entries-map (s/map-of possible-timestamp? entry-spec))
 (s/def :iww.search-result/hashtags (s/* string?))
 (s/def :iww.search-result/mentions (s/* string?))
@@ -282,3 +283,5 @@
                    :iww.client-state/new-entries
                    :iww.client-state/query-cfg
                    :iww.client-state/cfg]))
+
+(s/def :state/search :iww.client-state/query-cfg)

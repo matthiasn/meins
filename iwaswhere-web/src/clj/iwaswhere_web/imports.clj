@@ -153,8 +153,9 @@
                  (put-fn (with-meta [:entry/import file-info] msg-meta))))
              (catch Exception ex (log/error (str "Error while importing "
                                                  filename) ex)))))
-    {:send-to-self [[:state/publish-current {}]
-                    [:state/stats-tags-get]]}))
+    #_{:send-to-self [[:state/publish-current {}]
+                        [:state/stats-tags-get]]}
+    {:send-to-self [:state/updated {}]}))
 
 (defn import-visits-fn
   [rdr put-fn msg-meta filename]
@@ -222,8 +223,10 @@
       (let [filename (.getName file)]
         (log/info "Trying to import" filename)
         (import-weight-csv-fn (io/reader file) put-fn msg-meta filename)))
+    #_
     {:send-to-self [[:state/publish-current {}]
-                    [:state/stats-tags-get]]}))
+                    [:state/stats-tags-get]]}
+    {:send-to-self [:state/updated {}]}))
 
 (defn update-audio-tag
   [entry]
@@ -257,8 +260,9 @@
       (let [filename (.getName file)]
         (log/info "Trying to import " filename)
         (import-text-entries-fn (io/reader file) put-fn msg-meta filename)))
-    {:send-to-self [[:state/publish-current {}]
-                    [:state/stats-tags-get]]}))
+    #_{:send-to-self [[:state/publish-current {}]
+                      [:state/stats-tags-get]]}
+    {:send-to-self [:state/updated {}]}))
 
 (defn cmp-map
   "Generates component map for imports-cmp."

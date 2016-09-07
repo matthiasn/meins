@@ -142,7 +142,6 @@
               {:keys [new-state emit-msg]} (f/geo-entry-persist-fn
                                              {:current-state new-state
                                               :msg-payload   updated-test-entry})
-              {:keys [new-state]} (gs/stats-tags-fn {:current-state new-state})
               res (gq/get-filtered-results new-state simple-query)
 
               state-from-disk (:current-state (mk-test-state test-ts))

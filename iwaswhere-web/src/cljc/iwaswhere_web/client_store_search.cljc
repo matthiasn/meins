@@ -3,7 +3,8 @@
     [iwaswhere-web.client-store-cfg :as c]
     [matthiasn.systems-toolbox.component :as st]
     [iwaswhere-web.utils.parse :as p]
-    [clojure.pprint :as pp]))
+    [clojure.pprint :as pp]
+    [clojure.set :as set]))
 
 (def initial-query-cfg
   {:queries    {}
@@ -14,6 +15,7 @@
    :cljs (defonce query-cfg (sa/local-storage
                               (atom initial-query-cfg) "iWasWhere_query_cfg")))
 
+#_
 (def update-location-hash-msg
   [:cmd/schedule-new {:timeout 5000 :message [:search/set-hash]}])
 
@@ -23,14 +25,13 @@
   [{:keys [current-state msg-payload]}]
   (let [query-id (:query-id msg-payload)
         query-path [:query-cfg :queries query-id]
-        new-state (assoc-in current-state query-path msg-payload)
         query-msg (merge msg-payload
                          {:sort-by-upvotes (:sort-by-upvotes current-state)
-                          :sort-asc (:sort-asc (:cfg current-state))})]
+                          :sort-asc (:sort-asc (:cfg current-state))})
+        new-state (assoc-in current-state query-path query-msg)]
     (swap! query-cfg assoc-in [:queries query-id] msg-payload)
     {:new-state new-state
-     :emit-msg  [[:state/get query-msg]
-                 update-location-hash-msg]}))
+     :emit-msg  [:state/search (:query-cfg new-state)]}))
 
 ; TODO: linked filter belongs in query-cfg
 (defn set-linked-filter
@@ -38,7 +39,8 @@
   [{:keys [current-state msg-payload]}]
   (let [{:keys [search query-id]} msg-payload]
     {:new-state (assoc-in current-state [:cfg :linked-filter query-id] search)
-     :emit-msg  update-location-hash-msg}))
+     ;:emit-msg  update-location-hash-msg
+     }))
 
 (defn set-active-query
   "Sets active query for specified tab group."
@@ -59,11 +61,11 @@
         all-path [:query-cfg :tab-groups tab-group :all]
         new-state (-> current-state
                       (assoc-in active-path query-id)
-                      (update-in all-path conj query-id))]
+                      (update-in all-path conj query-id))
+        new-query (merge {:query-id query-id} (p/parse-search ""))]
     (reset! query-cfg (:query-cfg new-state))
-    {:new-state new-state
-     :send-to-self [:search/update (merge {:query-id query-id}
-                                          (p/parse-search ""))]}))
+    {:new-state    new-state
+     :send-to-self [:search/update new-query]}))
 
 (defn remove-query
   "Remove query inside tab group specified in msg."
@@ -89,10 +91,20 @@
         new-query (update-in merged [:n] + 20)]
     {:send-to-self [:search/update new-query]}))
 
+(defn search-refresh-fn
+  "Refreshes client-side state by sending all queries, plus, with a delay,
+   the stats and tags."
+  [{:keys [current-state]}]
+  (let [query-cfg (-> current-state :query-cfg)]
+    {:emit-msg [[:state/search query-cfg]
+                [:cmd/schedule-new {:timeout 2000
+                                    :message [:state/stats-tags-get]}]]}))
+
 (def search-handler-map
   {:search/update     update-query-fn
    :search/set-active set-active-query
    :search/add        add-query
    :search/remove     remove-query
+   :search/refresh    search-refresh-fn
    :show/more         show-more-fn
    :linked-filter/set set-linked-filter})

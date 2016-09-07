@@ -52,9 +52,9 @@
   (let [snapshot @observed
         cfg (merge (:cfg snapshot) (:options snapshot))
         local-cfg {:query-id query-id}
-        results (query-id (:results snapshot))
+        entries (query-id (:results snapshot))
         entries-map (:entries-map snapshot)
-        entries (map (fn [ts] (get entries-map ts)) (:entries results))
+        entries (map (fn [ts] (get entries-map ts)) entries)
         show-pvt? (:show-pvt cfg)
         filtered-entries (if show-pvt?
                            entries

@@ -38,7 +38,7 @@
           (let [query (merge (:current-query snapshot)
                              {:sort-by-upvotes (not sort-by-upvotes?)})]
             (put-fn [:cmd/toggle-key {:path [:cfg :sort-by-upvotes]}])
-            (put-fn [:state/get query])))
+            (put-fn [:state/search query])))
         toggle-qr-code
         (fn [_ev]
           (let [msg {:path [:cfg :qr-code]}

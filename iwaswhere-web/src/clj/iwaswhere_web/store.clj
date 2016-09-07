@@ -15,71 +15,6 @@
             [clojure.pprint :as pp]
             [clojure.edn :as edn]))
 
-(defn publish-state-fn
-  "Publishes current state, as filtered for the respective clients. Sends to
-   single connected client with the latest filter when message payload contains
-   :sente-uid, otherwise sends to all clients."
-  [{:keys [current-state msg-payload msg-meta]}]
-  (if-let [sente-uid (:sente-uid msg-payload)]
-    (let [start-ts (System/nanoTime)
-          query (get-in current-state [:client-queries sente-uid])
-          res (gq/get-filtered-results current-state query)
-          ms (/ (- (System/nanoTime) start-ts) 1000000)
-          ms-string (pp/cl-format nil "~,3f ms" ms)
-          res-msg (with-meta [:state/new (merge res {:duration-ms ms-string})]
-                             (merge msg-meta {:sente-uid sente-uid}))]
-      (log/info "Query" sente-uid "took" ms-string)
-      (log/info "Result size" (count (str res)))
-      {:emit-msg res-msg})
-    {:send-to-self (mapv (fn [uid] [:state/publish-current {:sente-uid uid}])
-                         (keys (:client-queries current-state)))}))
-
-(defn run-query
-  [current-state msg-meta]
-  (fn
-    [[query-id query]]
-    (let [start-ts (System/nanoTime)
-          res (gq/get-filtered-results current-state query)
-          ms (/ (- (System/nanoTime) start-ts) 1000000)
-          dur {:duration-ms (pp/cl-format nil "~,3f ms" ms)}]
-      (log/info "Query" (:sente-uid msg-meta) query-id "took" (:duration-ms dur))
-      (log/info "Result size" (count (str res)))
-      (with-meta [:state/new (merge res dur {:query-id query-id})] msg-meta))))
-
-(defn publish-state-fn
-  "Publishes current state, as filtered for the respective clients. Sends to
-   single connected client with the latest filter when message payload contains
-   :sente-uid, otherwise sends to all clients."
-  [{:keys [current-state msg-payload msg-meta]}]
-  (if-let [sente-uid (:sente-uid msg-payload)]
-    (let [query-id (:query-id msg-payload)
-          queries (get-in current-state [:client-queries sente-uid :queries])
-          queries (if query-id {query-id (query-id queries)} queries)
-          msg-meta  (merge msg-meta {:sente-uid sente-uid})
-          get-results (run-query current-state (merge msg-meta
-                                                      {:sente-uid sente-uid}))
-          results (mapv get-results queries)]
-      {:emit-msg results})
-    {:send-to-self (mapv (fn [uid] [:state/publish-current {:sente-uid uid}])
-                         (keys (:client-queries current-state)))}))
-
-(defn state-get-fn
-  "Handler function for retrieving current state. Updates filter for connected
-   client, and then sends a message to self to publish state for this particular
-   client.
-   Removes '~' from the not-tags, which is the set of tags that shall not be
-   contained in matching entries or any of their comments."
-  [{:keys [current-state msg-payload msg-meta]}]
-  (let [sente-uid (:sente-uid msg-meta)
-        query-id (:query-id msg-payload)
-        update-path [:client-queries sente-uid :queries query-id]
-        new-state (update-in current-state update-path merge msg-payload)
-        publish-msg [:state/publish-current {:sente-uid sente-uid
-                                             :query-id  query-id}]]
-    {:new-state new-state
-     :send-to-self [(with-meta publish-msg msg-meta)
-                    (with-meta [:cmd/keep-alive] msg-meta)]}))
-
 (defn state-fn
   "Initial state function, creates state atom and then parses all files in
    data directory into the component state.
@@ -122,8 +57,6 @@
                         (put-fn [:ft/add entry]))))]
         (log/info "Indexed" (count @entries-to-index) "entries." t))
       (reset! entries-to-index []))
-    ; TODO: send off :state/stats-tags message
-    (swap! state #(:new-state (gs/stats-tags-fn {:current-state %})))
     {:state state}))
 
 (defn cmp-map
@@ -138,9 +71,6 @@
                    :entry/find            gq/find-entry
                    :entry/update          f/geo-entry-persist-fn
                    :entry/trash           f/trash-entry-fn
-                   :state/publish-current publish-state-fn
-                   :state/get             state-get-fn
+                   :state/search          gq/query-fn
                    :state/stats-tags-get  gs/stats-tags-fn
-                   :cmd/keep-alive        ka/keepalive-fn
-                   :keep-alive/queries    ka/update-client-queries
-                   :cmd/query-gc          ka/query-gc-fn})})
+                   :cmd/keep-alive        ka/keepalive-fn})})

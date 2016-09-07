@@ -13,12 +13,12 @@
 
 (defonce switchboard (sb/component :client/switchboard))
 
-(def sente-cfg {:relay-types #{:state/get :entry/update :entry/find :entry/trash
+(def sente-cfg {:relay-types #{:entry/update :entry/find :entry/trash
                                :import/geo :import/photos :import/phone
                                :cmd/keep-alive :stats/pomo-day-get
                                :stats/activity-day-get :stats/tasks-day-get
                                :state/stats-tags-get :import/weight
-                               :keep-alive/queries}})
+                               :state/search}})
 
 (defn init!
   "Initializes client-side system by sending messages to the switchboard for

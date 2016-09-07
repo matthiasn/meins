@@ -14,7 +14,9 @@
    :date-string nil
    :timestamp   nil
    :n           40
-   :query-id    :query-1})
+   :query-id    :query-1
+   :sort-by-upvotes nil
+   :sort-asc nil})
 
 (def open-tasks-query
   {:search-text "#task ~#done "
@@ -24,7 +26,9 @@
    :date-string nil
    :timestamp   nil
    :n           40
-   :query-id    :query-1})
+   :query-id    :query-1
+   :sort-by-upvotes nil
+   :sort-asc nil})
 
 (def test-entry
   {:mentions       #{}
@@ -91,7 +95,7 @@
                                  :msg-meta      meta-from-backend}))]
     (testing
       "entries are on new state"
-      (is (= (get-in new-state [:results :query-1 :entries])
+      (is (= (get-in new-state [:results])
              (:entries state-from-backend))))
     (testing
       "entries map is on new state"

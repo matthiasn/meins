@@ -10,7 +10,8 @@
             [clojure.tools.logging :as log]
             [clj-time.format :as ctf]
             [clojure.core.reducers :as r]
-            [iwaswhere-web.utils.misc :as u]))
+            [iwaswhere-web.utils.misc :as u]
+            [clojure.pprint :as pp]))
 
 (defn entries-filter-fn
   "Creates a filter function which ensures that all tags and mentions in the
@@ -237,3 +238,29 @@
             entry (comments-linked-mapper (uc/attrs g ts))]
         {:emit-msg [:entry/found entry]})
       (log/warn "cannot find node: " ts))))
+
+(defn run-query
+  [current-state msg-meta]
+  (fn [[query-id query]]
+    (let [start-ts (System/nanoTime)
+          res (get-filtered-results current-state query)
+          ms (/ (- (System/nanoTime) start-ts) 1000000)
+          dur {:duration-ms (pp/cl-format nil "~,3f ms" ms)}]
+      (log/info "Query" (:sente-uid msg-meta) query-id "took" (:duration-ms dur))
+      [query-id res])))
+
+(defn query-fn
+  "Runs all queries in request, sends back to client, with all entry maps
+   for the individual queries merged into one."
+  [{:keys [current-state msg-payload msg-meta]}]
+  (let [start-ts (System/nanoTime)
+        res-mapper (run-query current-state msg-meta)
+        res (mapv res-mapper (:queries msg-payload))
+        res2 (reduce (fn [acc [k v]]
+                       (-> acc
+                           (update-in [:entries-map] merge (:entries-map v))
+                           (assoc-in [:entries k] (:entries v)))) {} res)
+        ms (/ (- (System/nanoTime) start-ts) 1000000)
+        dur {:duration-ms (pp/cl-format nil "~,3f ms" ms)}]
+    (log/info "Query" (:sente-uid msg-meta) "took" (:duration-ms dur))
+    {:emit-msg [:state/new (merge res2 dur)]}))

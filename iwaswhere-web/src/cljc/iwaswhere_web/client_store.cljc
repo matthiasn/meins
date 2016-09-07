@@ -9,16 +9,15 @@
 (defn new-state-fn
   "Update client side state with list of journal entries received from backend."
   [{:keys [current-state msg-payload msg-meta]}]
-  (let [query-id (:query-id msg-payload)
-        store-meta (:client/store-cmp msg-meta)
-        entries (:entries msg-payload)
+  (let [store-meta (:client/store-cmp msg-meta)
+        {:keys [entries entries-map ]} msg-payload
         new-state (-> current-state
-                      (assoc-in [:results query-id :entries] entries)
-                      (update-in [:entries-map] merge (:entries-map msg-payload))
+                      (assoc-in [:results] entries)
+                      (update-in [:entries-map] merge entries-map)
                       (assoc-in [:timing] {:query (:duration-ms msg-payload)
                                            :rtt   (- (:in-ts store-meta)
                                                      (:out-ts store-meta))
-                                           :count (count entries)}))]
+                                           :count (count entries-map)}))]
     {:new-state new-state}))
 
 (defn stats-tags-fn
@@ -49,8 +48,7 @@
                              :activity-stats (sorted-map)
                              :task-stats     (sorted-map)
                              :cfg            @c/app-cfg})]
-    (doseq [[_id q] (:queries (:query-cfg @initial-state))]
-      (put-fn [:state/get q]))
+    (put-fn [:state/search (:query-cfg @initial-state)])
     (put-fn [:state/stats-tags-get])
     {:state initial-state}))
 
@@ -62,8 +60,7 @@
     {:new-state (assoc-in current-state [:cfg :active query-id]
                           (if (= currently-active timestamp)
                             nil
-                            timestamp))
-     :emit-msg  s/update-location-hash-msg}))
+                            timestamp))}))
 
 (defn save-stats
   "Stores received stats on component state."

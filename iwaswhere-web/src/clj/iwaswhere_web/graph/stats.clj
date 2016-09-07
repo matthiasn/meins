@@ -108,12 +108,11 @@
 (defn stats-tags-fn
   "Generates stats and tags (they only change on insert anyway) and initiates
    publication thereof to all connected clients."
-  [{:keys [current-state put-fn]}]
+  [{:keys [current-state put-fn msg-meta]}]
   (future
-    (let [stats-tags (make-stats-tags current-state)]
-      (doseq [uid (keys (:client-queries current-state))]
-        (put-fn (with-meta [:state/stats-tags stats-tags] {:sente-uid uid})))))
-  {:new-state current-state})
+    (let [stats-tags (make-stats-tags current-state)
+          uid (:sente-uid msg-meta)]
+      (put-fn (with-meta [:state/stats-tags stats-tags] {:sente-uid uid})))))
 
 (def stats-handler-map
   {:stats/pomo-day-get     (get-day-stats pomodoro-mapper :stats/pomo-days)

@@ -28,11 +28,7 @@
       "query is sent, with additional :sort-by-upvotes key"
       (is (= (merge st/empty-query {:sort-by-upvotes nil
                                     :sort-asc        nil})
-             (second (first (:emit-msg handler-res))))))
-    (testing
-      "location change message is scheduled on change"
-      (is (= (second (:emit-msg handler-res))
-             [:cmd/schedule-new {:timeout 5000 :message [:search/set-hash]}])))
+             (-> handler-res :emit-msg  second :queries :query-1))))
     (testing
       "active entry not set"
       (is (not (:active new-state))))
@@ -68,18 +64,13 @@
       "query is sent, with additional but false :sort-by-upvotes key"
       (is (= (merge st/open-tasks-query {:sort-by-upvotes nil
                                          :sort-asc        nil})
-             (second (first (:emit-msg handler-res))))))
+             (-> handler-res :emit-msg  second :queries :query-1))))
     (testing
       "query is sent after upvotes-toggle, with additional :sort-by-upvotes key
        being true"
       (is (= (merge st/open-tasks-query {:sort-by-upvotes true
                                          :sort-asc        nil})
-             (second (first (:emit-msg handler-res1))))))
-    (testing
-      "location change message is scheduled on change"
-      (is (= (second (:emit-msg handler-res1))
-             [:cmd/schedule-new {:timeout 5000
-                                 :message [:search/set-hash]}])))))
+             (-> handler-res1 :emit-msg  second :queries :query-1))))))
 
 (deftest show-more-test
   "Ensure that query is properly updated when more results are desired."

@@ -5,11 +5,13 @@
             [iwaswhere-web.files :as f]
             [iwaswhere-web.store-test :as st]
             [iwaswhere-web.store :as s]
-            [iwaswhere-web.store :as s]
+            [iwaswhere-web.graph.query :as qq]
             [clojure.set :as set]
             [iwaswhere-web.graph.stats :as gs]
             [iwaswhere-web.utils.misc :as u]
-            [iwaswhere-web.graph.stats :as gs]))
+            [iwaswhere-web.graph.stats :as gs]
+            [iwaswhere-web.graph.query :as gq]
+            [iwaswhere-web.graph.query :as gq]))
 
 (def simple-query
   {:search-text ""
@@ -76,23 +78,6 @@
   (:new-state (f/geo-entry-persist-fn {:current-state acc
                                        :msg-payload   entry})))
 
-(defn extract-query-res
-  "Extracts entries from query result as returned by publish-state-fn."
-  [current-state client-id]
-  (-> (s/publish-state-fn {:current-state current-state
-                           :msg-payload   {:sente-uid client-id}})
-      :emit-msg   ; get published messages
-      first       ; 1st message
-      second      ; msg-payload
-      :entries))
-
-(defn add-query
-  "Adds query to state, returns new state."
-  [current-state query client-id]
-  (:new-state (s/state-get-fn {:current-state current-state
-                               :msg-payload   query
-                               :msg-meta      {:sente-uid client-id}})))
-
 (deftest query-test
   "Test that different queries return the expected results."
   (let [test-ts (System/currentTimeMillis)
@@ -109,53 +94,40 @@
             new-state (reduce persist-reducer new-state
                               (map st/mk-test-entry (range 100)))
 
-            new-state (-> new-state
-                          (add-query simple-query simple-query-uid)
-                          (add-query (merge simple-query {:n 200}) simple-query2-uid)
-                          (add-query tasks-query tasks-query-uid)
-                          (add-query no-results-query no-results-query-uid)
-                          (add-query tasks-done-query tasks-done-query-uid)
-                          (add-query tasks-not-done-query tasks-not-done-query-uid))
+            req-msg
+            {:queries {simple-query-uid         simple-query
+                       simple-query2-uid        (merge simple-query {:n 200})
+                       tasks-query-uid          tasks-query
+                       no-results-query-uid     no-results-query
+                       tasks-done-query-uid     tasks-done-query
+                       tasks-not-done-query-uid tasks-not-done-query}}
 
-            {:keys [new-state]} (gs/stats-tags-fn {:current-state new-state})
-            client-queries (:client-queries new-state)]
-
-        (testing
-          "client queries associated with proper connection IDs"
-          (is (= (get-in client-queries [simple-query-uid :queries :query-1])
-                 simple-query))
-          (is (= (get-in client-queries [tasks-done-query-uid :queries :query-1])
-                 tasks-done-query)))
-
-        (testing
-          "client queries with not-tags properly re-formatted"
-          (is (= (get-in client-queries
-                         [tasks-not-done-query-uid :queries :query-1])
-                 (merge tasks-not-done-query {:not-tags #{"#done" "#backlog"}}))))
+            res (second (:emit-msg (gq/query-fn {:current-state new-state
+                                                 :msg-payload   req-msg})))]
 
         (testing
           "query with no matches should return 0 results"
-          (is (empty? (extract-query-res new-state no-results-query-uid))))
+          (is (empty? (get-in res [:entries no-results-query-uid]))))
 
         (testing
           "simple query has 40 results"
-          (is (= 40 (count (extract-query-res new-state simple-query-uid)))))
+          (is (= 40 (count (get-in res [:entries simple-query-uid])))))
 
         (testing
           "simple query2 returns all 105 results"
-          (is (= 105 (count (extract-query-res new-state simple-query2-uid)))))
+          (is (= 105 (count (get-in res [:entries simple-query2-uid])))))
 
         (testing
           "tasks query has 5 results"
-          (is (= 5 (count (extract-query-res new-state tasks-query-uid)))))
+          (is (= 5 (count (get-in res [:entries tasks-query-uid])))))
 
         (testing
           "tasks done query has 3 results"
-          (is (= 3 (count (extract-query-res new-state tasks-done-query-uid)))))
+          (is (= 3 (count (get-in res [:entries tasks-done-query-uid])))))
 
         (testing
           "tasks - not done query has 2 results"
-          (is (= 2 (count (extract-query-res new-state tasks-not-done-query-uid)))))
+          (is (= 2 (count (get-in res [:entries tasks-not-done-query-uid])))))
 
         (testing
           "stats show expected numbers"
