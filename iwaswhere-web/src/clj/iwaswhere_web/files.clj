@@ -69,8 +69,6 @@
         new-state (ga/remove-node current-state entry-ts)]
     (log/info "Entry" entry-ts "marked as deleted.")
     (append-daily-log (merge msg-payload {:deleted true}))
-    {:new-state    new-state
-     #_#_
-     :send-to-self [[:state/publish-current {}]
-                    [:state/stats-tags-get]]
-     :emit-msg     [:ft/remove {:timestamp entry-ts}]}))
+    {:new-state new-state
+     :emit-msg  [[:ft/remove {:timestamp entry-ts}]
+                 [:search/refresh]]}))
