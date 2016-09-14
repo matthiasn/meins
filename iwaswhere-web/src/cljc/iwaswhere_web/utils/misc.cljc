@@ -20,13 +20,11 @@
   [entry]
   (let [arrival-ts (:arrival-timestamp entry)
         depart-ts (:departure-timestamp entry)
-        dur (when (and arrival-ts depart-ts)
+        secs (when (and arrival-ts depart-ts)
               (let [dur (- depart-ts arrival-ts)]
-                (if (int? dur)
-                  (/ dur 1000)
-                  (Math/floor dur))))]
-    (when (and dur (< dur 99999999))
-      (str ", " (duration-string dur)))))
+                (Math/floor (if (int? dur) (/ dur 1000) dur))))]
+    (when (and secs (< secs 99999999))
+      (str ", " (duration-string secs)))))
 
 (defn pvt-filter
   "Filter for entries considered private."
