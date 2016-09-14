@@ -68,6 +68,9 @@
   :aliases {"build" ["do" "clean" ["cljsbuild" "once" "release"]
                      ["sass" "once"] "uberjar"]}
 
+  :codox {:output-path "codox"
+          :source-uri "https://github.com/matthiasn/iWasWhere/blob/master/iwaswhere-web/{filepath}#L{line}"}
+
   :cljsbuild
   {:builds
    [{:id           "dev"
