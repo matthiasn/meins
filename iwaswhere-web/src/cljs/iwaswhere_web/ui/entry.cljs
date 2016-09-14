@@ -4,6 +4,7 @@
             [iwaswhere-web.ui.edit :as e]
             [iwaswhere-web.ui.media :as m]
             [iwaswhere-web.ui.pomodoro :as p]
+            [iwaswhere-web.utils.parse :as up]
             [cljsjs.moment]
             [iwaswhere-web.helpers :as h]
             [iwaswhere-web.utils.misc :as u]
@@ -110,6 +111,7 @@
       [entry cfg put-fn edit-mode? toggle-edit local-cfg]
       (let [ts (:timestamp entry)
             query-id (:query-id local-cfg)
+            tab-group (:tab-group local-cfg)
             map? (:latitude entry)
             toggle-map #(put-fn [:cmd/toggle
                                  {:timestamp ts
@@ -142,6 +144,11 @@
             trash-entry #(if edit-mode?
                           (put-fn [:entry/remove-local {:timestamp ts}])
                           (put-fn [:entry/trash {:timestamp ts}]))
+            open-external #(put-fn [:search/add
+                                    {:tab-group (if (= tab-group :right)
+                                                  :left
+                                                  :right)
+                                     :query     (up/parse-search (str ts))}])
             upvotes (:upvotes entry)
             upvote-fn (fn [op]
                         #(put-fn [:entry/update
@@ -172,8 +179,7 @@
             {:on-click toggle-comments
              :class    (when-not show-comments? "hidden-comments")}])
          (when-not (:comment-for entry)
-           [:a {:href (str "/#" ts) :target "_blank"}
-            [:span.fa.fa-external-link.toggle]])
+           [:span.fa.fa-external-link.toggle {:on-click open-external}])
          (when-not (:comment-for entry)
            [new-link entry put-fn cfg create-linked-entry])
          [trash-icon trash-entry]]))))

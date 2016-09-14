@@ -48,10 +48,10 @@
 (defn journal-view
   "Renders journal div, one entry per item, with map if geo data exists in the
    entry."
-  [{:keys [observed put-fn]} query-id]
+  [{:keys [observed put-fn]} local-cfg]
   (let [snapshot @observed
         cfg (merge (:cfg snapshot) (:options snapshot))
-        local-cfg {:query-id query-id}
+        query-id (:query-id local-cfg)
         entries (query-id (:results snapshot))
         entries-map (:entries-map snapshot)
         entries (map (fn [ts] (get entries-map ts)) entries)

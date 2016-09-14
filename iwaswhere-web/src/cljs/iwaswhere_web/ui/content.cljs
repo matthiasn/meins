@@ -30,13 +30,14 @@
   (let [snapshot @observed
         cfg (:cfg snapshot)
         query-cfg (:query-cfg snapshot)
-        query-id (-> query-cfg :tab-groups tab-group :active)]
+        query-id (-> query-cfg :tab-groups tab-group :active)
+        local-cfg {:query-id query-id :tab-group tab-group}]
     [:div.split-window-view {:class (when (:split-view cfg) "split-view")}
      [tabs-header-view query-cfg tab-group put-fn]
      (when query-id
        [search/search-field-view snapshot put-fn query-id])
      (when query-id
-       [j/journal-view cmp-map query-id])]))
+       [j/journal-view cmp-map local-cfg])]))
 
 (defn split-windows-view
   "Renders a split view, with new entries at the top."

@@ -55,14 +55,14 @@
 (defn add-query
   "Adds query inside tab group specified in msg."
   [{:keys [current-state msg-payload]}]
-  (let [{:keys [tab-group]} msg-payload
+  (let [{:keys [tab-group query]} msg-payload
         query-id (keyword (st/make-uuid))
         active-path [:query-cfg :tab-groups tab-group :active]
         all-path [:query-cfg :tab-groups tab-group :all]
         new-state (-> current-state
                       (assoc-in active-path query-id)
                       (update-in all-path conj query-id))
-        new-query (merge {:query-id query-id} (p/parse-search ""))]
+        new-query (merge {:query-id query-id} (p/parse-search "") query)]
     (reset! query-cfg (:query-cfg new-state))
     {:new-state    new-state
      :send-to-self [:search/update new-query]}))
