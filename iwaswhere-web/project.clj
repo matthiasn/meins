@@ -3,11 +3,11 @@
   :url "https://github.com/matthiasn/systems-toolbox"
   :license {:name "GNU GENERAL PUBLIC LICENSE"
             :url  "http://www.gnu.org/licenses/gpl-3.0.en.html"}
-  :dependencies [[org.clojure/clojure "1.9.0-alpha11"]
-                 [org.clojure/clojurescript "1.9.227"]
+  :dependencies [[org.clojure/clojure "1.9.0-alpha12"]
+                 [org.clojure/clojurescript "1.9.229"]
                  [org.clojure/tools.logging "0.3.1"]
                  [org.clojure/tools.namespace "0.2.11"]
-                 [com.taoensso/encore "2.80.0"]
+                 [com.taoensso/encore "2.81.1"]
                  [ch.qos.logback/logback-classic "1.1.7"]
                  [hiccup "1.0.5"]
                  [clj-pid "0.1.2"]
@@ -45,13 +45,13 @@
   :profiles {:uberjar {:aot :all}}
 
   :plugins [[lein-cljsbuild "1.1.4"]
-            [lein-figwheel "0.5.6" :exclusions [org.clojure/clojure]]
+            [lein-figwheel "0.5.7"]
             [lein-sassy "1.0.7"
              :exclusions [org.clojure/clojure org.codehaus.plexus/plexus-utils]]
             [com.jakemccrary/lein-test-refresh "0.17.0"]
             [test2junit "1.2.2"]
             [lein-doo "0.1.7"]
-            [lein-codox "0.9.6" :exclusions [org.clojure/clojure]]]
+            [lein-codox "0.9.7"]]
 
   :sass {:src "src/scss/"
          :dst "resources/public/css/"}
