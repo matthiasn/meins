@@ -95,7 +95,7 @@
   "Refreshes client-side state by sending all queries, plus, with a delay,
    the stats and tags."
   [{:keys [current-state]}]
-  (let [query-cfg (-> current-state :query-cfg)]
+  (let [query-cfg (:query-cfg current-state)]
     {:emit-msg [[:state/search query-cfg]
                 [:cmd/schedule-new {:timeout 2000
                                     :message [:state/stats-tags-get]}]]}))

@@ -22,7 +22,7 @@
   Caveat: the timezone detection currently only works in Chrome. My Firefox 46.0.1 strictly refused
   to tell me a timezone when calling 'Intl.DateTimeFormat().resolvedOptions()', which would be
   according to standards but unfortunately the timeZone is always undefined."
-  [put-fn opts]
+  [put-fn opts run-fn]
   (fn [_ev]
     (let [ts (st/now)
           timezone (or (when-let [resolved (.-resolved (new js/Intl.DateTimeFormat))]
@@ -36,7 +36,8 @@
                         :utc-offset (.getTimezoneOffset (new js/Date))}
                        opts)]
       (put-fn [:entry/new entry])
-      (send-w-geolocation entry put-fn))))
+      (send-w-geolocation entry put-fn)
+      (when run-fn (run-fn)))))
 
 (defn clean-entry
   [entry]

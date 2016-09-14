@@ -62,7 +62,7 @@
   "Renders new and import buttons."
   [put-fn]
   [:div
-   [:button.menu-new {:on-click (h/new-entry-fn put-fn {})}
+   [:button.menu-new {:on-click (h/new-entry-fn put-fn {} nil)}
     [:span.fa.fa-plus-square] " new"]
    [:button {:on-click #(do (put-fn [:import/photos])
                             (put-fn [:import/geo])

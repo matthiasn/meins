@@ -109,20 +109,22 @@
     (fn
       [entry cfg put-fn edit-mode? toggle-edit local-cfg]
       (let [ts (:timestamp entry)
+            query-id (:query-id local-cfg)
             map? (:latitude entry)
             toggle-map #(put-fn [:cmd/toggle
                                  {:timestamp ts
                                   :path      [:cfg :show-maps-for]}])
-            show-comments? (contains? (:show-comments-for cfg) ts)
-            toggle-comments #(put-fn [:cmd/toggle
-                                      {:timestamp ts
-                                       :path      [:cfg :show-comments-for]}])
-            create-comment (h/new-entry-fn put-fn {:comment-for ts})
-            create-linked-entry (h/new-entry-fn put-fn {:linked-entries [ts]})
-            new-pomodoro #(do ((h/new-entry-fn put-fn (p/pomodoro-defaults ts)))
-                              (put-fn [:cmd/set-opt
-                                       {:timestamp ts
-                                        :path      [:cfg :show-comments-for]}]))
+            show-comments? (= query-id (get-in cfg [:show-comments-for ts]))
+            show-hide-comments #(put-fn [:cmd/assoc-in
+                                         {:path  [:cfg :show-comments-for ts]
+                                          :value %}])
+            show-comments #(show-hide-comments query-id)
+            toggle-comments #(show-hide-comments
+                              (when-not show-comments? query-id))
+            create-comment (h/new-entry-fn put-fn {:comment-for ts} show-comments)
+            create-linked-entry (h/new-entry-fn put-fn {:linked-entries [ts]} nil)
+            new-pomodoro (h/new-entry-fn
+                           put-fn (p/pomodoro-defaults ts) show-comments)
             add-activity #(put-fn [:entry/update-local
                                    (assoc-in entry [:activity]
                                              {:name ""
@@ -374,6 +376,7 @@
    showing the warning that the entry is not saved yet."
   [entry cfg new-entries put-fn entries-map local-cfg]
   (let [ts (:timestamp entry)
+        query-id (:query-id local-cfg)
         entry (or (get new-entries ts) entry)
         comments-set (set (:comments entry))
         comments (mapv (u/find-missing-entry entries-map put-fn) comments-set)
@@ -381,9 +384,9 @@
                    comments
                    (filter (u/pvt-filter cfg) comments))
         comments-map (into {} (map (fn [c] [(:timestamp c) c])) comments)
-        toggle-comments #(put-fn [:cmd/toggle
-                                  {:timestamp ts
-                                   :path [:cfg :show-comments-for]}])
+        toggle-comments #(put-fn [:cmd/assoc-in
+                                   {:path      [:cfg :show-comments-for ts]
+                                    :value query-id}])
         comments-filter (fn [[_ts c]] (= (:comment-for c) (:timestamp entry)))
         local-comments (into {} (filter comments-filter new-entries))
         all-comments (sort-by :timestamp (vals (merge comments-map
@@ -393,7 +396,7 @@
      [journal-entry entry cfg put-fn new-entries?
       (p/pomodoro-stats-view all-comments) local-cfg]
      (when (seq all-comments)
-       (if (or (contains? (:show-comments-for cfg) ts) (seq local-comments))
+       (if (= query-id (get-in cfg [:show-comments-for ts]))
          [:div.comments
           (for [comment all-comments]
             ^{:key (str "c" (:timestamp comment))}
@@ -401,6 +404,6 @@
              (contains? new-entries (:timestamp comment)) nil local-cfg])]
          [:div.show-comments
           (let [n (count comments)]
-            [:span {:on-click toggle-comments :on-mouse-enter toggle-comments}
+            [:span {:on-click toggle-comments}
              (str "show " n " comment" (when (> n 1) "s"))])]))
      (when (:thumbnails cfg) [thumbnails entry entries-map cfg put-fn])]))

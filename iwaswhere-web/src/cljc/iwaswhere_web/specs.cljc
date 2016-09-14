@@ -119,6 +119,9 @@
 (s/def :cmd/set-opt (s/keys :req-un [:iww.cfg/path
                                      :iww.entry/timestamp]))
 
+(s/def :cmd/assoc-in (s/keys :req-un [:iww.cfg/path
+                                      :iww.cfg/value]))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Search Spec
 (s/def :iww.search/search-text string?)
@@ -257,7 +260,7 @@
                    :iww.query-cfg/tab-groups]))
 
 (s/def :iww.client-state.cfg/show-maps-for set?)
-(s/def :iww.client-state.cfg/show-comments-for set?)
+(s/def :iww.client-state.cfg/show-comments-for map?)
 (s/def :iww.client-state.cfg/sort-by-upvotes boolean?)
 (s/def :iww.client-state.cfg/show-all-maps boolean?)
 (s/def :iww.client-state.cfg/show-hashtags boolean?)

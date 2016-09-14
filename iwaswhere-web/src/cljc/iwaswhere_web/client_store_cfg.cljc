@@ -7,7 +7,7 @@
    :linked-filter     {}
    :show-context      true
    :show-maps-for     #{}
-   :show-comments-for #{}
+   :show-comments-for {}
    :split-view        true
    :thumbnails        true
    :lines-shortened   3})
@@ -66,5 +66,14 @@
   (let [path (:path msg-payload)
         ts (:timestamp msg-payload)
         new-state (update-in current-state path conj ts)]
+    {:new-state    new-state
+     :send-to-self [:cfg/save]}))
+
+(defn assoc-in-state
+  "Assoc the provided value in the app state at the provided path."
+  [{:keys [current-state msg-payload]}]
+  (let [path (:path msg-payload)
+        value (:value msg-payload)
+        new-state (assoc-in current-state path value)]
     {:new-state    new-state
      :send-to-self [:cfg/save]}))

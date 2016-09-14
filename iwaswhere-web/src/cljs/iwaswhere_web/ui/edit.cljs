@@ -85,10 +85,6 @@
                     meta-key (.. ev -metaKey)]
                 (when (and meta-key (= key-code 83))   ; CMD-s pressed
                   (save-fn)
-                  (when-let [comment-for (:comment-for entry)]
-                    (put-fn [:cmd/set-opt
-                             {:timestamp comment-for
-                              :path      [:cfg :show-comments-for]}]))
                   (.preventDefault ev))
                 (when (= key-code 9)    ; TAB key pressed
                   (when (and curr-tag (seq f-tags))
