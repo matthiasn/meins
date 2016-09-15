@@ -37,17 +37,17 @@
                       :on-mouse-leave mouse-leave-fn
                       :on-click       (cc/open-day-fn v put-fn)}
                   [:rect {:x      x
-                          :y      (+ (- chart-h-half h-tasks) headline-reserved)
-                          :width  9
-                          :height h-tasks
-                          :class  (cc/weekend-class "tasks" v)}]
-                  [:rect {:x      x
-                          :y      (+ chart-h-half headline-reserved)
+                          :y      (+ (- chart-h-half h-done) headline-reserved)
                           :width  9
                           :height h-done
                           :class  (cc/weekend-class "done" v)}]
                   [:rect {:x      x
-                          :y      (- chart-h h-closed)
+                          :y      (+ chart-h-half headline-reserved)
+                          :width  9
+                          :height h-tasks
+                          :class  (cc/weekend-class "tasks" v)}]
+                  [:rect {:x      x
+                          :y      headline-reserved
                           :width  9
                           :height h-closed
                           :class  (cc/weekend-class "closed" v)}]])))]]
