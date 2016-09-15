@@ -1,5 +1,5 @@
 (ns iwaswhere-web.ui.new-entries
-  (:require [iwaswhere-web.ui.entry :as e]))
+  (:require [iwaswhere-web.ui.entry.entry :as e]))
 
 (defn new-entries-view
   "Renders view for editing new entries. New entries are those that are only

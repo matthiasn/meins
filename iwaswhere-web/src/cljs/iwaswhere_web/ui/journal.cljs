@@ -1,11 +1,8 @@
 (ns iwaswhere-web.ui.journal
-  (:require [matthiasn.systems-toolbox-ui.reagent :as r]
-            [iwaswhere-web.utils.misc :as u]
-            [iwaswhere-web.ui.entry :as e]
-            [iwaswhere-web.ui.search :as search]
+  (:require [iwaswhere-web.utils.misc :as u]
+            [iwaswhere-web.ui.entry.entry :as e]
             [iwaswhere-web.utils.parse :as ps]
-            [clojure.set :as set]
-            [clojure.string :as s]))
+            [clojure.set :as set]))
 
 (defn linked-filter-fn
   "Filter linked entries by search."
