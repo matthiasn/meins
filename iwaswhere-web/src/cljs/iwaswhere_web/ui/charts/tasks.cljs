@@ -9,9 +9,9 @@
    depending on the maximum count found in the data.
    On mouse-over on any of the bars, the date and the values for the date are
    shown in an info div next to the bars."
-  [task-stats chart-h]
+  [task-stats chart-h put-fn]
   (let [local (rc/atom {})]
-    (fn [task-stats chart-h]
+    (fn [task-stats chart-h put-fn]
       (let [indexed (map-indexed (fn [idx [_k v]] [idx v]) task-stats)
             max-cnt (apply max (map (fn [[_idx v]]
                                       (max (:tasks-cnt v) (:done-cnt v)))
@@ -34,7 +34,8 @@
                      mouse-leave-fn (cc/mouse-leave-fn local v)]
                  ^{:key (str "tbar" (:date-string v) idx)}
                  [:g {:on-mouse-enter mouse-enter-fn
-                      :on-mouse-leave mouse-leave-fn}
+                      :on-mouse-leave mouse-leave-fn
+                      :on-click       (cc/open-day-fn v put-fn)}
                   [:rect {:x      x
                           :y      (+ (- chart-h-half h-tasks) headline-reserved)
                           :width  9

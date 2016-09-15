@@ -36,7 +36,7 @@
 
 (defn activity-bars
   "Renders bars for each day's activity."
-  [indexed local y-start y-end]
+  [indexed local y-start y-end put-fn]
   [:g
    (for [[idx v] indexed]
      (let [chart-h (- y-end y-start)
@@ -48,6 +48,7 @@
        (when (pos? max-val)
          ^{:key (str "actbar" idx)}
          [:rect {:x              (* 10 idx)
+                 :on-click       (cc/open-day-fn v put-fn)
                  :y              (- y-end h)
                  :width          9
                  :height         h
@@ -60,17 +61,17 @@
    circles for each value, activites are represented as bars. On mouse-over
    on top of bars or circles, a small info div next to the hovered item is
    shown."
-  [stats chart-h]
+  [stats chart-h put-fn]
   (let [local (rc/atom {:value true
                         :lbm   false
                         :girth true})]
-    (fn [stats chart-h]
+    (fn [stats chart-h put-fn]
       (let [indexed (map-indexed (fn [idx [k v]] [idx v]) stats)]
         [:div
          [:svg
           {:viewBox (str "0 0 600 " chart-h)}
           [cc/chart-title "activity/weight/girth"]
-          [activity-bars indexed local 180 250]
+          [activity-bars indexed local 180 250 put-fn]
           [draw-line indexed local 50 130 "weight" [:weight :value] :value 20 20]
           [draw-line indexed local 50 130 "lbm" [:weight :lbm] :lbm 42 20]
           [draw-line indexed local 140 170 "girth" [:girth] :girth 64 20]]

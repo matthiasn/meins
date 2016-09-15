@@ -3,7 +3,7 @@
             [iwaswhere-web.ui.charts.common :as cc]))
 
 (defn bars
-  [indexed local k chart-h y-scale]
+  [indexed local k chart-h y-scale put-fn]
   [:g
    (for [[idx v] indexed]
      (let [h (* y-scale (k v))
@@ -11,6 +11,7 @@
            mouse-leave-fn (cc/mouse-leave-fn local v)]
        ^{:key (str "pbar" k idx)}
        [:rect {:class          (cc/weekend-class (name k) v)
+               :on-click       (cc/open-day-fn v put-fn)
                :x              (* 10 idx)
                :y              (- chart-h h)
                :width          9
@@ -19,17 +20,17 @@
                :on-mouse-leave mouse-leave-fn}]))])
 
 (defn pomodoro-bar-chart
-  [pomodoro-stats chart-h title y-scale]
+  [pomodoro-stats chart-h title y-scale put-fn]
   (let [local (rc/atom {})]
-    (fn [pomodoro-stats chart-h title y-scale]
+    (fn [pomodoro-stats chart-h title y-scale put-fn]
       (let [indexed (map-indexed (fn [idx [k v]] [idx v]) pomodoro-stats)]
         [:div
          [:svg
           {:viewBox (str "0 0 600 " chart-h)}
           [:g
            [cc/chart-title title]
-           [bars indexed local :total chart-h y-scale]
-           [bars indexed local :completed chart-h y-scale]
+           [bars indexed local :total chart-h y-scale put-fn]
+           [bars indexed local :completed chart-h y-scale put-fn]
            [cc/path "M 0 50 l 600 0 z"]
            [cc/path "M 0 100 l 600 0 z"]
            [cc/path "M 0 150 l 600 0 z"]

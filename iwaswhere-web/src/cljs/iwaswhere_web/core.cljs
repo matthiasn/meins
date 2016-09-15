@@ -44,6 +44,7 @@
 
      [:cmd/route {:from #{:client/ws-cmp
                           :client/content-cmp
+                          :client/stats-cmp
                           :client/menu-cmp}
                   :to   :client/store-cmp}]
 

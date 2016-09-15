@@ -12,14 +12,14 @@
 
 (defn stats-view
   "Renders stats component."
-  [{:keys [observed]}]
+  [{:keys [observed put-fn]}]
   (let [snapshot @observed
         {:keys [options pomodoro-stats activity-stats task-stats stats]} snapshot]
     [:div.stats
      [:div.charts
-      [cp/pomodoro-bar-chart pomodoro-stats 250 "Pomodoros" 10]
-      [ca/activity-weight-chart activity-stats 250]
-      [ct/tasks-chart task-stats 250]]
+      [cp/pomodoro-bar-chart pomodoro-stats 250 "Pomodoros" 10 put-fn]
+      [ca/activity-weight-chart activity-stats 250 put-fn]
+      [ct/tasks-chart task-stats 250 put-fn]]
      (when stats
        [:div (:entry-count stats) " entries, " (:node-count stats) " nodes, "
         (:edge-count stats) " edges, " (count (:hashtags options)) " hashtags, "

@@ -1,5 +1,6 @@
 (ns iwaswhere-web.ui.charts.common
-  (:require [clojure.string :as s]))
+  (:require [clojure.string :as s]
+            [iwaswhere-web.utils.parse :as up]))
 
 (defn line-points
   [indexed mapper]
@@ -69,3 +70,12 @@
              :left (if (< (- page-w mouse-x) 120)
                      (- mouse-x 100)
                      (+ mouse-x 20))}}))
+
+(defn open-day-fn
+  "Return on-click function for chart elements which then triggers opening
+   a new tab with the associated day in a new tab on the right side of the
+   split view."
+  [v put-fn]
+  (fn [_ev]
+    (put-fn [:search/add {:tab-group :right
+                          :query     (up/parse-search (:date-string v))}])))
