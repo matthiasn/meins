@@ -10,11 +10,13 @@
 .split-window-container {
   display: flex;
   flex-flow: column;
+  min-height: 0;
 }
 
 .split-windows-view {
   display: flex;
   flex-flow: row;
+  min-height: 0;
 }
 
 .split-window-view {
@@ -24,7 +26,8 @@
   flex-basis: 0;
   margin-left: 0.5em;
   background-color: $tab-bg;
-  }
+  min-height: 0;
+}
 
 .split-view {
   // TODO: fix this hack
@@ -60,6 +63,7 @@
   display: flex;
   flex-flow: row;
   padding-left: 0.3em;
+  min-height: 0;
 }
 
 .journal-entries {

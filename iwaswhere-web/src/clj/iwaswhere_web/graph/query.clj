@@ -259,7 +259,9 @@
         res2 (reduce (fn [acc [k v]]
                        (-> acc
                            (update-in [:entries-map] merge (:entries-map v))
-                           (assoc-in [:entries k] (:entries v)))) {} res)
+                           (assoc-in [:entries k] (:entries v))))
+                     {:entries-map {} :entries {}}
+                     res)
         ms (/ (- (System/nanoTime) start-ts) 1000000)
         dur {:duration-ms (pp/cl-format nil "~,3f ms" ms)}]
     (log/info "Query" (:sente-uid msg-meta) "took" (:duration-ms dur))
