@@ -4,6 +4,7 @@
   margin: 0.15em 0 0.15em 0;
   background: white;
   height: inherit;
+  flex-shrink: 0;
 
   .thumbnails {
     display: flex;
@@ -86,6 +87,7 @@
 
     div:nth-child(2) {
       flex-grow: 1;
+      flex-shrink: 0;
 
       .incomplete {
         font-size: 1em;
@@ -128,7 +130,8 @@
     }
 
     div:nth-child(3) {
-      flex: 0;
+      flex-grow: 1;
+      flex-shrink: 0;
     }
 
     div:nth-child(4) {

@@ -32,6 +32,7 @@
                  [org.webjars.bower/normalize-css "4.1.1"]
                  [org.webjars.bower/leaflet "0.7.7"]
                  [org.webjars.npm/github-com-mrkelly-lato "0.3.0"]
+                 [org.webjars.npm/intl "1.2.4"]
                  [alandipert/storage-atom "2.0.1"]]
 
   :source-paths ["src/cljc" "src/clj/"]

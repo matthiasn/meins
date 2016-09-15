@@ -79,6 +79,7 @@
 .new-entries {
   flex-flow: column;
   flex-grow: 1;
+  flex-shrink: 0;
   margin: 0.6em 25% 0.2em 0.4em;
   max-width: 500px;
 }
