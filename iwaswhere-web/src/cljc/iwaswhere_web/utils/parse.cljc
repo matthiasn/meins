@@ -31,16 +31,28 @@
    either the entry or any of its comments, can be found like this:
    #task ~#done."
   [text]
-  {:search-text text
-   :ft-search   (when-let [ft-search (re-find #"\".*\"" text)]
-                  (s/replace ft-search "\"" ""))
-   :tags        (set (map second (re-seq search-tag-regex text)))
-   :not-tags    (set (map #(s/replace % "~" "")
-                          (re-seq search-not-tags-regex text)))
-   :mentions    (set (re-seq search-mention-regex text))
-   :date-string (re-find #"[0-9]{4}-[0-9]{2}-[0-9]{2}" text)
-   :timestamp   (re-find #"[0-9]{13}" text)
-   :n           20})
+  (let [text (str text)]
+    {:search-text text
+     :ft-search   (when-let [ft-search (re-find #"\".*\"" text)]
+                    (s/replace ft-search "\"" ""))
+     :tags        (set (map second (re-seq search-tag-regex text)))
+     :not-tags    (set (map #(s/replace % "~" "")
+                            (re-seq search-not-tags-regex text)))
+     :mentions    (set (re-seq search-mention-regex text))
+     :date-string (re-find #"[0-9]{4}-[0-9]{2}-[0-9]{2}" text)
+     :timestamp   (re-find #"[0-9]{13}" text)
+     :n           20}))
+
+(defn add-search
+  "Adds search by sending a message that'll open the specified search in a new
+   tab."
+  [query-string tab-group put-fn]
+  (fn [_ev]
+    (put-fn [:search/add
+             {:tab-group (if (= tab-group :right)
+                           :left
+                           :right)
+              :query     (parse-search query-string)}])))
 
 (defn autocomplete-tags
   "Determine autocomplete options for the partial tag (or mention) before the

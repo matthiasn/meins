@@ -141,11 +141,13 @@
 
   (testing
     "partial tag correctly matched with multiple matches"
-    (is (= (p/autocomplete-tags "some #auto" "(?!^) ?#" tags) ["#auto" #{"#autocomplete" "#autosuggestion"}])))
+    (is (= (p/autocomplete-tags "some #auto" "(?!^) ?#" tags)
+           ["#auto" #{"#autocomplete" "#autosuggestion"}])))
 
   (testing
     "not case sensitive"
-    (is (= (p/autocomplete-tags "some #cloju" "(?!^) ?#" tags) ["#cloju" #{"#Clojure" "#ClojureScript"}])))
+    (is (= (p/autocomplete-tags "some #cloju" "(?!^) ?#" tags)
+           ["#cloju" #{"#Clojure" "#ClojureScript"}])))
 
   (testing
     "also working with mentions"

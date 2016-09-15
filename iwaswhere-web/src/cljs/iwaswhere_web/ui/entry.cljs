@@ -14,15 +14,17 @@
 
 (defn hashtags-mentions-list
   "Horizontally renders list with hashtags and mentions."
-  [entry cfg]
+  [entry cfg tab-group put-fn]
   [:div.hashtags
    (when (:redacted cfg) {:class "redacted"})
    (for [mention (:mentions entry)]
      ^{:key (str "tag-" mention)}
-     [:span.mention mention])
+     [:span.mention {:on-click (up/add-search mention tab-group put-fn)}
+      mention])
    (for [hashtag (:tags entry)]
      ^{:key (str "tag-" hashtag)}
-     [:span.hashtag hashtag])])
+     [:span.hashtag {:on-click (up/add-search hashtag tab-group put-fn)}
+      hashtag])])
 
 (defn trash-icon
   "Renders a trash icon, which transforms into a warning button that needs to be
@@ -144,11 +146,7 @@
             trash-entry #(if edit-mode?
                           (put-fn [:entry/remove-local {:timestamp ts}])
                           (put-fn [:entry/trash {:timestamp ts}]))
-            open-external #(put-fn [:search/add
-                                    {:tab-group (if (= tab-group :right)
-                                                  :left
-                                                  :right)
-                                     :query     (up/parse-search (str ts))}])
+            open-external (up/add-search ts tab-group put-fn)
             upvotes (:upvotes entry)
             upvote-fn (fn [op]
                         #(put-fn [:entry/update
@@ -312,14 +310,14 @@
         hashtags (set/union (:hashtags cfg) (:pvt-displayed cfg))
         pvt-hashtags (:pvt-hashtags cfg)
         hashtags (if show-pvt? (set/union hashtags pvt-hashtags) hashtags)
-        mentions (:mentions cfg)]
+        mentions (:mentions cfg)
+        q-date-string (.format (js/moment ts) "YYYY-MM-DD")
+        tab-group (:tab-group local-cfg)]
     [:div.entry
      [:div.header
       [:div
-       [:a {:href (str "/#" (.format (js/moment ts) "YYYY-MM-DD"))}
-        ;[:time (.format (js/moment ts) "ddd, MMMM Do YYYY")]
-        [:time (.format (js/moment ts) "ddd, YYYY-MM-DD HH:mm")]]
-       ;[:time (.format (js/moment ts) ", h:mm a") (u/visit-duration entry)]
+       [:a [:time {:on-click (up/add-search q-date-string tab-group put-fn)}
+            (.format (js/moment ts) "ddd, YYYY-MM-DD HH:mm")]]
        [:time (u/visit-duration entry)]]
       (if (= :pomodoro (:entry-type entry))
         [p/pomodoro-header entry #(put-fn [:cmd/pomodoro-start entry]) edit-mode?]
@@ -335,7 +333,7 @@
                             :class    (when entry-active? "active")}
             (str " linked: " (count (:linked-entries-list entry)))]))]
       [entry-actions entry cfg put-fn edit-mode? toggle-edit local-cfg]]
-     [hashtags-mentions-list entry cfg]
+     [hashtags-mentions-list entry cfg tab-group put-fn]
      [l/leaflet-map entry (or show-map? (:show-all-maps cfg)) local-cfg]
      (if edit-mode?
        [e/editable-md-render entry hashtags mentions put-fn toggle-edit]

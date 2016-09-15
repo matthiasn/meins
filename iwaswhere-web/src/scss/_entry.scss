@@ -23,6 +23,12 @@
     border: 2px solid green;
   }
 
+  .hashtags {
+    span {
+      cursor: pointer;
+    }
+  }
+
   img {
     width: 100%;
   }
@@ -72,6 +78,10 @@
     div:nth-child(1) {
       flex-grow: 2;
       font-size: 0.6em;
+    }
+
+    a time {
+      cursor: pointer;
     }
 
     div:nth-child(2) {
