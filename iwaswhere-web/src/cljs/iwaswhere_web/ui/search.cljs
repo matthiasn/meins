@@ -25,10 +25,28 @@
          ^{:key (str "search-" tag)}
          [:span.mention tag])])))
 
+(defn editable-field
+  [on-input-fn on-keydown-fn state text current-query]
+  [:div.search-field
+   {:content-editable true
+    :on-input         on-input-fn
+    :on-key-down      on-keydown-fn
+    :on-focus         (fn [ev]
+                        (let [target (.-target ev)]
+                          (swap! state assoc-in [:local-query] current-query)
+                          (swap! state assoc-in [:focused] true)
+                          (.setTimeout js/window
+                                       (fn [] (h/focus-on-end target)) 1)))
+    :on-blur          (fn [_ev]
+                        (swap! state assoc-in [:local-query] current-query)
+                        (swap! state assoc-in [:focused] false))}
+   text])
+
 (defn search-field-view
   "Renders search field for current tab."
   [snapshot put-fn query-id]
-  (let [focused (r/atom false)]
+  (let [state (r/atom {:local-query (query-id (:queries (:query-cfg snapshot)))
+                       :focused     false})]
     (fn [snapshot put-fn query-id]
       (let [current-query (query-id (:queries (:query-cfg snapshot)))
             update-search-fn (fn [search-str]
@@ -47,31 +65,35 @@
             [curr-mention f-mentions] (p/autocomplete-tags before-cursor "@" mentions)
             on-input-fn (fn [ev] (update-search-fn (aget ev "target" "innerText")))
             tag-replace-fn
-            (fn [curr-tag tag]
+            (fn [curr-tag tag ev]
               (let [curr-regex (js/RegExp (str curr-tag "(?!" p/tag-char-cls ")") "i")
-                    search-text (:search-text current-query)]
-                (update-search-fn (s/replace search-text curr-regex tag))))
+                    search (s/replace (:search-text current-query) curr-regex tag)
+                    target (.-target ev)
+                    local-query (merge {:query-id query-id}
+                                       (p/parse-search search))]
+                (update-search-fn search)
+                (aset target "innerHTML" search)
+                (.setTimeout js/window (fn [] (h/focus-on-end target)) 10)
+                (swap! state assoc-in [:local-query] local-query)))
             on-keydown-fn
             (fn [ev]
               (let [key-code (.. ev -keyCode)]
                 (when (= key-code 9)                        ; TAB key pressed
                   (when (and curr-tag (seq f-tags))
-                    (tag-replace-fn curr-tag (first f-tags)))
+                    (tag-replace-fn curr-tag (first f-tags) ev))
                   (when (and curr-mention (seq f-mentions))
-                    (tag-replace-fn curr-mention (first f-mentions)))
-                  ;(.setTimeout js/window (fn [] (h/focus-on-end (.-target ev))) 50)
+                    (tag-replace-fn curr-mention (first f-mentions) ev))
                   (.preventDefault ev))))]
         [:div.search
          [tags-view current-query]
-         [:div.search-field {:content-editable true
-                             :on-input         on-input-fn
-                             :on-key-down      on-keydown-fn
-                             :on-focus         #(reset! focused true)
-                             :on-blur          #(reset! focused false)}
-          (:search-text current-query)]
-         (when @focused
+         [editable-field on-input-fn on-keydown-fn state
+          (if (:focused @state)
+            (:search-text (:local-query @state))
+            (:search-text current-query))
+          current-query]
+         (when (:focused @state)
            [u/suggestions
             "search" f-tags curr-tag tag-replace-fn "hashtag"])
-         (when @focused
+         (when (:focused @state)
            [u/suggestions
             "search" f-mentions curr-mention tag-replace-fn "mention"])]))))
