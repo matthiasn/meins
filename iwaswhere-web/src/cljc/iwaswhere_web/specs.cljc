@@ -147,6 +147,8 @@
 
 (s/def :search/update :iww.search/search)
 (s/def :state/get :iww.search/search)
+(s/def :search/set-dragged (s/keys :req-un [:iww.search/query-id
+                                            :iww.search/tab-group]))
 
 (s/def :show/more (s/keys :req-un [:iww.search/query-id]))
 

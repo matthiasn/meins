@@ -61,7 +61,7 @@
                           (aset dt "effectAllowed" "move")
                           (aset dt "dropEffect" "link")))]
     (fn [entry put-fn cfg create-linked-entry]
-      (let [on-drag-over
+      (let [on-drop
             (fn [ev]
               (let [ts (:currently-dragged cfg)
                     new-entry (update-in entry [:linked-entries] #(set (conj % ts)))]
@@ -73,7 +73,9 @@
          [:span.fa.fa-link.toggle {:on-click      toggle-visible
                                    :draggable     true
                                    :on-drag-start on-drag-start
-                                   :on-drag-over  on-drag-over}]
+                                   :on-drop       on-drop
+                                   :on-drag-over  h/prevent-default
+                                   :on-drag-enter h/prevent-default}]
          (when (:visible @local)
            [:span.new-link
             [:span.fa.fa-plus-square

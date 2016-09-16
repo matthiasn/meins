@@ -15,10 +15,6 @@
    :cljs (defonce query-cfg (sa/local-storage
                               (atom initial-query-cfg) "iWasWhere_query_cfg")))
 
-#_
-(def update-location-hash-msg
-  [:cmd/schedule-new {:timeout 5000 :message [:search/set-hash]}])
-
 (defn update-query-fn
   "Update query in client state, with resetting the active entry in the linked
    entries view."
@@ -38,9 +34,7 @@
   "Sets search in linked entries column."
   [{:keys [current-state msg-payload]}]
   (let [{:keys [search query-id]} msg-payload]
-    {:new-state (assoc-in current-state [:cfg :linked-filter query-id] search)
-     ;:emit-msg  update-location-hash-msg
-     }))
+    {:new-state (assoc-in current-state [:cfg :linked-filter query-id] search)}))
 
 (defn set-active-query
   "Sets active query for specified tab group."
@@ -82,6 +76,13 @@
     (reset! query-cfg (:query-cfg new-state))
     {:new-state new-state}))
 
+(defn set-dragged-fn
+  "Set actively dragged tab so it's available when dropped onto another element."
+  [{:keys [current-state msg-payload]}]
+  (let [new-state (assoc-in current-state [:query-cfg :dragged] msg-payload)]
+    (reset! query-cfg (:query-cfg new-state))
+    {:new-state new-state}))
+
 (defn show-more-fn
   "Runs previous query but with more results. Also updates the number to show in
    the UI."
@@ -101,10 +102,11 @@
                                     :message [:state/stats-tags-get]}]]}))
 
 (def search-handler-map
-  {:search/update     update-query-fn
-   :search/set-active set-active-query
-   :search/add        add-query
-   :search/remove     remove-query
-   :search/refresh    search-refresh-fn
-   :show/more         show-more-fn
-   :linked-filter/set set-linked-filter})
+  {:search/update      update-query-fn
+   :search/set-active  set-active-query
+   :search/add         add-query
+   :search/remove      remove-query
+   :search/refresh     search-refresh-fn
+   :search/set-dragged set-dragged-fn
+   :show/more          show-more-fn
+   :linked-filter/set  set-linked-filter})

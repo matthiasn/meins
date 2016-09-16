@@ -70,6 +70,8 @@
     (.collapse false)
     .select))
 
+(defn prevent-default [ev] (.preventDefault ev))
+
 (defn print-duration
   "Helper for inspecting where time is spent."
   [msg-meta]
