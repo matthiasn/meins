@@ -27,9 +27,11 @@
             "OK"))
         binary-post-fn
         (fn [dir filename req]
-          (let [filename (str f/data-path "/" dir "/" filename)]
+          (let [filename (str f/data-path "/" dir "/" filename)
+                file (java.io.File. filename)]
+            (io/make-parents file)
             (log/info :server/upload-cmp req)
-            (io/copy (:body req) (java.io.File. filename)))
+            (io/copy (:body req) file))
           "OK")
         app
         (routes
