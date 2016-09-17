@@ -58,5 +58,4 @@
    :routes-fn     routes-fn
    :port          8765
    :relay-types   #{:cmd/keep-alive-res :entry/saved :entry/found :state/new
-                    :stats/pomo-days :stats/activity-days :stats/tasks-days
-                    :state/stats-tags :search/refresh}})
+                    :stats/result :state/stats-tags :search/refresh}})

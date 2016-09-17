@@ -190,10 +190,11 @@
                    :iww.search-result/mentions
                    :iww.search-result/stats]))
 
-(s/def :stats/get-day (s/keys :req-un [:iww.search/date-string]))
-(s/def :stats/pomo-day-get (s/coll-of :stats/get-day))
-(s/def :stats/activity-day-get (s/coll-of :stats/get-day))
-(s/def :stats/tasks-day-get (s/coll-of :stats/get-day))
+(s/def :stats/day (s/keys :req-un [:iww.search/date-string]))
+(s/def :stats/days (s/coll-of :stats/day))
+(s/def :stats/type keyword?)
+(s/def :stats/get (s/keys :req.un [:stats/type
+                                   :stats/days]))
 
 (s/def :pomo-stats/total int-not-neg?)
 (s/def :pomo-stats/completed int-not-neg?)
@@ -206,14 +207,14 @@
                    :pomo-stats/completed
                    :pomo-stats/started
                    :pomo-stats/total-time]))
-(s/def :stats/pomo-days (s/map-of :iww.search/date-string :stats/pomo-day))
+(s/def :stats/pomodoro (s/map-of :iww.search/date-string :stats/pomo-day))
 
 (s/def :activity-stats/total-exercise int-not-neg?)
 
 (s/def :stats/activity-day
   (s/keys :req-un [:iww.search/date-string
                    :activity-stats/total-exercise]))
-(s/def :stats/activity-days
+(s/def :stats/activity
   (s/map-of :iww.search/date-string :stats/activity-day))
 
 (s/def :task-stats/tasks-cnt int-not-neg?)
@@ -225,7 +226,11 @@
                    :task-stats/tasks-cnt
                    :task-stats/done-cnt
                    :task-stats/closed-cnt]))
-(s/def :stats/tasks-days (s/map-of :iww.search/date-string :stats/tasks-day))
+(s/def :stats/tasks (s/map-of :iww.search/date-string :stats/tasks-day))
+
+(s/def :stats/result
+  (s/keys :req-un [:stats/type
+                   :stats/stats]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Spec for :state/publish-current

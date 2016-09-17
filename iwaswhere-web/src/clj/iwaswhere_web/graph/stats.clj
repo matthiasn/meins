@@ -2,7 +2,8 @@
   "Get stats from graph."
   (:require [ubergraph.core :as uber]
             [iwaswhere-web.graph.query :as gq]
-            [matthiasn.systems-toolbox.component :as st]))
+            [matthiasn.systems-toolbox.component :as st]
+            [iwaswhere-web.ui.markdown :as md]))
 
 (defn pomodoro-mapper
   "Create mapper function for pomodoro stats"
@@ -63,14 +64,33 @@
                      :total-exercise (apply + (map :duration-m activities))}]
       [date-string day-stats])))
 
-(defn get-day-stats
-  "Get stats of specified type."
-  [stats-mapper msg-type]
-  (fn [{:keys [current-state msg-payload put-fn msg-meta]}]
-    (future
-      (let [g (:graph current-state)
-            stats (into {} (mapv (stats-mapper g) msg-payload))]
-        (put-fn (with-meta [msg-type stats] msg-meta))))))
+(defn wordcount-mapper
+  "Create mapper function for wordcount stats"
+  [g]
+  (fn [d]
+    (let [date-string (:date-string d)
+          day-nodes (gq/get-nodes-for-day g {:date-string date-string})
+          day-nodes-attrs (map #(uber/attrs g %) day-nodes)
+          counts (map (fn [entry] (md/count-words entry)) day-nodes-attrs)
+          day-stats {:date-string date-string
+                     :word-count  (apply + counts)}]
+      [date-string day-stats])))
+
+(defn get-stats-fn
+  "Retrieves stats of specified type. Picks the appropriate mapper function
+   for the requested message type."
+  [{:keys [current-state msg-payload msg-meta put-fn]}]
+  (let [g (:graph current-state)
+        stats-type (:type msg-payload)
+        stats-mapper (case stats-type
+                       :stats/pomodoro pomodoro-mapper
+                       :stats/activity activities-mapper
+                       :stats/tasks tasks-mapper
+                       :stats/wordcount wordcount-mapper)
+        days (:days msg-payload)
+        stats (into {} (mapv (stats-mapper g) days))]
+    (put-fn (with-meta [:stats/result {:stats stats
+                                       :type  stats-type}] msg-meta))))
 
 (defn res-count
   "Count results for specified query."
@@ -115,6 +135,5 @@
       (put-fn (with-meta [:state/stats-tags stats-tags] {:sente-uid uid})))))
 
 (def stats-handler-map
-  {:stats/pomo-day-get     (get-day-stats pomodoro-mapper :stats/pomo-days)
-   :stats/activity-day-get (get-day-stats activities-mapper :stats/activity-days)
-   :stats/tasks-day-get    (get-day-stats tasks-mapper :stats/tasks-days)})
+  {:stats/get            get-stats-fn
+   :state/stats-tags-get stats-tags-fn})

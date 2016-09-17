@@ -90,3 +90,17 @@
            [:span.more
             {:on-mouse-enter #(swap! initial-atom update-in [:show-shortened] not)}
             "[...]"])]))))
+
+(defn count-words
+  "Naive implementation of a wordcount function."
+  [entry]
+  (if-let [text (:md entry)]
+    (count (s/split text #" "))
+    0))
+
+(defn count-words-formatted
+  "Generate wordcount string."
+  [entry]
+  (let [cnt (count-words entry)]
+    (when (> cnt 20)
+      (str cnt " words"))))

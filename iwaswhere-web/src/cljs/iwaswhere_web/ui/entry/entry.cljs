@@ -84,11 +84,13 @@
      [m/videoplayer-view entry]
      (when-let [measurements (:measurements entry)]
        [:pre [:code (with-out-str (pp/pprint measurements))]])
-     (when-let [upvotes (:upvotes entry)]
-       (when (pos? upvotes)
-         [:div
-          [:span.fa.fa-thumbs-up]
-          [:span.upvotes upvotes]]))]))
+     [:div.footer
+      [:div.likes (when-let [upvotes (:upvotes entry)]
+              (when (pos? upvotes)
+                [:div
+                 [:span.fa.fa-thumbs-up]
+                 [:span.upvotes upvotes]]))]
+      [:div.word-count (md/count-words-formatted entry)]]]))
 
 (defn entry-with-comments
   "Renders individual journal entry. Interaction with application state happens

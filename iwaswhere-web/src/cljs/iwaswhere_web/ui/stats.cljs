@@ -2,6 +2,7 @@
   (:require [matthiasn.systems-toolbox-ui.reagent :as r]
             [iwaswhere-web.ui.charts.activity :as ca]
             [iwaswhere-web.ui.charts.tasks :as ct]
+            [iwaswhere-web.ui.charts.wordcount :as wc]
             [iwaswhere-web.ui.charts.pomodoros :as cp]
             [cljsjs.moment]
             [cljs.pprint :as pp]))
@@ -14,12 +15,14 @@
   "Renders stats component."
   [{:keys [observed put-fn]}]
   (let [snapshot @observed
-        {:keys [options pomodoro-stats activity-stats task-stats stats]} snapshot]
+        {:keys [options pomodoro-stats activity-stats task-stats
+                wordcount-stats stats]} snapshot]
     [:div.stats
      [:div.charts
       [cp/pomodoro-bar-chart pomodoro-stats 250 "Pomodoros" 10 put-fn]
       [ca/activity-weight-chart activity-stats 250 put-fn]
-      [ct/tasks-chart task-stats 250 put-fn]]
+      [ct/tasks-chart task-stats 250 put-fn]
+      [wc/wordcount-chart wordcount-stats 250 put-fn]]
      (when stats
        [:div (:entry-count stats) " entries, " (:node-count stats) " nodes, "
         (:edge-count stats) " edges, " (count (:hashtags options)) " hashtags, "
@@ -43,13 +46,15 @@
   "Retrieves pomodoro stats for the last n days."
   [stats-key put-fn n]
   (let [days (map n-days-go-fmt (reverse (range n)))]
-    (put-fn [stats-key (mapv (fn [d] {:date-string d}) days)])))
+    (put-fn [:stats/get {:days (mapv (fn [d] {:date-string d}) days)
+                         :type stats-key}])))
 
 (defn update-stats
   [{:keys [put-fn]}]
-  (get-stats :stats/pomo-day-get put-fn 60)
-  (get-stats :stats/activity-day-get put-fn 60)
-  (get-stats :stats/tasks-day-get put-fn 60))
+  (get-stats :stats/pomodoro put-fn 60)
+  (get-stats :stats/activity put-fn 60)
+  (get-stats :stats/tasks put-fn 60)
+  (get-stats :stats/wordcount put-fn 60))
 
 (defn cmp-map
   [cmp-id]

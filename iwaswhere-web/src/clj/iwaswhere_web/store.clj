@@ -72,5 +72,4 @@
                    :entry/update          f/geo-entry-persist-fn
                    :entry/trash           f/trash-entry-fn
                    :state/search          gq/query-fn
-                   :state/stats-tags-get  gs/stats-tags-fn
                    :cmd/keep-alive        ka/keepalive-fn})})

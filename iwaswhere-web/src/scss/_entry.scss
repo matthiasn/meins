@@ -24,6 +24,20 @@
     border: 2px solid green;
   }
 
+  .footer {
+    display: flex;
+
+    .word-count {
+      flex: 1;
+      font-size: 0.8em;
+      text-align: right;
+      color: $body-background-color;
+    }
+    .likes {
+      flex: 1;
+    }
+  }
+
   .hashtags {
     span {
       cursor: pointer;

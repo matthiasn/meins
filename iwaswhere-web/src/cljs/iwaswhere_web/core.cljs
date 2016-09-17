@@ -16,7 +16,7 @@
 (def sente-cfg {:relay-types #{:entry/update :entry/find :entry/trash
                                :import/geo :import/photos :import/phone
                                :cmd/keep-alive :stats/pomo-day-get
-                               :stats/activity-day-get :stats/tasks-day-get
+                               :stats/get
                                :state/stats-tags-get :import/weight
                                :state/search}})
 

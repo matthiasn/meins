@@ -40,14 +40,15 @@
    yet, and sets that contain information for which entries to show the map,
    or the edit mode."
   [put-fn]
-  (let [initial-state (atom {:entries        []
-                             :last-alive     (st/now)
-                             :new-entries    @cse/new-entries-ls
-                             :query-cfg      @s/query-cfg
-                             :pomodoro-stats (sorted-map)
-                             :activity-stats (sorted-map)
-                             :task-stats     (sorted-map)
-                             :cfg            @c/app-cfg})]
+  (let [initial-state (atom {:entries         []
+                             :last-alive      (st/now)
+                             :new-entries     @cse/new-entries-ls
+                             :query-cfg       @s/query-cfg
+                             :pomodoro-stats  (sorted-map)
+                             :activity-stats  (sorted-map)
+                             :task-stats      (sorted-map)
+                             :wordcount-stats (sorted-map)
+                             :cfg             @c/app-cfg})]
     (put-fn [:state/search (:query-cfg @initial-state)])
     (put-fn [:state/stats-tags-get])
     {:state initial-state}))
@@ -62,12 +63,16 @@
                             nil
                             timestamp))}))
 
-(defn save-stats
+(defn save-stats-fn
   "Stores received stats on component state."
-  [k]
-  (fn [{:keys [current-state msg-payload]}]
-    (let [day-stats (into (sorted-map) msg-payload)]
-      {:new-state (assoc-in current-state [k] day-stats)})))
+  [{:keys [current-state msg-payload]}]
+  (let [k (case (:type msg-payload)
+            :stats/pomodoro  :pomodoro-stats
+            :stats/activity  :activity-stats
+            :stats/tasks     :task-stats
+            :stats/wordcount :wordcount-stats)
+        day-stats (into (sorted-map) (:stats msg-payload))]
+    {:new-state (assoc-in current-state [k] day-stats)}))
 
 (defn cmp-map
   "Creates map for the component which holds the client-side application state."
@@ -78,18 +83,16 @@
    :state-spec        :state/client-store-spec
    :handler-map       (merge cse/entry-handler-map
                              s/search-handler-map
-                             {:state/new           new-state-fn
-                              :stats/pomo-days     (save-stats :pomodoro-stats)
-                              :stats/activity-days (save-stats :activity-stats)
-                              :stats/tasks-days    (save-stats :task-stats)
-                              :state/stats-tags    stats-tags-fn
-                              :cfg/save            c/save-cfg
-                              :cmd/toggle-active   toggle-active-fn
-                              :cmd/toggle          c/toggle-set-fn
-                              :cmd/set-opt         c/set-conj-fn
-                              :cmd/set-dragged     c/set-currently-dragged
-                              :cmd/toggle-key      c/toggle-key-fn
-                              :cmd/assoc-in        c/assoc-in-state
-                              :cmd/keep-alive      ka/reset-fn
-                              :cmd/keep-alive-res  ka/set-alive-fn
-                              :cmd/toggle-lines    c/toggle-lines})})
+                             {:state/new          new-state-fn
+                              :stats/result       save-stats-fn
+                              :state/stats-tags   stats-tags-fn
+                              :cfg/save           c/save-cfg
+                              :cmd/toggle-active  toggle-active-fn
+                              :cmd/toggle         c/toggle-set-fn
+                              :cmd/set-opt        c/set-conj-fn
+                              :cmd/set-dragged    c/set-currently-dragged
+                              :cmd/toggle-key     c/toggle-key-fn
+                              :cmd/assoc-in       c/assoc-in-state
+                              :cmd/keep-alive     ka/reset-fn
+                              :cmd/keep-alive-res ka/set-alive-fn
+                              :cmd/toggle-lines   c/toggle-lines})})

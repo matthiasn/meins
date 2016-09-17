@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [0.1.14] - 2016-09-18
+### Changed
+- wordcount stats
+
 ## [0.1.12] - 2016-08-29
 ### Changed
 - tab view
@@ -49,6 +53,8 @@ All notable changes to this project will be documented in this file. This change
 ### Changed
 - query improvements
 
+[0.1.14]: https://github.com/matthiasn/iWasWhere/compare/v0.1.12...v0.1.14
+[0.1.12]: https://github.com/matthiasn/iWasWhere/compare/v0.1.11...v0.1.12
 [0.1.11]: https://github.com/matthiasn/iWasWhere/compare/v0.1.10...v0.1.11
 [0.1.10]: https://github.com/matthiasn/iWasWhere/compare/v0.1.9...v0.1.10
 [0.1.9]: https://github.com/matthiasn/iWasWhere/compare/v0.1.8...v0.1.9

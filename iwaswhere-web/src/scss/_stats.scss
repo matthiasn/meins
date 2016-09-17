@@ -53,6 +53,9 @@ $activity-weekend: lighten($activity, 30);
         opacity: 0.5;
       }
 
+      .bar-bg {
+        fill: rgba(0,0,0,0)
+      }
       .completed {
         fill: $completed;
       }
@@ -65,7 +68,6 @@ $activity-weekend: lighten($activity, 30);
       .total-weekend {
         fill: $total-weekend;
       }
-
       .done {
         fill: $done;
       }
