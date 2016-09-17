@@ -243,7 +243,7 @@
               [:span.dur "1m 40s"]
               [:span]
               [:span.btn {:on-click fake-start-fn :class "start"}
-               [:span.fa {:class "fa-play-circle-o"}] " start"]])))
+               [:span.fa {:class "fa-play-circle-o"}] "start"]])))
 
     (testing "renders icon, duration and pause button in edit mode when running"
       (is (= (p/pomodoro-header test-entry2a fake-start-fn true)
@@ -251,7 +251,7 @@
               [:span.dur "1m 40s"]
               [:span]
               [:span.btn {:on-click fake-start-fn :class "stop"}
-               [:span.fa {:class "fa-pause-circle-o"}] " pause"]])))
+               [:span.fa {:class "fa-pause-circle-o"}] "pause"]])))
 
     (testing "renders completed icon and duration when completed"
       (is (= (p/pomodoro-header test-entry3 fake-start-fn false)

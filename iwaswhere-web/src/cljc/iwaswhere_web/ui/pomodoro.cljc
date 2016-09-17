@@ -32,7 +32,7 @@
          [:span.btn {:on-click start-fn :class (if running? "stop" "start")}
           [:span.fa
            {:class (if running? "fa-pause-circle-o" "fa-play-circle-o")}]
-          (if running? " pause" " start")])])))
+          (if running? "pause" "start")])])))
 
 (defn pomodoro-stats
   "Create some stats about the provided entries."
