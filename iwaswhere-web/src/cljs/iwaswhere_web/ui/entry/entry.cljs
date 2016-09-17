@@ -11,7 +11,8 @@
             [cljsjs.moment]
             [iwaswhere-web.utils.misc :as u]
             [cljs.pprint :as pp]
-            [clojure.set :as set]))
+            [clojure.set :as set]
+            [iwaswhere-web.helpers :as h]))
 
 (defn hashtags-mentions-list
   "Horizontally renders list with hashtags and mentions."
@@ -46,7 +47,9 @@
         mentions (:mentions cfg)
         q-date-string (.format (js/moment ts) "YYYY-MM-DD")
         tab-group (:tab-group local-cfg)]
-    [:div.entry
+    [:div.entry {:on-drop       (a/drop-linked-fn entry cfg put-fn)
+                 :on-drag-over  h/prevent-default
+                 :on-drag-enter h/prevent-default}
      [:div.header
       [:div
        [:a [:time {:on-click (up/add-search q-date-string tab-group put-fn)}

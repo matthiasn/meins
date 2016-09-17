@@ -38,11 +38,20 @@
           [:span.fa.fa-pencil-square-o.toggle {:on-click guarded-edit-fn}])
         [:span.fa.fa-pencil-square-o.toggle {:on-click toggle-edit}]))))
 
+(defn drop-linked-fn
+  "Creates handler function for drop event, which takes the timestamp of the
+   currently dragged element and links that entry to the one onto which it is
+   dropped."
+  [entry cfg put-fn]
+  (fn [_ev]
+    (let [ts (:currently-dragged cfg)
+          new-entry (update-in entry [:linked-entries] #(set (conj % ts)))]
+      (put-fn [:entry/update (h/clean-entry new-entry)]))))
+
 (defn new-link
   "Renders input for adding link entry."
   [entry put-fn cfg create-linked-entry]
-  (let [local (r/atom {:visible     false
-                       :last-linked nil})
+  (let [local (r/atom {:visible false})
         toggle-visible #(swap! local update-in [:visible] not)
         keydown-fn
         (fn [ev]
@@ -61,27 +70,16 @@
                           (aset dt "effectAllowed" "move")
                           (aset dt "dropEffect" "link")))]
     (fn [entry put-fn cfg create-linked-entry]
-      (let [on-drop
-            (fn [ev]
-              (let [ts (:currently-dragged cfg)
-                    new-entry (update-in entry [:linked-entries] #(set (conj % ts)))]
-                (when (and (not= ts (:last-linked @local))
-                           (not= ts (:timestamp entry)))
-                  (put-fn [:entry/update (h/clean-entry new-entry)]))
-                (swap! local assoc-in [:last-linked] ts)))]
-        [:span.new-link-btn
-         [:span.fa.fa-link.toggle {:on-click      toggle-visible
-                                   :draggable     true
-                                   :on-drag-start on-drag-start
-                                   :on-drop       on-drop
-                                   :on-drag-over  h/prevent-default
-                                   :on-drag-enter h/prevent-default}]
-         (when (:visible @local)
-           [:span.new-link
-            [:span.fa.fa-plus-square
-             {:on-click #(do (create-linked-entry) (toggle-visible))}]
-            [:input {:on-click    #(.stopPropagation %)
-                     :on-key-down keydown-fn}]])]))))
+      [:span.new-link-btn
+       [:span.fa.fa-link.toggle {:on-click      toggle-visible
+                                 :draggable     true
+                                 :on-drag-start on-drag-start}]
+       (when (:visible @local)
+         [:span.new-link
+          [:span.fa.fa-plus-square
+           {:on-click #(do (create-linked-entry) (toggle-visible))}]
+          [:input {:on-click    #(.stopPropagation %)
+                   :on-key-down keydown-fn}]])])))
 
 (defn entry-actions
   "Entry-related action buttons. Hidden by default, become visible when mouse
@@ -112,8 +110,8 @@
                            put-fn (p/pomodoro-defaults ts) show-comments)
             add-activity #(put-fn [:entry/update-local
                                    (assoc-in entry [:activity]
-                                             {:name ""
-                                              :duration-m 0
+                                             {:name           ""
+                                              :duration-m     0
                                               :exertion-level 5})])
             add-consumption
             (fn [_ev]
