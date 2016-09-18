@@ -67,12 +67,16 @@
   "Stores received stats on component state."
   [{:keys [current-state msg-payload]}]
   (let [k (case (:type msg-payload)
-            :stats/pomodoro  :pomodoro-stats
-            :stats/activity  :activity-stats
-            :stats/tasks     :task-stats
-            :stats/wordcount :wordcount-stats)
+            :stats/pomodoro :pomodoro-stats
+            :stats/activity :activity-stats
+            :stats/tasks :task-stats
+            :stats/wordcount :wordcount-stats
+            :stats/daily-summaries :daily-summary-stats
+            nil)
         day-stats (into (sorted-map) (:stats msg-payload))]
-    {:new-state (assoc-in current-state [k] day-stats)}))
+    (if k
+      {:new-state (assoc-in current-state [k] day-stats)}
+      (prn "WARN: No key defined for " msg-payload))))
 
 (defn cmp-map
   "Creates map for the component which holds the client-side application state."

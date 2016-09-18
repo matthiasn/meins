@@ -3,13 +3,17 @@
   (:require [ubergraph.core :as uber]
             [iwaswhere-web.graph.query :as gq]
             [matthiasn.systems-toolbox.component :as st]
-            [iwaswhere-web.ui.markdown :as md]))
+            [clj-time.core :as t]
+            [iwaswhere-web.ui.markdown :as md]
+            [clj-time.format :as ctf]
+            [matthiasn.systems-toolbox.log :as l]))
 
 (defn pomodoro-mapper
   "Create mapper function for pomodoro stats"
-  [g]
+  [current-state]
   (fn [d]
-    (let [date-string (:date-string d)
+    (let [g (:graph current-state)
+          date-string (:date-string d)
           day-nodes (gq/get-nodes-for-day g {:date-string date-string})
           day-nodes-attrs (map #(uber/attrs g %) day-nodes)
           pomo-nodes (filter #(= (:entry-type %) :pomodoro) day-nodes-attrs)
@@ -26,9 +30,10 @@
 
 (defn tasks-mapper
   "Create mapper function for task stats"
-  [g]
+  [current-state]
   (fn [d]
-    (let [date-string (:date-string d)
+    (let [g (:graph current-state)
+          date-string (:date-string d)
           day-nodes (gq/get-nodes-for-day g {:date-string date-string})
           day-nodes-attrs (map #(uber/attrs g %) day-nodes)
           task-nodes (filter #(contains? (:tags %) "#task") day-nodes-attrs)
@@ -42,9 +47,10 @@
 
 (defn activities-mapper
   "Create mapper function for activity stats"
-  [g]
+  [current-state]
   (fn [d]
-    (let [date-string (:date-string d)
+    (let [g (:graph current-state)
+          date-string (:date-string d)
           day-nodes (gq/get-nodes-for-day g {:date-string date-string})
           day-nodes-attrs (map #(uber/attrs g %) day-nodes)
           weight-nodes (sort-by #(-> % :measurements :weight :value)
@@ -66,9 +72,10 @@
 
 (defn wordcount-mapper
   "Create mapper function for wordcount stats"
-  [g]
+  [current-state]
   (fn [d]
-    (let [date-string (:date-string d)
+    (let [g (:graph current-state)
+          date-string (:date-string d)
           day-nodes (gq/get-nodes-for-day g {:date-string date-string})
           day-nodes-attrs (map #(uber/attrs g %) day-nodes)
           counts (map (fn [entry] (md/count-words entry)) day-nodes-attrs)
@@ -76,21 +83,35 @@
                      :word-count  (apply + counts)}]
       [date-string day-stats])))
 
+(defn daily-summaries-mapper
+  "Create mapper function for daily summary stats"
+  [current-state]
+  (fn [d]
+    (let [day (:date-string d)
+          day-stats (merge
+                      (get-in current-state [:stats :daily-summaries day])
+                      {:date-string day})]
+      [day day-stats])))
+
 (defn get-stats-fn
   "Retrieves stats of specified type. Picks the appropriate mapper function
    for the requested message type."
   [{:keys [current-state msg-payload msg-meta put-fn]}]
-  (let [g (:graph current-state)
-        stats-type (:type msg-payload)
+  (let [stats-type (:type msg-payload)
         stats-mapper (case stats-type
                        :stats/pomodoro pomodoro-mapper
                        :stats/activity activities-mapper
                        :stats/tasks tasks-mapper
-                       :stats/wordcount wordcount-mapper)
+                       :stats/wordcount wordcount-mapper
+                       :stats/daily-summaries daily-summaries-mapper
+                       nil)
         days (:days msg-payload)
-        stats (into {} (mapv (stats-mapper g) days))]
-    (put-fn (with-meta [:stats/result {:stats stats
-                                       :type  stats-type}] msg-meta))))
+        stats (when stats-mapper
+                (into {} (mapv (stats-mapper current-state) days)))]
+    (if stats
+      (put-fn (with-meta [:stats/result {:stats stats
+                                         :type  stats-type}] msg-meta))
+      (l/warn "No mapper defined for" stats-type))))
 
 (defn res-count
   "Count results for specified query."
@@ -100,19 +121,24 @@
               (merge {:n Integer/MAX_VALUE} query))]
     (count (set (:entries res)))))
 
-(defn get-basic-stats
+(defn task-summary-stats
   "Generate some very basic stats about the graph size for display in UI."
   [state]
-  {:entry-count    (count (:sorted-entries state))
-   :node-count     (count (:node-map (:graph state)))
-   :edge-count     (count (uber/find-edges (:graph state) {}))
-   :open-tasks-cnt (res-count state {:tags     #{"#task"}
+  {:open-tasks-cnt (res-count state {:tags     #{"#task"}
                                      :not-tags #{"#done" "#backlog" "#closed"}})
    :backlog-cnt    (res-count state {:tags     #{"#task" "#backlog"}
                                      :not-tags #{"#done"}})
-   :completed-cnt  (res-count state {:tags #{"#task" "#done"}})
-   :import-cnt     (res-count state {:tags #{"#import"}})
-   :new-cnt        (res-count state {:tags #{"#new"}})})
+   :completed-cnt  (res-count state {:tags #{"#task" "#done"}})})
+
+(defn get-basic-stats
+  "Generate some very basic stats about the graph size for display in UI."
+  [state]
+  (merge (task-summary-stats state)
+         {:entry-count    (count (:sorted-entries state))
+          :node-count     (count (:node-map (:graph state)))
+          :edge-count     (count (uber/find-edges (:graph state) {}))
+          :import-cnt     (res-count state {:tags #{"#import"}})
+          :new-cnt        (res-count state {:tags #{"#new"}})}))
 
 (defn make-stats-tags
   "Generate stats and tags from current-state."
@@ -137,3 +163,13 @@
 (def stats-handler-map
   {:stats/get            get-stats-fn
    :state/stats-tags-get stats-tags-fn})
+
+(defn add-daily-summary
+  "Gathers daily summary stats at the beginning of each day."
+  [state day-node]
+  (if (>= (:year day-node) 2016)
+    (let [day-stats (task-summary-stats state)
+          day (t/date-time (:year day-node) (:month day-node) (:day day-node))
+          day-string (ctf/unparse (ctf/formatters :year-month-day) day)]
+      (update-in state [:stats :daily-summaries day-string] merge day-stats))
+    state))

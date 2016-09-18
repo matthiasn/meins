@@ -33,9 +33,10 @@
                      :client-queries {}
                      :hashtags       #{}
                      :mentions       #{}
-                     :stats          {:entry-count 0
-                                      :node-count  0
-                                      :edge-count  0}})
+                     :stats          {:entry-count     0
+                                      :node-count      0
+                                      :edge-count      0
+                                      :daily-summaries {}}})
         files (file-seq (clojure.java.io/file f/daily-logs-path))]
     (doseq [f (f/filter-by-name files #"\d{4}-\d{2}-\d{2}.jrn")]
       (with-open [reader (clojure.java.io/reader f)]

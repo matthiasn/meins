@@ -16,6 +16,9 @@ $tasks-weekend: lighten($tasks, 30);
 $closed: rgba(249,166,30,0.8);
 $closed-weekend: lighten($closed, 30);
 
+$backlog: DarkOrange;
+$backlog-weekend: lighten($backlog, 30);
+
 $activity: steelblue;
 $activity-weekend: lighten($activity, 30);
 
@@ -85,6 +88,12 @@ $activity-weekend: lighten($activity, 30);
       }
       .closed-weekend {
         fill: $closed-weekend;
+      }
+      .backlog {
+        fill: $backlog;
+      }
+      .backlog-weekend {
+        fill: $backlog-weekend;
       }
       .activity {
         fill: $activity;

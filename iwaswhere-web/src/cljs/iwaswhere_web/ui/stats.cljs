@@ -4,6 +4,7 @@
             [iwaswhere-web.ui.charts.tasks :as ct]
             [iwaswhere-web.ui.charts.wordcount :as wc]
             [iwaswhere-web.ui.charts.pomodoros :as cp]
+            [iwaswhere-web.ui.charts.daily-summaries :as ds]
             [cljsjs.moment]
             [cljs.pprint :as pp]))
 
@@ -16,12 +17,13 @@
   [{:keys [observed put-fn]}]
   (let [snapshot @observed
         {:keys [options pomodoro-stats activity-stats task-stats
-                wordcount-stats stats]} snapshot]
+                wordcount-stats daily-summary-stats stats]} snapshot]
     [:div.stats
      [:div.charts
       [cp/pomodoro-bar-chart pomodoro-stats 250 "Pomodoros" 10 put-fn]
-      [ca/activity-weight-chart activity-stats 250 put-fn]
       [ct/tasks-chart task-stats 250 put-fn]
+      [ds/daily-summaries-chart daily-summary-stats 250 put-fn]
+      [ca/activity-weight-chart activity-stats 250 put-fn]
       [wc/wordcount-chart wordcount-stats 250 put-fn]]
      (when stats
        [:div (:entry-count stats) " entries, " (:node-count stats) " nodes, "
@@ -50,11 +52,13 @@
                          :type stats-key}])))
 
 (defn update-stats
+  "Request updated stats."
   [{:keys [put-fn]}]
   (get-stats :stats/pomodoro put-fn 60)
   (get-stats :stats/activity put-fn 60)
   (get-stats :stats/tasks put-fn 60)
-  (get-stats :stats/wordcount put-fn 60))
+  (get-stats :stats/wordcount put-fn 60)
+  (get-stats :stats/daily-summaries put-fn 60))
 
 (defn cmp-map
   [cmp-id]
