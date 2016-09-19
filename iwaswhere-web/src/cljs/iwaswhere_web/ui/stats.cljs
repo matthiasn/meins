@@ -31,6 +31,7 @@
         (count (:mentions options)) " people, " (:open-tasks-cnt stats)
         " open tasks, " (:backlog-cnt stats) " in backlog, "
         (:completed-cnt stats) " completed, "
+        (:closed-cnt stats) " closed, "
         (:import-cnt stats) " tagged #import, "
         (:new-cnt stats) " tagged #new."])
      (when-let [ms (get-in snapshot [:timing :query])]

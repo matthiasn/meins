@@ -127,8 +127,9 @@
   {:open-tasks-cnt (res-count state {:tags     #{"#task"}
                                      :not-tags #{"#done" "#backlog" "#closed"}})
    :backlog-cnt    (res-count state {:tags     #{"#task" "#backlog"}
-                                     :not-tags #{"#done"}})
-   :completed-cnt  (res-count state {:tags #{"#task" "#done"}})})
+                                     :not-tags #{"#done" "#closed"}})
+   :completed-cnt  (res-count state {:tags #{"#task" "#done"}})
+   :closed-cnt     (res-count state {:tags #{"#task" "#closed"}})})
 
 (defn get-basic-stats
   "Generate some very basic stats about the graph size for display in UI."
