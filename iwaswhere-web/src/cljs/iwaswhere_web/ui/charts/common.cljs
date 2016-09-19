@@ -79,3 +79,17 @@
   (fn [_ev]
     (put-fn [:search/add {:tab-group :right
                           :query     (up/parse-search (:date-string v))}])))
+
+(defn bg-bars
+  "Renders invisible bars of maximum height. Allows mouse-over effect in entire
+   column, rather than only where visible bars are."
+  [indexed local chart-h k]
+  [:g
+   (for [[idx v] indexed]
+     ^{:key (str "bgbar" (:date-string v) idx k)}
+     [:g {:on-mouse-enter (mouse-enter-fn local v)
+          :on-mouse-leave (mouse-leave-fn local v)}
+      [:rect.bar-bg {:x      (* 10 idx)
+                     :y      0
+                     :width  9
+                     :height chart-h}]])])

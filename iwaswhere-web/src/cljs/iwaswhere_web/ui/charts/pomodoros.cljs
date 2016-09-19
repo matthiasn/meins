@@ -29,6 +29,7 @@
           {:viewBox (str "0 0 600 " chart-h)}
           [:g
            [cc/chart-title title]
+           [cc/bg-bars indexed local chart-h :pomodoro]
            [bars indexed local :total chart-h y-scale put-fn]
            [bars indexed local :completed chart-h y-scale put-fn]
            [cc/path "M 0 50 l 600 0 z"]

@@ -21,6 +21,7 @@
           {:viewBox (str "0 0 600 " chart-h)}
           [:g
            [cc/chart-title "Tasks opened/closed"]
+           [cc/bg-bars indexed local chart-h :tasks]
            (when (pos? max-cnt)
              (for [[idx v] indexed]
                (let [headline-reserved 50

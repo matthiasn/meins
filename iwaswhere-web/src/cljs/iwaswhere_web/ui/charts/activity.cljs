@@ -71,6 +71,7 @@
          [:svg
           {:viewBox (str "0 0 600 " chart-h)}
           [cc/chart-title "activity/weight/girth"]
+          [cc/bg-bars indexed local chart-h :activity]
           [activity-bars indexed local 180 250 put-fn]
           [draw-line indexed local 50 130 "weight" [:weight :value] :value 20 20]
           [draw-line indexed local 50 130 "lbm" [:weight :lbm] :lbm 42 20]

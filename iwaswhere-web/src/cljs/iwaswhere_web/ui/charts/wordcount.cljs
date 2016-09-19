@@ -17,6 +17,7 @@
           {:viewBox (str "0 0 600 " chart-h)}
           [:g
            [cc/chart-title "Words per Day"]
+           [cc/bg-bars indexed local chart-h :wordcount]
            (when (pos? max-cnt)
              (for [[idx v] indexed]
                (let [reserved 50
@@ -30,10 +31,6 @@
                  [:g {:on-mouse-enter mouse-enter-fn
                       :on-mouse-leave mouse-leave-fn
                       :on-click       (cc/open-day-fn v put-fn)}
-                  [:rect.bar-bg {:x      x
-                                 :y      reserved
-                                 :width  9
-                                 :height max-h}]
                   [:rect {:x      x
                           :y      (+ (- max-h h) reserved)
                           :width  9

@@ -37,8 +37,9 @@
          [:svg
           {:viewBox (str "0 0 600 " chart-h)}
           [cc/chart-title "open tasks / backlog / completed"]
-          [bars indexed :open-tasks-cnt "tasks" local 60 120 put-fn]
-          [bars indexed :backlog-cnt "backlog" local 125 185 put-fn]
+          [cc/bg-bars indexed local chart-h :daily-summaries]
+          [bars indexed :open-tasks-cnt "tasks" local 50 110 put-fn]
+          [bars indexed :backlog-cnt "backlog" local 120 180 put-fn]
           [bars indexed :completed-cnt "done" local 190 250 put-fn]]
          (when (:mouse-over @local)
            [:div.mouse-over-info (cc/info-div-pos @local)
