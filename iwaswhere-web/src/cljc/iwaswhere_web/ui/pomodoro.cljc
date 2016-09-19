@@ -29,7 +29,8 @@
          (into [:span] (map (fn [_] [:span.fa.fa-bolt]) (range interruptions)))
          [:span [:span.fa.fa-bolt] [:span.bolt-cnt interruptions]])
        (when (and edit-mode? (time-left? entry))
-         [:span.btn {:on-click start-fn :class (if running? "stop" "start")}
+         [:span.btn {:on-click start-fn
+                     :class    (if running? "stop" "start")}
           [:span.fa
            {:class (if running? "fa-pause-circle-o" "fa-play-circle-o")}]
           (if running? "pause" "start")])])))

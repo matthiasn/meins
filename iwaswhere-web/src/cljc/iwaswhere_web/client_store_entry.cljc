@@ -8,8 +8,8 @@
 
 (defn update-local-storage
   "Updates local-storage with the provided new-entries."
-  [new-entries]
-  (reset! new-entries-ls (:new-entries new-entries)))
+  [state]
+  (reset! new-entries-ls (:new-entries state)))
 
 (defn toggle-set-fn
   "Toggles for example the visibility of a map or the edit mode for an individual
@@ -57,7 +57,7 @@
         (if (= (:md curr-local) (:md msg-payload))
           (-> current-state
               (update-in [:new-entries] dissoc ts)
-              (assoc-in [:entries-map ts] (merge curr-local msg-payload)))
+              (assoc-in [:entries-map ts] msg-payload))
           current-state)]
     (update-local-storage new-state)
     {:new-state new-state
