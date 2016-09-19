@@ -83,8 +83,8 @@
                    (fn []
                      (swap! initial-atom assoc-in [:recently-clicked] false))
                    500)))]
-        [:div {:on-click on-click-fn}
-         (when (:redacted cfg) {:class "redacted"})
+        [:div {:on-click on-click-fn
+               :class    (when (:redacted cfg) "redacted")}
          [:div {:dangerouslySetInnerHTML {:__html html}}]
          (when shortened?
            [:span.more
