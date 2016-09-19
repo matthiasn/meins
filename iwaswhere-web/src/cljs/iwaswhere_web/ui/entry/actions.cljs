@@ -25,16 +25,19 @@
    clicked again for actually discarding changes. This label is a little to the
    right, so it can't be clicked accidentally, and disappears again within 5
    seconds."
-  [toggle-edit edit-mode?]
+  [toggle-edit edit-mode? entry]
   (let [clicked (r/atom false)
         guarded-edit-fn (fn [_ev]
                           (swap! clicked not)
                           (.setTimeout js/window #(reset! clicked false) 5000))]
-    (fn [toggle-edit edit-mode?]
+    (fn [toggle-edit edit-mode? entry]
       (if edit-mode?
         (if @clicked
-          [:span.delete-warn {:on-click #(do (toggle-edit) (swap! clicked not))}
-           [:span.fa.fa-trash] "  discard changes?"]
+          (let [discard-click-fn #(do (toggle-edit)
+                                      (swap! clicked not)
+                                      (prn "Discarding local changes:" entry))]
+            [:span.delete-warn {:on-click discard-click-fn}
+             [:span.fa.fa-trash] "  discard changes?"])
           [:span.fa.fa-pencil-square-o.toggle {:on-click guarded-edit-fn}])
         [:span.fa.fa-pencil-square-o.toggle {:on-click toggle-edit}]))))
 
@@ -124,7 +127,7 @@
                            (update-in [:md] #(str % " #consumption ")))]))
             trash-entry #(if edit-mode?
                           (put-fn [:entry/remove-local {:timestamp ts}])
-                          (put-fn [:entry/trash {:timestamp ts}]))
+                          (put-fn [:entry/trash entry]))
             open-external (up/add-search ts tab-group put-fn)
             upvotes (:upvotes entry)
             upvote-fn (fn [op]
@@ -142,7 +145,7 @@
          (when (pos? upvotes)
            [:span.fa.fa-thumbs-down.toggle {:on-click (upvote-fn dec)}])
          (when map? [:span.fa.fa-map-o.toggle {:on-click toggle-map}])
-         [edit-icon toggle-edit edit-mode?]
+         [edit-icon toggle-edit edit-mode? entry]
          (when-not (:comment-for entry)
            [:span.fa.fa-clock-o.toggle {:on-click new-pomodoro}])
          (when-not (:activity entry)

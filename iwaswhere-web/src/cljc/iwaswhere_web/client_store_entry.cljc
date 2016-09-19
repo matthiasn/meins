@@ -118,7 +118,6 @@
   [{:keys [current-state msg-payload]}]
   (let [ts (:timestamp msg-payload)
         new-state (update-in current-state [:new-entries] dissoc ts)]
-    (prn "Discarding local changes:" msg-payload)
     (update-local-storage new-state)
     {:new-state new-state}))
 

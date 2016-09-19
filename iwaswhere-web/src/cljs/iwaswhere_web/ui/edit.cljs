@@ -56,8 +56,7 @@
                 [:entry/update
                  (if (and (:new-entry entry) (not (:comment-for entry)))
                    (update-in (h/clean-entry latest-entry) [:tags] conj "#new")
-                   (h/clean-entry latest-entry))])
-              (toggle-edit))
+                   (h/clean-entry latest-entry))]))
 
             ; find incomplete tag or mention before cursor, show suggestions
             before-cursor (h/string-before-cursor (:md latest-entry))

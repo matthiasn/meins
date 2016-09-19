@@ -10,10 +10,13 @@
             [clojure.tools.logging :as log]
             [iwaswhere-web.fulltext-search :as ft]
             [ubergraph.core :as uber]
-            [matthiasn.systems-toolbox.component :as st]))
+            [matthiasn.systems-toolbox.component :as st]
+            [me.raynes.fs :as fs]
+            [clojure.tools.logging :as l]))
 
 (def data-path (or (System/getenv "DATA_PATH") "data"))
 (def daily-logs-path (str data-path "/daily-logs/"))
+(def trash-path (str data-path "/trash/"))
 
 (defn filter-by-name
   "Filter a sequence of files by their name, matched via regular expression."
@@ -62,13 +65,26 @@
                     [:cmd/schedule-new {:timeout 2000
                                         :message [:state/stats-tags-get]}]]}))
 
+(defn move-attachment-to-trash
+  "Moves attached media file to trash folder."
+  [entry dir k]
+  (when-let [filename (k entry)]
+    (fs/rename (str data-path "/" dir "/" filename)
+               (str data-path "/trash/" filename))
+    (l/info "Moved file to trash:" filename)))
+
 (defn trash-entry-fn
   "Handler function for deleting journal entry."
   [{:keys [current-state msg-payload]}]
   (let [entry-ts (:timestamp msg-payload)
         new-state (ga/remove-node current-state entry-ts)]
     (log/info "Entry" entry-ts "marked as deleted.")
-    (append-daily-log (merge msg-payload {:deleted true}))
+    (append-daily-log {:timestamp (:timestamp msg-payload)
+                       :deleted   true})
+    (fs/mkdirs trash-path)
+    (move-attachment-to-trash msg-payload "images" :img-file)
+    (move-attachment-to-trash msg-payload "audio" :audio-file)
+    (move-attachment-to-trash msg-payload "videos" :video-file)
     {:new-state new-state
      :emit-msg  [[:ft/remove {:timestamp entry-ts}]
                  [:search/refresh]]}))
