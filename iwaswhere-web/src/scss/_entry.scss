@@ -21,7 +21,7 @@
   padding: 0.5em 0.8em 0.2em 0.8em;
 
   .active {
-    border: 2px solid green;
+    border: 1px solid red;
   }
 
   .footer {
@@ -87,11 +87,11 @@
   .header {
     line-height: 1.4em;
     overflow-wrap: normal;
+    flex-wrap: wrap;
     display: flex;
     justify-content: space-between;
 
     div:nth-child(1) {
-      flex-grow: 2;
       font-size: 0.6em;
     }
 
@@ -102,6 +102,7 @@
     div:nth-child(2) {
       flex-grow: 1;
       flex-shrink: 0;
+      padding-left: 10px;
 
       .incomplete {
         font-size: 1em;
@@ -149,7 +150,8 @@
     }
 
     div:nth-child(4) {
-      flex-grow: 1;
+      flex-grow: 2;
+      font-size: 0.9em;
       display: flex;
       justify-content: flex-end;
       align-items: flex-end;

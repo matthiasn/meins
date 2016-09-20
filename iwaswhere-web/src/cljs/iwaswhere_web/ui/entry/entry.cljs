@@ -103,15 +103,17 @@
   (let [ts (:timestamp entry)
         query-id (:query-id local-cfg)
         entry (or (get new-entries ts) entry)
+        show-comments-for? (get-in cfg [:show-comments-for ts])
         comments-set (set (:comments entry))
         comments (mapv (u/find-missing-entry entries-map put-fn) comments-set)
         comments (if (:show-pvt cfg)
                    comments
                    (filter (u/pvt-filter cfg) comments))
         comments-map (into {} (map (fn [c] [(:timestamp c) c])) comments)
-        toggle-comments #(put-fn [:cmd/assoc-in
-                                   {:path      [:cfg :show-comments-for ts]
-                                    :value query-id}])
+        toggle-comments
+        #(put-fn [:cmd/assoc-in
+                  {:path  [:cfg :show-comments-for ts]
+                   :value (when-not (= show-comments-for? query-id) query-id)}])
         comments-filter (fn [[_ts c]] (= (:comment-for c) (:timestamp entry)))
         local-comments (into {} (filter comments-filter new-entries))
         all-comments (sort-by :timestamp (vals (merge comments-map
@@ -121,8 +123,12 @@
      [journal-entry entry cfg put-fn new-entries?
       (p/pomodoro-stats-view all-comments) local-cfg]
      (when (seq all-comments)
-       (if (= query-id (get-in cfg [:show-comments-for ts]))
+       (if (= query-id show-comments-for?)
          [:div.comments
+          [:div.show-comments
+           (let [n (count comments)]
+             [:span {:on-click toggle-comments}
+              (str "hide " n " comment" (when (> n 1) "s"))])]
           (for [comment all-comments]
             ^{:key (str "c" (:timestamp comment))}
             [journal-entry comment cfg put-fn

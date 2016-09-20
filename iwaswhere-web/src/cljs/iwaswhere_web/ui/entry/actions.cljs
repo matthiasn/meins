@@ -100,13 +100,10 @@
             toggle-map #(put-fn [:cmd/toggle
                                  {:timestamp ts
                                   :path      [:cfg :show-maps-for]}])
-            show-comments? (= query-id (get-in cfg [:show-comments-for ts]))
             show-hide-comments #(put-fn [:cmd/assoc-in
                                          {:path  [:cfg :show-comments-for ts]
                                           :value %}])
             show-comments #(show-hide-comments query-id)
-            toggle-comments #(show-hide-comments
-                              (when-not show-comments? query-id))
             create-comment (h/new-entry-fn put-fn {:comment-for ts} show-comments)
             create-linked-entry (h/new-entry-fn put-fn {:linked-entries [ts]} nil)
             new-pomodoro (h/new-entry-fn
@@ -154,10 +151,6 @@
            [:span.fa.fa-coffee.toggle {:on-click add-consumption}])
          (when-not (:comment-for entry)
            [:span.fa.fa-comment-o.toggle {:on-click create-comment}])
-         (when (seq (:comments entry))
-           [:span.fa.fa-comments.toggle
-            {:on-click toggle-comments
-             :class    (when-not show-comments? "hidden-comments")}])
          (when-not (:comment-for entry)
            [:span.fa.fa-external-link.toggle {:on-click open-external}])
          (when-not (:comment-for entry)
