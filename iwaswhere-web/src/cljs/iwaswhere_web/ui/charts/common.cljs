@@ -32,6 +32,16 @@
                         :font-size   24}}
    title])
 
+(defn mouse-leave-fn
+  "Creates event handler that removes the keys required for the info div
+   when leaving an element, such as a bar or circle in an SVG chart."
+  [local v]
+  (fn [_ev]
+    (when (= v (:mouse-over @local))
+      (swap! local (fn [state] (-> state
+                                   (dissoc :mouse-over)
+                                   (dissoc :mouse-pos)))))))
+
 (defn mouse-enter-fn
   "Creates event handler for mouse-enter events on elements in a chart.
    Takes a local atom and the value associated with the chart element.
@@ -45,17 +55,8 @@
                       (-> state
                           (assoc-in [:mouse-over] v)
                           (assoc-in [:mouse-pos] mouse-pos)))]
-      (swap! local update-fn v))))
-
-(defn mouse-leave-fn
-  "Creates event handler that removes the keys required for the info div
-   when leaving an element, such as a bar or circle in an SVG chart."
-  [local v]
-  (fn [_ev]
-    (when (= v (:mouse-over @local))
-      (swap! local (fn [state] (-> state
-                                   (dissoc :mouse-over)
-                                   (dissoc :mouse-pos)))))))
+      (swap! local update-fn v)
+      (.setTimeout js/window (mouse-leave-fn local v) 5000))))
 
 (defn info-div-pos
   "Determines position for info div in chart, depending on position on page.
