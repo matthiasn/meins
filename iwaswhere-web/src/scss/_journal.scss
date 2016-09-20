@@ -11,6 +11,7 @@
   display: flex;
   flex-flow: column;
   min-height: 0;
+  padding: 3px;
 }
 
 .split-windows-view {
@@ -30,8 +31,7 @@
 }
 
 .split-view {
-  // TODO: fix this hack
-  max-width: 50%;
+  width: calc(50% - 170px);
 }
 
 .tabs-header {

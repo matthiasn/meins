@@ -24,9 +24,17 @@
       [ct/tasks-chart task-stats 250 put-fn]
       [ds/daily-summaries-chart daily-summary-stats 250 put-fn]
       [ca/activity-weight-chart activity-stats 250 put-fn]
-      [wc/wordcount-chart wordcount-stats 250 put-fn]]
+      [wc/wordcount-chart wordcount-stats 250 put-fn]]]))
+
+(defn stats-text
+  "Renders stats text component."
+  [{:keys [observed put-fn]}]
+  (let [snapshot @observed
+        {:keys [options stats]} snapshot]
+    [:div.stats-string
      (when stats
-       [:div (:entry-count stats) " entries, " (:node-count stats) " nodes, "
+       [:div
+        (:entry-count stats) " entries, " (:node-count stats) " nodes, "
         (:edge-count stats) " edges, " (count (:hashtags options)) " hashtags, "
         (count (:mentions options)) " people, " (:open-tasks-cnt stats)
         " open tasks, " (:backlog-cnt stats) " in backlog, "
@@ -35,7 +43,7 @@
         (:import-cnt stats) " tagged #import, "
         (:new-cnt stats) " tagged #new."])
      (when-let [ms (get-in snapshot [:timing :query])]
-       [:div.stats
+       [:div
         (str "Query with " (get-in snapshot [:timing :count])
              " results completed in " ms ", RTT "
              (get-in snapshot [:timing :rtt]) " ms")])]))
@@ -66,5 +74,5 @@
   (r/cmp-map {:cmp-id      cmp-id
               :init-fn     init-fn
               :handler-map {:state/stats-tags update-stats}
-              :view-fn     stats-view
+              :view-fn     stats-text
               :dom-id      "stats"}))

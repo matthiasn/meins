@@ -4,16 +4,16 @@ $chart-bg: white;
 $completed: steelblue;
 $total: lighten($completed, 30);
 
-$completed-weekend: rgb(249,166,53);
+$completed-weekend: rgb(249, 166, 53);
 $total-weekend: lighten($completed-weekend, 30);
 
-$done: rgb(50,159,50);
+$done: rgb(50, 159, 50);
 $done-weekend: lighten($done, 30);
 
-$tasks: rgb(188,30,30);
+$tasks: rgb(188, 30, 30);
 $tasks-weekend: lighten($tasks, 30);
 
-$closed: rgba(249,166,30,0.8);
+$closed: rgba(249, 166, 30, 0.8);
 $closed-weekend: lighten($closed, 30);
 
 $backlog: DarkOrange;
@@ -22,139 +22,145 @@ $backlog-weekend: lighten($backlog, 30);
 $activity: steelblue;
 $activity-weekend: lighten($activity, 30);
 
-#stats {
+.stats {
+  display: flex;
   flex: 0 0 auto;
-  height: 180px;
-  background-color: $stats-bg-color;
   overflow-y: auto;
-  padding: 2px;
 
-  .stats {
-    button {
-      line-height: 0.8em;
-      font-size: 0.8em;
+  button {
+    line-height: 0.8em;
+    font-size: 0.8em;
+  }
+
+  .charts {
+    display: flex;
+    flex-flow: column;
+  }
+
+  svg {
+    margin: 3px;
+    background-color: $chart-bg;
+    height: 125px;
+
+    text {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
     }
 
-    .charts {
-      display: flex;
-      flex-flow: row;
+    rect:hover {
+      opacity: 0.5;
     }
 
-    svg {
-      margin: 3px;
-      background-color: $chart-bg;
-      height: 125px;
+    .bar-bg {
+      fill: rgba(0, 0, 0, 0)
+    }
+    .completed {
+      fill: $completed;
+    }
+    .completed-weekend {
+      fill: $completed-weekend;
+    }
+    .total {
+      fill: $total;
+    }
+    .total-weekend {
+      fill: $total-weekend;
+    }
+    .done {
+      fill: $done;
+    }
+    .done-weekend {
+      fill: $done-weekend;
+    }
+    .tasks {
+      fill: $tasks;
+    }
+    .tasks-weekend {
+      fill: $tasks-weekend;
+    }
+    .closed {
+      fill: $closed;
+    }
+    .closed-weekend {
+      fill: $closed-weekend;
+    }
+    .backlog {
+      fill: $backlog;
+    }
+    .backlog-weekend {
+      fill: $backlog-weekend;
+    }
+    .activity {
+      fill: $activity;
+    }
+    .activity-weekend {
+      fill: $activity-weekend;
+    }
 
-      text {
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
+    .lbm {
+      opacity: 0.5;
+      polyline {
+        stroke: grey;
+        stroke-width: 3;
+        fill: none;
       }
-
-      rect:hover {
-        opacity: 0.5;
-      }
-
-      .bar-bg {
-        fill: rgba(0,0,0,0)
-      }
-      .completed {
-        fill: $completed;
-      }
-      .completed-weekend {
-          fill: $completed-weekend;
-      }
-      .total {
-        fill: $total;
-      }
-      .total-weekend {
-        fill: $total-weekend;
-      }
-      .done {
-        fill: $done;
-      }
-      .done-weekend {
-        fill: $done-weekend;
-      }
-      .tasks {
-        fill: $tasks;
-      }
-      .tasks-weekend {
-        fill: $tasks-weekend;
-      }
-      .closed {
-        fill: $closed;
-      }
-      .closed-weekend {
-        fill: $closed-weekend;
-      }
-      .backlog {
-        fill: $backlog;
-      }
-      .backlog-weekend {
-        fill: $backlog-weekend;
-      }
-      .activity {
-        fill: $activity;
-      }
-      .activity-weekend {
-        fill: $activity-weekend;
-      }
-
-      .lbm {
-        opacity: 0.5;
-        polyline {
-          stroke: grey;
-          stroke-width: 3;
-          fill: none;
-        }
-        circle {
-          stroke: grey;
-          stroke-width: 1;
-          fill: lightgrey;
-        }
-      }
-
-      .weight {
-        polyline {
-          stroke: steelblue;
-          stroke-width: 3;
-          fill: none;
-        }
-        circle {
-          stroke: steelblue;
-          stroke-width: 1;
-          fill: lightblue;
-        }
-      }
-
-      .girth {
-        polyline {
-          stroke: $done;
-          stroke-width: 3;
-          fill: none;
-        }
-        circle {
-          stroke: $done;
-          stroke-width: 1;
-          fill: lighten($done, 20);
-        }
+      circle {
+        stroke: grey;
+        stroke-width: 1;
+        fill: lightgrey;
       }
     }
 
-    .mouse-over-info {
-      padding: 5px;
-      background-color: white;
-      border: 1px solid darken($hashtag-blue, 25%);
-      border-radius: $info-border-radius;
-      position: fixed;
-      top: 100px;
-
-      div:first-of-type {
-        font-weight: bold;
+    .weight {
+      polyline {
+        stroke: steelblue;
+        stroke-width: 3;
+        fill: none;
       }
+      circle {
+        stroke: steelblue;
+        stroke-width: 1;
+        fill: lightblue;
+      }
+    }
+
+    .girth {
+      polyline {
+        stroke: $done;
+        stroke-width: 3;
+        fill: none;
+      }
+      circle {
+        stroke: $done;
+        stroke-width: 1;
+        fill: lighten($done, 20);
+      }
+    }
+  }
+
+  .mouse-over-info {
+    padding: 5px;
+    background-color: white;
+    border: 1px solid darken($hashtag-blue, 25%);
+    border-radius: $info-border-radius;
+    position: fixed;
+    top: 100px;
+
+    div:first-of-type {
+      font-weight: bold;
     }
   }
 }
 
+#stats {
+  flex: 0 0 auto;
+  background-color: $stats-bg-color;
+  overflow-y: auto;
+  padding: 2px;
+}
+
+.stats-string {
+  color: $tab-bg;
+}

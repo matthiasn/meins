@@ -4,6 +4,7 @@
             [iwaswhere-web.ui.search :as search]
             [iwaswhere-web.ui.journal :as j]
             [clojure.string :as s]
+            [iwaswhere-web.ui.stats :as stats]
             [iwaswhere-web.helpers :as h]
             [iwaswhere-web.utils.parse :as p]))
 
@@ -64,6 +65,7 @@
     [:div.split-window-container
      [n/new-entries-view store-snapshot local-cfg put-fn]
      [:div.split-windows-view
+      [stats/stats-view cmp-map]
       [split-window-view cmp-map :left]
       (when (:split-view cfg)
         [split-window-view cmp-map :right])]]))
