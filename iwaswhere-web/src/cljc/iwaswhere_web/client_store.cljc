@@ -72,6 +72,7 @@
             :stats/tasks :task-stats
             :stats/wordcount :wordcount-stats
             :stats/daily-summaries :daily-summary-stats
+            :stats/media :media-stats
             nil)
         day-stats (into (sorted-map) (:stats msg-payload))]
     (if k

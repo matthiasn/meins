@@ -69,8 +69,8 @@
           {:viewBox (str "0 0 600 " chart-h)}
           [cc/chart-title "open tasks / backlog / completed"]
           [cc/bg-bars indexed local chart-h :daily-summaries]
-          [stacked-bars :open-tasks-cnt "tasks" :backlog-cnt "backlog" 50 145]
-          [stacked-bars :completed-cnt "done" :closed-cnt "closed" 155 250]]
+          [stacked-bars :open-tasks-cnt "tasks" :backlog-cnt "backlog" 50 120]
+          [stacked-bars :completed-cnt "done" :closed-cnt "closed" 130 200]]
          (when (:mouse-over @local)
            [:div.mouse-over-info (cc/info-div-pos @local)
             [:div (:date-string (:mouse-over @local))]

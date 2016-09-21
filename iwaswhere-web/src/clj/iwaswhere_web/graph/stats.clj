@@ -83,6 +83,20 @@
                      :word-count  (apply + counts)}]
       [date-string day-stats])))
 
+(defn media-mapper
+  "Create mapper function for media stats"
+  [current-state]
+  (fn [d]
+    (let [g (:graph current-state)
+          date-string (:date-string d)
+          day-nodes (gq/get-nodes-for-day g {:date-string date-string})
+          day-nodes-attrs (map #(uber/attrs g %) day-nodes)
+          day-stats {:date-string date-string
+                     :photo-cnt (count (filter :img-file day-nodes-attrs))
+                     :audio-cnt (count (filter :audio-file day-nodes-attrs))
+                     :video-cnt (count (filter :video-file day-nodes-attrs))}]
+      [date-string day-stats])))
+
 (defn daily-summaries-mapper
   "Create mapper function for daily summary stats"
   [current-state]
@@ -103,6 +117,7 @@
                        :stats/activity activities-mapper
                        :stats/tasks tasks-mapper
                        :stats/wordcount wordcount-mapper
+                       :stats/media media-mapper
                        :stats/daily-summaries daily-summaries-mapper
                        nil)
         days (:days msg-payload)
