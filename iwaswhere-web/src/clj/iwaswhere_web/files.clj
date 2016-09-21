@@ -54,12 +54,14 @@
 
 (defn geo-entry-persist-fn
   "Handler function for persisting journal entry."
-  [{:keys [current-state msg-payload]}]
-  (let [entry-ts (:timestamp msg-payload)
+  [{:keys [current-state msg-payload msg-meta]}]
+  (let [ts (:timestamp msg-payload)
         with-last-modified (merge msg-payload {:last-saved (st/now)})
-        new-state (ga/add-node current-state entry-ts with-last-modified)]
+        new-state (ga/add-node current-state ts with-last-modified)]
     (append-daily-log with-last-modified)
     {:new-state    new-state
+     :send-to-self (when-let [comment-for (:comment-for msg-payload)]
+                     (with-meta [:entry/find {:timestamp comment-for}] msg-meta))
      :emit-msg     [[:entry/saved with-last-modified]
                     [:ft/add with-last-modified]
                     [:cmd/schedule-new {:timeout 2000

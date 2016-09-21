@@ -65,8 +65,8 @@
 
 (defn get-comments
   "Extract all comments for entry."
-  [entry g n]
-  (let [edges (uc/find-edges g {:dest n :relationship :COMMENT})
+  [entry g ts]
+  (let [edges (uc/find-edges g {:dest ts :relationship :COMMENT})
         comment-ids (->> (flatten edges)
                          (remove :mirror?)
                          (map :src)
