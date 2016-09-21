@@ -82,5 +82,7 @@
   flex-grow: 1;
   flex-shrink: 0;
   margin: 0.6em 25% 0.2em 0.4em;
-  max-width: 500px;
+  max-width: 600px;
+  max-height: 350px;
+  overflow-y: scroll;
 }

@@ -84,6 +84,11 @@
           [:input {:on-click    #(.stopPropagation %)
                    :on-key-down keydown-fn}]])])))
 
+(defn upvote-fn [entry op put-fn]
+  "Create click function for like. Can handle both upvotes and downvotes."
+  (fn [_ev]
+    (put-fn [:entry/update (update-in entry [:upvotes] op)])))
+
 (defn entry-actions
   "Entry-related action buttons. Hidden by default, become visible when mouse
    hovers over element, stays visible for a little while after mose leaves."
@@ -127,20 +132,14 @@
                           (put-fn [:entry/trash entry]))
             open-external (up/add-search ts tab-group put-fn)
             upvotes (:upvotes entry)
-            upvote-fn (fn [op]
-                        #(put-fn [:entry/update
-                                  (update-in entry [:upvotes] op)]))
             show-pvt? (:show-pvt cfg)]
         [:div {:on-mouse-enter #(reset! visible true)
                :on-drag-over   #(do (hide-fn nil) (reset! visible true))
                :on-mouse-leave hide-fn
                :style          {:opacity (if (or edit-mode? @visible) 1 0)}}
          [:span.fa.toggle
-          {:on-click (upvote-fn inc)
+          {:on-click (upvote-fn entry inc put-fn)
            :class    (if (pos? upvotes) "fa-thumbs-up" "fa-thumbs-o-up")}]
-         (when (pos? upvotes) [:span.upvotes upvotes])
-         (when (pos? upvotes)
-           [:span.fa.fa-thumbs-down.toggle {:on-click (upvote-fn dec)}])
          (when map? [:span.fa.fa-map-o.toggle {:on-click toggle-map}])
          [edit-icon toggle-edit edit-mode? entry]
          (when-not (:comment-for entry)

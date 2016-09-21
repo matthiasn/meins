@@ -53,7 +53,7 @@
      [:div.header
       [:div
        [:a [:time {:on-click (up/add-search q-date-string tab-group put-fn)}
-            (.format (js/moment ts) "ddd, YYYY-MM-DD HH:mm")]]
+            (.format (js/moment ts) "ddd YY-MM-DD HH:mm")]]
        [:time (u/visit-duration entry)]]
       (if (= :pomodoro (:entry-type entry))
         [p/pomodoro-header entry #(put-fn [:cmd/pomodoro-start entry]) edit-mode?]
@@ -88,8 +88,11 @@
       [:div.likes (when-let [upvotes (:upvotes entry)]
               (when (pos? upvotes)
                 [:div
-                 [:span.fa.fa-thumbs-up]
-                 [:span.upvotes upvotes]]))]
+                 [:span.fa.fa-thumbs-up
+                  {:on-click (a/upvote-fn entry inc put-fn)}]
+                 [:span.upvotes upvotes]
+                 [:span.fa.fa-thumbs-down.toggle
+                  {:on-click (a/upvote-fn entry dec put-fn)}]]))]
       [:div.word-count (md/count-words-formatted entry)]]]))
 
 (defn entry-with-comments
@@ -125,10 +128,11 @@
      (when (seq all-comments)
        (if (= query-id show-comments-for?)
          [:div.comments
-          [:div.show-comments
-           (let [n (count comments)]
-             [:span {:on-click toggle-comments}
-              (str "hide " n " comment" (when (> n 1) "s"))])]
+          (let [n (count comments)]
+            [:div.show-comments
+             (when (pos? n)
+               [:span {:on-click toggle-comments}
+                (str "hide " n " comment" (when (> n 1) "s"))])])
           (for [comment all-comments]
             ^{:key (str "c" (:timestamp comment))}
             [journal-entry comment cfg put-fn

@@ -187,7 +187,7 @@
     padding-left: 20px;
     padding-right: 5px;
   }
-  .entry:nth-child(odd) {
+  .entry:nth-child(even) {
     background-color: lighten($hashtag-blue, 40%);
   }
 }
