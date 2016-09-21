@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [0.1.16] - 2016-09-21
+### Changed
+- latest deps
+- media chart
+
 ## [0.1.15] - 2016-09-20
 ### Changed
 - new layout

@@ -1,4 +1,4 @@
-(defproject matthiasn/iwaswhere-web "0.1.15"
+(defproject matthiasn/iwaswhere-web "0.1.16"
   :description "Sample application built with systems-toolbox library"
   :url "https://github.com/matthiasn/systems-toolbox"
   :license {:name "GNU GENERAL PUBLIC LICENSE"
@@ -20,8 +20,8 @@
                  [com.drewnoakes/metadata-extractor "2.9.1"]
                  [ubergraph "0.3.0"]
                  [camel-snake-kebab "0.4.0"]
-                 [matthiasn/systems-toolbox "0.6.1-alpha6"]
-                 [matthiasn/systems-toolbox-ui "0.6.1-alpha8"]
+                 [matthiasn/systems-toolbox "0.6.1-alpha7"]
+                 [matthiasn/systems-toolbox-ui "0.6.1-alpha9"]
                  [matthiasn/systems-toolbox-sente "0.6.1-alpha7"]
                  [matthiasn/inspect-probe "0.6.1-alpha1"]
                  [clucy "0.4.0"]
@@ -52,7 +52,7 @@
             [com.jakemccrary/lein-test-refresh "0.17.0"]
             [test2junit "1.2.2"]
             [lein-doo "0.1.7"]
-            [lein-codox "0.9.7"]]
+            [lein-codox "0.10.0"]]
 
   :sass {:src "src/scss/"
          :dst "resources/public/css/"}
