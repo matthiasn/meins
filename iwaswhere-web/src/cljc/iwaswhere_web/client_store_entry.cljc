@@ -60,7 +60,7 @@
               (assoc-in [:entries-map ts] msg-payload))
           current-state)]
     (update-local-storage new-state)
-    {:new-state new-state
+    {:new-state    new-state
      :send-to-self [:search/refresh]}))
 
 (defn play-audio

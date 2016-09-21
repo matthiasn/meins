@@ -41,7 +41,11 @@
   [{:keys [current-state msg-payload]}]
   (let [{:keys [query-id tab-group]} msg-payload
         path [:query-cfg :tab-groups tab-group :active]
-        new-state (assoc-in current-state path query-id)]
+        new-state (-> current-state
+                      (assoc-in path query-id)
+                      (update-in [:query-cfg :tab-groups tab-group :history]
+                                 #(conj (take 50 %1) %2)
+                                 query-id))]
     (when (-> current-state :query-cfg :queries query-id)
       (reset! query-cfg (:query-cfg new-state))
       {:new-state new-state})))
@@ -55,7 +59,10 @@
         all-path [:query-cfg :tab-groups tab-group :all]
         new-state (-> current-state
                       (assoc-in active-path query-id)
-                      (update-in all-path conj query-id))
+                      (update-in all-path conj query-id)
+                      (update-in [:query-cfg :tab-groups tab-group :history]
+                                 #(conj (take 50 %1) %2)
+                                 query-id))
         new-query (merge {:query-id query-id} (p/parse-search "") query)]
     (reset! query-cfg (:query-cfg new-state))
     {:new-state    new-state
@@ -67,10 +74,20 @@
   (let [{:keys [query-id tab-group]} msg-payload
         all-path [:query-cfg :tab-groups tab-group :all]
         active-path [:query-cfg :tab-groups tab-group :active]
+        hist-path [:query-cfg :tab-groups tab-group :history]
         query-path [:query-cfg :queries]
+        update-active (fn [state]
+                        (update-in state active-path
+                          (fn [active]
+                            (if (= active query-id)
+                              (let [hist (get-in state hist-path)]
+                                (first (filter
+                                         #(contains? (get-in state all-path) %)
+                                         hist)))
+                              active))))
         new-state (-> current-state
                       (update-in all-path disj query-id)
-                      (update-in active-path #(when-not (= % query-id) %))
+                      update-active
                       (update-in query-path dissoc query-id)
                       (update-in [:results] dissoc query-id))]
     (reset! query-cfg (:query-cfg new-state))
