@@ -64,5 +64,5 @@
         tag-substr-filter (fn [tag]
                             (when (seq current-tag)
                               (re-find current-tag-regex tag)))
-        f-tags (set (filter tag-substr-filter tags))]
+        f-tags (filter tag-substr-filter tags)]
     [current-tag f-tags]))

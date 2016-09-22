@@ -59,7 +59,7 @@
             show-pvt? (:show-pvt cfg)
             hashtags (:hashtags options)
             pvt-hashtags (:pvt-hashtags options)
-            hashtags (if show-pvt? (set/union hashtags pvt-hashtags) hashtags)
+            hashtags (if show-pvt? (concat hashtags pvt-hashtags) hashtags)
             mentions (:mentions options)
             [curr-tag f-tags] (p/autocomplete-tags before-cursor "#" hashtags)
             [curr-mention f-mentions] (p/autocomplete-tags before-cursor "@" mentions)

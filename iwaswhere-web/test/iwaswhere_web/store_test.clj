@@ -79,7 +79,7 @@
           (testing
             "hashtag was created for entry"
             (is (= (:tags test-entry)
-                   (gq/find-all-hashtags new-state))))
+                   (set (gq/find-all-hashtags new-state)))))
 
           (testing
             "mention was created for entry"
@@ -117,7 +117,8 @@
 
   (testing
     "hashtag was created for entry"
-    (is (= (:tags test-entry) (gq/find-all-hashtags state))))
+    (is (= (:tags test-entry)
+           (set (gq/find-all-hashtags state)))))
 
   (testing
     "mention was created for entry"

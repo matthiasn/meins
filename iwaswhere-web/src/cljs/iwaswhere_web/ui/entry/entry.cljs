@@ -43,7 +43,7 @@
         show-pvt? (:show-pvt cfg)
         hashtags (set/union (:hashtags cfg) (:pvt-displayed cfg))
         pvt-hashtags (:pvt-hashtags cfg)
-        hashtags (if show-pvt? (set/union hashtags pvt-hashtags) hashtags)
+        hashtags (if show-pvt? (concat hashtags pvt-hashtags) hashtags)
         mentions (:mentions cfg)
         q-date-string (.format (js/moment ts) "YYYY-MM-DD")
         tab-group (:tab-group local-cfg)]

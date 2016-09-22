@@ -166,9 +166,15 @@
   [current-state]
   (let [g (:graph current-state)
         ltags (map #(-> % :dest :tag) (uc/find-edges g {:src :hashtags}))
-        tags (map #(:val (uc/attrs g {:tag %})) ltags)
-        cfg (:cfg current-state)]
-    (set tags)))
+        sorted-tags (->> ltags
+                         (map (fn [lt]
+                                (let [tag (:val (uc/attrs g {:tag lt}))
+                                      cnt (count (uc/find-edges g {:src {:tag lt}}))]
+                                  [tag cnt])))
+                         (sort-by second)
+                         reverse
+                         (map first))]
+    sorted-tags))
 
 (defn find-all-pvt-hashtags
   "Finds all private hashtags. Private hashtags are either those used

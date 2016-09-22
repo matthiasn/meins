@@ -129,29 +129,32 @@
 (deftest autocomplete-tags-test
   (testing
     "empty string before cursor returns zero filtered tags"
-    (is (= (p/autocomplete-tags "" "(?!^) ?#" tags) ["" #{}])))
+    (is (= (p/autocomplete-tags "" "(?!^) ?#" tags)
+           ["" '()])))
 
   (testing
     "Hashtag at end of string parsed correctly"
-    (is (= (p/autocomplete-tags "some #task" "(?!^) ?#" tags) ["#task" #{"#task"}])))
+    (is (= (p/autocomplete-tags "some #task" "(?!^) ?#" tags)
+           ["#task" '("#task")])))
 
   (testing
     "empty tags returns empty filtered tags list"
-    (is (= (p/autocomplete-tags "some #task" "(?!^) ?#" #{}) ["#task" #{}])))
+    (is (= (p/autocomplete-tags "some #task" "(?!^) ?#" #{}) ["#task" '()])))
 
   (testing
     "partial tag correctly matched with multiple matches"
     (is (= (p/autocomplete-tags "some #auto" "(?!^) ?#" tags)
-           ["#auto" #{"#autocomplete" "#autosuggestion"}])))
+           ["#auto" '("#autocomplete" "#autosuggestion")])))
 
   (testing
     "not case sensitive"
     (is (= (p/autocomplete-tags "some #cloju" "(?!^) ?#" tags)
-           ["#cloju" #{"#Clojure" "#ClojureScript"}])))
+           ["#cloju" '("#Clojure" "#ClojureScript")])))
 
   (testing
     "also working with mentions"
-    (is (= (p/autocomplete-tags "@m" "@" mentions) ["@m" #{"@me" "@myself"}]))))
+    (is (= (p/autocomplete-tags "@m" "@" mentions)
+           ["@m" '("@me" "@myself")]))))
 
 (def codeblock-ignore-str
   "some #detected `#not-detected #not-detected2` some \n```\ncode block @not-detected blah\n```\n some text @detected \n```\n@not-detected #not-detected blah\n```\n")
