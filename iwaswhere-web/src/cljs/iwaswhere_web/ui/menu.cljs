@@ -45,7 +45,7 @@
                 reset-msg (merge msg {:reset-to false})]
             (put-fn [:cmd/schedule-new {:timeout 20000
                                         :message [:cmd/toggle-key reset-msg]}])
-            (put-fn [:cmd/toggle-key msg])))]
+            (put-fn [:cmd/toggle-key (merge msg {:reset-to true})])))]
     [:div
      [:span.fa.fa-thumbs-up.toggle
       {:class    (when-not sort-by-upvotes? "inactive")
@@ -54,7 +54,8 @@
        ^{:key (str "toggle" (:cls option))}
        [toggle-option-view option cfg put-fn])
      [:span.fa.fa-qrcode.toggle
-      {:on-click toggle-qr-code :class (when-not (:qr-code cfg) "inactive")}]
+      {:on-click toggle-qr-code
+       :class    (when-not (:qr-code cfg) "inactive")}]
      [:span.fa.fa-ellipsis-h.toggle
       {:on-click #(put-fn [:cmd/toggle-lines])}]]))
 
