@@ -74,7 +74,6 @@
                                            (s/replace md curr-regex tag)))]
                 (reset! local-display-entry updated)
                 (put-fn [:entry/update-local updated])
-                #_
                 (.setTimeout js/window
                              (fn [] (h/focus-on-end @edit-elem-atom)) 100)))
 
