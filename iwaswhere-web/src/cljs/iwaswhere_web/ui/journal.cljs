@@ -65,7 +65,7 @@
                                         (or (:new-entry entry) show-context?)))
         active-id (-> snapshot :cfg :active query-id)
         active-entry (get entries-map active-id)
-        linked-entries-set (set (:linked-entries-list active-entry))
+        linked-entries-set (into (sorted-set) (:linked-entries-list active-entry))
         linked-mapper (u/find-missing-entry entries-map put-fn)
         linked-entries (map linked-mapper linked-entries-set)]
     [:div.journal
