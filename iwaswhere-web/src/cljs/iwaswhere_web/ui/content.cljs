@@ -63,12 +63,12 @@
         local-cfg {}
         cfg (:cfg store-snapshot)]
     [:div.split-window-container
-     [n/new-entries-view store-snapshot local-cfg put-fn]
      [:div.split-windows-view
       [stats/stats-view cmp-map]
       [split-window-view cmp-map :left]
       (when (:split-view cfg)
-        [split-window-view cmp-map :right])]]))
+        [split-window-view cmp-map :right])]
+     [n/new-entries-view store-snapshot local-cfg put-fn]]))
 
 (defn cmp-map
   [cmp-id]

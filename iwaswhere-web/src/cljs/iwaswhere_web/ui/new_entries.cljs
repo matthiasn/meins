@@ -7,13 +7,15 @@
   [snapshot local-cfg put-fn]
   (let [cfg (merge (:cfg snapshot) (:options snapshot))
         entries-map (:entries-map snapshot)
-        new-entries (:new-entries snapshot)]
-    (when (seq new-entries)
+        new-entries (:new-entries snapshot)
+        filtered-entries (filter #(and
+                                   (not (:comment-for %))
+                                   (not (contains? entries-map (:timestamp %))))
+                                 (vals new-entries))]
+    (when (seq filtered-entries)
       [:div.new-entries
-       (for [entry (filter #(and
-                             (not (:comment-for %))
-                             (not (contains? entries-map (:timestamp %))))
-                           (vals new-entries))]
-         ^{:key (:timestamp entry)}
-         [e/entry-with-comments entry
-          cfg new-entries put-fn entries-map local-cfg])])))
+       [:div.new-entries-list
+        (for [entry filtered-entries]
+          ^{:key (:timestamp entry)}
+          [e/entry-with-comments entry
+           cfg new-entries put-fn entries-map local-cfg])]])))
