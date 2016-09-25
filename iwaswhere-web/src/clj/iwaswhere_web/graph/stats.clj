@@ -97,15 +97,34 @@
                      :video-cnt (count (filter :video-file day-nodes-attrs))}]
       [date-string day-stats])))
 
+(defn res-count
+  "Count results for specified query."
+  [current-state query]
+  (let [res (gq/get-filtered-results
+              current-state
+              (merge {:n Integer/MAX_VALUE} query))]
+    (count (set (:entries res)))))
+
+(defn task-summary-stats
+  "Generate some very basic stats about the graph size for display in UI."
+  [state]
+  {:open-tasks-cnt (res-count state {:tags     #{"#task"}
+                                     :not-tags #{"#done" "#backlog" "#closed"}})
+   :backlog-cnt    (res-count state {:tags     #{"#task" "#backlog"}
+                                     :not-tags #{"#done" "#closed"}})
+   :completed-cnt  (res-count state {:tags #{"#task" "#done"}})
+   :closed-cnt     (res-count state {:tags #{"#task" "#closed"}})})
+
 (defn daily-summaries-mapper
   "Create mapper function for daily summary stats"
   [current-state]
   (fn [d]
     (let [day (:date-string d)
-          day-stats (merge
-                      (get-in current-state [:stats :daily-summaries day])
-                      {:date-string day})]
-      [day day-stats])))
+          today? (= day (ctf/unparse (ctf/formatters :year-month-day) (t/now)))
+          day-stats (if today?
+                      (task-summary-stats current-state)
+                      (get-in current-state [:stats :daily-summaries day]))]
+      [day (merge day-stats {:date-string day})])))
 
 (defn get-stats-fn
   "Retrieves stats of specified type. Picks the appropriate mapper function
@@ -127,24 +146,6 @@
       (put-fn (with-meta [:stats/result {:stats stats
                                          :type  stats-type}] msg-meta))
       (l/warn "No mapper defined for" stats-type))))
-
-(defn res-count
-  "Count results for specified query."
-  [current-state query]
-  (let [res (gq/get-filtered-results
-              current-state
-              (merge {:n Integer/MAX_VALUE} query))]
-    (count (set (:entries res)))))
-
-(defn task-summary-stats
-  "Generate some very basic stats about the graph size for display in UI."
-  [state]
-  {:open-tasks-cnt (res-count state {:tags     #{"#task"}
-                                     :not-tags #{"#done" "#backlog" "#closed"}})
-   :backlog-cnt    (res-count state {:tags     #{"#task" "#backlog"}
-                                     :not-tags #{"#done" "#closed"}})
-   :completed-cnt  (res-count state {:tags #{"#task" "#done"}})
-   :closed-cnt     (res-count state {:tags #{"#task" "#closed"}})})
 
 (defn get-basic-stats
   "Generate some very basic stats about the graph size for display in UI."
