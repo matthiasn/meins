@@ -61,7 +61,8 @@
       [:div
        (when (seq (:linked-entries-list entry))
          (let [ts (:timestamp entry)
-               entry-active? (contains? (set (vals (:active cfg))) ts)
+               entry-active? (when-let [query-id (:query-id local-cfg)]
+                               (= (query-id (:active cfg)) ts))
                set-active-fn #(put-fn [:cmd/toggle-active
                                        {:timestamp ts
                                         :query-id (:query-id local-cfg)}])]

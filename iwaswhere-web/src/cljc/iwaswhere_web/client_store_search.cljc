@@ -34,7 +34,8 @@
   "Sets search in linked entries column."
   [{:keys [current-state msg-payload]}]
   (let [{:keys [search query-id]} msg-payload]
-    {:new-state (assoc-in current-state [:cfg :linked-filter query-id] search)}))
+    {:new-state (assoc-in current-state [:cfg :linked-filter query-id] search)
+     :send-to-self [:cfg/save]}))
 
 (defn set-active-query
   "Sets active query for specified tab group."

@@ -53,16 +53,6 @@
     (put-fn [:state/stats-tags-get])
     {:state initial-state}))
 
-(defn toggle-active-fn
-  "Sets entry in payload as the active entry for which to show linked entries."
-  [{:keys [current-state msg-payload]}]
-  (let [{:keys [timestamp query-id]} msg-payload
-        currently-active (get-in current-state [:cfg :active query-id])]
-    {:new-state (assoc-in current-state [:cfg :active query-id]
-                          (if (= currently-active timestamp)
-                            nil
-                            timestamp))}))
-
 (defn save-stats-fn
   "Stores received stats on component state."
   [{:keys [current-state msg-payload]}]
@@ -92,7 +82,7 @@
                               :stats/result       save-stats-fn
                               :state/stats-tags   stats-tags-fn
                               :cfg/save           c/save-cfg
-                              :cmd/toggle-active  toggle-active-fn
+                              :cmd/toggle-active  c/toggle-active-fn
                               :cmd/toggle         c/toggle-set-fn
                               :cmd/set-opt        c/set-conj-fn
                               :cmd/set-dragged    c/set-currently-dragged

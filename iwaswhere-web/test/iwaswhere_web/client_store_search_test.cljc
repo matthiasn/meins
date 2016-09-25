@@ -15,7 +15,7 @@
                                              :msg-payload   st/empty-query})
         new-state (:new-state handler-res)
         toggle-msg {:timestamp (:timestamp st/test-entry) :query-id :query-1}
-        new-state1 (:new-state (store/toggle-active-fn
+        new-state1 (:new-state (c/toggle-active-fn
                                  {:current-state new-state
                                   :msg-payload   toggle-msg}))
         new-state2 (:new-state (search/update-query-fn

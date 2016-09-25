@@ -125,7 +125,7 @@
   "Test that active entry is updated properly in store component state"
   (let [current-state @(:state (store/initial-state-fn (fn [_put-fn])))
         ts (:timestamp test-entry)
-        new-state (:new-state (store/toggle-active-fn
+        new-state (:new-state (c/toggle-active-fn
                                 {:current-state current-state
                                  :msg-payload   {:timestamp ts
                                                  :query-id  :query-1}}))]
