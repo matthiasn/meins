@@ -50,7 +50,11 @@
                       msg-payload)]
     (when-not (= existing node-to-add)
       (append-daily-log node-to-add))
-    {:new-state (ga/add-node current-state entry-ts node-to-add)}))
+    {:new-state (ga/add-node current-state entry-ts node-to-add)
+     :emit-msg [:cmd/schedule-new
+                {:timeout 5000
+                 :message (with-meta [:search/refresh]
+                                     {:sente-uid :broadcast})}]}))
 
 (defn geo-entry-persist-fn
   "Handler function for persisting journal entry."

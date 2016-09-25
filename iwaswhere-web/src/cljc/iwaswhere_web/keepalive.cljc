@@ -14,8 +14,11 @@
     switchboard
     [[:cmd/init-comp (sched/cmp-map :server/scheduler-cmp)]
      [:cmd/route {:from :server/scheduler-cmp
-                  :to   #{:server/store-cmp :server/ws-cmp}}]
-     [:cmd/route {:from :server/store-cmp :to :server/scheduler-cmp}]]))
+                  :to   #{:server/store-cmp
+                          :server/ws-cmp}}]
+     [:cmd/route {:from #{:server/store-cmp
+                          :server/imports-cmp}
+                  :to :server/scheduler-cmp}]]))
 
 (defn keepalive-fn
   "Responds to keepalive message."
