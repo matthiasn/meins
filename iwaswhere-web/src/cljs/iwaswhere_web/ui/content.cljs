@@ -14,12 +14,9 @@
         active-query (-> query-cfg :tab-groups tab-group :active)
         on-drop #(let [dragged (:dragged query-cfg)
                        dragged-id (:query-id dragged)
-                       dragged-query (dragged-id (:queries query-cfg))
-                       new-query (p/parse-search (:search-text dragged-query))]
+                       dragged-query (dragged-id (:queries query-cfg))]
                   (when (not= tab-group (:tab-group dragged))
-                    (put-fn [:search/add {:query     new-query
-                                          :tab-group tab-group}])
-                    (put-fn [:search/remove dragged]))
+                    (put-fn [:search/move-tab {:dragged dragged :to tab-group}]))
                   (.preventDefault %))]
     [:div.tabs-header {:on-drop       on-drop
                        :on-drag-over  h/prevent-default

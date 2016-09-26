@@ -69,26 +69,30 @@
     {:new-state    new-state
      :send-to-self [:search/update new-query]}))
 
+(defn previously-active
+  "Sets active query for the tab group to the previously active query."
+  [state query-id tab-group]
+  (let [all-path [:query-cfg :tab-groups tab-group :all]
+        active-path [:query-cfg :tab-groups tab-group :active]
+        hist-path [:query-cfg :tab-groups tab-group :history]]
+    (update-in state active-path
+               (fn [active]
+                 (if (= active query-id)
+                   (let [hist (get-in state hist-path)]
+                     (first (filter
+                              #(contains? (get-in state all-path) %)
+                              hist)))
+                   active)))))
+
 (defn remove-query
   "Remove query inside tab group specified in msg."
   [{:keys [current-state msg-payload]}]
   (let [{:keys [query-id tab-group]} msg-payload
         all-path [:query-cfg :tab-groups tab-group :all]
-        active-path [:query-cfg :tab-groups tab-group :active]
-        hist-path [:query-cfg :tab-groups tab-group :history]
         query-path [:query-cfg :queries]
-        update-active (fn [state]
-                        (update-in state active-path
-                          (fn [active]
-                            (if (= active query-id)
-                              (let [hist (get-in state hist-path)]
-                                (first (filter
-                                         #(contains? (get-in state all-path) %)
-                                         hist)))
-                              active))))
         new-state (-> current-state
                       (update-in all-path disj query-id)
-                      update-active
+                      (previously-active query-id tab-group)
                       (update-in query-path dissoc query-id)
                       (update-in [:results] dissoc query-id))]
     (reset! query-cfg (:query-cfg new-state))
@@ -98,6 +102,21 @@
   "Set actively dragged tab so it's available when dropped onto another element."
   [{:keys [current-state msg-payload]}]
   (let [new-state (assoc-in current-state [:query-cfg :dragged] msg-payload)]
+    (reset! query-cfg (:query-cfg new-state))
+    {:new-state new-state}))
+
+(defn move-tab-fn
+  "Moves query tab from one tab-group to another."
+  [{:keys [current-state msg-payload]}]
+  (let [dragged (:dragged msg-payload)
+        q-id (:query-id dragged)
+        from (:tab-group dragged)
+        to (:to msg-payload)
+        new-state (-> current-state
+                      (assoc-in [:query-cfg :tab-groups to :active] q-id)
+                      (update-in [:query-cfg :tab-groups to :all] conj q-id)
+                      (update-in [:query-cfg :tab-groups from :all] disj q-id)
+                      (previously-active q-id from))]
     (reset! query-cfg (:query-cfg new-state))
     {:new-state new-state}))
 
@@ -126,5 +145,6 @@
    :search/remove      remove-query
    :search/refresh     search-refresh-fn
    :search/set-dragged set-dragged-fn
+   :search/move-tab    move-tab-fn
    :show/more          show-more-fn
    :linked-filter/set  set-linked-filter})
