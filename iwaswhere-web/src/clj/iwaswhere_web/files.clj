@@ -14,7 +14,10 @@
             [me.raynes.fs :as fs]
             [clojure.tools.logging :as l]))
 
-(def data-path (or (System/getenv "DATA_PATH") "data"))
+(def data-path (or (System/getenv "DATA_PATH")
+                   (let [path (str (System/getenv "HOME") "/iWasWhere/data")]
+                     (when (fs/exists? path) path))
+                   "data"))
 (def daily-logs-path (str data-path "/daily-logs/"))
 (def trash-path (str data-path "/trash/"))
 
