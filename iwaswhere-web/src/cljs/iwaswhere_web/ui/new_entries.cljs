@@ -18,4 +18,4 @@
         (for [entry filtered-entries]
           ^{:key (:timestamp entry)}
           [e/entry-with-comments entry
-           cfg new-entries put-fn entries-map local-cfg])]])))
+           cfg new-entries put-fn entries-map local-cfg true])]])))

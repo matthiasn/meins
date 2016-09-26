@@ -40,7 +40,7 @@
                     (or (:new-entry entry) (:show-context cfg)))
            ^{:key (str "linked-" (:timestamp entry))}
            [e/entry-with-comments
-            entry cfg new-entries put-fn entries-map local-cfg]))])))
+            entry cfg new-entries put-fn entries-map local-cfg false]))])))
 
 (defn journal-view
   "Renders journal div, one entry per item, with map if geo data exists in the
@@ -75,7 +75,7 @@
         (when (with-comments? entry)
           ^{:key (:timestamp entry)}
           [e/entry-with-comments
-           entry cfg new-entries put-fn entries-map local-cfg]))
+           entry cfg new-entries put-fn entries-map local-cfg false]))
       (when (seq entries)
         (let [show-more #(put-fn [:show/more {:query-id query-id}])]
           [:div.show-more {:on-click show-more :on-mouse-over show-more}

@@ -35,7 +35,7 @@
    content component used in edit mode also sends a modified entry to the store
    component, which is useful for displaying updated hashtags, or also for
    showing the warning that the entry is not saved yet."
-  [entry cfg put-fn edit-mode? info local-cfg]
+  [entry cfg put-fn edit-mode? info local-cfg always-show-map?]
   (let [ts (:timestamp entry)
         show-map? (contains? (:show-maps-for cfg) ts)
         toggle-edit #(if edit-mode? (put-fn [:entry/remove-local entry])
@@ -71,7 +71,8 @@
             (str " linked: " (count (:linked-entries-list entry)))]))]
       [a/entry-actions entry cfg put-fn edit-mode? toggle-edit local-cfg]]
      [hashtags-mentions-list entry cfg tab-group put-fn]
-     [l/leaflet-map entry (or show-map? (:show-all-maps cfg)) local-cfg]
+     [l/leaflet-map
+      entry (or show-map? (:show-all-maps cfg) always-show-map?) local-cfg]
      (if edit-mode?
        [e/editable-md-render entry hashtags mentions put-fn toggle-edit]
        [md/markdown-render entry cfg toggle-edit])
@@ -103,7 +104,7 @@
    content component used in edit mode also sends a modified entry to the store
    component, which is useful for displaying updated hashtags, or also for
    showing the warning that the entry is not saved yet."
-  [entry cfg new-entries put-fn entries-map local-cfg]
+  [entry cfg new-entries put-fn entries-map local-cfg always-show-map?]
   (let [ts (:timestamp entry)
         query-id (:query-id local-cfg)
         entry (or (get new-entries ts) entry)
@@ -125,7 +126,7 @@
         new-entries? (contains? new-entries ts)]
     [:div.entry-with-comments
      [journal-entry entry cfg put-fn new-entries?
-      (p/pomodoro-stats-view all-comments) local-cfg]
+      (p/pomodoro-stats-view all-comments) local-cfg always-show-map?]
      (when (seq all-comments)
        (if (= query-id show-comments-for?)
          [:div.comments
@@ -136,10 +137,11 @@
                 (str "hide " n " comment" (when (> n 1) "s"))])])
           (for [comment all-comments]
             ^{:key (str "c" (:timestamp comment))}
-            [journal-entry comment cfg put-fn
-             (contains? new-entries (:timestamp comment)) nil local-cfg])]
+            [journal-entry
+             comment cfg put-fn (contains? new-entries (:timestamp comment))
+             nil local-cfg always-show-map?])]
          [:div.show-comments
-          (let [n (count comments)]
+          (let [n (count all-comments)]
             [:span {:on-click toggle-comments}
              (str "show " n " comment" (when (> n 1) "s"))])]))
      (when (:thumbnails cfg) [t/thumbnails entry entries-map cfg put-fn])]))
