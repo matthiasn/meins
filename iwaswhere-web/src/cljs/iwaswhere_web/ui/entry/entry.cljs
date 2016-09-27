@@ -71,8 +71,6 @@
             (str " linked: " (count (:linked-entries-list entry)))]))]
       [a/entry-actions entry cfg put-fn edit-mode? toggle-edit local-cfg]]
      [hashtags-mentions-list entry cfg tab-group put-fn]
-     [l/leaflet-map
-      entry (or show-map? (:show-all-maps cfg) always-show-map?) local-cfg]
      (if edit-mode?
        [e/editable-md-render entry hashtags mentions put-fn toggle-edit]
        [md/markdown-render entry cfg toggle-edit])
@@ -82,6 +80,8 @@
      (when show-pvt?
        [c/consumption-div entry cfg put-fn edit-mode?])
      [m/audioplayer-view entry]
+     [l/leaflet-map
+      entry (or show-map? (:show-all-maps cfg) always-show-map?) local-cfg]
      [m/image-view entry]
      [m/videoplayer-view entry]
      (when-let [measurements (:measurements entry)]

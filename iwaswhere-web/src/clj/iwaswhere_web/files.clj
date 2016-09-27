@@ -49,7 +49,8 @@
                                (select-keys msg-payload [:longitude
                                                          :latitude
                                                          :horizontal-accuracy
-                                                         :gps-timestamp])))
+                                                         :gps-timestamp
+                                                         :linked-entries])))
                       msg-payload)]
     (when-not (= existing node-to-add)
       (append-daily-log node-to-add))
