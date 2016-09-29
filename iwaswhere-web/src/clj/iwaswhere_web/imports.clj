@@ -245,11 +245,12 @@
                    entry
                    (-> (cc/parse-string line #(keyword (s/replace % "_" "-")))
                        (m/add-tags-mentions)
-                       (update-in [:tags] conj "#import")
                        (update-audio-tag)
                        (update-in [:timestamp] u/double-ts-to-long)
-                       (update-in [:linked-timestamp] u/double-ts-to-long)
-                       set-linked)]
+                       (update-in [:linked-timestamp] u/double-ts-to-long))
+                   entry (if (:linked-timestamp entry)
+                           (set-linked entry)
+                           (update-in entry [:tags] conj "#import"))]
                (put-fn (with-meta [:entry/import entry] msg-meta))))))
        (catch Exception ex (log/error (str "Error while importing "
                                            filename) ex))))

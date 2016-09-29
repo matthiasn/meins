@@ -113,11 +113,16 @@
             create-linked-entry (h/new-entry-fn put-fn {:linked-entries [ts]} nil)
             new-pomodoro (h/new-entry-fn
                            put-fn (p/pomodoro-defaults ts) show-comments)
-            add-activity #(put-fn [:entry/update-local
-                                   (assoc-in entry [:activity]
-                                             {:name           ""
-                                              :duration-m     0
-                                              :exertion-level 5})])
+            add-activity
+            (fn [_ev]
+              (put-fn [:entry/update-local
+                       (-> entry
+                           (assoc-in [:activity]
+                                     {:name           ""
+                                      :duration-m     0
+                                      :exertion-level 5})
+                           (update-in [:tags] conj "#activity")
+                           (update-in [:md] #(str % " #activity ")))]))
             add-consumption
             (fn [_ev]
               (put-fn [:entry/update-local
