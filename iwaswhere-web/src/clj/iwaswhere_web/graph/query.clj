@@ -43,12 +43,18 @@
           mentions (set (map s/lower-case
                              (set/union entry-mentions entry-comments-mentions)))
 
+          story-match? (if-let [story (:story q)]
+                         (or (= story (:linked-story entry))
+                             (= story (:timestamp entry)))
+                         true)
+
           match? (and (set/subset? q-tags tags)
                       (empty? (set/intersection q-not-tags tags))
                       (or (empty? q-mentions)
                           (seq (set/intersection q-mentions mentions)))
                       (or day-match? (empty? q-day))
-                      (or q-ts-match? (empty? q-timestamp)))]
+                      (or q-ts-match? (empty? q-timestamp))
+                      story-match?)]
       match?)))
 
 (defn compare-w-upvotes
@@ -113,9 +119,9 @@
    for node by mapping over the sorted set and extracting attributes for each
    node.
    Warns when node not in graph. (debugging, should never happen)"
-  [current-state query]
+  [state query]
   (let [sort-by-upvotes? (:sort-by-upvotes query)
-        g (:graph current-state)
+        g (:graph state)
         mapper-fn (fn [n]
                     (if (uc/has-node? g n)
                       (-> (uc/attrs g n)
@@ -124,20 +130,21 @@
                       (log/warn "extract-sorted-entries can't find node: " n)))
         sort-fn #(into (sorted-set-by (if (:sort-asc query) < >)) %)
         matched-ids (cond
-                          ; set with timestamps matching tags and mentions
-                          (or (seq (:tags query)) (seq (:mentions query)))
-                          (sort-fn (get-tags-mentions-matches g query))
-                          ; full-text search
-                          (:ft-search query)
-                          (sort-fn (ft/search query))
-                          ; set with the one timestamp in query
-                          (:timestamp query) #{(Long/parseLong
-                                                 (:timestamp query))}
-                          ; set with timestamps matching the day
-                          (:date-string query) (sort-fn
-                                                 (get-nodes-for-day g query))
-                          ; set with all timestamps (leads to full scan)
-                          :else (:sorted-entries current-state))
+                      ; set with timestamps matching tags and mentions
+                      (or (seq (:tags query)) (seq (:mentions query)))
+                      (sort-fn (get-tags-mentions-matches g query))
+                      ; full-text search
+                      (:ft-search query)
+                      (sort-fn (ft/search query))
+                      ; set with the one timestamp in query
+                      (:timestamp query) #{(Long/parseLong (:timestamp query))}
+                      ; set with timestamps matching the day
+                      (:date-string query) (sort-fn (get-nodes-for-day g query))
+                      ; query is for specific story
+                      (:story query)
+                      (get-in state [:sorted-story-entries (:story query)])
+                      ; set with all timestamps (leads to full scan at worst)
+                      :else (:sorted-entries state))
         matched-entries (map mapper-fn matched-ids)
         parent-ids (filter identity (map :comment-for matched-entries))
         parents (map mapper-fn parent-ids)
@@ -196,6 +203,15 @@
                        (uc/find-edges g {:src :mentions}))
         mentions (map #(:val (uc/attrs g {:mention %})) lmentions)]
     (set mentions)))
+
+(defn find-all-stories
+  "Finds all stories in graph and returns map with the id of the story
+   (creation timestamp) as key and the story node itself as value."
+  [current-state]
+  (let [g (:graph current-state)
+        story-ids (map #(-> % :dest) (uc/find-edges g {:src :stories}))
+        stories (into {} (map (fn [id] [id (uc/attrs g id)]) story-ids))]
+    stories))
 
 (defn find-all-activities
   "Finds all activities used in entries by finding the edges that originate from

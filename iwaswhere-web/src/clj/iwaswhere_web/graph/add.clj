@@ -185,12 +185,32 @@
       (do (log/warn "remove-node cannot find node: " ts)
           current-state))))
 
+(defn add-story
+  "When entry is a :story, adds node for story.
+   Does nothing when entry is not of type :story."
+  [graph entry]
+  (if (= (:entry-type entry) :story)
+    (-> graph
+        (uc/add-nodes :stories)
+        (uc/add-edges [:stories (:timestamp entry)]))
+    graph))
+
+(defn add-story-set
+  "When entry is linked to a story, add that entry timestamp to the set with
+   the entry ids on that timeline."
+  [current-state entry]
+  (if-let [linked-story (:linked-story entry)]
+    (let [ts (:timestamp entry)
+          path [:sorted-story-entries linked-story]
+          entries-set (into (sorted-set) (get-in current-state path))]
+      (assoc-in current-state path (conj entries-set ts)))
+    current-state))
+
 (defn add-node
   "Adds node to both graph and the sorted set, which maintains the entries
    sorted by timestamp."
   [current-state ts entry]
   (let [graph (:graph current-state)
-        cfg (:cfg current-state)
         old-entry (when (uc/has-node? graph ts) (uc/attrs graph ts))
         merged (merge old-entry entry)
         old-tags (:tags old-entry)
@@ -199,7 +219,6 @@
                            (let [reducing-fn
                                  (fn [g ltag] (uc/remove-edges g [ts {k ltag}]))]
                              (reduce reducing-fn g (map s/lower-case tags))))
-
         media-tags (set (filter identity [(when (:img-file entry) "#photo")
                                           (when (:audio-file entry) "#audio")
                                           (when (:video entry) "#video")]))
@@ -219,4 +238,6 @@
         (update-in [:graph] add-consumption new-entry)
         (update-in [:graph] add-linked-visit new-entry)
         (update-in [:graph] add-parent-ref new-entry)
+        (update-in [:graph] add-story new-entry)
+        (add-story-set new-entry)
         (update-in [:sorted-entries] conj ts))))

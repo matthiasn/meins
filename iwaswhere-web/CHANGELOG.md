@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [0.1.18] - 2016-09-30
+### Changed
+- stories
+
 ## [0.1.17] - 2016-09-27
 ### Changed
 - latest deps

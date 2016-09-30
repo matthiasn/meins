@@ -11,7 +11,20 @@
   }
 }
 
+.search-row {
+  display: flex;
+}
+
 .search-field {
+  display: flex;
+  flex-grow: 2;
+  margin: 2px 5px 2px 0;
+  padding: 4px;
+  height: 2em;
+  background-color: $search-field-color;
+}
+
+.linked-search-field {
   display: flex;
   flex: 0 0 auto;
   margin: 2px 0;

@@ -165,6 +165,7 @@
    :pvt-hashtags      (gq/find-all-pvt-hashtags current-state)
    :pvt-displayed     (:pvt-displayed (:cfg current-state))
    :mentions          (gq/find-all-mentions current-state)
+   :stories           (gq/find-all-stories current-state)
    :activities        (gq/find-all-activities current-state)
    :consumption-types (gq/find-all-consumption-types current-state)})
 

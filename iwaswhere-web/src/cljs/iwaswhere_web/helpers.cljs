@@ -19,9 +19,8 @@
 (defn new-entry-fn
   "Create a new, empty entry. The opts map is merged last with the generated
    entry, thus keys can be overwritten here.
-  Caveat: the timezone detection currently only works in Chrome. My Firefox 46.0.1 strictly refused
-  to tell me a timezone when calling 'Intl.DateTimeFormat().resolvedOptions()', which would be
-  according to standards but unfortunately the timeZone is always undefined."
+   Caveat: the timezone detection currently only works in Chrome. TODO: check
+   "
   [put-fn opts run-fn]
   (fn [_ev]
     (let [ts (st/now)

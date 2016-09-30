@@ -53,36 +53,23 @@
 
 (defn new-link
   "Renders input for adding link entry."
-  [entry put-fn cfg create-linked-entry]
+  [entry put-fn create-linked-entry]
   (let [local (r/atom {:visible false})
         toggle-visible #(swap! local update-in [:visible] not)
-        keydown-fn
-        (fn [ev]
-          (when (= (.-keyCode ev) 13)
-            (let [link (re-find #"[0-9]{13}" (.-value (.-target ev)))
-                  linked-entries (conj (:linked-entries entry) (long link))
-                  new-entry (h/clean-entry
-                              (merge entry {:linked-entries linked-entries}))]
-              (when link
-                (put-fn [:entry/update new-entry])
-                (swap! local update-in [:visible] not)))))
-
         on-drag-start (fn [ev]
                         (let [dt (.-dataTransfer ev)]
                           (put-fn [:cmd/set-dragged entry])
                           (aset dt "effectAllowed" "move")
                           (aset dt "dropEffect" "link")))]
-    (fn [entry put-fn cfg create-linked-entry]
+    (fn [entry put-fn create-linked-entry]
       [:span.new-link-btn
        [:span.fa.fa-link.toggle {:on-click      toggle-visible
                                  :draggable     true
                                  :on-drag-start on-drag-start}]
        (when (:visible @local)
          [:span.new-link
-          [:span.fa.fa-plus-square
-           {:on-click #(do (create-linked-entry) (toggle-visible))}]
-          [:input {:on-click    #(.stopPropagation %)
-                   :on-key-down keydown-fn}]])])))
+          {:on-click #(do (create-linked-entry) (toggle-visible))}
+          [:span.fa.fa-plus-square] "add linked"])])))
 
 (defn upvote-fn [entry op put-fn]
   "Create click function for like. Can handle both upvotes and downvotes."
@@ -158,5 +145,5 @@
          (when-not (:comment-for entry)
            [:span.fa.fa-external-link.toggle {:on-click open-external}])
          (when-not (:comment-for entry)
-           [new-link entry put-fn cfg create-linked-entry])
+           [new-link entry put-fn create-linked-entry])
          [trash-icon trash-entry]]))))

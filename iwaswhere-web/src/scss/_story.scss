@@ -1,0 +1,19 @@
+@import "variables.scss";
+
+.story-edit-field {
+  display: flex;
+  flex-grow: 1;
+  padding: 4px;
+  height: 2em;
+  background-color: $search-field-color;
+}
+
+.story {
+  background: white;
+  display: flex;
+
+  label {
+    font-weight: bold;
+    padding: 4px 0;
+  }
+}

@@ -7,6 +7,7 @@
             [iwaswhere-web.utils.parse :as up]
             [iwaswhere-web.ui.entry.actions :as a]
             [iwaswhere-web.ui.entry.capture :as c]
+            [iwaswhere-web.ui.entry.story :as es]
             [iwaswhere-web.ui.entry.thumbnails :as t]
             [cljsjs.moment]
             [iwaswhere-web.utils.misc :as u]
@@ -71,11 +72,14 @@
             (str " linked: " (count (:linked-entries-list entry)))]))]
       [a/entry-actions entry cfg put-fn edit-mode? toggle-edit local-cfg]]
      [hashtags-mentions-list entry cfg tab-group put-fn]
+     [es/story-name entry put-fn]
+     [es/story-select entry cfg put-fn edit-mode?]
      (if edit-mode?
        [e/editable-md-render entry hashtags mentions put-fn toggle-edit]
        (if (and (empty? (:md entry)) linked-desc)
          [md/markdown-render
-          (update-in linked-desc [:md] #(str % " **(from linked)**"))
+          (update-in linked-desc [:md]
+                     #(str % " <span class=\"fa fa-link\"></span>"))
           cfg #()]
          [md/markdown-render entry cfg toggle-edit]))
      [c/activity-div entry cfg put-fn edit-mode?]

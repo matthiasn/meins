@@ -51,7 +51,7 @@
       (let [current-query (query-id (:queries (:query-cfg snapshot)))
             update-search-fn (fn [search-str]
                                (put-fn [:search/update
-                                        (merge {:query-id query-id}
+                                        (merge (:local-query @state)
                                                (p/parse-search search-str))]))
             before-cursor (h/string-before-cursor (:search-text current-query))
             cfg (:cfg snapshot)
@@ -83,14 +83,29 @@
                     (tag-replace-fn curr-tag (first f-tags) ev))
                   (when (and curr-mention (seq f-mentions))
                     (tag-replace-fn curr-mention (first f-mentions) ev))
-                  (.preventDefault ev))))]
+                  (.preventDefault ev))))
+            story-select-handler
+            (fn [ev]
+              (let [v (-> ev .-nativeEvent .-target .-value)
+                    story (js/parseInt v)
+                    q (merge current-query
+                             {:story (when-not (js/isNaN story) story)})]
+                (put-fn [:search/update q])))]
         [:div.search
          [tags-view current-query]
-         [editable-field on-input-fn on-keydown-fn state
-          (if (:focused @state)
-            (:search-text (:local-query @state))
-            (:search-text current-query))
-          current-query]
+         [:div.search-row
+          [editable-field on-input-fn on-keydown-fn state
+           (if (:focused @state)
+             (:search-text (:local-query @state))
+             (:search-text current-query))
+           current-query]
+          [:select {:value     (:story current-query)
+                    :on-change story-select-handler}
+           [:option {:value ""} "no story selected"]
+           (for [[id story] (:stories options)]
+             (let [story-name (:story-name story)]
+               ^{:key (str query-id story-name)}
+               [:option {:value id} story-name]))]]
          (when (:focused @state)
            [u/suggestions
             "search" f-tags curr-tag tag-replace-fn "hashtag"])

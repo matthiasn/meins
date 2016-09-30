@@ -8,20 +8,12 @@
     position: absolute;
     z-index: 1002;
     margin-top: 1.5em;
-    margin-left: -150px;
+    margin-left: -80px;
+    cursor: pointer;
+    font-weight: bold;
 
     .fa-plus-square {
       margin: 5px 5px 0 0;
-    }
-
-    input {
-      visibility: visible;
-      text-align: center;
-      padding: 1px;
-      width: 120px;
-      font-family: $font-family;
-      font-weight: bold;
-      font-size: 0.5em;
     }
   }
 }

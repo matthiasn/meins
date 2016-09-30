@@ -33,7 +33,7 @@
           linked-entries (filter filter-fn linked-entries)]
       [:div.journal-entries
        (when (query-id (:active cfg))
-         [:div.search-field {:content-editable true :on-input on-input-fn}
+         [:div.linked-search-field {:content-editable true :on-input on-input-fn}
           (:search-text (query-id (:linked-filter cfg)))])
        (for [entry linked-entries]
          (when (and (not (:comment-for entry))
