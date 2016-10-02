@@ -78,7 +78,7 @@
             on-keydown-fn
             (fn [ev]
               (let [key-code (.. ev -keyCode)]
-                (when (= key-code 9)                        ; TAB key pressed
+                (when (= key-code 9) ; TAB key pressed
                   (when (and curr-tag (seq f-tags))
                     (tag-replace-fn curr-tag (first f-tags) ev))
                   (when (and curr-mention (seq f-mentions))

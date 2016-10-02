@@ -40,13 +40,14 @@
           (let [selected (js/parseInt (-> ev .-nativeEvent .-target .-value))]
             (put-fn [:entry/update-local
                      (assoc-in entry [:linked-story] selected)])))]
-    (when-not (or (= (:entry-type entry) :story) (:comment-for entry))
-      [:div.story
-       [:label "Story:"]
-       [:select {:value     (:linked-story entry)
-                 :on-change select-handler}
-        [:option {:value ""} "no story selected"]
-        (for [[id story] (:stories cfg)]
-          (let [story-name (:story-name story)]
-            ^{:key (str ts story-name)}
-            [:option {:value id} story-name]))]])))
+    (when edit-mode?
+      (when-not (or (= (:entry-type entry) :story) (:comment-for entry))
+        [:div.story
+         [:label "Story:"]
+         [:select {:value     (:linked-story entry)
+                   :on-change select-handler}
+          [:option {:value ""} "no story selected"]
+          (for [[id story] (:stories cfg)]
+            (let [story-name (:story-name story)]
+              ^{:key (str ts story-name)}
+              [:option {:value id} story-name]))]]))))
