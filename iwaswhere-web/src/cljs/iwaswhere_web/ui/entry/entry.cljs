@@ -51,6 +51,7 @@
     [:div.entry {:on-drop       (a/drop-linked-fn entry cfg put-fn)
                  :on-drag-over  h/prevent-default
                  :on-drag-enter h/prevent-default}
+     [es/story-select entry cfg put-fn edit-mode?]
      [:div.header
       [:div
        [:a [:time {:on-click (up/add-search q-date-string tab-group put-fn)}
@@ -73,7 +74,6 @@
       [a/entry-actions entry cfg put-fn edit-mode? toggle-edit local-cfg]]
      [hashtags-mentions-list entry cfg tab-group put-fn]
      [es/story-name entry put-fn]
-     [es/story-select entry cfg put-fn edit-mode?]
      (if edit-mode?
        [e/editable-md-render entry hashtags mentions put-fn toggle-edit]
        (if (and (empty? (:md entry)) linked-desc)

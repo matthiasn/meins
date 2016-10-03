@@ -36,6 +36,7 @@
           hashtags (:hashtags cfg)
           only-pvt-tags (set/difference private-tags hashtags)
           matched (set/intersection tags only-pvt-tags)]
+      (prn private-tags)
       (empty? matched))))
 
 (defn suggestions

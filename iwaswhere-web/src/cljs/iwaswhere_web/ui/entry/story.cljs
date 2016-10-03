@@ -35,19 +35,23 @@
   "In edit mode, allow editing of activities, otherwise show a summary."
   [entry cfg put-fn edit-mode?]
   (let [ts (:timestamp entry)
+        stories (:stories cfg)
+        linked-story (:linked-story entry)
         select-handler
         (fn [ev]
           (let [selected (js/parseInt (-> ev .-nativeEvent .-target .-value))]
             (put-fn [:entry/update-local
                      (assoc-in entry [:linked-story] selected)])))]
-    (when edit-mode?
+    (if edit-mode?
       (when-not (or (= (:entry-type entry) :story) (:comment-for entry))
         [:div.story
          [:label "Story:"]
-         [:select {:value     (:linked-story entry)
+         [:select {:value     linked-story
                    :on-change select-handler}
           [:option {:value ""} "no story selected"]
-          (for [[id story] (:stories cfg)]
+          (for [[id story] stories]
             (let [story-name (:story-name story)]
               ^{:key (str ts story-name)}
-              [:option {:value id} story-name]))]]))))
+              [:option {:value id} story-name]))]])
+      (when linked-story
+        [:div.story (:story-name (get stories linked-story))]))))

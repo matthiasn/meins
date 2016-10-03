@@ -9,8 +9,12 @@
 }
 
 .story {
-  background: white;
   display: flex;
+  justify-content: center;
+  align-items: center;
+
+  font-size: 0.6em;
+  color: #5d7186;
 
   label {
     font-weight: bold;
