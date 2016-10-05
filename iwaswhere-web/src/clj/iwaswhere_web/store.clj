@@ -51,7 +51,7 @@
                     (swap! state ga/add-node ts parsed))))))))
 
     (future
-      (Thread/sleep 10000)
+      (Thread/sleep 2000)
       (log/info "Indexing started")
       (let [t (with-out-str
                 (time (doseq [entry (vals @entries-to-index)]

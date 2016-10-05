@@ -130,9 +130,6 @@
                       (log/warn "extract-sorted-entries can't find node: " n)))
         sort-fn #(into (sorted-set-by (if (:sort-asc query) < >)) %)
         matched-ids (cond
-                      ; set with timestamps matching tags and mentions
-                      (or (seq (:tags query)) (seq (:mentions query)))
-                      (sort-fn (get-tags-mentions-matches g query))
                       ; full-text search
                       (:ft-search query)
                       (sort-fn (ft/search query))
@@ -143,6 +140,9 @@
                       ; query is for specific story
                       (:story query)
                       (get-in state [:sorted-story-entries (:story query)])
+                      ; set with timestamps matching tags and mentions
+                      (or (seq (:tags query)) (seq (:mentions query)))
+                      (sort-fn (get-tags-mentions-matches g query))
                       ; set with all timestamps (leads to full scan at worst)
                       :else (:sorted-entries state))
         matched-entries (map mapper-fn matched-ids)
