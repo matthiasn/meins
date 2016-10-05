@@ -124,16 +124,19 @@
                           (put-fn [:entry/trash entry]))
             open-external (up/add-search ts tab-group put-fn)
             upvotes (:upvotes entry)
-            show-pvt? (:show-pvt cfg)]
+            show-pvt? (:show-pvt cfg)
+            prev-saved? (:last-saved entry)]
         [:div {:on-mouse-enter #(reset! visible true)
                :on-drag-over   #(do (hide-fn nil) (reset! visible true))
                :on-mouse-leave hide-fn
                :style          {:opacity (if (or edit-mode? @visible) 1 0)}}
-         [:span.fa.toggle
-          {:on-click (upvote-fn entry inc put-fn)
-           :class    (if (pos? upvotes) "fa-thumbs-up" "fa-thumbs-o-up")}]
+         (when prev-saved?
+           [:span.fa.toggle
+            {:on-click (upvote-fn entry inc put-fn)
+             :class    (if (pos? upvotes) "fa-thumbs-up" "fa-thumbs-o-up")}])
          (when map? [:span.fa.fa-map-o.toggle {:on-click toggle-map}])
-         [edit-icon toggle-edit edit-mode? entry]
+         (when prev-saved?
+           [edit-icon toggle-edit edit-mode? entry])
          (when-not (:comment-for entry)
            [:span.fa.fa-clock-o.toggle {:on-click new-pomodoro}])
          (when-not (:activity entry)
@@ -142,7 +145,7 @@
            [:span.fa.fa-coffee.toggle {:on-click add-consumption}])
          (when-not (:comment-for entry)
            [:span.fa.fa-comment-o.toggle {:on-click create-comment}])
-         (when-not (:comment-for entry)
+         (when (and (not (:comment-for entry)) prev-saved?)
            [:span.fa.fa-external-link.toggle {:on-click open-external}])
          (when-not (:comment-for entry)
            [new-link entry put-fn create-linked-entry])
