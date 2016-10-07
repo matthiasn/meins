@@ -25,7 +25,7 @@
       [ct/tasks-chart task-stats 250 put-fn]
       [ds/daily-summaries-chart daily-summary-stats 200 put-fn]
       [ca/activity-weight-chart activity-stats 250 put-fn]
-      [wc/wordcount-chart wordcount-stats 150 put-fn]
+      [wc/wordcount-chart wordcount-stats 150 put-fn 1000]
       [m/media-chart media-stats 150 put-fn]]]))
 
 (defn stats-text
