@@ -38,40 +38,42 @@
 (defn entry-import-fn
   "Handler function for persisting an imported journal entry."
   [{:keys [current-state msg-payload]}]
-  (let [entry-ts (:timestamp msg-payload)
+  (let [entry (merge msg-payload {:last-saved (st/now)})
+        ts (:timestamp entry)
         graph (:graph current-state)
-        exists? (uber/has-node? graph entry-ts)
-        existing (when exists? (uber/attrs graph entry-ts))
+        exists? (uber/has-node? graph ts)
+        existing (when exists? (uber/attrs graph ts))
         node-to-add (if exists?
                       (if (= (:md existing) "No departure recorded #visit")
-                        msg-payload
+                        entry
                         (merge existing
                                (select-keys msg-payload [:longitude
                                                          :latitude
                                                          :horizontal-accuracy
                                                          :gps-timestamp
                                                          :linked-entries])))
-                      msg-payload)]
+                      entry)]
     (when-not (= existing node-to-add)
       (append-daily-log node-to-add))
-    {:new-state (ga/add-node current-state entry-ts node-to-add)
-     :emit-msg [:cmd/schedule-new
-                {:timeout 5000
-                 :message (with-meta [:search/refresh]
-                                     {:sente-uid :broadcast})}]}))
+    {:new-state (ga/add-node current-state ts node-to-add)
+     :emit-msg  [[:ft/add entry]
+                 [:cmd/schedule-new
+                  {:timeout 5000
+                   :message (with-meta [:search/refresh]
+                                       {:sente-uid :broadcast})}]]}))
 
 (defn geo-entry-persist-fn
   "Handler function for persisting journal entry."
   [{:keys [current-state msg-payload msg-meta]}]
   (let [ts (:timestamp msg-payload)
-        with-last-modified (merge msg-payload {:last-saved (st/now)})
-        new-state (ga/add-node current-state ts with-last-modified)]
-    (append-daily-log with-last-modified)
+        entry (merge msg-payload {:last-saved (st/now)})
+        new-state (ga/add-node current-state ts entry)]
+    (append-daily-log entry)
     {:new-state    new-state
      :send-to-self (when-let [comment-for (:comment-for msg-payload)]
                      (with-meta [:entry/find {:timestamp comment-for}] msg-meta))
-     :emit-msg     [[:entry/saved with-last-modified]
-                    [:ft/add with-last-modified]
+     :emit-msg     [[:entry/saved entry]
+                    [:ft/add entry]
                     [:cmd/schedule-new {:timeout 2000
                                         :message [:state/stats-tags-get]}]]}))
 
