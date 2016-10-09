@@ -36,6 +36,7 @@
   [entry cfg put-fn edit-mode?]
   (let [ts (:timestamp entry)
         stories (:stories cfg)
+        sorted-stories (:sorted-stories cfg)
         linked-story (:linked-story entry)
         select-handler
         (fn [ev]
@@ -49,7 +50,7 @@
          [:select {:value     linked-story
                    :on-change select-handler}
           [:option {:value ""} "no story selected"]
-          (for [[id story] stories]
+          (for [[id story] sorted-stories]
             (let [story-name (:story-name story)]
               ^{:key (str ts story-name)}
               [:option {:value id} story-name]))]])

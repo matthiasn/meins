@@ -23,7 +23,11 @@
 (defn stats-tags-fn
   "Update client side state with stats and tags received from backend."
   [{:keys [current-state msg-payload]}]
-  (let [new-state
+  (let [stories (:stories msg-payload)
+        sorted-stories (sort (fn [[_ x] [_ y]]
+                               (< (:story-name x) (:story-name y)))
+                             stories)
+        new-state
         (-> current-state
             (assoc-in [:options :hashtags] (:hashtags msg-payload))
             (assoc-in [:options :pvt-hashtags] (:pvt-hashtags msg-payload))
@@ -31,7 +35,8 @@
             (assoc-in [:options :activities] (:activities msg-payload))
             (assoc-in [:options :consumption-types] (:consumption-types msg-payload))
             (assoc-in [:options :custom-fields] (:custom-fields msg-payload))
-            (assoc-in [:options :stories] (:stories msg-payload))
+            (assoc-in [:options :stories] stories)
+            (assoc-in [:options :sorted-stories] sorted-stories)
             (assoc-in [:options :mentions] (:mentions msg-payload))
             (assoc-in [:stats] (:stats msg-payload)))]
     {:new-state new-state}))

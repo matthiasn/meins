@@ -8,10 +8,10 @@
             [clj-time.core :as time]
             [clj-time.format :as timef]
             [clojure.tools.logging :as log]
-            [iwaswhere-web.fulltext-search :as ft]
             [ubergraph.core :as uber]
             [matthiasn.systems-toolbox.component :as st]
             [me.raynes.fs :as fs]
+            [clojure.java.io :as io]
             [clojure.tools.logging :as l]))
 
 (def data-path (or (System/getenv "DATA_PATH")
@@ -20,6 +20,8 @@
                    "data"))
 (def daily-logs-path (str data-path "/daily-logs/"))
 (def trash-path (str data-path "/trash/"))
+(fs/mkdirs daily-logs-path)
+(fs/mkdirs trash-path)
 
 (defn filter-by-name
   "Filter a sequence of files by their name, matched via regular expression."

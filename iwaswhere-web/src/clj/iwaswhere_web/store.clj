@@ -15,6 +15,9 @@
             [clojure.pprint :as pp]
             [clojure.edn :as edn]))
 
+(def default-config {:pvt-tags      #{}
+                     :pvt-displayed #{"#pvt" "#private" "#nsfw" "#consumption"}})
+
 (defn state-fn
   "Initial state function, creates state atom and then parses all files in
    data directory into the component state.
@@ -22,9 +25,9 @@
    timestamp of an entry. A sort order by descending timestamp is maintained
    in a sorted set of the nodes."
   [put-fn]
-  (fs/mkdirs f/daily-logs-path)
   (let [conf-filepath (str f/data-path "/conf.edn")
-        conf (edn/read-string (slurp conf-filepath))
+        conf (try (edn/read-string (slurp conf-filepath))
+                  (catch Exception ex default-config))
         entries-to-index (atom {})
         state (atom {:sorted-entries (sorted-set-by >)
                      :graph          (uber/graph)

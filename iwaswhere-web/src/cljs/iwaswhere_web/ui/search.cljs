@@ -102,7 +102,7 @@
           [:select {:value     (:story current-query)
                     :on-change story-select-handler}
            [:option {:value ""} "no story selected"]
-           (for [[id story] (:stories options)]
+           (for [[id story] (:sorted-stories options)]
              (let [story-name (:story-name story)]
                ^{:key (str query-id story-name)}
                [:option {:value id} story-name]))]]
