@@ -1,2 +1,14 @@
-{:pvt-tags #{}
- :pvt-displayed #{"#pvt" "#private" "#nsfw" "#consumption"}}
+{:pvt-tags      #{}
+ :pvt-displayed #{"#pvt" "#private" "#nsfw" "#consumption"}
+ :custom-fields {"#sit-ups"  {:fields {:cnt     {:type  :number
+                                                 :label "Completed:"}
+                                       :comment {:type  :text
+                                                 :label "Comment:"}}}
+                 "#pull-ups" {:fields {:cnt {:type  :number
+                                             :label "Completed:"}}}
+                 "#push-ups" {:fields {:cnt {:type  :number
+                                             :label "Completed:"}}}
+                 "#squats"   {:fields {:cnt {:type  :number
+                                             :label "Completed:"}}}
+                 "#lunges"   {:fields {:cnt {:type  :number
+                                             :label "Completed:"}}}}}

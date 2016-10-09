@@ -30,6 +30,7 @@
             (assoc-in [:options :pvt-displayed] (:pvt-displayed msg-payload))
             (assoc-in [:options :activities] (:activities msg-payload))
             (assoc-in [:options :consumption-types] (:consumption-types msg-payload))
+            (assoc-in [:options :custom-fields] (:custom-fields msg-payload))
             (assoc-in [:options :stories] (:stories msg-payload))
             (assoc-in [:options :mentions] (:mentions msg-payload))
             (assoc-in [:stats] (:stats msg-payload)))]

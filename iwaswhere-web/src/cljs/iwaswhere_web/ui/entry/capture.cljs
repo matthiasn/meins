@@ -111,3 +111,32 @@
         [:div "Consumption: "
          [:strong (:name consumption)] ", quantity "
          [:strong (:quantity consumption)]]))))
+
+(defn custom-fields-div
+  "In edit mode, allow editing of custom fields, otherwise show a summary."
+  [entry cfg put-fn edit-mode?]
+  (when-let [custom-fields (:custom-fields cfg)]
+    (let [ts (:timestamp entry)
+          entry-fields (select-keys custom-fields (:tags entry))]
+      [:form.custom-fields
+       (for [[tag conf] entry-fields]
+         ^{:key (str "cf" ts tag)}
+         [:fieldset
+          [:legend tag]
+          (for [[k field-cfg] (:fields conf)]
+            (let [field-type (:type field-cfg)
+                  on-change-fn
+                  (fn [ev]
+                    (let [value (.. ev -target -value)
+                          parsed (if (= :number field-type)
+                                   (js/parseInt value)
+                                   value)
+                          updated (assoc-in entry [:custom-fields tag k] parsed)]
+                      (put-fn [:entry/update-local updated])))]
+              ^{:key (str "cf" ts tag k)}
+              [:span
+               [:label (:label field-cfg)]
+               [:input {:type      field-type
+                        :read-only (not edit-mode?)
+                        :on-change on-change-fn
+                        :value (get-in entry [:custom-fields tag k])}]]))])])))

@@ -87,6 +87,7 @@
      [c/girth-div entry put-fn edit-mode?]
      (when show-pvt?
        [c/consumption-div entry cfg put-fn edit-mode?])
+     [c/custom-fields-div entry cfg put-fn edit-mode?]
      [m/audioplayer-view entry]
      [l/leaflet-map
       entry (or show-map? (:show-all-maps cfg) always-show-map?) local-cfg]

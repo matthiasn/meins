@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [0.1.19] - 2016-10-09
+### Changed
+- capturing custom fields
+
 ## [0.1.18] - 2016-09-30
 ### Changed
 - stories
@@ -72,6 +76,11 @@ All notable changes to this project will be documented in this file. This change
 ### Changed
 - query improvements
 
+[0.1.19]: https://github.com/matthiasn/iWasWhere/compare/v0.1.18...v0.1.19
+[0.1.18]: https://github.com/matthiasn/iWasWhere/compare/v0.1.17...v0.1.18
+[0.1.17]: https://github.com/matthiasn/iWasWhere/compare/v0.1.16...v0.1.17
+[0.1.16]: https://github.com/matthiasn/iWasWhere/compare/v0.1.15...v0.1.16
+[0.1.15]: https://github.com/matthiasn/iWasWhere/compare/v0.1.14...v0.1.15
 [0.1.14]: https://github.com/matthiasn/iWasWhere/compare/v0.1.12...v0.1.14
 [0.1.12]: https://github.com/matthiasn/iWasWhere/compare/v0.1.11...v0.1.12
 [0.1.11]: https://github.com/matthiasn/iWasWhere/compare/v0.1.10...v0.1.11
