@@ -71,22 +71,6 @@
          [:strong (:quality-level sleep)] "/10. "
          [:strong (:interruptions sleep)] " interruptions."]))))
 
-(defn consumption-div
-  "In edit mode, allow editing of consumption, otherwise show a summary."
-  [entry cfg put-fn edit-mode?]
-  (let [consumption-types (:consumption-types cfg)
-        quantities (range 0 10)]
-    (when-let [consumption (:consumption entry)]
-      (if edit-mode?
-        [:div
-         [:label "Consumption:"]
-         [select-elem entry consumption-types [:consumption :name] false put-fn]
-         [:label "Quantity:"]
-         [select-elem entry quantities [:consumption :quantity] true put-fn]]
-        [:div "Consumption: "
-         [:strong (:name consumption)] ", quantity "
-         [:strong (:quantity consumption)]]))))
-
 (defn custom-fields-div
   "In edit mode, allow editing of custom fields, otherwise show a summary."
   [entry cfg put-fn edit-mode?]

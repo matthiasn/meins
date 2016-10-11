@@ -110,21 +110,11 @@
                                       :exertion-level 5})
                            (update-in [:tags] conj "#activity")
                            (update-in [:md] #(str % " #activity ")))]))
-            add-consumption
-            (fn [_ev]
-              (put-fn [:entry/update-local
-                       (-> entry
-                           (assoc-in [:consumption]
-                                     {:name     ""
-                                      :quantity 0})
-                           (update-in [:tags] conj "#consumption")
-                           (update-in [:md] #(str % " #consumption ")))]))
             trash-entry #(if edit-mode?
                           (put-fn [:entry/remove-local {:timestamp ts}])
                           (put-fn [:entry/trash entry]))
             open-external (up/add-search ts tab-group put-fn)
             upvotes (:upvotes entry)
-            show-pvt? (:show-pvt cfg)
             prev-saved? (:last-saved entry)]
         [:div {:on-mouse-enter #(reset! visible true)
                :on-drag-over   #(do (hide-fn nil) (reset! visible true))
@@ -141,8 +131,6 @@
            [:span.fa.fa-clock-o.toggle {:on-click new-pomodoro}])
          (when-not (:activity entry)
            [:span.fa.fa-bicycle.toggle {:on-click add-activity}])
-         (when (and show-pvt? (not (:consumption entry)))
-           [:span.fa.fa-coffee.toggle {:on-click add-consumption}])
          (when-not (:comment-for entry)
            [:span.fa.fa-comment-o.toggle {:on-click create-comment}])
          (when (and (not (:comment-for entry)) prev-saved?)
