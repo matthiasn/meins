@@ -39,38 +39,6 @@
          [:strong (:name activity)] " for " [:strong (:duration-m activity)]
          " min, level " [:strong (:exertion-level activity)] "/10."]))))
 
-(defn sleep-div
-  "In edit mode, allow editing of sleep data, otherwise show a summary."
-  [entry put-fn edit-mode?]
-  (let [quality-levels [1 2 3 4 5 6 7 8 9 10]
-        interruptions [0 1 2 3 4 5 6 7 8 9 10]
-        duration-m (range 0 60 5)
-        duration-h (range 0 14)]
-    (when (and edit-mode?
-               (contains? (:tags entry) "#sleep")
-               (not (:sleep entry)))
-      (put-fn [:entry/update-local
-               (assoc-in entry [:sleep]
-                         {:duration-h    0
-                          :duration-m    0
-                          :quality-level 5
-                          :interruptions 0})]))
-    (when-let [sleep (:sleep entry)]
-      (if edit-mode?
-        [:div
-         [:label "Sleep Hours:"]
-         [select-elem entry duration-h [:sleep :duration-h] true put-fn]
-         [:label "Minutes:"]
-         [select-elem entry duration-m [:sleep :duration-m] true put-fn]
-         [:label "Quality:"]
-         [select-elem entry quality-levels [:sleep :quality-level] true put-fn]
-         [:label "Interruptions:"]
-         [select-elem entry interruptions [:sleep :interruptions] true put-fn]]
-        [:div "Sleep: " [:strong (:duration-h sleep)] " h "
-         [:strong (:duration-m sleep)] " m, quality "
-         [:strong (:quality-level sleep)] "/10. "
-         [:strong (:interruptions sleep)] " interruptions."]))))
-
 (defn custom-fields-div
   "In edit mode, allow editing of custom fields, otherwise show a summary."
   [entry cfg put-fn edit-mode?]

@@ -83,7 +83,6 @@
           cfg #()]
          [md/markdown-render entry cfg toggle-edit]))
      [c/activity-div entry cfg put-fn edit-mode?]
-     [c/sleep-div entry put-fn edit-mode?]
      [c/custom-fields-div entry cfg put-fn edit-mode?]
      [m/audioplayer-view entry]
      [l/leaflet-map
