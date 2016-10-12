@@ -21,7 +21,8 @@
        [:option {:value opt} opt])]))
 
 (defn activity-div
-  "In edit mode, allow editing of activities, otherwise show a summary."
+  "DEPRECATED: use custom fields instead
+   In edit mode, allow editing of activities, otherwise show a summary."
   [entry cfg put-fn edit-mode?]
   (let [activities (:activities cfg)
         ex-levels [1 2 3 4 5 6 7 8 9 10]

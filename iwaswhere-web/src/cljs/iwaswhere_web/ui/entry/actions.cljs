@@ -100,16 +100,6 @@
             create-linked-entry (h/new-entry-fn put-fn {:linked-entries [ts]} nil)
             new-pomodoro (h/new-entry-fn
                            put-fn (p/pomodoro-defaults ts) show-comments)
-            add-activity
-            (fn [_ev]
-              (put-fn [:entry/update-local
-                       (-> entry
-                           (assoc-in [:activity]
-                                     {:name           ""
-                                      :duration-m     0
-                                      :exertion-level 5})
-                           (update-in [:tags] conj "#activity")
-                           (update-in [:md] #(str % " #activity ")))]))
             trash-entry #(if edit-mode?
                           (put-fn [:entry/remove-local {:timestamp ts}])
                           (put-fn [:entry/trash entry]))
@@ -129,8 +119,6 @@
            [edit-icon toggle-edit edit-mode? entry])
          (when-not (:comment-for entry)
            [:span.fa.fa-clock-o.toggle {:on-click new-pomodoro}])
-         (when-not (:activity entry)
-           [:span.fa.fa-bicycle.toggle {:on-click add-activity}])
          (when-not (:comment-for entry)
            [:span.fa.fa-comment-o.toggle {:on-click create-comment}])
          (when (and (not (:comment-for entry)) prev-saved?)

@@ -22,7 +22,7 @@
                  [camel-snake-kebab "0.4.0"]
                  [matthiasn/systems-toolbox "0.6.1-alpha7"]
                  [matthiasn/systems-toolbox-ui "0.6.1-alpha9"]
-                 [matthiasn/systems-toolbox-sente "0.6.1-alpha8"]
+                 [matthiasn/systems-toolbox-sente "0.6.1-alpha9"]
                  [matthiasn/inspect-probe "0.6.1-alpha1"]
                  [clucy "0.4.0"]
                  [seesaw "1.4.5"]
@@ -48,7 +48,7 @@
   :plugins [[lein-cljsbuild "1.1.4"
              :exclusions [org.apache.commons/commons-compress]]
             [lein-figwheel "0.5.7"]
-            [lein-sassy "1.0.7"
+            [lein-sassy "1.0.8"
              :exclusions [org.clojure/clojure org.codehaus.plexus/plexus-utils]]
             [com.jakemccrary/lein-test-refresh "0.17.0"]
             [test2junit "1.2.2"]
