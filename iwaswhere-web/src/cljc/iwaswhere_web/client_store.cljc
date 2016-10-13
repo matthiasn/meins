@@ -32,7 +32,6 @@
             (assoc-in [:options :hashtags] (:hashtags msg-payload))
             (assoc-in [:options :pvt-hashtags] (:pvt-hashtags msg-payload))
             (assoc-in [:options :pvt-displayed] (:pvt-displayed msg-payload))
-            (assoc-in [:options :activities] (:activities msg-payload))
             (assoc-in [:options :consumption-types] (:consumption-types msg-payload))
             (assoc-in [:options :custom-fields] (:custom-fields msg-payload))
             (assoc-in [:options :stories] stories)
@@ -69,6 +68,7 @@
             :stats/tasks :task-stats
             :stats/wordcount :wordcount-stats
             :stats/daily-summaries :daily-summary-stats
+            :stats/custom-fields :custom-field-stats
             :stats/media :media-stats
             nil)
         day-stats (into (sorted-map) (:stats msg-payload))]

@@ -6,7 +6,8 @@
             [clj-time.core :as t]
             [iwaswhere-web.ui.markdown :as md]
             [clj-time.format :as ctf]
-            [matthiasn.systems-toolbox.log :as l]))
+            [matthiasn.systems-toolbox.log :as l]
+            [clojure.tools.logging :as log]))
 
 (defn pomodoro-mapper
   "Create mapper function for pomodoro stats"
@@ -126,6 +127,44 @@
                       (get-in current-state [:stats :daily-summaries day]))]
       [day (merge day-stats {:date-string day})])))
 
+(defn custom-fields-mapper
+  "Creates mapper function for custom field stats. Takes current state. Returns
+   function that takes date string, such as '2016-10-10', and returns map with
+   results for the defined custom fields, plus the date string. Performs
+   operation specified for field, such as sum, min, max."
+  [current-state]
+  (fn [d]
+    (let [g (:graph current-state)
+          custom-fields (:custom-fields (:cfg current-state))
+          custom-field-stats-def (into {} (map (fn [[k v]] [k (:fields v)])
+                                               custom-fields))
+          date-string (:date-string d)
+          day-nodes (gq/get-nodes-for-day g {:date-string date-string})
+          day-nodes-attrs (map #(uber/attrs g %) day-nodes)
+          nodes (filter :custom-fields day-nodes-attrs)
+
+          stats-mapper
+          (fn [[k fields]]
+            (let [sum-mapper
+                  (fn [[field v]]
+                    (let [path [:custom-fields k field]
+                          val-mapper #(get-in % path)
+                          op (case (:agg v)
+                               :min #(when (seq %) (apply min %))
+                               :max #(when (seq %) (apply max %))
+                               :mean #(when (seq %)
+                                       (/ (apply + %) (count %)))
+                               :none nil
+                               #(apply + %))
+                          res (mapv val-mapper nodes)]
+                      [field (when op
+                               (try (op (filter identity res))
+                                    (catch Exception e (log/error e res))))]))]
+              [k (into {} (mapv sum-mapper fields))]))
+          day-stats (into {:date-string date-string}
+                          (mapv stats-mapper custom-field-stats-def))]
+      [date-string day-stats])))
+
 (defn get-stats-fn
   "Retrieves stats of specified type. Picks the appropriate mapper function
    for the requested message type."
@@ -134,6 +173,7 @@
         stats-mapper (case stats-type
                        :stats/pomodoro pomodoro-mapper
                        :stats/activity activities-mapper
+                       :stats/custom-fields custom-fields-mapper
                        :stats/tasks tasks-mapper
                        :stats/wordcount wordcount-mapper
                        :stats/media media-mapper
@@ -167,7 +207,6 @@
    :mentions          (gq/find-all-mentions current-state)
    :stories           (gq/find-all-stories current-state)
    :custom-fields     (:custom-fields (:cfg current-state))
-   :activities        (gq/find-all-activities current-state)
    :consumption-types (gq/find-all-consumption-types current-state)})
 
 (defn stats-tags-fn

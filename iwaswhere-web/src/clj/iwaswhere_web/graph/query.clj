@@ -213,14 +213,6 @@
         stories (into {} (map (fn [id] [id (uc/attrs g id)]) story-ids))]
     stories))
 
-(defn find-all-activities
-  "Finds all activities used in entries by finding the edges that originate from
-   the :activities node."
-  [current-state]
-  (let [g (:graph current-state)]
-    (set (map #(-> % :dest :name)
-              (uc/find-edges g {:src :activities})))))
-
 (defn find-all-consumption-types
   "Finds all consumption types used in entries by finding the edges that
    originate from the :consumption-types node."

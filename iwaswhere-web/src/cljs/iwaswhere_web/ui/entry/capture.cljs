@@ -20,26 +20,6 @@
        ^{:key (str ts opt)}
        [:option {:value opt} opt])]))
 
-(defn activity-div
-  "DEPRECATED: use custom fields instead
-   In edit mode, allow editing of activities, otherwise show a summary."
-  [entry cfg put-fn edit-mode?]
-  (let [activities (:activities cfg)
-        ex-levels [1 2 3 4 5 6 7 8 9 10]
-        durations (range 0 185 5)]
-    (when-let [activity (:activity entry)]
-      (if edit-mode?
-        [:div
-         [:label "Activity:"]
-         [select-elem entry activities [:activity :name] false put-fn]
-         [:label "Duration:"]
-         [select-elem entry durations [:activity :duration-m] true put-fn]
-         [:label "Level:"]
-         [select-elem entry ex-levels [:activity :exertion-level] true put-fn]]
-        [:div "Physical activity: "
-         [:strong (:name activity)] " for " [:strong (:duration-m activity)]
-         " min, level " [:strong (:exertion-level activity)] "/10."]))))
-
 (defn custom-fields-div
   "In edit mode, allow editing of custom fields, otherwise show a summary."
   [entry cfg put-fn edit-mode?]

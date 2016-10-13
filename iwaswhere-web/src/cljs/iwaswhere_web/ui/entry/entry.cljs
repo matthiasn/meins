@@ -82,7 +82,6 @@
                      #(str % " <span class=\"fa fa-link\"></span>"))
           cfg #()]
          [md/markdown-render entry cfg toggle-edit]))
-     [c/activity-div entry cfg put-fn edit-mode?]
      [c/custom-fields-div entry cfg put-fn edit-mode?]
      [m/audioplayer-view entry]
      [l/leaflet-map

@@ -27,7 +27,7 @@
   [put-fn]
   (let [conf-filepath (str f/data-path "/conf.edn")
         conf (try (edn/read-string (slurp conf-filepath))
-                  (catch Exception ex default-config))
+                  (catch Exception ex (log/error ex) default-config))
         entries-to-index (atom {})
         state (atom {:sorted-entries (sorted-set-by >)
                      :graph          (uber/graph)
