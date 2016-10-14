@@ -33,9 +33,7 @@
            [bars indexed local :total chart-h y-scale put-fn]
            [bars indexed local :completed chart-h y-scale put-fn]
            [cc/path "M 0 50 l 600 0 z"]
-           [cc/path "M 0 100 l 600 0 z"]
-           [cc/path "M 0 150 l 600 0 z"]
-           [cc/path "M 0 200 l 600 0 z"]]]
+           [cc/path "M 0 100 l 600 0 z"]]]
          (when (:mouse-over @local)
            [:div.mouse-over-info (cc/info-div-pos @local)
             [:div (:date-string (:mouse-over @local))]

@@ -2,6 +2,7 @@
   (:require [matthiasn.systems-toolbox-ui.reagent :as r]
             [iwaswhere-web.ui.charts.activity :as ca]
             [iwaswhere-web.ui.charts.tasks :as ct]
+            [iwaswhere-web.ui.charts.custom-fields :as cf]
             [iwaswhere-web.ui.charts.wordcount :as wc]
             [iwaswhere-web.ui.charts.pomodoros :as cp]
             [iwaswhere-web.ui.charts.media :as m]
@@ -18,11 +19,12 @@
   [{:keys [observed put-fn]}]
   (let [snapshot @observed
         {:keys [pomodoro-stats activity-stats task-stats wordcount-stats
-                daily-summary-stats media-stats]} snapshot]
+                daily-summary-stats media-stats custom-field-stats]} snapshot]
     [:div.stats
      [:div.charts
-      [cp/pomodoro-bar-chart pomodoro-stats 250 "Pomodoros" 10 put-fn]
+      [cp/pomodoro-bar-chart pomodoro-stats 150 "Pomodoros" 5 put-fn]
       [ct/tasks-chart task-stats 250 put-fn]
+      [cf/custom-fields-chart custom-field-stats 620 put-fn (:options snapshot)]
       [ds/daily-summaries-chart daily-summary-stats 200 put-fn]
       [ca/activity-weight-chart activity-stats 250 put-fn]
       [wc/wordcount-chart wordcount-stats 150 put-fn 1000]

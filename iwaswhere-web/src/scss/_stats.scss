@@ -80,6 +80,12 @@ $activity-weekend: lighten($activity, 30);
     .tasks-weekend {
       fill: $tasks-weekend;
     }
+    .failed {
+      fill: lighten($tasks, 30)
+    }
+    .failed-weekend {
+      fill: lighten($tasks-weekend, 10)
+    }
     .closed {
       fill: $closed;
     }

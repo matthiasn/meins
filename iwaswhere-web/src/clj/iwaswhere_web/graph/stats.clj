@@ -200,14 +200,15 @@
 (defn make-stats-tags
   "Generate stats and tags from current-state."
   [current-state]
-  {:stats             (get-basic-stats current-state)
-   :hashtags          (gq/find-all-hashtags current-state)
-   :pvt-hashtags      (gq/find-all-pvt-hashtags current-state)
-   :pvt-displayed     (:pvt-displayed (:cfg current-state))
-   :mentions          (gq/find-all-mentions current-state)
-   :stories           (gq/find-all-stories current-state)
-   :custom-fields     (:custom-fields (:cfg current-state))
-   :consumption-types (gq/find-all-consumption-types current-state)})
+  {:stats               (get-basic-stats current-state)
+   :hashtags            (gq/find-all-hashtags current-state)
+   :pvt-hashtags        (gq/find-all-pvt-hashtags current-state)
+   :pvt-displayed       (:pvt-displayed (:cfg current-state))
+   :mentions            (gq/find-all-mentions current-state)
+   :stories             (gq/find-all-stories current-state)
+   :custom-fields       (:custom-fields (:cfg current-state))
+   :custom-field-charts (:custom-field-charts (:cfg current-state))
+   :consumption-types   (gq/find-all-consumption-types current-state)})
 
 (defn stats-tags-fn
   "Generates stats and tags (they only change on insert anyway) and initiates

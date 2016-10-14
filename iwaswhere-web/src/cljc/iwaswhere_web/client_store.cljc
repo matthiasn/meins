@@ -34,6 +34,7 @@
             (assoc-in [:options :pvt-displayed] (:pvt-displayed msg-payload))
             (assoc-in [:options :consumption-types] (:consumption-types msg-payload))
             (assoc-in [:options :custom-fields] (:custom-fields msg-payload))
+            (assoc-in [:options :custom-field-charts] (:custom-field-charts msg-payload))
             (assoc-in [:options :stories] stories)
             (assoc-in [:options :sorted-stories] sorted-stories)
             (assoc-in [:options :mentions] (:mentions msg-payload))

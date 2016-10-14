@@ -1,4 +1,4 @@
-(defproject matthiasn/iwaswhere-web "0.1.20"
+(defproject matthiasn/iwaswhere-web "0.1.21"
   :description "Sample application built with systems-toolbox library"
   :url "https://github.com/matthiasn/systems-toolbox"
   :license {:name "GNU GENERAL PUBLIC LICENSE"
@@ -7,22 +7,22 @@
                  [org.clojure/clojurescript "1.9.229"]
                  [org.clojure/tools.logging "0.3.1"]
                  [org.clojure/tools.namespace "0.2.11"]
-                 [com.taoensso/encore "2.82.1"]
+                 [com.taoensso/encore "2.85.0"]
                  [ch.qos.logback/logback-classic "1.1.7"]
                  [hiccup "1.0.5"]
                  [clj-pid "0.1.2"]
                  [clj-time "0.12.0"]
                  [me.raynes/fs "1.4.6"]
-                 [markdown-clj "0.9.89"]
+                 [markdown-clj "0.9.90"]
                  [cheshire "5.6.3"]
                  [cljsjs/moment "2.10.6-4"]
-                 [cljsjs/leaflet "0.7.7-4"]
+                 [cljsjs/leaflet "0.7.7-5"]
                  [com.drewnoakes/metadata-extractor "2.9.1"]
                  [ubergraph "0.3.0"]
                  [camel-snake-kebab "0.4.0"]
                  [matthiasn/systems-toolbox "0.6.1-alpha7"]
-                 [matthiasn/systems-toolbox-ui "0.6.1-alpha9"]
-                 [matthiasn/systems-toolbox-sente "0.6.1-alpha9"]
+                 [matthiasn/systems-toolbox-ui "0.6.1-alpha10"]
+                 [matthiasn/systems-toolbox-sente "0.6.1-alpha10"]
                  [matthiasn/inspect-probe "0.6.1-alpha1"]
                  [clucy "0.4.0"]
                  [seesaw "1.4.5"]
@@ -47,13 +47,13 @@
 
   :plugins [[lein-cljsbuild "1.1.4"
              :exclusions [org.apache.commons/commons-compress]]
-            [lein-figwheel "0.5.7"]
+            [lein-figwheel "0.5.8"]
             [lein-sassy "1.0.8"
              :exclusions [org.clojure/clojure org.codehaus.plexus/plexus-utils]]
             [com.jakemccrary/lein-test-refresh "0.17.0"]
-            [test2junit "1.2.2"]
+            [test2junit "1.2.5"]
             [lein-doo "0.1.7"]
-            [lein-codox "0.10.0"]]
+            [lein-codox "0.10.1"]]
 
   :sass {:src "src/scss/"
          :dst "resources/public/css/"}
