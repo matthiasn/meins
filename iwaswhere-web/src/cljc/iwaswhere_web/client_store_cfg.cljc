@@ -53,8 +53,7 @@
   (let [{:keys [timestamp query-id]} msg-payload
         currently-active (get-in current-state [:cfg :active query-id])
         new-state (assoc-in current-state [:cfg :active query-id]
-                            (if (= currently-active timestamp)
-                              nil
+                            (when-not (= currently-active timestamp)
                               timestamp))]
     {:new-state new-state
      :send-to-self [:cfg/save]}))

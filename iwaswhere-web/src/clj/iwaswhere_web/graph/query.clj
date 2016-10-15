@@ -209,7 +209,7 @@
    (creation timestamp) as key and the story node itself as value."
   [current-state]
   (let [g (:graph current-state)
-        story-ids (map #(-> % :dest) (uc/find-edges g {:src :stories}))
+        story-ids (map :dest (uc/find-edges g {:src :stories}))
         stories (into {} (map (fn [id] [id (uc/attrs g id)]) story-ids))]
     stories))
 
