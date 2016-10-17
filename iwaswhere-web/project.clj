@@ -22,7 +22,7 @@
                  [camel-snake-kebab "0.4.0"]
                  [matthiasn/systems-toolbox "0.6.1-alpha8"]
                  [matthiasn/systems-toolbox-ui "0.6.1-alpha10"]
-                 [matthiasn/systems-toolbox-sente "0.6.1-alpha11"]
+                 [matthiasn/systems-toolbox-sente "0.6.1-alpha12"]
                  [matthiasn/inspect-probe "0.6.1-alpha1"]
                  [clucy "0.4.0"]
                  [seesaw "1.4.5"]

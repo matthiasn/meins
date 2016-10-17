@@ -100,7 +100,7 @@
         [:div
          [:svg
           {:viewBox (str "0 0 600 " chart-h)}
-          [cc/chart-title "pull-ups/squats/lunges/push-ups/sit-ups"]
+          [cc/chart-title "custom fields"]
           [cc/bg-bars indexed local chart-h :custom]
           (for [[k row-cfg] (:custom-field-charts options)]
             (if (= :barchart (:type row-cfg))

@@ -55,10 +55,7 @@
               [:rect (merge common bar-2)]])))])))
 
 (defn daily-summaries-chart
-  "Draws chart for daily activities vs weight. Weight is a line chart with
-   circles for each value, activites are represented as bars. On mouse-over
-   on top of bars or circles, a small info div next to the hovered item is
-   shown."
+  "Draws chart for daily summaries."
   [stats chart-h put-fn]
   (let [local (rc/atom {})]
     (fn [stats chart-h put-fn]

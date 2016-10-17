@@ -24,10 +24,10 @@
      [:div.charts
       [cp/pomodoro-bar-chart pomodoro-stats 150 "Pomodoros" 5 put-fn]
       [ct/tasks-chart task-stats 250 put-fn]
-      [cf/custom-fields-chart custom-field-stats 620 put-fn (:options snapshot)]
       [ds/daily-summaries-chart daily-summary-stats 200 put-fn]
-      [ca/activity-weight-chart activity-stats 250 put-fn]
+      [cf/custom-fields-chart custom-field-stats 660 put-fn (:options snapshot)]
       [wc/wordcount-chart wordcount-stats 150 put-fn 1000]
+      [ca/activity-weight-chart activity-stats 250 put-fn]
       [m/media-chart media-stats 150 put-fn]]]))
 
 (defn stats-text
