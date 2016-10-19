@@ -4,10 +4,10 @@
   :license {:name "GNU GENERAL PUBLIC LICENSE"
             :url  "http://www.gnu.org/licenses/gpl-3.0.en.html"}
   :dependencies [[org.clojure/clojure "1.9.0-alpha13"]
-                 [org.clojure/clojurescript "1.9.229"]
+                 [org.clojure/clojurescript "1.9.293"]
                  [org.clojure/tools.logging "0.3.1"]
                  [org.clojure/tools.namespace "0.2.11"]
-                 [com.taoensso/encore "2.85.0"]
+                 [com.taoensso/encore "2.86.1"]
                  [ch.qos.logback/logback-classic "1.1.7"]
                  [hiccup "1.0.5"]
                  [clj-pid "0.1.2"]
