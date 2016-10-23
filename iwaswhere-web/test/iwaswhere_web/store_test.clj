@@ -45,11 +45,14 @@
   "Create test state by calling the component's state function and returning
    a state snapshot"
   [test-ts]
-  (let [test-daily-logs-path (str "./test-data/daily-logs/" test-ts "/")]
+  (let [test-daily-logs-path (str "./test-data/daily-logs/" test-ts "/")
+        test-path (str "./test-data")]
     (fs/mkdirs test-daily-logs-path)
-    (with-redefs [f/daily-logs-path test-daily-logs-path]
+    (with-redefs [f/data-path test-path
+                  f/daily-logs-path test-daily-logs-path]
       {:current-state @(:state (s/state-fn (fn [_])))
-       :logs-path     test-daily-logs-path})))
+       :logs-path     test-daily-logs-path
+       :test-path     test-path})))
 
 (def private-tags #{"#pvt" "#private" "#nsfw" "#consumption"})
 
@@ -58,9 +61,10 @@
     "Validates that handler properly adds entry and persists entry, including
      storing the hashtags and mentions in graph."
     (let [test-ts (System/currentTimeMillis)
-          {:keys [current-state logs-path]} (mk-test-state test-ts)
+          {:keys [current-state test-path logs-path]} (mk-test-state test-ts)
           test-entry (mk-test-entry test-ts)]
-      (with-redefs [f/daily-logs-path logs-path]
+      (with-redefs [f/data-path test-path
+                    f/daily-logs-path logs-path]
         (let [{:keys [new-state emit-msg]}
               (f/geo-entry-persist-fn {:current-state current-state
                                        :msg-payload   test-entry})
@@ -130,13 +134,14 @@
      if only the old entry contained a particular tag, this orphan should be
      removed from database."
     (let [test-ts (System/currentTimeMillis)
-          {:keys [current-state logs-path]} (mk-test-state test-ts)
+          {:keys [current-state test-path logs-path]} (mk-test-state test-ts)
           test-entry (mk-test-entry test-ts)
           updated-test-entry (merge test-entry
                                     {:tags     #{"#testing" "#new" "#entry"}
                                      :md       "Some #testing #entry @me #new"
                                      :mentions #{"@me"}})]
-      (with-redefs [f/daily-logs-path logs-path]
+      (with-redefs [f/data-path test-path
+                    f/daily-logs-path logs-path]
         (let [{:keys [new-state]} (f/geo-entry-persist-fn
                                     {:current-state current-state
                                      :msg-payload   test-entry})
@@ -196,10 +201,11 @@
      deletion message. Also runs the same assertions against graph reconstructed
      from files."
     (let [test-ts (System/currentTimeMillis)
-          {:keys [current-state logs-path]} (mk-test-state test-ts)
+          {:keys [current-state test-path logs-path]} (mk-test-state test-ts)
           test-entry (mk-test-entry test-ts)
           delete-msg {:timestamp (:timestamp test-entry) :deleted true}]
-      (with-redefs [f/daily-logs-path logs-path]
+      (with-redefs [f/data-path test-path
+                    f/daily-logs-path logs-path]
         (let [{:keys [new-state]} (f/geo-entry-persist-fn
                                     {:current-state current-state
                                      :msg-payload   some-test-entry})

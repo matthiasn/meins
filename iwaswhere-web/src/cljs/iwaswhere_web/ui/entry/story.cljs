@@ -40,9 +40,12 @@
         linked-story (:linked-story entry)
         select-handler
         (fn [ev]
-          (let [selected (js/parseInt (-> ev .-nativeEvent .-target .-value))]
-            (put-fn [:entry/update-local
-                     (assoc-in entry [:linked-story] selected)])))]
+          (let [selected (js/parseInt (-> ev .-nativeEvent .-target .-value))
+                custom-path (get-in stories [selected :custom-path])
+                updated (-> entry
+                            (assoc-in [:linked-story] selected)
+                            (assoc-in [:custom-path] custom-path))]
+            (put-fn [:entry/update-local updated])))]
     (if edit-mode?
       (when-not (or (= (:entry-type entry) :story) (:comment-for entry))
         [:div.story

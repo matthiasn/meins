@@ -1,5 +1,6 @@
 {:pvt-tags            #{}
  :pvt-displayed       #{"#pvt" "#private" "#nsfw" "#consumption"}
+ :custom-data-paths   {:data2 {:name "Data2" :path "data2"}}
  :custom-fields       {"#sit-ups"  {:fields {:cnt     {:label "Completed:"
                                                        :cfg   {:type :number
                                                                :step 1}}

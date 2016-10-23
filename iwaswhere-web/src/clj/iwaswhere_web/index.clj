@@ -21,7 +21,7 @@
       ; Download from https://github.com/christiannaths/Redacted-Font
       ; then uncomment in _entry.scss and recompile CSS for redacted fron
       (stylesheet "/redacted-font/fonts/web/stylesheet.css")
-      (stylesheet "/webjars/normalize-css/4.1.1/normalize.css")
+      (stylesheet "/webjars/normalize-css/5.0.0/normalize.css")
       (stylesheet "/webjars/github-com-mrkelly-lato/0.3.0/css/lato.css")
       (stylesheet "/webjars/fontawesome/4.6.3/css/font-awesome.css")
       (stylesheet "/webjars/leaflet/0.7.7/dist/leaflet.css")

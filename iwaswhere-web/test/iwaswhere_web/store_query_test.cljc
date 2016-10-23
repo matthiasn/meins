@@ -4,14 +4,9 @@
             [matthiasn.systems-toolbox.component :as stc]
             [iwaswhere-web.files :as f]
             [iwaswhere-web.store-test :as st]
-            [iwaswhere-web.store :as s]
-            [iwaswhere-web.graph.query :as qq]
-            [clojure.set :as set]
-            [iwaswhere-web.graph.stats :as gs]
-            [iwaswhere-web.utils.misc :as u]
             [iwaswhere-web.graph.stats :as gs]
             [iwaswhere-web.graph.query :as gq]
-            [iwaswhere-web.graph.query :as gq]))
+            [iwaswhere-web.files :as f]))
 
 (def simple-query
   {:search-text ""

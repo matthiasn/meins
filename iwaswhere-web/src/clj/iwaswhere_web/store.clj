@@ -18,6 +18,22 @@
 (def default-config {:pvt-tags      #{}
                      :pvt-displayed #{"#pvt" "#private" "#nsfw" "#consumption"}})
 
+(defn read-dir
+  [state entries-to-index cfg custom-path]
+  (let [path (:daily-logs-path (f/paths cfg custom-path))
+        files (file-seq (clojure.java.io/file path))]
+    (doseq [f (f/filter-by-name files #"\d{4}-\d{2}-\d{2}.jrn")]
+      (with-open [reader (clojure.java.io/reader f)]
+        (let [lines (line-seq reader)]
+          (doseq [line lines]
+            (let [parsed (clojure.edn/read-string line)
+                  ts (:timestamp parsed)]
+              (if (:deleted parsed)
+                (do (swap! state ga/remove-node ts)
+                    (swap! entries-to-index dissoc ts))
+                (do (swap! entries-to-index assoc-in [ts] parsed)
+                    (swap! state ga/add-node ts parsed))))))))))
+
 (defn state-fn
   "Initial state function, creates state atom and then parses all files in
    data directory into the component state.
@@ -39,19 +55,10 @@
                      :stats          {:entry-count     0
                                       :node-count      0
                                       :edge-count      0
-                                      :daily-summaries {}}})
-        files (file-seq (clojure.java.io/file f/daily-logs-path))]
-    (doseq [f (f/filter-by-name files #"\d{4}-\d{2}-\d{2}.jrn")]
-      (with-open [reader (clojure.java.io/reader f)]
-        (let [lines (line-seq reader)]
-          (doseq [line lines]
-            (let [parsed (clojure.edn/read-string line)
-                  ts (:timestamp parsed)]
-              (if (:deleted parsed)
-                (do (swap! state ga/remove-node ts)
-                    (swap! entries-to-index dissoc ts))
-                (do (swap! entries-to-index assoc-in [ts] parsed)
-                    (swap! state ga/add-node ts parsed))))))))
+                                      :daily-summaries {}}})]
+    (read-dir state entries-to-index conf nil)
+    (doseq [[k _] (:custom-data-paths conf)]
+      (read-dir state entries-to-index conf k))
 
     (future
       (Thread/sleep 2000)

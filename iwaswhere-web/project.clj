@@ -1,4 +1,4 @@
-(defproject matthiasn/iwaswhere-web "0.1.21"
+(defproject matthiasn/iwaswhere-web "0.1.22"
   :description "Sample application built with systems-toolbox library"
   :url "https://github.com/matthiasn/systems-toolbox"
   :license {:name "GNU GENERAL PUBLIC LICENSE"
@@ -22,14 +22,14 @@
                  [camel-snake-kebab "0.4.0"]
                  [matthiasn/systems-toolbox "0.6.1-alpha8"]
                  [matthiasn/systems-toolbox-ui "0.6.1-alpha10"]
-                 [matthiasn/systems-toolbox-sente "0.6.1-alpha12"]
+                 [matthiasn/systems-toolbox-sente "0.6.1-alpha13"]
                  [matthiasn/inspect-probe "0.6.1-alpha1"]
                  [clucy "0.4.0"]
                  [seesaw "1.4.5"]
                  [clj.qrgen "0.4.0"]
                  [image-resizer "0.1.9"]
                  [org.webjars.bower/fontawesome "4.6.3"]
-                 [org.webjars.bower/normalize-css "4.1.1"]
+                 [org.webjars.bower/normalize-css "5.0.0"]
                  [org.webjars.bower/leaflet "0.7.7"]
                  [org.webjars.npm/github-com-mrkelly-lato "0.3.0"]
                  [org.webjars.npm/intl "1.2.4"]
