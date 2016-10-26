@@ -39,6 +39,7 @@
        [:source {:src "/mp3/tick.ogg" :type "audio/ogg"}]]
       [:script {:src "/webjars/intl/1.2.4/dist/Intl.min.js"}]
       [:script {:src "/webjars/intl/1.2.4/locale-data/jsonp/en.js"}]
+      [:script {:src "/webjars/randomcolor/0.4.4/randomColor.js"}]
       [:script {:src "/js/build/iwaswhere.js"}]]]))
 
 (defn routes-fn

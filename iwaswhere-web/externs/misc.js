@@ -4,3 +4,5 @@ Inst.DateTimeFormat.resolved;
 Inst.DateTimeFormat.resolved.timeZone;
 Inst.DateTimeFormat.resolvedOptions = function () {};
 Inst.DateTimeFormat.resolvedOptions.timeZone;
+
+var randomColor = function () {};

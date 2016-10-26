@@ -149,13 +149,15 @@
                   (fn [[field v]]
                     (let [path [:custom-fields k field]
                           val-mapper #(get-in % path)
-                          op (case (:agg v)
-                               :min #(when (seq %) (apply min %))
-                               :max #(when (seq %) (apply max %))
-                               :mean #(when (seq %)
-                                       (/ (apply + %) (count %)))
-                               :none nil
-                               #(apply + %))
+                          op (if (= :number (:type (:cfg v)))
+                               (case (:agg v)
+                                 :min #(when (seq %) (apply min %))
+                                 :max #(when (seq %) (apply max %))
+                                 :mean #(when (seq %)
+                                         (/ (apply + %) (count %)))
+                                 :none nil
+                                 #(apply + %))
+                               nil)
                           res (mapv val-mapper nodes)]
                       [field (when op
                                (try (op (filter identity res))

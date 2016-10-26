@@ -31,6 +31,12 @@
       (swap! local update-fn day-stats)
       (.setTimeout js/window (mouse-leave-fn local day-stats) 7500))))
 
+(defn item-color
+  "Calls randomColor with seed, which returns same color for seed in subsequent
+   invocations."
+  [seed]
+  (.randomColor js/window (clj->js {"seed" (str seed)})))
+
 (defn linechart-row
   "Draws line chart, for example for weight or LBM."
   [indexed local put-fn cfg]
@@ -43,10 +49,12 @@
                  (let [x (+ 5 (* 10 idx))
                        y (- (+ chart-h y-start) (* y-scale (- v min-val)))]
                    (str x "," y)))
-        points (cc/line-points vals mapper)]
+        points (cc/line-points vals mapper)
+        color (item-color path)]
     [:g {:class cls}
      [:g
-      [:polyline {:points points}]
+      [:polyline {:points points
+                  :style {:stroke color}}]
       (for [[idx day] (filter #(get-in (second %) path) indexed)]
         (let [w (get-in day path)
               mouse-enter-fn (mouse-enter-fn local day path)
@@ -56,6 +64,7 @@
           [:circle {:cx             (+ (* 10 idx) 5)
                     :cy             cy
                     :r              4
+                    :style          {:stroke color}
                     :on-mouse-enter mouse-enter-fn
                     :on-mouse-leave mouse-leave-fn}]))]]))
 

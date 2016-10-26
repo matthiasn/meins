@@ -105,11 +105,22 @@ $activity-weekend: lighten($activity, 30);
       fill: $activity-weekend;
     }
 
+    .line {
+      polyline {
+        stroke-width: 4;
+        fill: none;
+      }
+      circle {
+        stroke-width: 1;
+        fill: lightgrey;
+      }
+    }
+
     .lbm {
       opacity: 0.5;
       polyline {
         stroke: grey;
-        stroke-width: 3;
+        stroke-width: 4;
         fill: none;
       }
       circle {
