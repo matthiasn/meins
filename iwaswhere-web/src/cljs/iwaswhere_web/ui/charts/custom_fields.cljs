@@ -54,11 +54,11 @@
     [:g {:class cls}
      [:g
       [:polyline {:points points
-                  :style {:stroke color}}]
+                  :style  {:stroke color}}]
       (for [[idx day] (filter #(get-in (second %) path) indexed)]
         (let [w (get-in day path)
               mouse-enter-fn (mouse-enter-fn local day path)
-              mouse-leave-fn (mouse-leave-fn local day )
+              mouse-leave-fn (mouse-leave-fn local day)
               cy (- (+ chart-h y-start) (* y-scale (- w min-val)))]
           ^{:key (str path idx)}
           [:circle {:cx             (+ (* 10 idx) 5)
@@ -71,17 +71,18 @@
 (defn barchart-row
   "Renders bars."
   [indexed local put-fn cfg]
-  (let [{:keys [path chart-h y-start threshold]} cfg]
+  (let [{:keys [path chart-h y-start threshold threshold-type]} cfg]
     [:g
      (for [[idx day] indexed]
        (let [y-end (+ chart-h y-start)
              max-val (apply max (map (fn [[_idx v]] (get-in v path)) indexed))
              y-scale (/ chart-h (or max-val 1))
              v (get-in day path)
-             h (if (pos? v) (* y-scale v) (* y-scale threshold))
+             h (if (pos? v) (* y-scale v) 5)
              mouse-enter-fn (mouse-enter-fn local day path)
              mouse-leave-fn (mouse-leave-fn local day)
-             threshold-reached? (>= v threshold)]
+             threshold-fn (if (= threshold-type :below) < >=)
+             threshold-reached? (threshold-fn v threshold)]
          (when (pos? max-val)
            ^{:key (str path idx)}
            [:rect {:x              (* 10 idx)
@@ -89,10 +90,8 @@
                    :y              (- y-end h)
                    :width          9
                    :height         h
-                   :class          (if (pos? v)
-                                     (if threshold-reached?
-                                       (cc/weekend-class "done" day)
-                                       (cc/weekend-class "backlog" day))
+                   :class          (if threshold-reached?
+                                     (cc/weekend-class "done" day)
                                      (cc/weekend-class "failed" day))
                    :on-mouse-enter mouse-enter-fn
                    :on-mouse-leave mouse-leave-fn}])))]))

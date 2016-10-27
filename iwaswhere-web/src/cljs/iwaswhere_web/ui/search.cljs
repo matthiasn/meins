@@ -99,12 +99,12 @@
              (:search-text (:local-query @state))
              (:search-text current-query))
            current-query]
-          [:select {:value     (:story current-query)
+          [:select {:value     (or (:story current-query) "")
                     :on-change story-select-handler}
            [:option {:value ""} "no story selected"]
            (for [[id story] (:sorted-stories options)]
              (let [story-name (:story-name story)]
-               ^{:key (str query-id story-name)}
+               ^{:key (str query-id id story-name)}
                [:option {:value id} story-name]))]]
          (when (:focused @state)
            [u/suggestions

@@ -45,5 +45,6 @@
 (defn cmp-map
   [cmp-id]
   {:cmp-id   cmp-id
-   :state-fn state-fn})
+   :state-fn state-fn
+   :opts     {:reload-cmp false}})
 

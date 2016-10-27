@@ -50,7 +50,7 @@
       (when-not (or (= (:entry-type entry) :story) (:comment-for entry))
         [:div.story
          [:label "Story:"]
-         [:select {:value     linked-story
+         [:select {:value     (or linked-story "")
                    :on-change select-handler}
           [:option {:value ""} "no story selected"]
           (for [[id story] sorted-stories]
