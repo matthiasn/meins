@@ -9,6 +9,7 @@
             [cheshire.core :as cc]
             [matthiasn.systems-toolbox.component :as st]
             [me.raynes.fs :as fs]
+            [clj-http.client :as hc]
             [clj-time.format :as tf]
             [clojure.tools.logging :as log]
             [clojure.java.io :as io]
@@ -266,11 +267,25 @@
         (import-text-entries-fn (io/reader file) put-fn msg-meta filename)))
     {:emit-msg [:search/refresh]}))
 
+(defn import-movie
+  "Imports movie metadata from IMDb."
+  [{:keys [msg-payload]}]
+  (log/info "importing movie" msg-payload)
+  (let [parser (fn [res] (cc/parse-string (:body res) #(keyword (s/lower-case %))))
+        res (hc/get (str "http://www.omdbapi.com/?i=" (:imdb-id msg-payload)))
+        imdb (parser res)
+        series (when-let [sid (:seriesid imdb)]
+                 {:series (parser
+                            (hc/get (str "http://www.omdbapi.com/?i=" sid)))})]
+    {:emit-msg [:entry/update (merge (:entry msg-payload)
+                                     {:imdb (merge imdb series)})]}))
+
 (defn cmp-map
   "Generates component map for imports-cmp."
   [cmp-id]
   {:cmp-id      cmp-id
    :handler-map {:import/photos import-media
                  :import/geo    import-geo
+                 :import/movie  import-movie
                  :import/weight import-weight-csv
                  :import/phone  import-text-entries}})

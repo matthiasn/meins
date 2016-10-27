@@ -88,6 +88,7 @@
       entry (or show-map? (:show-all-maps cfg) always-show-map?) local-cfg]
      [m/image-view entry]
      [m/videoplayer-view entry]
+     [m/imdb-view entry put-fn]
      [:div.footer
       [:div.likes (when-let [upvotes (:upvotes entry)]
               (when (pos? upvotes)

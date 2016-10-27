@@ -89,6 +89,10 @@
 (s/def :entry/find timestamp-required-spec)
 (s/def :entry/found entry-spec)
 
+(s/def :import/entry entry-spec)
+(s/def :import/imdb-id string?)
+(s/def :import/movie (s/keys :req-un [:import/entry :import/imdb-id]))
+
 (s/def :cmd/set-dragged timestamp-required-spec)
 
 (s/def :ft/add entry-spec)

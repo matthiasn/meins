@@ -63,6 +63,7 @@
                                              :fare         {:label "Fare:" :cfg {:type :string}}
                                              :seat         {:label "Seat:" :cfg {:type :string}}
                                              :delay        {:label "Delay (min):" :cfg {:type :number :step 1}}}}
+                       "#imdb"     {:fields {:imdb-id {:label "IMDb ID:" :cfg {:type :imdb}}}}
                        "#walking"  {:fields {:duration {:label "Minutes:"
                                                         :cfg   {:type :number
                                                                 :step 1}}}}

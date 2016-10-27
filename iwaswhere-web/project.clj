@@ -12,6 +12,7 @@
                  [hiccup "1.0.5"]
                  [clj-pid "0.1.2"]
                  [clj-time "0.12.0"]
+                 [clj-http "3.3.0"]
                  [me.raynes/fs "1.4.6"]
                  [markdown-clj "0.9.90"]
                  [cheshire "5.6.3"]
