@@ -1,4 +1,5 @@
-(ns iwaswhere-web.ui.entry.capture)
+(ns iwaswhere-web.ui.entry.capture
+  (:require [clojure.string :as s]))
 
 (defn select-elem
   "Render select element for the given options. On change, dispatch message
@@ -33,15 +34,24 @@
           [:legend tag]
           (for [[k field] (:fields conf)]
             (let [input-cfg (:cfg field)
-                  value (get-in entry [:custom-fields tag k])
+                  input-type (:type input-cfg)
+                  path [:custom-fields tag k]
+                  value (get-in entry path)
                   on-change-fn
                   (fn [ev]
                     (let [v (.. ev -target -value)
-                          parsed (if (= :number (:type input-cfg))
+                          parsed (if (= :number input-type)
                                    (when (seq v) (js/parseFloat v))
                                    v)
-                          updated (assoc-in entry [:custom-fields tag k] parsed)]
+                          updated (assoc-in entry path parsed)]
                       (put-fn [:entry/update-local updated])))]
+              (when-not value
+                (when (and (= input-type :number) edit-mode?)
+                  (let [p1 (-> (:md entry) (s/split tag) first)
+                        last-n (last (re-seq #"\d+" p1))]
+                    (when last-n
+                      (let [updated (assoc-in entry path (js/parseFloat last-n))]
+                        (put-fn [:entry/update-local updated]))))))
               ^{:key (str "cf" ts tag k)}
               [:span
                [:label (:label field)]
