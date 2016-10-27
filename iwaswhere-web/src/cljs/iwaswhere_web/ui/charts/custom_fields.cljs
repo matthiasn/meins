@@ -38,7 +38,7 @@
   (.randomColor js/window (clj->js {"seed" (str seed)})))
 
 (defn linechart-row
-  "Draws line chart, for example for weight or LBM."
+  "Draws line chart."
   [indexed local put-fn cfg]
   (let [{:keys [path chart-h y-start cls]} cfg
         vals (filter second (map (fn [[k v]] [k (get-in v path)]) indexed))

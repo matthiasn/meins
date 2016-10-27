@@ -52,29 +52,17 @@
                                              :elevation-gain {:label "Elevation gain:"
                                                               :cfg   {:type :number
                                                                       :step 1}}}}
-                       "#flight"   {:fields {:distance       {:label "Distance (Miles):"
-                                                              :cfg   {:type :number
-                                                                      :step 1}}
-                                             :duration       {:label "Minutes:"
-                                                              :cfg   {:type :number
-                                                                      :step 1}}
-                                             :flight-no      {:label "Flight number:"
-                                                              :cfg   {:type :string}}
-                                             :takeoff-time   {:label "Takeoff time:"
-                                                              :cfg {:type :string}}
-                                             :landing-time   {:label "Landing time:"
-                                                              :cfg {:type :string}}
-                                             :departure      {:label "Departure:"
-                                                              :cfg   {:type :string}}
-                                             :destination    {:label "Destination:"
-                                                              :cfg   {:type :string}}
-                                             :fare           {:label "Fare:"
-                                                              :cfg   {:type :string}}
-                                             :seat           {:label "Seat:"
-                                                              :cfg   {:type :string}}
-                                             :delay          {:label "Delay (min):"
-                                                              :cfg   {:type :number
-                                                                      :step 1}}}}
+                       "#flight"   {:fields {:distance     {:label "Distance (Miles):" :cfg {:type :number :step 1}}
+                                             :duration     {:label "Minutes:" :cfg {:type :number :step 1}}
+                                             :flight-no    {:label "Flight number:" :cfg {:type :string}}
+                                             :takeoff-time {:label "Takeoff time:" :cfg {:type :string}}
+                                             :landing-time {:label "Landing time:" :cfg {:type :string}}
+                                             :origin       {:label "Origin:" :cfg {:type :string}}
+                                             :destination  {:label "Destination:" :cfg {:type :string}}
+                                             :aircraft     {:label "Aircraft:" :cfg {:type :string}}
+                                             :fare         {:label "Fare:" :cfg {:type :string}}
+                                             :seat         {:label "Seat:" :cfg {:type :string}}
+                                             :delay        {:label "Delay (min):" :cfg {:type :number :step 1}}}}
                        "#walking"  {:fields {:duration {:label "Minutes:"
                                                         :cfg   {:type :number
                                                                 :step 1}}}}
