@@ -48,7 +48,7 @@
               (when-not value
                 (when (and (= input-type :number) edit-mode?)
                   (let [p1 (-> (:md entry) (s/split tag) first)
-                        last-n (last (re-seq #"\d+" p1))]
+                        last-n (last (re-seq #"[0-9]*\.?[0-9]+" p1))]
                     (when last-n
                       (let [updated (assoc-in entry path (js/parseFloat last-n))]
                         (put-fn [:entry/update-local updated]))))))
