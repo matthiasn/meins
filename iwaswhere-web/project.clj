@@ -1,7 +1,7 @@
-(defproject matthiasn/iwaswhere-web "0.1.22"
+(defproject matthiasn/iwaswhere-web "0.1.23"
   :description "Sample application built with systems-toolbox library"
   :url "https://github.com/matthiasn/systems-toolbox"
-  :license {:name "GNU GENERAL PUBLIC LICENSE"
+  :license {:name "GNU AFFERO GENERAL PUBLIC LICENSE"
             :url  "http://www.gnu.org/licenses/gpl-3.0.en.html"}
   :dependencies [[org.clojure/clojure "1.9.0-alpha13"]
                  [org.clojure/clojurescript "1.9.293"]
