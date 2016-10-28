@@ -39,16 +39,16 @@
   (when-let [imdb-id (get-in entry [:custom-fields "#imdb" :imdb-id])]
     (let [imdb (:imdb entry)
           series (:series imdb)]
-      (when-not imdb
+      (if imdb
+        [:div
+         (if series
+           [:h4 (:title series) " S" (:season imdb) "E" (:episode imdb)
+            ": " (:title imdb) " - " (:year imdb)]
+           [:h4 (:title imdb) " - " (:year imdb)])
+         [:p (:actors imdb)]
+         [:p (:plot imdb)]
+         (when series
+           [:img {:src (:poster series)}])
+         [:img {:src (:poster imdb)}]]
         (put-fn [:import/movie {:entry   entry
-                                :imdb-id imdb-id}]))
-      [:div
-       (if series
-         [:h4 (:title series) " S" (:season imdb) "E" (:episode imdb)
-          ": " (:title imdb) " - " (:year imdb)]
-         [:h4 (:title imdb) " - " (:year imdb)])
-       [:p (:actors imdb)]
-       [:p (:plot imdb)]
-       (when series
-         [:img {:src (:poster series)}])
-       [:img {:src (:poster imdb)}]])))
+                                :imdb-id imdb-id}])))))

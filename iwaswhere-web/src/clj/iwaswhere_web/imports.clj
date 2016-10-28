@@ -271,14 +271,17 @@
   "Imports movie metadata from IMDb."
   [{:keys [msg-payload]}]
   (log/info "importing movie" msg-payload)
-  (let [parser (fn [res] (cc/parse-string (:body res) #(keyword (s/lower-case %))))
-        res (hc/get (str "http://www.omdbapi.com/?i=" (:imdb-id msg-payload)))
+  (let [imdb-id (:imdb-id msg-payload)
+        parser (fn [res] (cc/parse-string (:body res) #(keyword (s/lower-case %))))
+        res (hc/get (str "http://www.omdbapi.com/?i=" imdb-id))
         imdb (parser res)
         series (when-let [sid (:seriesid imdb)]
                  {:series (parser
                             (hc/get (str "http://www.omdbapi.com/?i=" sid)))})]
-    {:emit-msg [:entry/update (merge (:entry msg-payload)
-                                     {:imdb (merge imdb series)})]}))
+    (if (:error imdb)
+      (log/error "could not find on omdbapi.com:" imdb-id)
+      {:emit-msg [:entry/update (merge (:entry msg-payload)
+                                       {:imdb (merge imdb series)})]})))
 
 (defn cmp-map
   "Generates component map for imports-cmp."
