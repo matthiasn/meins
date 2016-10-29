@@ -47,8 +47,8 @@
            [:h4 (:title imdb) " - " (:year imdb)])
          [:p (:actors imdb)]
          [:p (:plot imdb)]
-         (when series
-           [:img {:src (:poster series)}])
+         (when-let [series-poster (:poster series)]
+           [:img {:src series-poster}])
          [:img {:src (:poster imdb)}]]
         (put-fn [:import/movie {:entry   entry
                                 :imdb-id imdb-id}])))))

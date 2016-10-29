@@ -3,10 +3,10 @@
   :url "https://github.com/matthiasn/systems-toolbox"
   :license {:name "GNU AFFERO GENERAL PUBLIC LICENSE"
             :url  "http://www.gnu.org/licenses/gpl-3.0.en.html"}
-  :dependencies [[org.clojure/clojure "1.9.0-alpha13"]
+  :dependencies [[org.clojure/clojure "1.9.0-alpha14"]
                  [org.clojure/clojurescript "1.9.293"]
                  [org.clojure/tools.logging "0.3.1"]
-                 [org.clojure/tools.namespace "0.2.11"]
+                 [org.clojure/tools.namespace "0.3.0-alpha3"]
                  [com.taoensso/encore "2.86.1"]
                  [ch.qos.logback/logback-classic "1.1.7"]
                  [hiccup "1.0.5"]
@@ -29,7 +29,7 @@
                  [seesaw "1.4.5"]
                  [clj.qrgen "0.4.0"]
                  [image-resizer "0.1.9"]
-                 [org.webjars.bower/fontawesome "4.6.3"]
+                 [org.webjars.bower/fontawesome "4.7.0"]
                  [org.webjars.npm/randomcolor "0.4.4"]
                  [org.webjars.bower/normalize-css "5.0.0"]
                  [org.webjars.bower/leaflet "0.7.7"]

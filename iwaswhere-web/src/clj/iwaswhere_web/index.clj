@@ -23,7 +23,7 @@
       (stylesheet "/redacted-font/fonts/web/stylesheet.css")
       (stylesheet "/webjars/normalize-css/5.0.0/normalize.css")
       (stylesheet "/webjars/github-com-mrkelly-lato/0.3.0/css/lato.css")
-      (stylesheet "/webjars/fontawesome/4.6.3/css/font-awesome.css")
+      (stylesheet "/webjars/fontawesome/4.7.0/css/font-awesome.css")
       (stylesheet "/webjars/leaflet/0.7.7/dist/leaflet.css")
       (stylesheet "/css/iwaswhere.css")]
      [:body
