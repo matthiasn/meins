@@ -34,6 +34,12 @@
                 (do (swap! entries-to-index assoc-in [ts] parsed)
                     (swap! state ga/add-node ts parsed))))))))))
 
+(defn load-cfg
+  "Load config from file, or default config."
+  []
+  (try (edn/read-string (slurp (str f/data-path "/conf.edn")))
+       (catch Exception ex (log/error ex) default-config)))
+
 (defn state-fn
   "Initial state function, creates state atom and then parses all files in
    data directory into the component state.
@@ -41,9 +47,7 @@
    timestamp of an entry. A sort order by descending timestamp is maintained
    in a sorted set of the nodes."
   [put-fn]
-  (let [conf-filepath (str f/data-path "/conf.edn")
-        conf (try (edn/read-string (slurp conf-filepath))
-                  (catch Exception ex (log/error ex) default-config))
+  (let [conf (load-cfg)
         entries-to-index (atom {})
         state (atom {:sorted-entries (sorted-set-by >)
                      :graph          (uber/graph)
@@ -70,6 +74,11 @@
       (reset! entries-to-index []))
     {:state state}))
 
+(defn refresh-cfg
+  "Refresh configuration by reloading the config file."
+  [{:keys [current-state]}]
+  {:new-state (assoc-in current-state [:cfg] (load-cfg))})
+
 (defn cmp-map
   "Generates component map for state-cmp."
   [cmp-id]
@@ -83,4 +92,5 @@
                    :entry/update          f/geo-entry-persist-fn
                    :entry/trash           f/trash-entry-fn
                    :state/search          gq/query-fn
+                   :cfg/refresh           refresh-cfg
                    :cmd/keep-alive        ka/keepalive-fn})})

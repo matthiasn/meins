@@ -18,7 +18,7 @@
                                :cmd/keep-alive :stats/pomo-day-get
                                :stats/get :import/movie
                                :state/stats-tags-get :import/weight
-                               :state/search}})
+                               :state/search :cfg/refresh}})
 
 (defn init!
   "Initializes client-side system by sending messages to the switchboard for

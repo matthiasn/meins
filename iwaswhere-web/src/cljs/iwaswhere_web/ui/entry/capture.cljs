@@ -53,7 +53,7 @@
                       (let [updated (assoc-in entry path (js/parseFloat last-n))]
                         (put-fn [:entry/update-local updated]))))))
               ^{:key (str "cf" ts tag k)}
-              [:span
+              [:div
                [:label (:label field)]
                [:input (merge
                          input-cfg

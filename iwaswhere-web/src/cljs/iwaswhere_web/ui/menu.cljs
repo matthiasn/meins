@@ -39,6 +39,7 @@
                              {:sort-by-upvotes (not sort-by-upvotes?)})]
             (put-fn [:cmd/toggle-key {:path [:cfg :sort-by-upvotes]}])
             (put-fn [:state/search query])))
+        refresh-cfg #(put-fn [:cfg/refresh])
         toggle-qr-code
         (fn [_ev]
           (let [msg {:path [:cfg :qr-code]}
@@ -53,6 +54,7 @@
      (for [option toggle-options]
        ^{:key (str "toggle" (:cls option))}
        [toggle-option-view option cfg put-fn])
+     [:span.fa.fa-refresh.toggle {:on-click refresh-cfg}]
      [:span.fa.fa-qrcode.toggle
       {:on-click toggle-qr-code
        :class    (when-not (:qr-code cfg) "inactive")}]
