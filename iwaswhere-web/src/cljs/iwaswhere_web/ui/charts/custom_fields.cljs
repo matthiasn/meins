@@ -11,6 +11,7 @@
       (swap! local (fn [state] (-> state
                                    (dissoc :mouse-over)
                                    (dissoc :mouse-over-path)
+                                   (dissoc :mouse-over-label)
                                    (dissoc :mouse-pos)))))))
 
 (defn mouse-enter-fn
@@ -20,13 +21,14 @@
    replaces :mouse-over key in local atom with v and :mouse-pos with the
    mouse position in the event. Also sets path that specifies where to find
    the data of the moused over element."
-  [local day-stats path]
+  [local day-stats path k]
   (fn [ev]
     (let [mouse-pos {:x (.-pageX ev) :y (.-pageY ev)}
           update-fn (fn [state day-stats]
                       (-> state
                           (assoc-in [:mouse-over] day-stats)
                           (assoc-in [:mouse-over-path] path)
+                          (assoc-in [:mouse-over-label] k)
                           (assoc-in [:mouse-pos] mouse-pos)))]
       (swap! local update-fn day-stats)
       (.setTimeout js/window (mouse-leave-fn local day-stats) 7500))))
@@ -39,7 +41,7 @@
 
 (defn linechart-row
   "Draws line chart."
-  [indexed local put-fn cfg]
+  [indexed local put-fn cfg k]
   (let [{:keys [path chart-h y-start cls]} cfg
         vals (filter second (map (fn [[k v]] [k (get-in v path)]) indexed))
         max-val (or (apply max (map second vals)) 10)
@@ -57,7 +59,7 @@
                   :style  {:stroke color}}]
       (for [[idx day] (filter #(get-in (second %) path) indexed)]
         (let [w (get-in day path)
-              mouse-enter-fn (mouse-enter-fn local day path)
+              mouse-enter-fn (mouse-enter-fn local day path k)
               mouse-leave-fn (mouse-leave-fn local day)
               cy (- (+ chart-h y-start) (* y-scale (- w min-val)))]
           ^{:key (str path idx)}
@@ -70,16 +72,17 @@
 
 (defn barchart-row
   "Renders bars."
-  [indexed local put-fn cfg]
+  [indexed local put-fn cfg k]
   (let [{:keys [path chart-h y-start threshold threshold-type]} cfg]
     [:g
      (for [[idx day] indexed]
        (let [y-end (+ chart-h y-start)
-             max-val (apply max (map (fn [[_idx v]] (get-in v path)) indexed))
+             max-val (or (:max cfg)
+                         (apply max (map (fn [[_idx v]] (get-in v path)) indexed)))
              y-scale (/ chart-h (or max-val 1))
              v (get-in day path)
              h (if (pos? v) (* y-scale v) 5)
-             mouse-enter-fn (mouse-enter-fn local day path)
+             mouse-enter-fn (mouse-enter-fn local day path k)
              mouse-leave-fn (mouse-leave-fn local day)
              threshold-fn (if (= threshold-type :below) < >=)
              threshold-reached? (threshold-fn v threshold)]
@@ -101,25 +104,29 @@
    circles for each value, activites are represented as bars. On mouse-over
    on top of bars or circles, a small info div next to the hovered item is
    shown."
-  [stats chart-h put-fn options]
+  [stats put-fn options]
   (let [local (rc/atom {})]
-    (fn [stats chart-h put-fn options]
-      (let [indexed (map-indexed (fn [idx [k v]] [idx v]) stats)]
+    (fn [stats put-fn options]
+      (let [indexed (map-indexed (fn [idx [k v]] [idx v]) stats)
+            charts (:custom-field-charts options)
+            chart-h1 (apply + (map (fn [[k cfg]] (:chart-h cfg)) charts))
+            chart-h 950]
+        (prn chart-h1)
         [:div
          [:svg
           {:viewBox (str "0 0 600 " chart-h)}
           [cc/chart-title "custom fields"]
           [cc/bg-bars indexed local chart-h :custom]
-          (for [[k row-cfg] (:custom-field-charts options)]
+          (for [[k row-cfg] charts]
             (if (= :barchart (:type row-cfg))
               ^{:key (str :custom-fields-barchart (:path row-cfg))}
-              [barchart-row indexed local put-fn row-cfg]
+              [barchart-row indexed local put-fn row-cfg k]
               ^{:key (str :custom-fields-linechart (:path row-cfg))}
-              [linechart-row indexed local put-fn row-cfg]))]
+              [linechart-row indexed local put-fn row-cfg k]))]
          (when-let [mouse-over (:mouse-over @local)]
            (let [path (:mouse-over-path @local)
                  v (get-in mouse-over path)]
              [:div.mouse-over-info (cc/info-div-pos @local)
               [:div (:date-string mouse-over)]
               (when path
-                [:div [:strong (first path)] ": " v])]))]))))
+                [:div [:strong (:mouse-over-label @local)] ": " v])]))]))))
