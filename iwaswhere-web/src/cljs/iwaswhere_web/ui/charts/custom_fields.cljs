@@ -110,7 +110,7 @@
       (let [indexed (map-indexed (fn [idx [k v]] [idx v]) stats)
             charts (:custom-field-charts options)
             chart-h1 (apply + (map (fn [[k cfg]] (:chart-h cfg)) charts))
-            chart-h 950]
+            chart-h 990]
         (prn chart-h1)
         [:div
          [:svg
