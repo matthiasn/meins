@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [0.1.24] - 2016-11-05
+### Changed
+-  blink1 integration
+
 ## [0.1.23] - 2016-10-27
 ### Changed
 -  improvement in custom fields chart

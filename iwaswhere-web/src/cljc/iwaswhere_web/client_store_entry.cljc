@@ -84,9 +84,10 @@
               (update-local-storage new-state)
               {:new-state new-state
                :emit-msg  (when (not done?)
-                            [:cmd/schedule-new
-                             {:timeout 1000
-                              :message [:cmd/pomodoro-inc {:timestamp ts}]}])})
+                            [[:blink/busy]
+                             [:cmd/schedule-new
+                              {:timeout 1000
+                               :message [:cmd/pomodoro-inc {:timestamp ts}]}]])})
           {:new-state current-state})))))
 
 (defn pomodoro-start-fn

@@ -6,14 +6,15 @@
             [matthiasn.systems-toolbox-sente.server :as sente]
             [matthiasn.inspect-probe.probe :as probe]
             [iwaswhere-web.index :as idx]
-            [iwaswhere-web.keepalive :as ka]
             [iwaswhere-web.specs]
             [clojure.tools.logging :as log]
             [clj-pid.core :as pid]
             [iwaswhere-web.store :as st]
             [iwaswhere-web.fulltext-search :as ft]
             [iwaswhere-web.upload :as up]
-            [iwaswhere-web.imports :as i]))
+            [iwaswhere-web.blink :as bl]
+            [iwaswhere-web.imports :as i]
+            [matthiasn.systems-toolbox.scheduler :as sched]))
 
 (defonce switchboard (sb/component :server/switchboard))
 
@@ -29,13 +30,16 @@
   (sb/send-mult-cmd
     switchboard
     [[:cmd/init-comp #{(sente/cmp-map :server/ws-cmp idx/sente-map)
+                       (sched/cmp-map :server/scheduler-cmp)
                        (i/cmp-map :server/imports-cmp)
                        (st/cmp-map :server/store-cmp)
                        (up/cmp-map :server/upload-cmp)
+                       (bl/cmp-map :server/blink-cmp)
                        (ft/cmp-map :server/ft-cmp)}]
 
      [:cmd/route {:from :server/ws-cmp
                   :to   #{:server/store-cmp
+                          :server/blink-cmp
                           :server/imports-cmp}}]
 
      [:cmd/route {:from :server/imports-cmp
@@ -46,7 +50,17 @@
 
      [:cmd/route {:from :server/store-cmp
                   :to   #{:server/ws-cmp
-                          :server/ft-cmp}}]]))
+                          :server/ft-cmp}}]
+
+     [:cmd/route {:from :server/scheduler-cmp
+                  :to   #{:server/store-cmp
+                          :server/blink-cmp
+                          :server/ws-cmp}}]
+
+     [:cmd/route {:from #{:server/store-cmp
+                          :server/blink-cmp
+                          :server/imports-cmp}
+                  :to :server/scheduler-cmp}]]))
 
 (defn -main
   "Starts the application from command line, saves and logs process ID. The
@@ -60,5 +74,4 @@
   (restart! switchboard)
   (when (get (System/getenv) "PROBE")
     (probe/start! switchboard))
-  (ka/restart-keepalive! switchboard)
   (Thread/sleep Long/MAX_VALUE))

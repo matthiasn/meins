@@ -87,10 +87,10 @@
    :opts        {:msgs-on-firehose true}
    :handler-map (merge
                   gs/stats-handler-map
-                  {:entry/import          f/entry-import-fn
-                   :entry/find            gq/find-entry
-                   :entry/update          f/geo-entry-persist-fn
-                   :entry/trash           f/trash-entry-fn
-                   :state/search          gq/query-fn
-                   :cfg/refresh           refresh-cfg
-                   :cmd/keep-alive        ka/keepalive-fn})})
+                  {:entry/import   f/entry-import-fn
+                   :entry/find     gq/find-entry
+                   :entry/update   f/geo-entry-persist-fn
+                   :entry/trash    f/trash-entry-fn
+                   :state/search   gq/query-fn
+                   :cfg/refresh    refresh-cfg
+                   :cmd/keep-alive ka/keepalive-fn})})

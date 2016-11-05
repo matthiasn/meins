@@ -1,24 +1,7 @@
 (ns iwaswhere-web.keepalive
   (:require [matthiasn.systems-toolbox.switchboard :as sb]
             [matthiasn.systems-toolbox.component :as st]
-            [matthiasn.systems-toolbox.scheduler :as sched]
             [clojure.pprint :as pp]))
-
-;; Server side
-(defn restart-keepalive!
-  "Starts or restarts connection-gc part of system. Here, messages to start
-   garbage collecting queries from clients that have not been seen in a while
-   are sent to the store-cmp."
-  [switchboard]
-  (sb/send-mult-cmd
-    switchboard
-    [[:cmd/init-comp (sched/cmp-map :server/scheduler-cmp)]
-     [:cmd/route {:from :server/scheduler-cmp
-                  :to   #{:server/store-cmp
-                          :server/ws-cmp}}]
-     [:cmd/route {:from #{:server/store-cmp
-                          :server/imports-cmp}
-                  :to :server/scheduler-cmp}]]))
 
 (defn keepalive-fn
   "Responds to keepalive message."
