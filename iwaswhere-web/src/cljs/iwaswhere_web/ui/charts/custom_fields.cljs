@@ -1,6 +1,8 @@
 (ns iwaswhere-web.ui.charts.custom-fields
   (:require [reagent.core :as rc]
-            [iwaswhere-web.ui.charts.common :as cc]))
+            [iwaswhere-web.ui.charts.common :as cc]
+            [iwaswhere-web.charts.custom-fields-cfg :as cf]
+            [clojure.pprint :as pp]))
 
 (defn mouse-leave-fn
   "Creates event handler that removes the keys required for the info div
@@ -100,28 +102,27 @@
                    :on-mouse-leave mouse-leave-fn}])))]))
 
 (defn custom-fields-chart
-  "Draws chart for daily activities vs weight. Weight is a line chart with
-   circles for each value, activites are represented as bars. On mouse-over
-   on top of bars or circles, a small info div next to the hovered item is
-   shown."
+  "Draws custom fields chart, with a row for each configured chart. The
+   position of each chart is calculated in the cf namespace."
   [stats put-fn options]
   (let [local (rc/atom {})]
     (fn [stats put-fn options]
       (let [indexed (map-indexed (fn [idx [k v]] [idx v]) stats)
-            charts (:custom-field-charts options)
-            chart-h1 (apply + (map (fn [[k cfg]] (:chart-h cfg)) charts))
-            chart-h 1030]
+            charts-vec (:custom-field-charts options)
+            chart-map (cf/build-chart-map charts-vec 55)
+            charts-h (:charts-h chart-map)]
         [:div
          [:svg
-          {:viewBox (str "0 0 600 " chart-h)}
+          {:viewBox (str "0 0 600 " charts-h)}
           [cc/chart-title "custom fields"]
-          [cc/bg-bars indexed local chart-h :custom]
-          (for [[k row-cfg] charts]
-            (if (= :barchart (:type row-cfg))
-              ^{:key (str :custom-fields-barchart (:path row-cfg))}
-              [barchart-row indexed local put-fn row-cfg k]
-              ^{:key (str :custom-fields-linechart (:path row-cfg))}
-              [linechart-row indexed local put-fn row-cfg k]))]
+          [cc/bg-bars indexed local charts-h :custom]
+          (for [row-cfg (:charts chart-map)]
+            (let [k (:label row-cfg)]
+              (if (= :barchart (:type row-cfg))
+                ^{:key (str :custom-fields-barchart (:path row-cfg))}
+                [barchart-row indexed local put-fn row-cfg k]
+                ^{:key (str :custom-fields-linechart (:path row-cfg))}
+                [linechart-row indexed local put-fn row-cfg k])))]
          (when-let [mouse-over (:mouse-over @local)]
            (let [path (:mouse-over-path @local)
                  v (get-in mouse-over path)]

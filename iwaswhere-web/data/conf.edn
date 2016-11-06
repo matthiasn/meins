@@ -1,57 +1,22 @@
 {:pvt-tags            #{}
  :pvt-displayed       #{"#pvt" "#private" "#nsfw" "#consumption"}
  :custom-data-paths   {:data2 {:name "Data2" :path "data2"}}
- :custom-fields       {"#sit-ups"  {:fields {:cnt     {:label "Completed:"
-                                                       :cfg   {:type :number
-                                                               :step 1}}
-                                             :comment {:label "Comment:"
-                                                       :agg   :none}}}
-                       "#pull-ups" {:fields {:cnt {:label "Completed:"
-                                                   :cfg   {:type :number
-                                                           :step 1}}}}
-                       "#push-ups" {:fields {:cnt {:label "Completed:"
-                                                   :cfg   {:type :number
-                                                           :step 1}}}}
-                       "#squats"   {:fields {:cnt {:label "Completed:"
-                                                   :cfg   {:type :number
-                                                           :step 1}}}}
-                       "#lunges"   {:fields {:cnt {:label "Completed:"
-                                                   :cfg   {:type :number
-                                                           :step 1}}}}
-                       "#sleep"    {:fields {:duration      {:label "Duration/h:"
-                                                             :cfg   {:type :number
-                                                                     :step 0.25}}
-                                             :interruptions {:label "Interruptions:"
-                                                             :cfg   {:type :number
-                                                                     :step 1}}
-                                             :restedness    {:label "Feeling rested? (1 poor - 10 very):"
-                                                             :cfg   {:type :number
-                                                                     :step 1}
-                                                             :agg   :mean}}}
-                       "#running"  {:fields {:distance       {:label "Distance:"
-                                                              :cfg   {:type :number
-                                                                      :step 0.1}}
-                                             :duration       {:label "Minutes:"
-                                                              :cfg   {:type :number
-                                                                      :step 1}}
-                                             :calories       {:label "Calories:"
-                                                              :cfg   {:type :number
-                                                                      :step 1}}
-                                             :elevation-gain {:label "Elevation gain:"
-                                                              :cfg   {:type :number
-                                                                      :step 1}}}}
-                       "#cycling"  {:fields {:distance       {:label "Distance:"
-                                                              :cfg   {:type :number
-                                                                      :step 0.1}}
-                                             :duration       {:label "Minutes:"
-                                                              :cfg   {:type :number
-                                                                      :step 1}}
-                                             :calories       {:label "Calories:"
-                                                              :cfg   {:type :number
-                                                                      :step 1}}
-                                             :elevation-gain {:label "Elevation gain:"
-                                                              :cfg   {:type :number
-                                                                      :step 1}}}}
+ :custom-fields       {"#sit-ups"  {:fields {:cnt {:label "Completed:" :cfg {:type :number :step 1}} :comment {:label "Comment:" :agg :none}}}
+                       "#pull-ups" {:fields {:cnt {:label "Completed:" :cfg {:type :number :step 1}}}}
+                       "#push-ups" {:fields {:cnt {:label "Completed:" :cfg {:type :number :step 1}}}}
+                       "#squats"   {:fields {:cnt {:label "Completed:" :cfg {:type :number :step 1}}}}
+                       "#lunges"   {:fields {:cnt {:label "Completed:" :cfg {:type :number :step 1}}}}
+                       "#sleep"    {:fields {:duration      {:label "Duration/h:" :cfg {:type :number :step 0.25}}
+                                             :interruptions {:label "Interruptions:" :cfg {:type :number :step 1}}
+                                             :restedness    {:label "Feeling rested? (1 poor - 10 very):" :cfg {:type :number :step 1} :agg :mean}}}
+                       "#running"  {:fields {:distance       {:label "Distance:" :cfg {:type :number :step 0.1}}
+                                             :duration       {:label "Minutes:" :cfg {:type :number :step 1}}
+                                             :calories       {:label "Calories:" :cfg {:type :number :step 1}}
+                                             :elevation-gain {:label "Elevation gain:" :cfg {:type :number :step 1}}}}
+                       "#cycling"  {:fields {:distance       {:label "Distance:" :cfg {:type :number :step 0.1}}
+                                             :duration       {:label "Minutes:" :cfg {:type :number :step 1}}
+                                             :calories       {:label "Calories:" :cfg {:type :number :step 1}}
+                                             :elevation-gain {:label "Elevation gain:" :cfg {:type :number :step 1}}}}
                        "#flight"   {:fields {:distance     {:label "Distance (Miles):" :cfg {:type :number :step 1}}
                                              :duration     {:label "Minutes:" :cfg {:type :number :step 1}}
                                              :flight-no    {:label "Flight number:" :cfg {:type :string}}
@@ -64,100 +29,27 @@
                                              :seat         {:label "Seat:" :cfg {:type :string}}
                                              :delay        {:label "Delay (min):" :cfg {:type :number :step 1}}}}
                        "#imdb"     {:fields {:imdb-id {:label "IMDb ID:" :cfg {:type :imdb}}}}
-                       "#walking"  {:fields {:duration {:label "Minutes:"
-                                                        :cfg   {:type :number
-                                                                :step 1}}}}
-                       "#swimming" {:fields {:duration {:label "Minutes:"
-                                                        :cfg   {:type :number
-                                                                :step 1}}}}
-                       "#girth"    {:fields {:abdominal  {:label "Abdominal:"
-                                                          :cfg   {:type :number
-                                                                  :step 0.1}
-                                                          :agg   :min}
-                                             :chest      {:label "Chest:"
-                                                          :cfg   {:type :number
-                                                                  :step 0.1}
-                                                          :agg   :min}
-                                             :arm-flexed {:label "Arm flexed:"
-                                                          :cfg   {:type :number
-                                                                  :step 0.1}
-                                                          :agg   :max}}}
-                       "#coffee"   {:fields {:vol {:label "Coffee/ml:"
-                                                   :cfg   {:type :number
-                                                           :step 1}}}}
-                       "#water"    {:fields {:vol {:label "Water/ml:"
-                                                   :cfg   {:type :number
-                                                           :step 1}}}}
-                       "#beer"     {:fields {:vol {:label "Beer/ml:"
-                                                   :cfg   {:type :number
-                                                           :step 1}}}}
-                       "#wine"     {:fields {:vol {:label "Wine/ml:"
-                                                   :cfg   {:type :number
-                                                           :step 1}}}}
-                       "#liquor"   {:fields {:vol {:label "Liquor/ml:"
-                                                   :cfg   {:type :number
-                                                           :step 1}}}}}
- :custom-field-charts {"#pull-ups"    {:path           ["#pull-ups" :cnt]
-                                       :type           :barchart
-                                       :chart-h        35
-                                       :y-start        55
-                                       :threshold      4
-                                       :threshold-type :above}
-                       "#squats"      {:path           ["#squats" :cnt]
-                                       :type           :barchart
-                                       :y-start        95
-                                       :chart-h        35
-                                       :threshold      20
-                                       :threshold-type :above}
-                       "#lunges"      {:path           ["#lunges" :cnt]
-                                       :type           :barchart
-                                       :y-start        135
-                                       :chart-h        35
-                                       :threshold      20
-                                       :threshold-type :above}
-                       "#push-ups"    {:path           ["#push-ups" :cnt]
-                                       :type           :barchart
-                                       :y-start        175
-                                       :chart-h        35
-                                       :threshold      25
-                                       :threshold-type :above}
-                       "#sit-ups"     {:path           ["#sit-ups" :cnt]
-                                       :type           :barchart
-                                       :y-start        215
-                                       :chart-h        35
-                                       :threshold      25
-                                       :threshold-type :above}
-                       "#running"     {:path           ["#running" :duration]
-                                       :type           :barchart
-                                       :y-start        260
-                                       :chart-h        35
-                                       :threshold      30
-                                       :threshold-type :above}
-                       "#cycling"     {:path           ["#cycling" :duration]
-                                       :type           :barchart
-                                       :y-start        300
-                                       :chart-h        35
-                                       :threshold      0
-                                       :threshold-type :above}
-                       "#beer"        {:path           ["#beer" :vol]
-                                       :type           :barchart
-                                       :y-start        345
-                                       :chart-h        35
-                                       :threshold      700
-                                       :threshold-type :below}
-                       "#coffee"      {:path           ["#coffee" :cnt]
-                                       :type           :barchart
-                                       :y-start        385
-                                       :chart-h        35
-                                       :threshold      600
-                                       :threshold-type :below}
-                       "#girth abd"   {:path    ["#girth" :abdominal]
-                                       :type    :linechart
-                                       :y-start 560
-                                       :cls     "lbm"
-                                       :chart-h 20}
-                       "#girth chest" {:path    ["#girth" :chest]
-                                       :type    :linechart
-                                       :y-start 590
-                                       :cls     "lbm"
-                                       :chart-h 20}}}
+                       "#walking"  {:fields {:duration {:label "Minutes:" :cfg {:type :number :step 1}}}}
+                       "#swimming" {:fields {:duration {:label "Minutes:" :cfg {:type :number :step 1}}}}
+                       "#girth"    {:fields {:abdominal  {:label "Abdominal:" :cfg {:type :number :step 0.1} :agg :min}
+                                             :chest      {:label "Chest:" :cfg {:type :number :step 0.1} :agg :min}
+                                             :arm-flexed {:label "Arm flexed:" :cfg {:type :number :step 0.1} :agg :max}}}
+                       "#coffee"   {:fields {:vol {:label "Coffee/ml:" :cfg {:type :number :step 1}}}}
+                       "#water"    {:fields {:vol {:label "Water/ml:" :cfg {:type :number :step 1}}}}
+                       "#beer"     {:fields {:vol {:label "Beer/ml:" :cfg {:type :number :step 1}}}}}
+ :custom-field-charts [{:label "#pull-ups" :path ["#pull-ups" :cnt] :type :barchart :chart-h 35 :threshold 4 :threshold-type :above}
+                       {:label "#squats" :path ["#squats" :cnt] :type :barchart :chart-h 35 :threshold 20 :threshold-type :above}
+                       {:label "#lunges" :path ["#lunges" :cnt] :type :barchart :chart-h 35 :threshold 20 :threshold-type :above}
+                       {:label "#push-ups" :path ["#push-ups" :cnt] :type :barchart :chart-h 35 :threshold 20 :threshold-type :above}
+                       {:label "#sit-ups" :path ["#sit-ups" :cnt] :type :barchart :chart-h 35 :threshold 25 :threshold-type :above}
+                       {:label "#plank" :path ["#plank" :cnt] :type :barchart :chart-h 35 :threshold 25 :threshold-type :above :space-after 15}
+                       {:label "#running" :path ["#running" :duration] :type :barchart :chart-h 35 :threshold 10 :threshold-type :above}
+                       {:label "#cycling" :path ["#cycling" :duration] :type :barchart :chart-h 35 :threshold 10 :threshold-type :above}
+                       {:label "#crosstrainer" :path ["#crosstrainer" :duration] :type :barchart :chart-h 35 :threshold 10 :threshold-type :above}
+                       {:label "#stairsteps" :path ["#stairsteps" :cnt] :type :barchart :chart-h 35 :threshold 10 :threshold-type :above :space-after 15}
+                       {:label "#beer" :path ["#beer" :vol] :type :barchart :chart-h 35 :threshold 700 :threshold-type :below}
+                       {:label "#coffee" :path ["#coffee" :cnt] :type :barchart :chart-h 35 :threshold 600 :threshold-type :below}
+                       {:label "#water" :path ["#water" :vol] :type :barchart :chart-h 35 :threshold 2 :threshold-type :above :space-after 15}
+                       {:label "#girth abd" :path ["#girth" :abdominal] :type :linechart :cls "line" :chart-h 20}
+                       {:label "#girth chest" :path ["#girth" :chest] :type :linechart :cls "line" :chart-h 20 :space-after 15}]
+ }
