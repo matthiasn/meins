@@ -137,7 +137,7 @@
 (s/def :iww.search/timestamp (s/nilable #(re-find #"[0-9]{13}" %)))
 (s/def :iww.search/n pos-int?)
 (s/def :iww.search/query-id keyword?)
-(s/def :iww.search/tab-group keyword?)
+(s/def :iww.search/tab-group #{:left :right})
 
 (s/def :iww.search/search
   (s/keys :req-un [:iww.search/search-text
@@ -153,6 +153,11 @@
 (s/def :state/get :iww.search/search)
 (s/def :search/set-dragged (s/keys :req-un [:iww.search/query-id
                                             :iww.search/tab-group]))
+
+(s/def :iww.search-drag/dragged :search/set-dragged)
+(s/def :iww.search-drag/to :iww.search/tab-group)
+(s/def :search/move-tab (s/keys :req-un [:iww.search-drag/dragged
+                                         :iww.search-drag/to]))
 
 (s/def :show/more (s/keys :req-un [:iww.search/query-id]))
 

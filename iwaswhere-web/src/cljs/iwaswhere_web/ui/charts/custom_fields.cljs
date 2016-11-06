@@ -111,7 +111,6 @@
             charts (:custom-field-charts options)
             chart-h1 (apply + (map (fn [[k cfg]] (:chart-h cfg)) charts))
             chart-h 1030]
-        (prn chart-h1)
         [:div
          [:svg
           {:viewBox (str "0 0 600 " chart-h)}

@@ -1,6 +1,7 @@
 (ns iwaswhere-web.client-store-entry
   (:require #?(:cljs [alandipert.storage-atom :as sa])
-    [matthiasn.systems-toolbox.component :as st]))
+    [matthiasn.systems-toolbox.component :as st]
+    [iwaswhere-web.utils.parse :as p]))
 
 #?(:clj  (defonce new-entries-ls (atom {}))
    :cljs (defonce new-entries-ls (sa/local-storage
@@ -109,8 +110,9 @@
   [{:keys [current-state msg-payload]}]
   (let [ts (:timestamp msg-payload)
         saved-entry (get-in current-state [:new-entries ts])
+        parsed (p/parse-entry (:md msg-payload))
         new-state (assoc-in current-state [:new-entries ts]
-                            (merge saved-entry msg-payload))]
+                            (merge saved-entry msg-payload parsed))]
     (update-local-storage new-state)
     {:new-state new-state}))
 
