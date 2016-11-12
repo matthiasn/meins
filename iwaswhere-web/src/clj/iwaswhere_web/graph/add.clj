@@ -19,18 +19,22 @@
    an edge to the existing node will be added, otherwise a new hashtag node will
    be created.
    When any of the private tags occur, the entry is considered private, and all
-   the tags will be added to the private tags in the graph."
+   the tags that are not known to be public will be added to the private tags
+   in the graph."
   [current-state entry]
   (let [graph (:graph current-state)
         cfg (:cfg current-state)
         tags (set (:tags entry))
         pvt-tags (set/union (:pvt-displayed cfg) (:pvt-tags cfg))
         pvt-entry? (seq (set/intersection tags pvt-tags))
-        ht-parent (if pvt-entry? :pvt-hashtags :hashtags)
-        tag-type (if pvt-entry? :ptag :tag)
         tag-add-fn
         (fn [g tag]
-          (let [ltag (s/lower-case tag)]
+          (let [ltag (s/lower-case tag)
+                public-tag? (uc/has-node? graph {:tag ltag})
+                pvt-tag? (and pvt-entry?
+                              (not public-tag?))
+                ht-parent (if pvt-tag? :pvt-hashtags :hashtags)
+                tag-type (if pvt-tag? :ptag :tag)]
             (-> g
                 (uc/add-nodes ht-parent)
                 (uc/add-nodes-with-attrs [{tag-type ltag} {:val tag}])

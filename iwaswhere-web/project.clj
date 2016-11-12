@@ -2,7 +2,7 @@
   :description "Sample application built with systems-toolbox library"
   :url "https://github.com/matthiasn/systems-toolbox"
   :license {:name "GNU AFFERO GENERAL PUBLIC LICENSE"
-            :url  "http://www.gnu.org/licenses/gpl-3.0.en.html"}
+            :url  "https://www.gnu.org/licenses/agpl-3.0.en.html"}
   :dependencies [[org.clojure/clojure "1.9.0-alpha14"]
                  [org.clojure/clojurescript "1.9.293"]
                  [org.clojure/tools.logging "0.3.1"]
@@ -16,12 +16,12 @@
                  [me.raynes/fs "1.4.6"]
                  [markdown-clj "0.9.90"]
                  [cheshire "5.6.3"]
-                 [cljsjs/moment "2.10.6-4"]
+                 [cljsjs/moment "2.15.2-2"]
                  [cljsjs/leaflet "0.7.7-5"]
                  [com.drewnoakes/metadata-extractor "2.9.1"]
                  [ubergraph "0.3.0"]
                  [camel-snake-kebab "0.4.0"]
-                 [matthiasn/systems-toolbox "0.6.1-alpha9"]
+                 [matthiasn/systems-toolbox "0.6.1-alpha11"]
                  [matthiasn/systems-toolbox-ui "0.6.1-alpha11"]
                  [matthiasn/systems-toolbox-sente "0.6.1-alpha13"]
                  [matthiasn/inspect-probe "0.6.1-alpha1"]

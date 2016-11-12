@@ -1,6 +1,8 @@
 (ns iwaswhere-web.utils.misc
   (:require [clojure.string :as s]
             [clojure.set :as set]
+            #?(:clj  [clojure.pprint :as pp]
+               :cljs [cljs.pprint :as pp])
             [iwaswhere-web.specs :as specs]))
 
 (defn duration-string
