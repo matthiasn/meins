@@ -88,15 +88,17 @@
   "Adds graph nodes for year, month and day of entry and connects those if they
    don't exist. In any case, connects new entry node to the entry node of the
    matching :timeline/day node."
-  [state entry]
+  [state entry startup?]
   (let [g (:graph state)
         dt (ctc/from-long (:timestamp entry))
         year (ct/year dt)
         month (ct/month dt)
         day-node {:type :timeline/day :year year :month month :day (ct/day dt)}
         day-node-exists? (uc/has-node? g day-node)]
-    (if-not day-node-exists?
-      (gs/add-daily-summary state day-node)
+    (if (and (not day-node-exists?) (>= (:year day-node) 2016))
+      (if startup?
+        (assoc-in state [:days-to-summarize day-node] state)
+        (gs/mk-daily-summary state state day-node))
       state)))
 
 (defn add-parent-ref
@@ -196,7 +198,7 @@
 (defn add-node
   "Adds node to both graph and the sorted set, which maintains the entries
    sorted by timestamp."
-  [current-state ts entry]
+  [current-state ts entry startup?]
   (let [graph (:graph current-state)
         old-entry (when (uc/has-node? graph ts) (uc/attrs graph ts))
         merged (merge old-entry entry)
@@ -220,7 +222,7 @@
         (add-hashtags new-entry)
         (update-in [:graph] add-mentions new-entry)
         (update-in [:graph] add-linked new-entry)
-        (add-daily-summary new-entry)
+        (add-daily-summary new-entry startup?)
         (add-timeline-tree new-entry)
         (update-in [:graph] add-linked-visit new-entry)
         (update-in [:graph] add-parent-ref new-entry)

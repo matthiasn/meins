@@ -225,12 +225,10 @@
   {:stats/get            get-stats-fn
    :state/stats-tags-get stats-tags-fn})
 
-(defn add-daily-summary
+(defn mk-daily-summary
   "Gathers daily summary stats at the beginning of each day."
-  [state day-node]
-  (if (>= (:year day-node) 2016)
-    (let [day-stats (task-summary-stats state)
-          day (t/date-time (:year day-node) (:month day-node) (:day day-node))
-          day-string (ctf/unparse (ctf/formatters :year-month-day) day)]
-      (update-in state [:stats :daily-summaries day-string] merge day-stats))
-    state))
+  [state day-snapshot day-node]
+  (let [day-stats (task-summary-stats day-snapshot)
+        day (t/date-time (:year day-node) (:month day-node) (:day day-node))
+        day-string (ctf/unparse (ctf/formatters :year-month-day) day)]
+    (update-in state [:stats :daily-summaries day-string] merge day-stats)))

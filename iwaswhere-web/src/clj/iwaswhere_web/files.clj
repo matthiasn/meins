@@ -70,7 +70,7 @@
         cfg (:cfg current-state)]
     (when-not (= existing node-to-add)
       (append-daily-log cfg node-to-add))
-    {:new-state (ga/add-node current-state ts node-to-add)
+    {:new-state (ga/add-node current-state ts node-to-add false)
      :emit-msg  [[:ft/add entry]
                  [:cmd/schedule-new
                   {:timeout 5000
@@ -82,7 +82,7 @@
   [{:keys [current-state msg-payload msg-meta]}]
   (let [ts (:timestamp msg-payload)
         entry (merge msg-payload {:last-saved (st/now)})
-        new-state (ga/add-node current-state ts entry)
+        new-state (ga/add-node current-state ts entry false)
         cfg (:cfg current-state)]
     (append-daily-log cfg entry)
     {:new-state    new-state

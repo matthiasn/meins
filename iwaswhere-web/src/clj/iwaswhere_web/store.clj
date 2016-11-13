@@ -32,7 +32,7 @@
                 (do (swap! state ga/remove-node ts)
                     (swap! entries-to-index dissoc ts))
                 (do (swap! entries-to-index assoc-in [ts] parsed)
-                    (swap! state ga/add-node ts parsed))))))))))
+                    (swap! state ga/add-node ts parsed :startup))))))))))
 
 (defn load-cfg
   "Load config from file, or default config."
@@ -63,6 +63,15 @@
     (read-dir state entries-to-index conf nil)
     (doseq [[k _] (:custom-data-paths conf)]
       (read-dir state entries-to-index conf k))
+
+    (future
+      (let [days-to-summarize (:days-to-summarize @state)
+            t (with-out-str
+                (time (doseq [[day-node snapshot] days-to-summarize]
+                        (swap! state gs/mk-daily-summary snapshot day-node))))
+            cnt (count days-to-summarize)]
+        (swap! state dissoc :days-to-summarize)
+        (log/info "Created summary stats for" cnt "days." t)))
 
     (future
       (Thread/sleep 2000)
