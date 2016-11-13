@@ -3,9 +3,10 @@
    React / Reagent components are mounted on the client side at runtime."
   (:require [hiccup.core :refer [html]]
             [compojure.route :as r]
-            [iwaswhere-web.upload-qr :as qr]
+            [iwaswhere-web.routes.upload-qr :as qr]
             [iwaswhere-web.files :as f]
-            [iwaswhere-web.img-route :as ir]))
+            [iwaswhere-web.routes.images :as ir]
+            [iwaswhere-web.routes.map-tile :as mt]))
 
 (defn stylesheet [url] [:link {:href url :rel "stylesheet"}])
 
@@ -51,7 +52,8 @@
    (r/files "/audio" {:root (str f/data-path "/audio/")})
    (r/files "/videos" {:root (str f/data-path "/videos/")})
    qr/address-qr-route
-   ir/img-resized-route])
+   ir/img-resized-route
+   mt/map-tile-route])
 
 (def sente-map
   "Configuration map for sente-cmp."

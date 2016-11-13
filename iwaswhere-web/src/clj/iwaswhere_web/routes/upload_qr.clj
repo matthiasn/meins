@@ -1,4 +1,4 @@
-(ns iwaswhere-web.upload-qr
+(ns iwaswhere-web.routes.upload-qr
   "Functions for rendering a QR code that contains the IP address for upload."
   (:require [compojure.core :refer [GET]]
             [clj.qrgen :as qr]

@@ -1,4 +1,4 @@
-(ns iwaswhere-web.img-route
+(ns iwaswhere-web.routes.images
   "Functions for serving images."
   (:require [compojure.core :refer [GET]]
             [iwaswhere-web.files :as f]

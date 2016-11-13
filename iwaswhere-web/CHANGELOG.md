@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [0.1.26] - 2016-11-13
+### Changed
+-  OpenStreetMap tiles cached locally
+- private entry filter fixd
+
 ## [0.1.25] - 2016-11-06
 ### Changed
 -  auto layout for custom field charts

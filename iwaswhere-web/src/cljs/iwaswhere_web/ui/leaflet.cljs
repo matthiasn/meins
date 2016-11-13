@@ -11,7 +11,7 @@
     (let [{:keys [lat lon]} props
           map-cfg (clj->js {:scrollWheelZoom false})
           map (.setView (.map js/L (:id props) map-cfg) #js [lat lon] 13)
-          tiles-url "http://{s}.tile.osm.org/{z}/{x}/{y}.png"]
+          tiles-url "/tiles/{z}/{x}/{y}.png"]
       (.addTo (.tileLayer js/L tiles-url (clj->js {:maxZoom 18})) map)
       (.addTo (.marker js/L #js [lat lon]) map))))
 
