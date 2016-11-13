@@ -65,6 +65,7 @@
       (read-dir state entries-to-index conf k))
 
     (future
+      (log/info "Summary stats creation started")
       (let [days-to-summarize (:days-to-summarize @state)
             t (with-out-str
                 (time (doseq [[day-node snapshot] days-to-summarize]

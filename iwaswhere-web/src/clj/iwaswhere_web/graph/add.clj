@@ -115,11 +115,10 @@
   [graph entry]
   (let [linked-entries (:linked-entries entry)]
     (reduce (fn [acc linked-entry]
-              (if (uc/has-node? graph linked-entry)
-                (uc/add-edges acc [(:timestamp entry) linked-entry
-                                   {:relationship :LINKED}])
-                (do (log/warn "Linked node does not exist, skipping" linked-entry)
-                    acc)))
+              (let [with-linked (if (uc/has-node? acc linked-entry)
+                                  acc (uc/add-nodes acc linked-entry))]
+                (uc/add-edges with-linked [(:timestamp entry) linked-entry
+                                           {:relationship :LINKED}])))
             graph
             linked-entries)))
 
