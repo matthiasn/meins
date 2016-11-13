@@ -74,11 +74,8 @@
         year-node {:type :timeline/year :year year}
         month-node {:type :timeline/month :year year :month month}
         day-node {:type :timeline/day :year year :month month :day (ct/day dt)}
-        day-node-exists? (uc/has-node? g day-node)
-        with-stats (if-not day-node-exists?
-                     (gs/add-daily-summary state day-node)
-                     state)]
-    (assoc-in with-stats [:graph] (-> g
+        day-node-exists? (uc/has-node? g day-node)]
+    (assoc-in state [:graph] (-> g
                                  (uc/add-nodes year-node month-node day-node)
                                  (uc/add-edges
                                    [year-node month-node]
@@ -86,6 +83,21 @@
                                    [day-node
                                     (:timestamp entry)
                                     {:relationship :DATE}])))))
+
+(defn add-daily-summary
+  "Adds graph nodes for year, month and day of entry and connects those if they
+   don't exist. In any case, connects new entry node to the entry node of the
+   matching :timeline/day node."
+  [state entry]
+  (let [g (:graph state)
+        dt (ctc/from-long (:timestamp entry))
+        year (ct/year dt)
+        month (ct/month dt)
+        day-node {:type :timeline/day :year year :month month :day (ct/day dt)}
+        day-node-exists? (uc/has-node? g day-node)]
+    (if-not day-node-exists?
+      (gs/add-daily-summary state day-node)
+      state)))
 
 (defn add-parent-ref
   "Adds an edge to parent node when :comment-for key on the entry exists."
@@ -208,6 +220,7 @@
         (add-hashtags new-entry)
         (update-in [:graph] add-mentions new-entry)
         (update-in [:graph] add-linked new-entry)
+        (add-daily-summary new-entry)
         (add-timeline-tree new-entry)
         (update-in [:graph] add-linked-visit new-entry)
         (update-in [:graph] add-parent-ref new-entry)
