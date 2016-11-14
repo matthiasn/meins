@@ -17,7 +17,10 @@
   "Renders audio player view."
   [entry]
   (when-let [audio-file (:audio-file entry)]
-    [:audio {:controls true :preload "none"}
+    [:audio {:id       audio-file
+             :controls true
+             :preload "auto"}
+     (prn audio-file)
      [:source {:src (str "/audio/" audio-file) :type "audio/mp4"}]]))
 
 (defn audioplayer

@@ -26,7 +26,14 @@
   [entry cfg put-fn edit-mode?]
   (when-let [custom-fields (:custom-fields cfg)]
     (let [ts (:timestamp entry)
-          entry-field-tags (select-keys custom-fields (:tags entry))]
+          entry-field-tags (select-keys custom-fields (:tags entry))
+          default-story (->> entry-field-tags
+                            (map (fn [[k v]] (:default-story v)))
+                             (filter identity)
+                             first)]
+      (when (and edit-mode? default-story (not (:linked-story entry)))
+        (put-fn [:entry/update-local (merge entry
+                                            {:linked-story default-story})]))
       [:form.custom-fields
        (for [[tag conf] entry-field-tags]
          ^{:key (str "cf" ts tag)}
