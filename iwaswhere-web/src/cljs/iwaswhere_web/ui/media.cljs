@@ -1,5 +1,6 @@
 (ns iwaswhere-web.ui.media
-  (:require [clojure.string :as s]))
+  (:require [clojure.string :as s]
+            [reagent.core :as r]))
 
 (defn image-view
   "Renders image view. Used resized and properly rotated image endpoint
@@ -15,12 +16,18 @@
 
 (defn audioplayer-view
   "Renders audio player view."
-  [entry]
+  [entry put-fn]
   (when-let [audio-file (:audio-file entry)]
     [:audio {:id       audio-file
              :controls true
              :preload "auto"}
-     (prn audio-file)
+     (let [elem (js->clj (.getElementById js/document audio-file))
+           duration (when elem (.. elem -duration))
+           path [:custom-fields "#audio" :duration]]
+       (when (and duration (not (js/isNaN duration)))
+         (when-not (get-in entry path)
+           (let [updated (assoc-in entry path (js/parseInt duration))]
+             (put-fn [:entry/update-local updated])))))
      [:source {:src (str "/audio/" audio-file) :type "audio/mp4"}]]))
 
 (defn audioplayer

@@ -83,7 +83,7 @@
           cfg #()]
          [md/markdown-render entry cfg toggle-edit]))
      [c/custom-fields-div entry cfg put-fn edit-mode?]
-     [m/audioplayer-view entry]
+     [m/audioplayer-view entry put-fn]
      [l/leaflet-map
       entry (or show-map? (:show-all-maps cfg) always-show-map?) local-cfg]
      [m/image-view entry]
