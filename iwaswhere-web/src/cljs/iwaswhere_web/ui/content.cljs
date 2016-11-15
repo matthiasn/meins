@@ -6,7 +6,11 @@
             [clojure.string :as s]
             [iwaswhere-web.ui.stats :as stats]
             [iwaswhere-web.helpers :as h]
-            [iwaswhere-web.utils.parse :as p]))
+            [cljsjs.react-grid-layout]
+            [iwaswhere-web.utils.parse :as p]
+            [reagent.core :as rc]
+            [iwaswhere-web.ui.charts.pomodoros :as cp]
+            [iwaswhere-web.ui.charts.daily-summaries :as ds]))
 
 (defn tabs-header-view
   [query-cfg tab-group put-fn]
@@ -53,6 +57,43 @@
      (when query-id
        [j/journal-view cmp-map local-cfg])]))
 
+(defn GridItem
+  [props data ]
+  (prn props data)
+  ^{:key (:i data)}
+  [:div "test"])
+
+(defn onLayoutChange [on-change prev new]
+  ;; note the need to convert the callbacks from js objects
+  (on-change prev (js->clj new :keywordize-keys true)))
+
+(defn Grid
+  [args]
+  (rc/create-class
+    ;; probably dont need this..
+    {:should-component-update
+     (fn [this [_ old-props] [_ new-props]]
+       ;; just re-render when data changes and width changes
+       (or (not= (:width old-props) (:width new-props))
+           (not= (:data old-props) (:data new-props))))
+     :reagent-render
+     (fn [{:keys [id data width row-height cols item-props on-change empty-text] :as props}]
+       [:div.grid-container.split-window-view
+        (if (seq data)
+          (into [:> js/ReactGridLayout {:id              id
+                                        :cols            cols
+                                        :initial-width   width
+                                        :row-height      row-height
+                                        :draggableHandle ".grid-toolbar"
+                                        :draggableCancel ".grid-content"
+                                        ;:onLayoutChange  (partial onLayoutChange on-change data)
+                                        }]
+                (mapv (partial GridItem item-props) data))
+          ;[EmptyGrid {:text empty-text}]
+          )])}))
+
+(def rgl (rc/adapt-react-class js/ReactGridLayout))
+
 (defn split-windows-view
   "Renders a split view, with new entries at the top."
   [{:keys [observed put-fn] :as cmp-map}]
@@ -63,8 +104,27 @@
      [:div.split-windows-view
       [stats/stats-view cmp-map]
       [split-window-view cmp-map :left]
+      #_
       (when (:split-view cfg)
-        [split-window-view cmp-map :right])]
+        [split-window-view cmp-map :right])
+
+      [rgl {:id "dashboard-widget-grid"
+            :width 400 ;<determined dynamically>
+            :layout [{:i "some-key" :x 0 :y 0 :w 20 :h 2}{:i "some-key2" :x 0 :y 1 :w 1 :h 2}]
+            :data [ {:i "some-key" :x 0 :y 0 :w 2 :h 2}{:i "some-key2" :x 0 :y 1 :w 1 :h 2}]
+            :row-height 20
+            :cols 6
+            :class "split-window-view"
+            ;:on-change                                 (fn [_])   ;handle-layout-change ;; persistance to backend
+            :item-props {:class "widget-component"}
+            }
+       [:div.rgl1 {:key :yjjy  :data-grid {:i "some-key" :x 1 :y 10 :w 3 :h 2}} "bla1"]
+       [:div.rgl1 {:key :yjjy1 :data-grid {:i "some-key2" :x 0 :y 0 :w 5 :h 4}}
+        [:div.stats
+         [ds/daily-summaries-chart (:daily-summary-stats @observed) 200 put-fn]]]
+       [:div.rgl1 {:key :yjj2y :data-grid {:i "some-key3" :x 0 :y 0 :w 5 :h 4}}
+        [:div.stats
+         [cp/pomodoro-bar-chart (:pomodoro-stats @observed) 150 "Pomodoros" 5 put-fn]]]]]
      [n/new-entries-view store-snapshot local-cfg put-fn]]))
 
 (defn cmp-map

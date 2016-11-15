@@ -18,6 +18,7 @@
                  [cheshire "5.6.3"]
                  [cljsjs/moment "2.15.2-2"]
                  [cljsjs/leaflet "0.7.7-5"]
+                 [cljsjs/react-grid-layout "0.13.7-0"]
                  [com.drewnoakes/metadata-extractor "2.9.1"]
                  [ubergraph "0.3.0"]
                  [camel-snake-kebab "0.4.0"]
