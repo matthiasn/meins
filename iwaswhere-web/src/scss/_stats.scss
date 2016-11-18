@@ -40,7 +40,8 @@ $activity-weekend: lighten($activity, 30);
   svg {
     margin: 3px;
     background-color: $chart-bg;
-    width: 300px;
+    //width: 300px;
+    width: 100%;
 
     text {
       -webkit-user-select: none;

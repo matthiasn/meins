@@ -104,3 +104,13 @@ body {
   box-sizing: border-box;
   cursor: se-resize;
 }
+
+.tile-tabs {
+  overflow: auto;
+  height: 100%;
+}
+
+.tile-journal {
+  overflow: auto;
+  background-color: $body-background-color;
+}
