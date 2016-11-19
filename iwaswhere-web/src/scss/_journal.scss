@@ -7,29 +7,6 @@
   min-height: 0;
 }
 
-.split-window-container {
-  display: flex;
-  flex-flow: column;
-  min-height: 0;
-  padding: 3px;
-}
-
-.split-windows-view {
-  display: flex;
-  flex-flow: row;
-  min-height: 0;
-}
-
-.split-window-view {
-  display: flex;
-  flex: 1;
-  flex-flow: column;
-  flex-basis: 0;
-  margin-left: 0.5em;
-  background-color: $tab-bg;
-  min-height: 0;
-}
-
 .tabs-header {
   display: flex;
   flex: 0 0 auto;
@@ -61,16 +38,16 @@
   flex-flow: row;
   padding-left: 0.3em;
   min-height: 0;
-  height: 80%;
-  overflow: auto;
 }
 
 .journal-entries {
+  display:flex;
+  flex-flow: column;
+  flex: 1;
   padding: 0 0 1em 0;
   overflow-x: hidden;
   overflow-y: scroll;
   width: 100%;
-//  height: 100%;
 }
 
 .new-entries {

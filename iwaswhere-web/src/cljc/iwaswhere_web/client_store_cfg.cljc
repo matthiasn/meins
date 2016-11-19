@@ -10,6 +10,7 @@
    :show-comments-for {}
    :show-pvt          true
    :thumbnails        true
+   :reconfigure-grid  true
    :lines-shortened   3})
 
 #?(:clj  (defonce app-cfg (atom default-config))

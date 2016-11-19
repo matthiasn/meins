@@ -137,7 +137,7 @@
 (s/def :iww.search/timestamp (s/nilable #(re-find #"[0-9]{13}" %)))
 (s/def :iww.search/n pos-int?)
 (s/def :iww.search/query-id keyword?)
-(s/def :iww.search/tab-group #{:left :right})
+(s/def :iww.search/tab-group keyword?)
 
 (s/def :iww.search/search
   (s/keys :req-un [:iww.search/search-text
