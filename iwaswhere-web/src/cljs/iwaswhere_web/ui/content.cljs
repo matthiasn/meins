@@ -10,7 +10,8 @@
             [iwaswhere-web.utils.parse :as p]
             [reagent.core :as rc]
             [iwaswhere-web.ui.charts.pomodoros :as cp]
-            [iwaswhere-web.ui.charts.daily-summaries :as ds]))
+            [iwaswhere-web.ui.charts.daily-summaries :as ds]
+            [iwaswhere-web.ui.charts.wordcount :as wc]))
 
 (defn tabs-header-view
   [query-cfg tab-group put-fn]
@@ -102,9 +103,7 @@
                                         :draggableCancel ".grid-content"
                                         ;:onLayoutChange  (partial onLayoutChange on-change data)
                                         }]
-                (mapv (partial GridItem item-props) data))
-          ;[EmptyGrid {:text empty-text}]
-          )])}))
+                (mapv (partial GridItem item-props) data)))])}))
 
 (def rgl (rc/adapt-react-class js/ReactGridLayout))
 
@@ -115,42 +114,46 @@
         local-cfg {}
         cfg (:cfg store-snapshot)]
     [:div.split-window-container
+
      [:div.split-windows-view
-      ;      [stats/stats-view cmp-map]
-      ;[split-window-view cmp-map :left]
-      #_(when (:split-view cfg)
-          [split-window-view cmp-map :right])
       [rgl {:id         "dashboard-widget-grid"
             :width      1200                                 ;<determined dynamically>
-            :layout     [{:i "some-key" :x 0 :y 0 :w 20 :h 2} {:i "some-key2" :x 0 :y 1 :w 1 :h 2}]
-            :data       [{:i "some-key" :x 0 :y 0 :w 2 :h 2} {:i "some-key2" :x 0 :y 1 :w 1 :h 2}]
+            ;:layout     [{:i "some-key" :x 0 :y 0 :w 20 :h 2} {:i "some-key2" :x 0 :y 1 :w 1 :h 2}]
+            ;:data       [{:i "some-key" :x 0 :y 0 :w 2 :h 2} {:i "some-key2" :x 0 :y 1 :w 1 :h 2}]
             :row-height 20
             :cols       24
             :class      "split-window-view tile-journal"
             ;:on-change (fn [_])   ;handle-layout-change ;; persistance to backend
-            :item-props {:class "widget-component"}
-            }
-       [:div.rgl1 {:key       :yjjy
-                   :data-grid {:i "some-key" :x 1 :y 10 :w 3 :h 2}}
+            :item-props {:class "widget-component"}}
+
+       [:div.rgl1 {:key       :all-stats
+                   :data-grid {:i "all-stats" :x 0 :y 0 :w 6 :h 19}}
         [stats/stats-view cmp-map]]
-       [:div.rgl1 {:key       :yjjy1
-                   :data-grid {:i "some-key2" :x 0 :y 0 :w 5 :h 4}}
+
+       [:div.rgl1 {:key       :daily-summaries-single
+                   :data-grid {:i "daily-summaries-single" :x 6 :y 17 :w 6 :h 3}}
         [:div.stats
          [ds/daily-summaries-chart (:daily-summary-stats @observed) 200 put-fn]]]
-       [:div.rgl1 {:key       :yjj2y
-                   :data-grid {:i "some-key3" :x 0 :y 0 :w 6 :h 4}}
+
+       [:div.rgl1 {:key       :pomo-single
+                   :data-grid {:i "pomo-single" :x 12 :y 17 :w 6 :h 3}}
         [:div.stats
          [cp/pomodoro-bar-chart (:pomodoro-stats @observed) 150 "Pomodoros" 5 put-fn]]]
 
-       [:div.rgl1 {:key       :split
-                   :data-grid {:i "some-key4" :x 6 :y 0 :w 9 :h 15}}
+       [:div.rgl1 {:key       :wc-single
+                   :data-grid {                             ;:i "wc-single"
+                               :x 19 :y 17 :w 6 :h 3}}
+        [:div.stats
+         [wc/wordcount-chart (:wordcount-stats @observed) 150 put-fn 1000]]]
+
+       [:div.rgl1 {:key       :split-left
+                   :data-grid {:i "split-left" :x 6 :y 0 :w 9 :h 16}}
         [split-window-view2 cmp-map :left]]
 
-       [:div.rgl1 {:key       :split2
-                   :data-grid {:i "some-key5" :x 15 :y 0 :w 9 :h 15}}
-        [split-window-view2 cmp-map :right]]
+       [:div.rgl1 {:key       :split-right
+                   :data-grid {:i "split-right" :x 15 :y 0 :w 9 :h 16}}
+        [split-window-view2 cmp-map :right]]]]
 
-       ]]
      [n/new-entries-view store-snapshot local-cfg put-fn]]))
 
 (defn cmp-map

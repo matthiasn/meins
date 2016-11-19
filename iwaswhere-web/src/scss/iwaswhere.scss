@@ -106,11 +106,14 @@ body {
 }
 
 .tile-tabs {
-  overflow: auto;
-  height: 100%;
+  // overflow: auto;
+  //  height: 100%;
 }
 
 .tile-journal {
-  overflow: auto;
   background-color: $body-background-color;
+}
+
+.split-windows-view {
+  overflow: auto;
 }
