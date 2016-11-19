@@ -48,14 +48,8 @@ body {
 
 
 
-
-
-
 .rgl1 {
-  background-color: white;
-}
-.rgl2 {
-  background-color: lightblue;
+  background-color: $tab-bg;
 }
 
 .react-grid-layout {
@@ -107,7 +101,7 @@ body {
 
 .tile-tabs {
   // overflow: auto;
-  //  height: 100%;
+    height: 100%;
 }
 
 .tile-journal {

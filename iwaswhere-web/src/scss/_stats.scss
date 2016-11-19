@@ -23,8 +23,6 @@ $activity: steelblue;
 $activity-weekend: lighten($activity, 30);
 
 .stats {
-  display: flex;
-  flex: 0 0 auto;
   height: 100%;
   overflow: auto;
 

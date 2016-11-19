@@ -51,7 +51,7 @@
         query-cfg (:query-cfg snapshot)
         query-id (-> query-cfg :tab-groups tab-group :active)
         local-cfg {:query-id query-id :tab-group tab-group}]
-    [:div.split-window-view {:class (when (:split-view cfg) "split-view")}
+    [:div.split-window-view
      [tabs-header-view query-cfg tab-group put-fn]
      (when query-id
        [search/search-field-view snapshot put-fn query-id])

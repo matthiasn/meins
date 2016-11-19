@@ -8,7 +8,6 @@
    :show-context      true
    :show-maps-for     #{}
    :show-comments-for {}
-   :split-view        true
    :show-pvt          true
    :thumbnails        true
    :lines-shortened   3})

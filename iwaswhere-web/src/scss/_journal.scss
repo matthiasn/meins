@@ -30,10 +30,6 @@
   min-height: 0;
 }
 
-.split-view {
-  width: calc(50% - 170px);
-}
-
 .tabs-header {
   display: flex;
   flex: 0 0 auto;
@@ -66,16 +62,15 @@
   padding-left: 0.3em;
   min-height: 0;
   height: 80%;
+  overflow: auto;
 }
 
 .journal-entries {
-  display: flex;
-  flex-flow: column;
-  flex: 1;
-  flex-basis: 0;
   padding: 0 0 1em 0;
   overflow-x: hidden;
   overflow-y: scroll;
+  width: 100%;
+//  height: 100%;
 }
 
 .new-entries {

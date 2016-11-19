@@ -1,22 +1,26 @@
 # Change Log
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [0.1.27] - 2016-11-19
+### Changed
+- flexible grid
+
 ## [0.1.26] - 2016-11-13
 ### Changed
--  OpenStreetMap tiles cached locally
-- private entry filter fixd
+- OpenStreetMap tiles cached locally
+- private entry filter fixed
 
 ## [0.1.25] - 2016-11-06
 ### Changed
--  auto layout for custom field charts
+- auto layout for custom field charts
 
 ## [0.1.24] - 2016-11-05
 ### Changed
--  blink1 integration
+- blink1 integration
 
 ## [0.1.23] - 2016-10-27
 ### Changed
--  improvement in custom fields chart
+- improvement in custom fields chart
 
 ## [0.1.22] - 2016-10-23
 ### Changed
