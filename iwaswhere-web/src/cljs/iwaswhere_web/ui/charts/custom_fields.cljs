@@ -107,14 +107,19 @@
   [stats put-fn options]
   (let [local (rc/atom {})]
     (fn [stats put-fn options]
-      (let [indexed (map-indexed (fn [idx [k v]] [idx v]) stats)
-            charts-vec (:custom-field-charts options)
+      (let [charts-vec (:custom-field-charts options)
             chart-map (cf/build-chart-map charts-vec 55)
-            charts-h (:charts-h chart-map)]
+            charts-h (:charts-h chart-map)
+            dom-node (rc/dom-node (rc/current-component))
+            w (if dom-node (.-offsetWidth dom-node) 300)
+            n (.floor js/Math (/ w 5))
+            indexed (map-indexed (fn [idx [k v]] [idx v])
+                                 (take-last n stats))]
+        (prn n)
         [:div
          [:svg
-          {:viewBox (str "0 0 600 " charts-h)}
-          [cc/chart-title "custom fields"]
+          {:viewBox (str "0 0 " (* 2 w) " " charts-h)}
+          [cc/chart-title "custom fields" w]
           [cc/bg-bars indexed local charts-h :custom]
           (for [row-cfg (:charts chart-map)]
             (let [k (:label row-cfg)]
@@ -126,7 +131,7 @@
          (when-let [mouse-over (:mouse-over @local)]
            (let [path (:mouse-over-path @local)
                  v (get-in mouse-over path)]
-             [:div.mouse-over-info (cc/info-div-pos @local)
+             [:div.mouse-over-info (cc/info-div-pos2 @local)
               [:div (:date-string mouse-over)]
               (when path
                 [:div [:strong (:mouse-over-label @local)] ": " v])]))]))))

@@ -8,7 +8,8 @@
             [iwaswhere-web.helpers :as h]
             [cljsjs.react-grid-layout]
             [reagent.core :as rc]
-            [cljs.pprint :as pp]))
+            [cljs.pprint :as pp]
+            [iwaswhere-web.ui.charts.custom-fields :as cf]))
 
 (defn tabs-header-view
   [query-cfg tab-group put-fn]
@@ -57,23 +58,30 @@
 (defn grid-view
   "Renders grid view."
   [{:keys [observed put-fn] :as cmp-map}]
-  (let [store-snapshot @observed
+  (let [snapshot @observed
         local-cfg {}
-        cfg (:cfg store-snapshot)
-        configurable? (:reconfigure-grid cfg)]
+        cfg (:cfg snapshot)
+        configurable? (:reconfigure-grid cfg)
+        dom-node (rc/dom-node (rc/current-component))
+        w (if dom-node (.-offsetWidth dom-node) 1200)]
     [:div.grid-view
      [react-grid-layout
-      {:width            1200
+      {:width            w
        :row-height       20
        :cols             24
-       :margin           [10 10]
+       :margin           [8 8]
        :is-draggable     configurable?
        :is-resizable     configurable?
        :class            "tile-journal"
        :on-layout-change (fn [layout]
                            (pp/pprint (js->clj layout :keywordize-keys true)))}
+      [:div.widget {:key       :custom-fields
+                    :data-grid {:x 0 :y 0 :w 6 :h 16}}
+       [:div.stats
+        [cf/custom-fields-chart
+         (:custom-field-stats snapshot) put-fn (:options snapshot)]]]
       [:div.widget {:key       :all-stats
-                    :data-grid {:x 0 :y 0 :w 6 :h 19}}
+                    :data-grid {:x 0 :y 0 :w 6 :h 16}}
        [stats/stats-view cmp-map]]
       [:div.widget {:key       :split-left
                     :data-grid {:x 6 :y 0 :w 9 :h 19}}
@@ -84,7 +92,7 @@
       #_[:div.widget {:key       :split-right2
                       :data-grid {:x 15 :y 17 :w 9 :h 16}}
          [tabs-view cmp-map :right2]]]
-     [n/new-entries-view store-snapshot local-cfg put-fn]]))
+     [n/new-entries-view snapshot local-cfg put-fn]]))
 
 (defn cmp-map
   [cmp-id]

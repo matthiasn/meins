@@ -19,13 +19,12 @@
   [{:keys [observed put-fn]}]
   (let [snapshot @observed
         {:keys [pomodoro-stats activity-stats task-stats wordcount-stats
-                daily-summary-stats media-stats custom-field-stats]} snapshot]
+                daily-summary-stats media-stats]} snapshot]
     [:div.stats
      [:div.charts
       [cp/pomodoro-bar-chart pomodoro-stats 150 "Pomodoros" 5 put-fn]
       [ct/tasks-chart task-stats 250 put-fn]
       [ds/daily-summaries-chart daily-summary-stats 200 put-fn]
-      [cf/custom-fields-chart custom-field-stats put-fn (:options snapshot)]
       [wc/wordcount-chart wordcount-stats 150 put-fn 1000]
       [ca/activity-weight-chart activity-stats 250 put-fn]
       [m/media-chart media-stats 150 put-fn]]]))
@@ -69,7 +68,7 @@
   [{:keys [put-fn]}]
   (get-stats :stats/pomodoro put-fn 60)
   (get-stats :stats/activity put-fn 60)
-  (get-stats :stats/custom-fields put-fn 60)
+  (get-stats :stats/custom-fields put-fn 120)
   (get-stats :stats/tasks put-fn 60)
   (get-stats :stats/wordcount put-fn 60)
   (get-stats :stats/media put-fn 60)

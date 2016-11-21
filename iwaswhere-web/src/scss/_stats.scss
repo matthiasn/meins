@@ -37,9 +37,8 @@ $activity-weekend: lighten($activity, 30);
   }
 
   svg {
-    margin: 3px;
+    margin: 2px 0;
     background-color: $chart-bg;
-    //width: 300px;
     width: 100%;
 
     text {
@@ -174,8 +173,6 @@ $activity-weekend: lighten($activity, 30);
 #stats {
   flex: 0 0 auto;
   background-color: $stats-bg-color;
-  overflow-y: auto;
-  padding: 2px;
 }
 
 .stats-string {

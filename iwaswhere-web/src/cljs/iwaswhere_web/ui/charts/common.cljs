@@ -1,6 +1,7 @@
 (ns iwaswhere-web.ui.charts.common
   (:require [clojure.string :as s]
-            [iwaswhere-web.utils.parse :as up]))
+            [iwaswhere-web.utils.parse :as up]
+            [reagent.core :as rc]))
 
 (defn line-points
   [indexed mapper]
@@ -22,8 +23,8 @@
   (str cls (when (weekend? (:date-string v)) "-weekend")))
 
 (defn chart-title
-  [title]
-  [:text {:x           300
+  [title x]
+  [:text {:x           (or x 300)
           :y           32
           :stroke      "none"
           :fill        "#AAA"
@@ -69,6 +70,22 @@
         page-h (.-scrollHeight (.-body js/document))]
     {:style {:top  (min (:y mouse-pos) (- page-h 80))
              :left (if (< (- page-w mouse-x) 120)
+                     (- mouse-x 100)
+                     (+ mouse-x 20))}}))
+
+(defn info-div-pos2
+  "Determines position for info div in chart, depending on position on page.
+   Avoids going so low or far to the right on the page that the div would be
+   cut off."
+  [snapshot]
+  (let [mouse-pos (:mouse-pos snapshot)
+        mouse-x (:x mouse-pos)
+        page-w (.-scrollWidth (.-body js/document))
+        page-h (.-scrollHeight (.-body js/document))
+        dom-node (rc/dom-node (rc/current-component))
+        w (if dom-node (.-offsetWidth dom-node) 300)]
+    {:style {:top  (+ 10 (min (:y mouse-pos) (- page-h 80)))
+             :left (if (> mouse-x (/ w 2))
                      (- mouse-x 100)
                      (+ mouse-x 20))}}))
 
