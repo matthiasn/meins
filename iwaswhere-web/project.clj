@@ -1,4 +1,4 @@
-(defproject matthiasn/iwaswhere-web "0.1.27"
+(defproject matthiasn/iwaswhere-web "0.1.28"
   :description "Sample application built with systems-toolbox library"
   :url "https://github.com/matthiasn/systems-toolbox"
   :license {:name "GNU AFFERO GENERAL PUBLIC LICENSE"
@@ -25,7 +25,7 @@
                  [matthiasn/systems-toolbox "0.6.2"]
                  [matthiasn/systems-toolbox-ui "0.6.1"]
                  [matthiasn/systems-toolbox-sente "0.6.1"]
-                 [matthiasn/inspect-probe "0.6.1-alpha1"]
+                 [matthiasn/systems-toolbox-probe "0.6.2"]
                  [clucy "0.4.0"]
                  [seesaw "1.4.5"]
                  [clj.qrgen "0.4.0"]

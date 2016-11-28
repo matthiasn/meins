@@ -1,6 +1,7 @@
 (ns iwaswhere-web.client-store-cfg
   (:require #?(:cljs [alandipert.storage-atom :as sa])
-    [matthiasn.systems-toolbox.component :as st]))
+    [matthiasn.systems-toolbox.component :as st]
+    [clojure.pprint :as pp]))
 
 (def default-config
   {:active            nil
@@ -11,11 +12,34 @@
    :show-pvt          true
    :thumbnails        true
    :reconfigure-grid  true
-   :lines-shortened   3})
+   :lines-shortened   3
+   :widgets           {:tabs-left     {:type      :tabs-view
+                                       :query-id  :left
+                                       :data-grid {:x 6 :y 0 :w 9 :h 19}}
+                       :tabs-right    {:type      :tabs-view
+                                       :query-id  :right
+                                       :data-grid {:x 15 :y 0 :w 9 :h 19}}
+                       :custom-fields {:type      :custom-fields-chart
+                                       :data-grid {:x 0 :y 0 :w 6 :h 10}}
+                       :all-stats     {:type      :all-stats-chart
+                                       :data-grid {:x 0 :y 0 :w 6 :h 9}}}})
 
 #?(:clj  (defonce app-cfg (atom default-config))
    :cljs (defonce app-cfg (sa/local-storage (atom default-config)
                                             "iWasWhere_cfg")))
+
+(defn save-layout
+  "Saves current layout in config."
+  [{:keys [current-state msg-payload]}]
+  (let [mapper (fn [widget]
+                 (let [k (keyword (:i widget))
+                       data-grid (select-keys widget [:x :y :w :h])]
+                   [k {:data-grid data-grid}]))
+        new-layout (into {} (map mapper msg-payload))
+        merged (merge-with merge (:widgets (:cfg current-state)) new-layout)
+        new-state (assoc-in current-state [:cfg :widgets] merged)]
+    {:new-state    new-state
+     :send-to-self [:cfg/save]}))
 
 (defn save-cfg
   "Saves current configuration in localstorage."
@@ -56,7 +80,7 @@
         new-state (assoc-in current-state [:cfg :active query-id]
                             (when-not (= currently-active timestamp)
                               timestamp))]
-    {:new-state new-state
+    {:new-state    new-state
      :send-to-self [:cfg/save]}))
 
 (defn toggle-set-fn

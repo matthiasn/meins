@@ -10,7 +10,7 @@
   "Update client side state with list of journal entries received from backend."
   [{:keys [current-state msg-payload msg-meta]}]
   (let [store-meta (:client/store-cmp msg-meta)
-        {:keys [entries entries-map ]} msg-payload
+        {:keys [entries entries-map]} msg-payload
         new-state (-> current-state
                       (assoc-in [:results] entries)
                       (update-in [:entries-map] merge entries-map)
@@ -84,11 +84,14 @@
    :state-fn          initial-state-fn
    :snapshot-xform-fn #(dissoc % :last-alive)
    :state-spec        :state/client-store-spec
+   :opts              {:msgs-on-firehose      true
+                       :snapshots-on-firehose true}
    :handler-map       (merge cse/entry-handler-map
                              s/search-handler-map
                              {:state/new          new-state-fn
                               :stats/result       save-stats-fn
                               :state/stats-tags   stats-tags-fn
+                              :layout/save        c/save-layout
                               :cfg/save           c/save-cfg
                               :cmd/toggle-active  c/toggle-active-fn
                               :cmd/toggle         c/toggle-set-fn

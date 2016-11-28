@@ -53,6 +53,20 @@
      (when query-id
        [j/journal-view cmp-map local-cfg])]))
 
+(defn widget-view
+  [{:keys [observed put-fn] :as cmp-map} id cfg]
+  (let [t (:type cfg)
+        snapshot @observed]
+    [:div.widget {:key       id
+                  :data-grid (:data-grid cfg)}
+     (case t
+       :tabs-view [tabs-view cmp-map (:query-id cfg)]
+       :custom-fields-chart (let [stats (:custom-field-stats snapshot)
+                                  options (:options snapshot)]
+                              [cf/custom-fields-chart stats put-fn options])
+       :all-stats-chart [stats/stats-view cmp-map]
+       [:div "unknown type"])]))
+
 (def react-grid-layout (rc/adapt-react-class js/ReactGridLayout))
 
 (defn grid-view
@@ -62,36 +76,22 @@
         local-cfg {}
         cfg (:cfg snapshot)
         configurable? (:reconfigure-grid cfg)
-        dom-node (rc/dom-node (rc/current-component))
-        w (if dom-node (.-offsetWidth dom-node) 1200)]
+        widgets (:widgets cfg)]
     [:div.grid-view
-     [react-grid-layout
-      {:width            w
-       :row-height       20
-       :cols             24
-       :margin           [8 8]
-       :is-draggable     configurable?
-       :is-resizable     configurable?
-       :class            "tile-journal"
-       :on-layout-change (fn [layout]
-                           (pp/pprint (js->clj layout :keywordize-keys true)))}
-      [:div.widget {:key       :custom-fields
-                    :data-grid {:x 0 :y 0 :w 6 :h 16}}
-       [:div.stats
-        [cf/custom-fields-chart
-         (:custom-field-stats snapshot) put-fn (:options snapshot)]]]
-      [:div.widget {:key       :all-stats
-                    :data-grid {:x 0 :y 0 :w 6 :h 16}}
-       [stats/stats-view cmp-map]]
-      [:div.widget {:key       :split-left
-                    :data-grid {:x 6 :y 0 :w 9 :h 19}}
-       [tabs-view cmp-map :left]]
-      [:div.widget {:key       :split-right
-                    :data-grid {:x 15 :y 0 :w 9 :h 19}}
-       [tabs-view cmp-map :right]]
-      #_[:div.widget {:key       :split-right2
-                      :data-grid {:x 15 :y 17 :w 9 :h 16}}
-         [tabs-view cmp-map :right2]]]
+     (when (seq widgets)
+       (into
+         [react-grid-layout
+          {:width            (.-innerWidth js/window)
+           :row-height       20
+           :cols             24
+           :margin           [8 8]
+           :is-draggable     configurable?
+           :is-resizable     configurable?
+           :class            "tile-journal"
+           :on-layout-change (fn [layout]
+                               (let [new (js->clj layout :keywordize-keys true)]
+                                 (put-fn [:layout/save new])))}]
+         (mapv (fn [[k v]] (widget-view cmp-map k v)) widgets)))
      [n/new-entries-view snapshot local-cfg put-fn]]))
 
 (defn cmp-map

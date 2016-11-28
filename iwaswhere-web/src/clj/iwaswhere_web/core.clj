@@ -4,7 +4,7 @@
   (:gen-class)
   (:require [matthiasn.systems-toolbox.switchboard :as sb]
             [matthiasn.systems-toolbox-sente.server :as sente]
-            [matthiasn.inspect-probe.probe :as probe]
+            [matthiasn.systems-toolbox-probe.probe :as probe]
             [iwaswhere-web.index :as idx]
             [iwaswhere-web.specs]
             [clojure.tools.logging :as log]

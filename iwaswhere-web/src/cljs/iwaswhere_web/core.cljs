@@ -18,7 +18,10 @@
                                :cmd/keep-alive :stats/pomo-day-get
                                :stats/get :import/movie :blink/busy
                                :state/stats-tags-get :import/weight
-                               :state/search :cfg/refresh}})
+                               :state/search :cfg/refresh
+                               :firehose/cmp-put
+                               :firehose/cmp-recv
+                               :firehose/cmp-publish-state}})
 
 (defn init!
   "Initializes client-side system by sending messages to the switchboard for
@@ -52,6 +55,8 @@
                           :to   #{:client/content-cmp
                                   :client/menu-cmp
                                   :client/stats-cmp}}]
+
+     [:cmd/attach-to-firehose :client/ws-cmp]
 
      [:cmd/route {:from :client/ws-cmp
                   :to   :client/stats-cmp}]

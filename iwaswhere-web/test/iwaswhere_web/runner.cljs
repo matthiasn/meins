@@ -6,7 +6,8 @@
             [iwaswhere-web.client-keepalive-test]
             [iwaswhere-web.ui-markdown-test]
             [iwaswhere-web.ui-pomodoros-test]
-            [iwaswhere-web.misc-utils-test]))
+            [iwaswhere-web.misc-utils-test]
+            [iwaswhere-web.client-store-cfg-test]))
 
 (doo-tests 'iwaswhere-web.client-store-test
            'iwaswhere-web.client-store-entry-test
@@ -14,4 +15,5 @@
            'iwaswhere-web.client-keepalive-test
            'iwaswhere-web.ui-markdown-test
            'iwaswhere-web.ui-pomodoros-test
-           'iwaswhere-web.misc-utils-test)
+           'iwaswhere-web.misc-utils-test
+           'iwaswhere-web.client-store-cfg-test)
