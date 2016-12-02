@@ -2,9 +2,8 @@
   "Get stats from graph."
   (:require [ubergraph.core :as uber]
             [iwaswhere-web.graph.query :as gq]
-            [matthiasn.systems-toolbox.component :as st]
             [clj-time.core :as t]
-            [iwaswhere-web.ui.markdown :as md]
+            [iwaswhere-web.utils.misc :as u]
             [clj-time.format :as ctf]
             [matthiasn.systems-toolbox.log :as l]
             [clojure.tools.logging :as log]))
@@ -79,7 +78,7 @@
           date-string (:date-string d)
           day-nodes (gq/get-nodes-for-day g {:date-string date-string})
           day-nodes-attrs (map #(uber/attrs g %) day-nodes)
-          counts (map (fn [entry] (md/count-words entry)) day-nodes-attrs)
+          counts (map (fn [entry] (u/count-words entry)) day-nodes-attrs)
           day-stats {:date-string date-string
                      :word-count  (apply + counts)}]
       [date-string day-stats])))

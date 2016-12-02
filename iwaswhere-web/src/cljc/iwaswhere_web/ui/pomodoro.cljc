@@ -12,11 +12,20 @@
    :completed-time 0
    :interruptions  0})
 
+(defn time-left?
+  [entry]
+  (> (:planned-dur entry) (:completed-time entry)))
+
+(defn bolts
+  [interruptions]
+  (if (<= interruptions 3)
+    (into [:span] (map (fn [_] [:span.fa.fa-bolt]) (range interruptions)))
+    [:span [:span.fa.fa-bolt] [:span.bolt-cnt interruptions]]))
+
 (defn pomodoro-header
   "Header showing time done, plus controls when not completed."
   [entry start-fn edit-mode?]
-  (let [time-left? #(> (:planned-dur %) (:completed-time %))
-        running? (:pomodoro-running entry)
+  (let [running? (:pomodoro-running entry)
         completed-time (:completed-time entry)
         interruptions (:interruptions entry)]
     (when (= (:entry-type entry) :pomodoro)
@@ -25,9 +34,7 @@
                               [:span.fa.fa-clock-o.completed])
        (when (pos? completed-time)
          [:span.dur (u/duration-string completed-time)])
-       (if (<= interruptions 3)
-         (into [:span] (map (fn [_] [:span.fa.fa-bolt]) (range interruptions)))
-         [:span [:span.fa.fa-bolt] [:span.bolt-cnt interruptions]])
+       [bolts interruptions]
        (when (and edit-mode? (time-left? entry))
          [:span.btn {:on-click start-fn
                      :class    (if running? "stop" "start")}

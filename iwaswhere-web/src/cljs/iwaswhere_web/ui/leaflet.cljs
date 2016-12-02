@@ -8,12 +8,16 @@
    longitude, also from the props map."
   [props]
   (fn []
-    (let [{:keys [lat lon]} props
+    (let [{:keys [lat lon zoom put-fn ts]} props
+          zoom (or zoom 13)
           map-cfg (clj->js {:scrollWheelZoom false})
-          map (.setView (.map js/L (:id props) map-cfg) #js [lat lon] 13)
+          map (.setView (.map js/L (:id props) map-cfg) #js [lat lon] zoom)
           tiles-url "/tiles/{z}/{x}/{y}.png"]
       (.addTo (.tileLayer js/L tiles-url (clj->js {:maxZoom 18})) map)
-      (.addTo (.marker js/L #js [lat lon]) map))))
+      (.addTo (.marker js/L #js [lat lon]) map)
+      (.on map "zoomend" #(put-fn [:entry/update-local
+                                   {:map-zoom  (aget % "target" "_zoom")
+                                    :timestamp ts}])))))
 
 (defn leaflet-component
   "Creates a leaflet map reagent class. The reagent-render function only creates
@@ -28,9 +32,12 @@
 
 (defn leaflet-map
   "Helper for showing map when exists and desired."
-  [entry show? local-cfg]
-  (let [{:keys [latitude longitude timestamp]} entry]
+  [entry show? local-cfg put-fn]
+  (let [{:keys [latitude longitude timestamp map-zoom]} entry]
     (when (and show? latitude)
-      [leaflet-component {:id  (str "map" timestamp (:query-id local-cfg))
-                          :lat latitude
-                          :lon longitude}])))
+      [leaflet-component {:id     (str "map" timestamp (:query-id local-cfg))
+                          :lat    latitude
+                          :lon    longitude
+                          :zoom   map-zoom
+                          :ts     timestamp
+                          :put-fn put-fn}])))

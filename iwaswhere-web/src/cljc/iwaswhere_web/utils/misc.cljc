@@ -30,12 +30,12 @@
 
 (defn pvt-filter
   "Filter for entries considered private."
-  [cfg]
+  [options]
   (fn
     [entry]
     (let [tags (set (map s/lower-case (:tags entry)))
-          private-tags (:pvt-hashtags cfg)
-          hashtags (:hashtags cfg)
+          private-tags (:pvt-hashtags options)
+          hashtags (:hashtags options)
           only-pvt-tags (set/difference private-tags hashtags)
           matched (set/intersection tags only-pvt-tags)]
       (empty? matched))))
@@ -81,3 +81,17 @@
           (let [missing-entry {:timestamp ts}]
             (put-fn [:entry/find missing-entry])
             missing-entry)))))
+
+(defn count-words
+  "Naive implementation of a wordcount function."
+  [entry]
+  (if-let [text (:md entry)]
+    (count (s/split text #" "))
+    0))
+
+(defn count-words-formatted
+  "Generate wordcount string."
+  [entry]
+  (let [cnt (count-words entry)]
+    (when (> cnt 20)
+      (str cnt " words"))))

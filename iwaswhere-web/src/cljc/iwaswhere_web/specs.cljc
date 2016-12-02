@@ -304,3 +304,5 @@
                    :iww.client-state/cfg]))
 
 (s/def :state/search :iww.client-state/query-cfg)
+
+(s/def :layout/save (s/coll-of map?))

@@ -1,9 +1,7 @@
 (ns iwaswhere-web.core
   (:require [iwaswhere-web.specs]
             [iwaswhere-web.client-store :as store]
-            [iwaswhere-web.ui.stats :as stats]
-            [iwaswhere-web.ui.menu :as m]
-            [iwaswhere-web.ui.content :as c]
+            [iwaswhere-web.ui.re-frame :as rf]
             [iwaswhere-web.keepalive :as ka]
             [matthiasn.systems-toolbox.switchboard :as sb]
             [matthiasn.systems-toolbox-sente.client :as sente]
@@ -30,39 +28,27 @@
   []
   (sb/send-mult-cmd
     switchboard
-    [[:cmd/init-comp
-      #{(sente/cmp-map :client/ws-cmp sente-cfg) ; WebSocket communication
-        (m/cmp-map :client/menu-cmp)             ; UI component for menu
-        (c/cmp-map :client/content-cmp)          ; UI component for journal
-        (store/cmp-map :client/store-cmp)        ; Data store component
-        (sched/cmp-map :client/scheduler-cmp)    ; Scheduler component
-        (stats/cmp-map :client/stats-cmp)        ; UI component for stats
-        }]
+    [[:cmd/init-comp #{(sente/cmp-map :client/ws-cmp sente-cfg)
+                       (store/cmp-map :client/store-cmp)
+                       (sched/cmp-map :client/scheduler-cmp)
+                       (rf/cmp-map :client/ui-cmp)}]
 
      [:cmd/route {:from #{:client/store-cmp
-                          :client/stats-cmp
-                          :client/content-cmp
-                          :client/menu-cmp}
+                          :client/ui-cmp}
                   :to   :client/ws-cmp}]
 
      [:cmd/route {:from #{:client/ws-cmp
-                          :client/content-cmp
-                          :client/stats-cmp
-                          :client/menu-cmp}
+                          :client/ui-cmp}
                   :to   :client/store-cmp}]
 
-     [:cmd/observe-state {:from :client/store-cmp
-                          :to   #{:client/content-cmp
-                                  :client/menu-cmp
-                                  :client/stats-cmp}}]
+     ;[:cmd/attach-to-firehose :client/ws-cmp]
 
-     [:cmd/attach-to-firehose :client/ws-cmp]
-
-     [:cmd/route {:from :client/ws-cmp
-                  :to   :client/stats-cmp}]
-
-     [:cmd/route {:from #{:client/store-cmp :client/menu-cmp}
+     [:cmd/route {:from #{:client/store-cmp
+                          :client/ui-cmp}
                   :to   :client/scheduler-cmp}]
+
+     [:cmd/observe-state {:from :client/store-cmp
+                          :to   :client/ui-cmp}]
 
      [:cmd/route {:from :client/scheduler-cmp
                   :to   #{:client/store-cmp

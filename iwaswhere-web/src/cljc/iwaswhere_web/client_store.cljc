@@ -1,7 +1,10 @@
 (ns iwaswhere-web.client-store
   (:require #?(:cljs [alandipert.storage-atom :refer [local-storage]])
+    #?(:cljs [reagent.core :refer [atom]])
+    #?(:cljs [iwaswhere-web.ui.stats :as stats])
     [matthiasn.systems-toolbox.component :as st]
     [iwaswhere-web.keepalive :as ka]
+    [re-frame.db :as rdb]
     [iwaswhere-web.client-store-entry :as cse]
     [iwaswhere-web.client-store-search :as s]
     [iwaswhere-web.client-store-cfg :as c]))
@@ -22,7 +25,7 @@
 
 (defn stats-tags-fn
   "Update client side state with stats and tags received from backend."
-  [{:keys [current-state msg-payload]}]
+  [{:keys [current-state msg-payload put-fn]}]
   (let [stories (:stories msg-payload)
         sorted-stories (sort (fn [[_ x] [_ y]]
                                (< (:story-name x) (:story-name y)))
@@ -39,6 +42,7 @@
             (assoc-in [:options :sorted-stories] sorted-stories)
             (assoc-in [:options :mentions] (:mentions msg-payload))
             (assoc-in [:stats] (:stats msg-payload)))]
+    #?(:cljs (stats/update-stats put-fn))
     {:new-state new-state}))
 
 (defn initial-state-fn
@@ -84,8 +88,10 @@
    :state-fn          initial-state-fn
    :snapshot-xform-fn #(dissoc % :last-alive)
    :state-spec        :state/client-store-spec
-   :opts              {:msgs-on-firehose      true
-                       :snapshots-on-firehose true}
+   :opts              {
+                       ;:msgs-on-firehose true
+                       ;:snapshots-on-firehose true
+                       }
    :handler-map       (merge cse/entry-handler-map
                              s/search-handler-map
                              {:state/new          new-state-fn

@@ -47,7 +47,7 @@
    dropped."
   [entry cfg put-fn]
   (fn [_ev]
-    (let [ts (:currently-dragged cfg)
+    (let [ts (:currently-dragged @cfg)
           new-entry (update-in entry [:linked-entries] #(set (conj % ts)))]
       (put-fn [:entry/update (h/clean-entry new-entry)]))))
 
@@ -79,40 +79,39 @@
 (defn entry-actions
   "Entry-related action buttons. Hidden by default, become visible when mouse
    hovers over element, stays visible for a little while after mose leaves."
-  [entry cfg put-fn edit-mode? toggle-edit local-cfg]
+  [entry put-fn edit-mode? toggle-edit local-cfg]
   (let [visible (r/atom false)
-        hide-fn (fn [_ev]
-                  (.setTimeout js/window #(reset! visible false) 60000))]
-    (fn
-      [entry cfg put-fn edit-mode? toggle-edit local-cfg]
-      (let [ts (:timestamp entry)
-            query-id (:query-id local-cfg)
-            tab-group (:tab-group local-cfg)
-            map? (:latitude entry)
-            toggle-map #(put-fn [:cmd/toggle
-                                 {:timestamp ts
-                                  :path      [:cfg :show-maps-for]}])
-            show-hide-comments #(put-fn [:cmd/assoc-in
-                                         {:path  [:cfg :show-comments-for ts]
-                                          :value %}])
-            show-comments #(show-hide-comments query-id)
-            create-comment (h/new-entry-fn put-fn {:comment-for ts} show-comments)
-            create-linked-entry (h/new-entry-fn put-fn {:linked-entries [ts]} nil)
-            new-pomodoro (h/new-entry-fn
-                           put-fn (p/pomodoro-defaults ts) show-comments)
-            trash-entry #(if edit-mode?
-                          (put-fn [:entry/remove-local {:timestamp ts}])
-                          (put-fn [:entry/trash entry]))
-            open-external (up/add-search ts tab-group put-fn)
+        hide-fn (fn [_ev] (.setTimeout js/window #(reset! visible false) 60000))
+        ts (:timestamp entry)
+        query-id (:query-id local-cfg)
+        tab-group (:tab-group local-cfg)
+        toggle-map #(put-fn [:cmd/toggle
+                             {:timestamp ts
+                              :path      [:cfg :show-maps-for]}])
+        show-hide-comments #(put-fn [:cmd/assoc-in
+                                     {:path  [:cfg :show-comments-for ts]
+                                      :value %}])
+        show-comments #(show-hide-comments query-id)
+        create-comment (h/new-entry-fn put-fn {:comment-for ts} show-comments)
+        create-linked-entry (h/new-entry-fn put-fn {:linked-entries [ts]} nil)
+        new-pomodoro (h/new-entry-fn
+                       put-fn (p/pomodoro-defaults ts) show-comments)
+        trash-entry #(if edit-mode?
+                       (put-fn [:entry/remove-local {:timestamp ts}])
+                       (put-fn [:entry/trash entry]))
+        open-external (up/add-search ts tab-group put-fn)
+        upvote (upvote-fn entry inc put-fn)
+        mouse-enter #(reset! visible true)]
+    (fn entry-actions-render [entry put-fn edit-mode? toggle-edit local-cfg]
+      (let [map? (:latitude entry)
             upvotes (:upvotes entry)
             prev-saved? (:last-saved entry)]
-        [:div {:on-mouse-enter #(reset! visible true)
-               :on-drag-over   #(do (hide-fn nil) (reset! visible true))
+        [:div {:on-mouse-enter mouse-enter
                :on-mouse-leave hide-fn
                :style          {:opacity (if (or edit-mode? @visible) 1 0)}}
          (when prev-saved?
            [:span.fa.toggle
-            {:on-click (upvote-fn entry inc put-fn)
+            {:on-click upvote
              :class    (if (pos? upvotes) "fa-thumbs-up" "fa-thumbs-o-up")}])
          (when map? [:span.fa.fa-map-o.toggle {:on-click toggle-map}])
          (when prev-saved?

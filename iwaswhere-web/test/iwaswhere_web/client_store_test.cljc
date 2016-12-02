@@ -105,6 +105,9 @@
       (is (= (:query (:timing new-state)) (:duration-ms state-from-backend)))
       (is (= (:rtt (:timing new-state)) 57)))))
 
+;; TODO: revive this
+
+#_
 (deftest stats-tags-test
   (let [current-state @(:state (store/initial-state-fn (fn [_put-fn])))
         new-state (:new-state (store/stats-tags-fn

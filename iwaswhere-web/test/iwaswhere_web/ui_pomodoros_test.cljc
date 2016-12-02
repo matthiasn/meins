@@ -216,6 +216,9 @@
    :timestamp      1465059173965
    :md             "Moving to #cljc"})
 
+;; TODO: this should be revived
+
+#_
 (deftest pomodoro-header-test
   (let [fake-start-fn #()]
     (testing "renders nothing when entry not of type :pomodoro"

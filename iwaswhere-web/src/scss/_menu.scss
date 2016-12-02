@@ -1,11 +1,7 @@
 @import "variables.scss";
 
-#header {
-  width: 100%;
-  flex: 0 0 auto;
-}
-
 .menu-header {
+  flex: 0 0 auto;
   display: flex;
   z-index: 1004;
   flex-flow: row;

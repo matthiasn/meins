@@ -2,6 +2,12 @@
   (:require [reagent.core :as rc]
             [iwaswhere-web.ui.charts.common :as cc]
             [iwaswhere-web.charts.custom-fields-cfg :as cf]
+            [re-frame.core :refer [reg-event-db
+                                   path
+                                   reg-sub
+                                   dispatch
+                                   dispatch-sync
+                                   subscribe]]
             [clojure.pprint :as pp]))
 
 (defn mouse-leave-fn
@@ -43,7 +49,7 @@
 
 (defn linechart-row
   "Draws line chart."
-  [indexed local put-fn cfg k]
+  [indexed local  cfg k]
   (let [{:keys [path chart-h y-start cls]} cfg
         vals (filter second (map (fn [[k v]] [k (get-in v path)]) indexed))
         max-val (or (apply max (map second vals)) 10)
@@ -104,17 +110,20 @@
 (defn custom-fields-chart
   "Draws custom fields chart, with a row for each configured chart. The
    position of each chart is calculated in the cf namespace."
-  [stats put-fn options]
-  (let [local (rc/atom {})]
-    (fn [stats put-fn options]
-      (let [charts-vec (:custom-field-charts options)
+  [put-fn]
+  (let [local (rc/atom {})
+        stats (subscribe [:custom-field-stats])
+        options (subscribe [:options])]
+    (fn custom-fields-chart-render
+      [put-fn]
+      (let [charts-vec (:custom-field-charts @options)
             chart-map (cf/build-chart-map charts-vec 55)
             charts-h (:charts-h chart-map)
             dom-node (rc/dom-node (rc/current-component))
             w (if dom-node (.-offsetWidth dom-node) 300)
             n (.floor js/Math (/ w 5))
             indexed (map-indexed (fn [idx [k v]] [idx v])
-                                 (take-last n stats))]
+                                 (take-last n @stats))]
         [:div.stats
          [:svg
           {:viewBox (str "0 0 " (* 2 w) " " charts-h)}
@@ -126,7 +135,7 @@
                 ^{:key (str :custom-fields-barchart (:path row-cfg))}
                 [barchart-row indexed local put-fn row-cfg k]
                 ^{:key (str :custom-fields-linechart (:path row-cfg))}
-                [linechart-row indexed local put-fn row-cfg k])))]
+                [linechart-row indexed local row-cfg k])))]
          (when-let [mouse-over (:mouse-over @local)]
            (let [path (:mouse-over-path @local)
                  v (get-in mouse-over path)]

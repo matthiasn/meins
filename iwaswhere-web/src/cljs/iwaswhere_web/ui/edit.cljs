@@ -6,7 +6,10 @@
             [iwaswhere-web.utils.misc :as u]
             [iwaswhere-web.utils.parse :as p]
             [reagent.core :as r]
-            [clojure.string :as s]))
+            [re-frame.core :refer [subscribe]]
+            [reagent.ratom :refer-macros [reaction]]
+            [clojure.string :as s]
+            [clojure.set :as set]))
 
 (defn editable-code-elem
   "Code element, with content editable. Takes md-string to render,
@@ -36,12 +39,19 @@
    mentions before the cursor, which can then be completed by clicking on an
    empty in the autosuggested list, or by using the tab key for selecting the
    first one."
-  [entry hashtags mentions put-fn toggle-edit]
-  (let [entry (-> entry (dissoc :comments) (dissoc :linked-entries))
+  [entry put-fn]
+  (let [cfg (subscribe [:cfg])
+        options (subscribe [:options])
+        show-pvt? (reaction (:show-pvt @cfg))
+        hashtags (reaction (set/union (:hashtags @options) (:pvt-displayed @options)))
+        pvt-hashtags (reaction (:pvt-hashtags @options))
+        hashtags (reaction (if @show-pvt? (concat @hashtags @pvt-hashtags) @hashtags))
+        mentions (reaction (:mentions @options))
+        entry (-> entry (dissoc :comments) (dissoc :linked-entries))
         ts (:timestamp entry)
         edit-elem-atom (atom {})
         local-display-entry (r/atom entry)]
-    (fn [entry hashtags mentions put-fn toggle-edit]
+    (fn [entry put-fn]
       (let [latest-entry (dissoc entry :comments)
             md-string (or (:md @local-display-entry) "edit here")
             get-content #(aget (.. % -target -parentElement -parentElement
@@ -61,9 +71,9 @@
             before-cursor (h/string-before-cursor (:md latest-entry))
 
             [curr-tag f-tags] (p/autocomplete-tags
-                                before-cursor "(?!^) ?#" hashtags)
+                                before-cursor "(?!^) ?#" @hashtags)
             [curr-mention f-mentions] (p/autocomplete-tags
-                                        before-cursor " ?@" mentions)
+                                        before-cursor " ?@" @mentions)
             replace-tag
             (fn [curr-tag tag]
               (let [curr-regex (js/RegExp

@@ -1,4 +1,4 @@
-(defproject matthiasn/iwaswhere-web "0.1.28"
+(defproject matthiasn/iwaswhere-web "0.1.29"
   :description "Sample application built with systems-toolbox library"
   :url "https://github.com/matthiasn/systems-toolbox"
   :license {:name "GNU AFFERO GENERAL PUBLIC LICENSE"
@@ -25,7 +25,8 @@
                  [matthiasn/systems-toolbox "0.6.2"]
                  [matthiasn/systems-toolbox-ui "0.6.1"]
                  [matthiasn/systems-toolbox-sente "0.6.1"]
-                 [matthiasn/systems-toolbox-probe "0.6.2"]
+                 ;[matthiasn/systems-toolbox-probe "0.6.2"]
+                 [re-frame "0.8.0"]
                  [clucy "0.4.0"]
                  [seesaw "1.4.5"]
                  [clj.qrgen "0.4.0"]
@@ -98,7 +99,7 @@
                     :output-to     "resources/public/js/build/iwaswhere.js"
                     :optimizations :advanced}}
     {:id           "cljs-test"
-     :source-paths ["src" "test"]
+     :source-paths ["src/cljs" "src/cljc" "test"]
      :compiler     {:output-to     "out/testable.js"
                     :output-dir    "out/"
                     :main          iwaswhere-web.runner

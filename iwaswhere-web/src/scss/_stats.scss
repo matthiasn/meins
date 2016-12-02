@@ -172,9 +172,10 @@ $activity-weekend: lighten($activity, 30);
 
 #stats {
   flex: 0 0 auto;
-  background-color: $stats-bg-color;
 }
 
 .stats-string {
+  background-color: $stats-bg-color;
   color: $tab-bg;
 }
+

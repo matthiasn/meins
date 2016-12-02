@@ -28,10 +28,7 @@
       (stylesheet "/webjars/leaflet/0.7.7/dist/leaflet.css")
       (stylesheet "/css/iwaswhere.css")]
      [:body
-      [:div.flex-container
-       [:div#header]
-       [:div#content]
-       [:div#stats]]
+      [:div#reframe]
       ;; Currently, from http://www.orangefreesounds.com/old-clock-ringing-short/
       ;; TODO: record own alarm clock
       [:audio#ringer {:autoPlay false :loop false}

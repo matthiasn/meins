@@ -1,6 +1,8 @@
 (ns iwaswhere-web.ui.entry.story
   (:require [iwaswhere-web.helpers :as h]
-            [iwaswhere-web.ui.entry.capture :as c]))
+            [iwaswhere-web.ui.entry.capture :as c]
+            [re-frame.core :refer [subscribe]]
+            [reagent.ratom :refer-macros [reaction]]))
 
 (defn editable-field
   [on-input-fn on-keydown-fn text]
@@ -33,29 +35,31 @@
 
 (defn story-select
   "In edit mode, allow editing of activities, otherwise show a summary."
-  [entry cfg put-fn edit-mode?]
-  (let [ts (:timestamp entry)
-        stories (:stories cfg)
-        sorted-stories (:sorted-stories cfg)
-        linked-story (:linked-story entry)
+  [entry put-fn edit-mode?]
+  (let [options (subscribe [:options])
+        stories (reaction (:stories @options))
+        sorted-stories (reaction (:sorted-stories @options))
         select-handler
         (fn [ev]
           (let [selected (js/parseInt (-> ev .-nativeEvent .-target .-value))
-                custom-path (get-in stories [selected :custom-path])
+                custom-path (get-in @stories [selected :custom-path])
                 updated (-> entry
                             (assoc-in [:linked-story] selected)
                             (assoc-in [:custom-path] custom-path))]
             (put-fn [:entry/update-local updated])))]
-    (if edit-mode?
-      (when-not (or (= (:entry-type entry) :story) (:comment-for entry))
-        [:div.story
-         [:label "Story:"]
-         [:select {:value     (or linked-story "")
-                   :on-change select-handler}
-          [:option {:value ""} "no story selected"]
-          (for [[id story] sorted-stories]
-            (let [story-name (:story-name story)]
-              ^{:key (str ts story-name)}
-              [:option {:value id} story-name]))]])
-      (when linked-story
-        [:div.story (:story-name (get stories linked-story))]))))
+    (fn story-select-render [entry put-fn edit-mode?]
+      (let [ts (:timestamp entry)
+            linked-story (:linked-story entry)]
+        (if edit-mode?
+          (when-not (or (= (:entry-type entry) :story) (:comment-for entry))
+            [:div.story
+             [:label "Story:"]
+             [:select {:value     (or linked-story "")
+                       :on-change select-handler}
+              [:option {:value ""} "no story selected"]
+              (for [[id story] @sorted-stories]
+                (let [story-name (:story-name story)]
+                  ^{:key (str ts story-name)}
+                  [:option {:value id} story-name]))]])
+          (when linked-story
+            [:div.story (:story-name (get @stories linked-story))]))))))
