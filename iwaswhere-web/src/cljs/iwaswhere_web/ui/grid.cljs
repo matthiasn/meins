@@ -84,7 +84,7 @@
               {:width            (.-innerWidth js/window)
                :row-height       20
                :cols             24
-               :margin           [8 8]
+               :margin           [5 5]
                :is-draggable     configurable?
                :is-resizable     configurable?
                :class            "tile-journal"

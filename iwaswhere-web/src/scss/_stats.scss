@@ -170,12 +170,7 @@ $activity-weekend: lighten($activity, 30);
   }
 }
 
-#stats {
-  flex: 0 0 auto;
-}
-
 .stats-string {
   background-color: $stats-bg-color;
   color: $tab-bg;
 }
-
