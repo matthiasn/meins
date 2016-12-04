@@ -39,17 +39,18 @@
   (let [options (subscribe [:options])
         stories (reaction (:stories @options))
         sorted-stories (reaction (:sorted-stories @options))
+        ts (:timestamp entry)
+        new-entries (subscribe [:new-entries])
         select-handler
         (fn [ev]
           (let [selected (js/parseInt (-> ev .-nativeEvent .-target .-value))
                 custom-path (get-in @stories [selected :custom-path])
-                updated (-> entry
+                updated (-> (get-in @new-entries [ts])
                             (assoc-in [:linked-story] selected)
                             (assoc-in [:custom-path] custom-path))]
             (put-fn [:entry/update-local updated])))]
     (fn story-select-render [entry put-fn edit-mode?]
-      (let [ts (:timestamp entry)
-            linked-story (:linked-story entry)]
+      (let [linked-story (:linked-story entry)]
         (if edit-mode?
           (when-not (or (= (:entry-type entry) :story) (:comment-for entry))
             [:div.story

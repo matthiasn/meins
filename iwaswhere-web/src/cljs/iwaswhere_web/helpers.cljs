@@ -23,7 +23,6 @@
    "
   [put-fn opts run-fn]
   (fn [_ev]
-    (prn :new-entry-fn)
     (let [ts (st/now)
           timezone (or (when-let [resolved (.-resolved (new js/Intl.DateTimeFormat))]
                          (.-timeZone resolved))

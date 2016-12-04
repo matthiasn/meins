@@ -43,7 +43,7 @@
    changes."
   [put-fn]
   (reagent/render [re-frame-ui put-fn]
-                  (js/document.getElementById "reframe"))
+                  (.getElementById js/document "reframe"))
   {:observed rdb/app-db})
 
 (defn cmp-map

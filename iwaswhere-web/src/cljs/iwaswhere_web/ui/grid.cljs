@@ -53,7 +53,7 @@
         [:div.tile-tabs
          [tabs-header-view tab-group put-fn]
          (when query-id
-           [search/search-field-view2 query-id put-fn])
+           [search/search-field-view query-id put-fn])
          (when query-id
            [j/journal-view local-cfg put-fn])]))))
 
