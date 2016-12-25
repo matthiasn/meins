@@ -27,10 +27,15 @@
       [:div.stats-string
        (when stats
          [:div
-          (:entry-count @stats) " entries, " (:node-count @stats) " nodes, "
-          (:edge-count @stats) " edges, " (count (:hashtags @options)) " hashtags, "
-          (count (:mentions @options)) " people, " (:open-tasks-cnt @stats)
-          " open tasks, " (:backlog-cnt @stats) " in backlog, "
+          (:entry-count @stats) " entries, "
+          (:node-count @stats) " nodes, "
+          (:edge-count @stats) " edges, "
+          (count (:hashtags @options)) " hashtags, "
+          (count (:mentions @options)) " people, "
+          (:open-tasks-cnt @stats) " open tasks, "
+          (:started-tasks-cnt @stats) " started tasks, "
+          (:due-tasks-cnt @stats) " due tasks, "
+          (:backlog-cnt @stats) " in backlog, "
           (:completed-cnt @stats) " completed, "
           (:closed-cnt @stats) " closed, "
           (:import-cnt @stats) " tagged #import, "

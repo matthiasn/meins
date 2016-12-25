@@ -11,7 +11,8 @@
             [clj-time.format :as ctf]
             [clojure.core.reducers :as r]
             [iwaswhere-web.utils.misc :as u]
-            [clojure.pprint :as pp]))
+            [clojure.pprint :as pp]
+            [matthiasn.systems-toolbox.component :as st]))
 
 (defn entries-filter-fn
   "Creates a filter function which ensures that all tags and mentions in the
@@ -48,13 +49,30 @@
                              (= story (:timestamp entry)))
                          true)
 
+          opts (:opts q)
+          opts-match? (cond
+                        (contains? opts ":started")
+                        (let [start-ts (:start (:task entry))]
+                          (when start-ts
+                            (> (st/now) start-ts)))
+                        (contains? opts ":due")
+                        (let [due-ts (:due (:task entry))]
+                          (when due-ts
+                            (> (st/now) due-ts)))
+                        (contains? opts ":no-start")
+                        (not (:start (:task entry)))
+                        (contains? opts ":no-due")
+                        (not (:due (:task entry)))
+                        :else true)
+
           match? (and (set/subset? q-tags tags)
                       (empty? (set/intersection q-not-tags tags))
                       (or (empty? q-mentions)
                           (seq (set/intersection q-mentions mentions)))
                       (or day-match? (empty? q-day))
                       (or q-ts-match? (empty? q-timestamp))
-                      story-match?)]
+                      story-match?
+                      opts-match?)]
       match?)))
 
 (defn compare-w-upvotes

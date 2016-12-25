@@ -7,8 +7,8 @@
                  [org.clojure/clojurescript "1.9.293"]
                  [org.clojure/tools.logging "0.3.1"]
                  [org.clojure/tools.namespace "0.3.0-alpha3"]
-                 [com.taoensso/encore "2.87.0"]
-                 [ch.qos.logback/logback-classic "1.1.7"]
+                 [com.taoensso/encore "2.88.1"]
+                 [ch.qos.logback/logback-classic "1.1.8"]
                  [hiccup "1.0.5"]
                  [clj-pid "0.1.2"]
                  [clj-time "0.12.2"]
@@ -26,7 +26,8 @@
                  [matthiasn/systems-toolbox-ui "0.6.1"]
                  [matthiasn/systems-toolbox-sente "0.6.1"]
                  ;[matthiasn/systems-toolbox-probe "0.6.2"]
-                 [re-frame "0.8.0"]
+                 [re-frame "0.9.1"]
+                 [cljsjs/pikaday "1.4.0-1"]
                  [clucy "0.4.0"]
                  [seesaw "1.4.5"]
                  [clj.qrgen "0.4.0"]
@@ -49,12 +50,12 @@
 
   :profiles {:uberjar {:aot :all}}
 
-  :plugins [[lein-cljsbuild "1.1.4"
+  :plugins [[lein-cljsbuild "1.1.5"
              :exclusions [org.apache.commons/commons-compress]]
             [lein-figwheel "0.5.8"]
             [lein-sassy "1.0.8"
              :exclusions [org.clojure/clojure org.codehaus.plexus/plexus-utils]]
-            [com.jakemccrary/lein-test-refresh "0.18.0"]
+            [com.jakemccrary/lein-test-refresh "0.18.1"]
             [test2junit "1.2.5"]
             [lein-doo "0.1.7"]
             [lein-codox "0.10.2"]]

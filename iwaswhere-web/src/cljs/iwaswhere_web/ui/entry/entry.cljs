@@ -9,6 +9,7 @@
             [iwaswhere-web.utils.parse :as up]
             [iwaswhere-web.ui.entry.actions :as a]
             [iwaswhere-web.ui.entry.capture :as c]
+            [iwaswhere-web.ui.entry.task :as task]
             [iwaswhere-web.ui.entry.story :as es]
             [iwaswhere-web.ui.entry.thumbnails :as t]
             [cljsjs.moment]
@@ -57,7 +58,8 @@
                                  :query-id  (:query-id local-cfg)}])
         drop-fn (a/drop-linked-fn entry cfg put-fn)]
     (fn journal-entry-render [entry put-fn info local-cfg linked-desc]
-      (let [edit-mode? @edit-mode
+      (let [entry (merge {:md ""} entry)
+            edit-mode? @edit-mode
             toggle-edit #(if edit-mode? (put-fn [:entry/remove-local entry])
                                         (put-fn [:entry/update-local entry]))]
         [:div.entry {:on-drop       drop-fn
@@ -96,6 +98,7 @@
          [m/image-view entry]
          [m/videoplayer-view entry]
          [m/imdb-view entry put-fn]
+         [task/task-details entry put-fn]
          [:div.footer
           [:div.likes (when-let [upvotes (:upvotes entry)]
                         (when (pos? upvotes)

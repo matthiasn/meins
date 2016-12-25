@@ -26,7 +26,6 @@
         options (subscribe [:options])
         entries-map (subscribe [:entries-map])]
     (fn linked-entries-render [put-fn local-cfg active-entry]
-      (prn :linked-entries-view)
       (let [conf (merge @cfg @options)
             linked-entries-set (into (sorted-set) (:linked-entries-list active-entry))
             linked-mapper (u/find-missing-entry @entries-map put-fn)

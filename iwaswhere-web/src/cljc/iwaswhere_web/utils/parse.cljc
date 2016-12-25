@@ -7,6 +7,7 @@
 (def search-tag-regex (re-pattern (str "(?m)(?:^|[^~])(#" tag-char-cls "+)")))
 (def search-not-tags-regex (re-pattern (str "(?m)~#" tag-char-cls "+")))
 (def search-mention-regex (re-pattern (str "(?m)@" tag-char-cls "+")))
+(def search-opts-regex (re-pattern (str "(?m):" tag-char-cls "+")))
 (def entry-tag-regex
   (re-pattern (str "(?m)(?!^) ?#" tag-char-cls "+(?!" tag-char-cls ")")))
 (def entry-mentions-regex
@@ -39,6 +40,7 @@
      :not-tags    (set (map #(s/replace % "~" "")
                             (re-seq search-not-tags-regex text)))
      :mentions    (set (re-seq search-mention-regex text))
+     :opts        (set (re-seq search-opts-regex text))
      :date-string (re-find #"[0-9]{4}-[0-9]{2}-[0-9]{2}" text)
      :timestamp   (re-find #"[0-9]{13}" text)
      :n           20}))

@@ -105,7 +105,8 @@
     (fn entry-actions-render [entry put-fn edit-mode? toggle-edit local-cfg]
       (let [map? (:latitude entry)
             upvotes (:upvotes entry)
-            prev-saved? (:last-saved entry)]
+            prev-saved? (or (:last-saved entry)
+                            (< ts 1479563777132))]
         [:div {:on-mouse-enter mouse-enter
                :on-mouse-leave hide-fn
                :style          {:opacity (if (or edit-mode? @visible) 1 0)}}

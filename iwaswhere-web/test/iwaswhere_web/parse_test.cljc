@@ -43,6 +43,7 @@
    :tags        #{}
    :not-tags    #{}
    :mentions    #{}
+   :opts        #{}
    :date-string nil
    :timestamp   nil
    :n           20})
@@ -53,6 +54,7 @@
    :tags        #{}
    :not-tags    #{}
    :mentions    #{}
+   :opts        #{}
    :date-string nil
    :timestamp   nil
    :n           20})
@@ -63,6 +65,18 @@
    :tags        #{"#task"}
    :not-tags #{"#backlog" "#done" "#outdated"}
    :mentions    #{}
+   :opts        #{}
+   :date-string nil
+   :timestamp   nil
+   :n           20})
+
+(def started-tasks-search
+  {:search-text "#task ~#done ~#backlog ~#outdated :started"
+   :ft-search   nil
+   :tags        #{"#task"}
+   :not-tags #{"#backlog" "#done" "#outdated"}
+   :mentions    #{}
+   :opts        #{":started"}
    :date-string nil
    :timestamp   nil
    :n           20})
@@ -73,6 +87,7 @@
    :tags        #{"#task" "#done"}
    :not-tags    #{}
    :mentions    #{"@myself"}
+   :opts        #{}
    :date-string nil
    :timestamp   nil
    :n           20})
@@ -83,6 +98,7 @@
    :tags        #{"#task" "#done"}
    :not-tags    #{}
    :mentions    #{"@myself"}
+   :opts        #{}
    :date-string "2016-06-07"
    :timestamp   nil
    :n           20})
@@ -93,6 +109,7 @@
    :tags        #{}
    :not-tags    #{}
    :mentions    #{}
+   :opts        #{}
    :date-string nil
    :timestamp   "1465325998053"
    :n           20})
@@ -109,6 +126,10 @@
   (testing
     "tasks done query is parsed correctly"
     (is (= (p/parse-search (:search-text tasks-done-search)) tasks-done-search)))
+
+  (testing
+    "fulltext search string is parsed correctly"
+    (is (= (p/parse-search (:search-text started-tasks-search)) started-tasks-search)))
 
   (testing
     "fulltext search string is parsed correctly"

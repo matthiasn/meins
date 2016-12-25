@@ -249,3 +249,12 @@
     }
   }
 }
+
+.task-details {
+  input {
+    width: 80px;
+  }
+  span {
+    white-space: nowrap;
+  }
+}

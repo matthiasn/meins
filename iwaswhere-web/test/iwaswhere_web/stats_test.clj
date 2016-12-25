@@ -23,31 +23,31 @@
     :tags      #{"#task"}
     :timestamp 1450999000000
     :md        "Some other #task"}
-   {:mentions  #{}
-    :tags      #{"#done"}
-    :timestamp 1450999000001
+   {:mentions    #{}
+    :tags        #{"#done"}
+    :timestamp   1450999000001
     :comment-for 1450999000000
-    :md        "and #done"}
+    :md          "and #done"}
 
    {:mentions  #{"@someone"}
     :tags      #{"#task"}
     :timestamp 1450999300000
     :md        "Yet another #task"}
-   {:mentions  #{"@someone"}
-    :tags      #{"#backlog"}
-    :timestamp 1450999300001
+   {:mentions    #{"@someone"}
+    :tags        #{"#backlog"}
+    :timestamp   1450999300001
     :comment-for 1450999300000
-    :md        "for #backlog"}
+    :md          "for #backlog"}
 
    {:mentions  #{"@JaneDoe"}
     :tags      #{"#task"}
     :timestamp 1450999400000
     :md        "And yet another #task @JaneDoe"}
-   {:mentions  #{"@JaneDoe"}
-    :tags      #{"#closed"}
-    :timestamp 145099940001
+   {:mentions    #{"@JaneDoe"}
+    :tags        #{"#closed"}
+    :timestamp   145099940001
     :comment-for 1450999400000
-    :md        "irrelevant #closed @JaneDoe"}])
+    :md          "irrelevant #closed @JaneDoe"}])
 
 (deftest summary-stats-test
   "test that daily summaries"
@@ -61,8 +61,10 @@
         (testing
           "task summary stats are correct"
           (let [stats (gs/task-summary-stats new-state)]
-            (is (= {:backlog-cnt    1
-                    :closed-cnt     1
-                    :completed-cnt  1
-                    :open-tasks-cnt 2}
+            (is (= {:backlog-cnt       1
+                    :closed-cnt        1
+                    :completed-cnt     1
+                    :due-tasks-cnt     0
+                    :open-tasks-cnt    2
+                    :started-tasks-cnt 0}
                    stats))))))))

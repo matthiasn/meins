@@ -92,9 +92,9 @@
           day-nodes (gq/get-nodes-for-day g {:date-string date-string})
           day-nodes-attrs (map #(uber/attrs g %) day-nodes)
           day-stats {:date-string date-string
-                     :photo-cnt (count (filter :img-file day-nodes-attrs))
-                     :audio-cnt (count (filter :audio-file day-nodes-attrs))
-                     :video-cnt (count (filter :video-file day-nodes-attrs))}]
+                     :photo-cnt   (count (filter :img-file day-nodes-attrs))
+                     :audio-cnt   (count (filter :audio-file day-nodes-attrs))
+                     :video-cnt   (count (filter :video-file day-nodes-attrs))}]
       [date-string day-stats])))
 
 (defn res-count
@@ -108,12 +108,18 @@
 (defn task-summary-stats
   "Generate some very basic stats about the graph size for display in UI."
   [state]
-  {:open-tasks-cnt (res-count state {:tags     #{"#task"}
-                                     :not-tags #{"#done" "#backlog" "#closed"}})
-   :backlog-cnt    (res-count state {:tags     #{"#task" "#backlog"}
-                                     :not-tags #{"#done" "#closed"}})
-   :completed-cnt  (res-count state {:tags #{"#task" "#done"}})
-   :closed-cnt     (res-count state {:tags #{"#task" "#closed"}})})
+  {:open-tasks-cnt    (res-count state {:tags     #{"#task"}
+                                        :not-tags #{"#done" "#backlog" "#closed"}})
+   :started-tasks-cnt (res-count state {:tags     #{"#task"}
+                                        :not-tags #{"#done" "#backlog" "#closed"}
+                                        :opts     #{":started"}})
+   :due-tasks-cnt     (res-count state {:tags     #{"#task"}
+                                        :not-tags #{"#done" "#backlog" "#closed"}
+                                        :opts     #{":due"}})
+   :backlog-cnt       (res-count state {:tags     #{"#task" "#backlog"}
+                                        :not-tags #{"#done" "#closed"}})
+   :completed-cnt     (res-count state {:tags #{"#task" "#done"}})
+   :closed-cnt        (res-count state {:tags #{"#task" "#closed"}})})
 
 (defn daily-summaries-mapper
   "Create mapper function for daily summary stats"
@@ -153,7 +159,7 @@
                                  :min #(when (seq %) (apply min %))
                                  :max #(when (seq %) (apply max %))
                                  :mean #(when (seq %)
-                                         (/ (apply + %) (count %)))
+                                          (/ (apply + %) (count %)))
                                  :none nil
                                  #(apply + %))
                                nil)
@@ -192,11 +198,11 @@
   "Generate some very basic stats about the graph size for display in UI."
   [state]
   (merge (task-summary-stats state)
-         {:entry-count    (count (:sorted-entries state))
-          :node-count     (count (:node-map (:graph state)))
-          :edge-count     (count (uber/find-edges (:graph state) {}))
-          :import-cnt     (res-count state {:tags #{"#import"}})
-          :new-cnt        (res-count state {:tags #{"#new"}})}))
+         {:entry-count (count (:sorted-entries state))
+          :node-count  (count (:node-map (:graph state)))
+          :edge-count  (count (uber/find-edges (:graph state) {}))
+          :import-cnt  (res-count state {:tags #{"#import"}})
+          :new-cnt     (res-count state {:tags #{"#new"}})}))
 
 (defn make-stats-tags
   "Generate stats and tags from current-state."
