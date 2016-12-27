@@ -93,7 +93,9 @@
                                       :value %}])
         show-comments #(show-hide-comments query-id)
         create-comment (h/new-entry-fn put-fn {:comment-for ts} show-comments)
-        create-linked-entry (h/new-entry-fn put-fn {:linked-entries [ts]} nil)
+        story (:linked-story entry)
+        create-linked-entry (h/new-entry-fn put-fn {:linked-entries [ts]
+                                                    :linked-story story} nil)
         new-pomodoro (h/new-entry-fn
                        put-fn (p/pomodoro-defaults ts) show-comments)
         trash-entry #(if edit-mode?
