@@ -1,8 +1,8 @@
 (ns iwaswhere-web.utils.misc
   (:require [clojure.string :as s]
             [clojure.set :as set]
-            #?(:clj  [clojure.pprint :as pp]
-               :cljs [cljs.pprint :as pp])
+    #?(:clj [clojure.pprint :as pp]
+       :cljs [cljs.pprint :as pp])
             [iwaswhere-web.specs :as specs]))
 
 (defn duration-string
@@ -23,8 +23,8 @@
   (let [arrival-ts (:arrival-timestamp entry)
         depart-ts (:departure-timestamp entry)
         secs (when (and arrival-ts depart-ts)
-              (let [dur (- depart-ts arrival-ts)]
-                (Math/floor (if (int? dur) (/ dur 1000) dur))))]
+               (let [dur (- depart-ts arrival-ts)]
+                 (Math/floor (if (int? dur) (/ dur 1000) dur))))]
     (when (and secs (< secs 99999999))
       (str ", " (duration-string secs)))))
 
@@ -68,7 +68,7 @@
   [entry]
   (let [departure-ts (let [ms (double-ts-to-long (:departure-timestamp entry))]
                        (when (specs/possible-timestamp? ms) ms))]
-    {:arrival-ts  (double-ts-to-long (:arrival-timestamp entry))
+    {:arrival-ts   (double-ts-to-long (:arrival-timestamp entry))
      :departure-ts departure-ts}))
 
 (defn find-missing-entry
@@ -95,3 +95,14 @@
   (let [cnt (count-words entry)]
     (when (> cnt 20)
       (str cnt " words"))))
+
+(defn deep-merge
+  "Deep merge for multiple maps."
+  [& maps]
+  (let [maps (filter identity maps)]
+    (when (seq maps)
+      (apply (fn m [& maps]
+               (if (every? map? maps)
+                 (apply merge-with m maps)
+                 (apply (fn [_ b] b) maps)))
+             maps))))

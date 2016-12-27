@@ -1,6 +1,7 @@
 (ns iwaswhere-web.client-store-entry
   (:require #?(:cljs [alandipert.storage-atom :as sa])
     [matthiasn.systems-toolbox.component :as st]
+    [iwaswhere-web.utils.misc :as u]
     [iwaswhere-web.utils.parse :as p]))
 
 #?(:clj  (defonce new-entries-ls (atom {}))
@@ -32,7 +33,7 @@
 (defn new-entry-fn
   "Create locally stored new entry for further edit."
   [{:keys [current-state msg-payload]}]
-  (let [ts  (:timestamp msg-payload)
+  (let [ts (:timestamp msg-payload)
         new-state (assoc-in current-state [:new-entries ts] msg-payload)]
     (update-local-storage new-state)
     {:new-state new-state}))
@@ -109,9 +110,9 @@
   "Update locally stored new entry with changes from edit element."
   [{:keys [current-state msg-payload]}]
   (let [ts (:timestamp msg-payload)
-        entry (merge (get-in current-state [:entries-map ts])
-                     (get-in current-state [:new-entries ts])
-                     msg-payload)
+        entry (u/deep-merge (get-in current-state [:entries-map ts])
+                            (get-in current-state [:new-entries ts])
+                            msg-payload)
         parsed (p/parse-entry (:md entry))
         new-state (assoc-in current-state [:new-entries ts]
                             (merge entry parsed))]
@@ -129,7 +130,7 @@
 (defn found-entry-fn
   "Save retrieved entry in entries-map."
   [{:keys [current-state msg-payload]}]
-  (let [ts  (:timestamp msg-payload)
+  (let [ts (:timestamp msg-payload)
         new-state (assoc-in current-state [:entries-map ts] msg-payload)]
     {:new-state new-state}))
 
