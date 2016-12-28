@@ -3,7 +3,8 @@
             [iwaswhere-web.utils.parse :as up]
             [cljsjs.moment]
             [iwaswhere-web.helpers :as h]
-            [reagent.core :as r]))
+            [reagent.core :as r]
+            [iwaswhere-web.utils.misc :as u]))
 
 (defn trash-icon
   "Renders a trash icon, which transforms into a warning button that needs to be
@@ -49,7 +50,7 @@
   (fn [_ev]
     (let [ts (:currently-dragged @cfg)
           new-entry (update-in entry [:linked-entries] #(set (conj % ts)))]
-      (put-fn [:entry/update (h/clean-entry new-entry)]))))
+      (put-fn [:entry/update (u/clean-entry new-entry)]))))
 
 (defn new-link
   "Renders input for adding link entry."

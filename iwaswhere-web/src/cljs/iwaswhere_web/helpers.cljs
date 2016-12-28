@@ -38,14 +38,6 @@
       (send-w-geolocation entry put-fn)
       (when run-fn (run-fn)))))
 
-(defn clean-entry
-  [entry]
-  (-> entry
-      (dissoc :comments)
-      (dissoc :new-entry)
-      (dissoc :pomodoro-running)
-      (dissoc :linked-entries-list)))
-
 (defn string-before-cursor
   "Determine the substring right before the cursor of the current selection.
    Only returns that substring if it is from current node's text, as otherwise

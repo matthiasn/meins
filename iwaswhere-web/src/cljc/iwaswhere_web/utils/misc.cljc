@@ -106,3 +106,11 @@
                  (apply merge-with m maps)
                  (apply (fn [_ b] b) maps)))
              maps))))
+
+(defn clean-entry
+  [entry]
+  (-> entry
+      (dissoc :comments)
+      (dissoc :new-entry)
+      (dissoc :pomodoro-running)
+      (dissoc :linked-entries-list)))
