@@ -151,13 +151,21 @@
                       ; full-text search
                       (:ft-search query)
                       (sort-fn (ft/search query))
+
                       ; set with the one timestamp in query
                       (:timestamp query) #{(Long/parseLong (:timestamp query))}
+
                       ; set with timestamps matching the day
                       (:date-string query) (sort-fn (get-nodes-for-day g query))
+
                       ; query is for specific story
                       (:story query)
                       (get-in state [:sorted-story-entries (:story query)])
+
+                      ; query is for tasks
+                      (seq (:opts query))
+                      (get-in state [:sorted-tasks])
+
                       ; set with timestamps matching tags and mentions
                       (or (seq (:tags query)) (seq (:mentions query)))
                       (sort-fn (get-tags-mentions-matches g query))

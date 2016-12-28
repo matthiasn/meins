@@ -194,6 +194,16 @@
       (assoc-in current-state path (conj entries-set ts)))
     current-state))
 
+(defn add-tasks-set
+  "When entry is a task, add it to sorted tasks set."
+  [current-state entry]
+  (if (:task entry)
+    (let [ts (:timestamp entry)
+          path [:sorted-tasks]
+          entries-set (into (sorted-set) (get-in current-state path))]
+      (assoc-in current-state path (conj entries-set ts)))
+    current-state))
+
 (defn add-node
   "Adds node to both graph and the sorted set, which maintains the entries
    sorted by timestamp."
@@ -227,4 +237,5 @@
         (update-in [:graph] add-parent-ref new-entry)
         (update-in [:graph] add-story new-entry)
         (add-story-set new-entry)
+        (add-tasks-set new-entry)
         (update-in [:sorted-entries] conj ts))))
