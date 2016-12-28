@@ -252,9 +252,12 @@
 
 .task-details {
   input {
-    width: 80px;
+    width: 160px;
   }
   span {
     white-space: nowrap;
+  }
+  time {
+    font-weight: bold;
   }
 }

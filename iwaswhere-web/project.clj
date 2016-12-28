@@ -27,7 +27,6 @@
                  [matthiasn/systems-toolbox-sente "0.6.1"]
                  ;[matthiasn/systems-toolbox-probe "0.6.2"]
                  [re-frame "0.9.1"]
-                 [cljsjs/pikaday "1.4.0-1"]
                  [clucy "0.4.0"]
                  [seesaw "1.4.5"]
                  [clj.qrgen "0.4.0"]
