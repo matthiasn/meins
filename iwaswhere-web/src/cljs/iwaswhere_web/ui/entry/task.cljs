@@ -1,4 +1,5 @@
-(ns iwaswhere-web.ui.entry.task)
+(ns iwaswhere-web.ui.entry.task
+  (:require [matthiasn.systems-toolbox.component :as st]))
 
 (defn task-details
   [entry put-fn edit-mode?]
@@ -19,6 +20,12 @@
               (put-fn [:entry/update-local updated]))))]
     (fn [entry put-fn edit-mode?]
       (when (contains? (:tags entry) "#task")
+        (when-not (:task entry)
+          (let [d (* 24 60 60 1000)
+                now (st/now)
+                updated (assoc-in entry [:task] {:start (+ now d)
+                                                 :due   (+ now d d)})]
+            (put-fn [:entry/update-local updated])))
         [:form.task-details
          [:fieldset
           [:legend "Task details"]
@@ -43,11 +50,13 @@
              [:select {:value     (get-in entry [:task :follow-up-hrs])
                        :on-change (follow-up-select entry)}
               [:option ""]
-              [:option {:value 1} "1"]
-              [:option {:value 3} "3"]
-              [:option {:value 6} "6"]
-              [:option {:value 12} "12"]
-              [:option {:value 18} "18"]
-              [:option {:value 24} "24"]
-              [:option {:value 48} "48"]]
-             [:span "hours"]])]]))))
+              [:option {:value 1} "1 hour"]
+              [:option {:value 3} "3 hours"]
+              [:option {:value 6} "6 hours"]
+              [:option {:value 12} "12 hours"]
+              [:option {:value 18} "18 hours"]
+              [:option {:value 24} "24 hours"]
+              [:option {:value 48} "48 hours"]
+              [:option {:value 72} "3 days"]
+              [:option {:value 96} "4 days"]
+              [:option {:value 168} "1 week"]]])]]))))
