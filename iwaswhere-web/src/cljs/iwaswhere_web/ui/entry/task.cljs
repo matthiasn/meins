@@ -14,7 +14,8 @@
         (fn [entry]
           (fn [ev]
             (let [sel (js/parseInt (-> ev .-nativeEvent .-target .-value))
-                  updated (assoc-in entry [:task :follow-up-hrs] sel)]
+                  follow-up-hrs (when-not (js/isNaN sel) sel)
+                  updated (assoc-in entry [:task :follow-up-hrs] follow-up-hrs)]
               (put-fn [:entry/update-local updated]))))]
     (fn [entry put-fn edit-mode?]
       (when (contains? (:tags entry) "#task")
@@ -46,6 +47,7 @@
               [:option {:value 3} "3"]
               [:option {:value 6} "6"]
               [:option {:value 12} "12"]
+              [:option {:value 18} "18"]
               [:option {:value 24} "24"]
               [:option {:value 48} "48"]]
              [:span "hours"]])]]))))
