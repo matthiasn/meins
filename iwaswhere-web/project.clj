@@ -11,7 +11,7 @@
                  [ch.qos.logback/logback-classic "1.1.8"]
                  [hiccup "1.0.5"]
                  [clj-pid "0.1.2"]
-                 [clj-time "0.12.2"]
+                 [clj-time "0.13.0"]
                  [clj-http "3.4.1"]
                  [me.raynes/fs "1.4.6"]
                  [markdown-clj "0.9.91"]

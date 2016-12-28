@@ -9,8 +9,6 @@
             [clojure.set :as set]
             [clojure.tools.logging :as log]
             [clj-time.format :as ctf]
-            [clojure.core.reducers :as r]
-            [iwaswhere-web.utils.misc :as u]
             [clojure.pprint :as pp]
             [matthiasn.systems-toolbox.component :as st]))
 
