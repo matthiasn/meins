@@ -20,7 +20,7 @@
               (put-fn [:entry/update-local updated]))))]
     (fn [entry put-fn edit-mode?]
       (when (contains? (:tags entry) "#task")
-        (when-not (:task entry)
+        (when (and edit-mode? (not (:task entry)))
           (let [d (* 24 60 60 1000)
                 now (st/now)
                 updated (assoc-in entry [:task] {:start (+ now d)
