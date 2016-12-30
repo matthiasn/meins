@@ -233,3 +233,20 @@
                 (let [last-line (last (line-seq reader))
                       parsed (clojure.edn/read-string last-line)]
                   (is (= parsed delete-msg)))))))))))
+
+(deftest cmp-map-test
+  (testing "cmp-map contains required keys"
+    (let [cmp-id :server/store-cmp
+          cmp-map (s/cmp-map cmp-id)
+          handler-map (:handler-map cmp-map)]
+      (is (= (:cmp-id cmp-map) cmp-id))
+      (is (fn? (:state-fn cmp-map)))
+      (is (fn? (:entry/import handler-map)))
+      (is (fn? (:entry/find handler-map)))
+      (is (fn? (:entry/update handler-map)))
+      (is (fn? (:entry/trash handler-map)))
+      (is (fn? (:state/search handler-map)))
+      (is (fn? (:cfg/refresh handler-map)))
+      (is (fn? (:cmd/keep-alive handler-map)))
+      (is (fn? (:stats/get handler-map)))
+      (is (fn? (:state/stats-tags-get handler-map))))))

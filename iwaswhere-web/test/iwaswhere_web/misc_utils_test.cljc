@@ -121,3 +121,21 @@
             res (mapv mapper-fn [1465059173965 1465059173966 1465059173967])]
         (is (= res [test-entry test-entry2 {:timestamp 1465059173967}]))
         (is (= @sent-msg [:entry/find {:timestamp 1465059173967}]))))))
+
+(deftest deep-merge-test
+  (testing "maps are merged properly"
+    (is (= {:a {:b {:c 2
+                    :d 2}}
+            :b 2}
+           (u/deep-merge {:a {:b {:c 1
+                                  :d 2}}
+                          :b 1}
+                         {:b 2}
+                         {:a {:b {:c 2}}}))))
+  (testing "handles nil properly"
+    (is (= (u/deep-merge nil nil nil)
+           nil))
+    (is (= (u/deep-merge nil {:a 1})
+           {:a 1}))
+    (is (= (u/deep-merge {:a 1} nil nil)
+           {:a 1}))))

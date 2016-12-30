@@ -19,7 +19,7 @@
     (clucy/add index entry)))
 
 (defn search
-  ""
+  "Finds timestamps of entries matching a query."
   [query]
   (map #(Long. (:timestamp %)) (clucy/search index (:ft-search query) 1000)))
 
