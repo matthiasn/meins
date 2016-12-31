@@ -28,6 +28,8 @@
                                              :fare         {:label "Fare:" :cfg {:type :string}}
                                              :seat         {:label "Seat:" :cfg {:type :string}}
                                              :delay        {:label "Delay (min):" :cfg {:type :number :step 1}}}}
+                       "#mood-map" {:fields {:energy  {:label "Energy? (1-10)" :cfg {:type :number :step 0.1}}
+                                             :neg-pos {:label "Negative to positive? (1-10)" :cfg {:type :number :step 0.1}}}}
                        "#imdb"     {:fields {:imdb-id {:label "IMDb ID:" :cfg {:type :imdb}}}}
                        "#walking"  {:fields {:duration {:label "Minutes:" :cfg {:type :number :step 1}}}}
                        "#swimming" {:fields {:duration {:label "Minutes:" :cfg {:type :number :step 1}}}}

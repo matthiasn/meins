@@ -140,8 +140,12 @@
                             (get-in current-state [:new-entries ts])
                             msg-payload)
         parsed (p/parse-entry (:md entry))
-        new-state (assoc-in current-state [:new-entries ts]
-                            (merge entry parsed))]
+        updated (merge entry parsed)
+        updated (if (and (:completed-time entry)
+                         (= (:completed-time entry) (:planned-dur entry)))
+                  (update-in updated [:tags] conj "#mood-map")
+                  updated)
+        new-state (assoc-in current-state [:new-entries ts] updated)]
     (update-local-storage new-state)
     {:new-state new-state}))
 
