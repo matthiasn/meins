@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [0.1.30] - 2017-01-01
+### Changed
+- follow-up tasks
+
 ## [0.1.29] - 2016-11-30
 ### Changed
 - re-frame for rendering UI
