@@ -65,7 +65,7 @@
                 follow-up-hrs (:follow-up-hrs (:task prev))]
             (when (and follow-up-hrs
                        (not (:follow-up-scheduled (:task prev))))
-              (let [reused (select-keys prev [:md :tags :mentions])
+              (let [reused (select-keys prev [:md :tags :mentions :linked-story])
                     now (st/now)
                     d (* 24 60 60 1000)
                     h (* 60 60 1000)
@@ -141,8 +141,11 @@
                             msg-payload)
         parsed (p/parse-entry (:md entry))
         updated (merge entry parsed)
+        now (st/now)
+        h (* 60 60 1000)
         updated (if (and (:completed-time entry)
-                         (= (:completed-time entry) (:planned-dur entry)))
+                         (= (:completed-time entry) (:planned-dur entry))
+                         (< (- now ts) h))
                   (update-in updated [:tags] conj "#mood-map")
                   updated)
         new-state (assoc-in current-state [:new-entries ts] updated)]
