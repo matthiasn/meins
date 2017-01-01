@@ -26,13 +26,16 @@
       (with-open [reader (clojure.java.io/reader f)]
         (let [lines (line-seq reader)]
           (doseq [line lines]
-            (let [parsed (clojure.edn/read-string line)
-                  ts (:timestamp parsed)]
-              (if (:deleted parsed)
-                (do (swap! state ga/remove-node ts)
-                    (swap! entries-to-index dissoc ts))
-                (do (swap! entries-to-index assoc-in [ts] parsed)
-                    (swap! state ga/add-node ts parsed :startup))))))))))
+            (try
+              (let [parsed (clojure.edn/read-string line)
+                    ts (:timestamp parsed)]
+                (if (:deleted parsed)
+                  (do (swap! state ga/remove-node ts)
+                      (swap! entries-to-index dissoc ts))
+                  (do (swap! entries-to-index assoc-in [ts] parsed)
+                      (swap! state ga/add-node ts parsed :startup))))
+              (catch Exception ex
+                (log/error "Exception" ex "when parsing line:\n" line)))))))))
 
 (defn load-cfg
   "Load config from file, or default config."
