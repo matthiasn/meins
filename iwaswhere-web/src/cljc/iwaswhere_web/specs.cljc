@@ -305,4 +305,16 @@
 
 (s/def :state/search :iww.client-state/query-cfg)
 
-(s/def :layout/save (s/coll-of map?))
+(s/def :iww.widget-cfg/x int?)
+(s/def :iww.widget-cfg/y int?)
+(s/def :iww.widget-cfg/w int?)
+(s/def :iww.widget-cfg/h int?)
+
+(s/def :iww.cfg/widget-cfg
+  (s/keys :req-un [:iww.widget-cfg/x
+                   :iww.widget-cfg/y
+                   :iww.widget-cfg/w
+                   :iww.widget-cfg/h
+                   :iww.widget-cfg/i]))
+
+(s/def :layout/save (s/coll-of :iww.cfg/widget-cfg))

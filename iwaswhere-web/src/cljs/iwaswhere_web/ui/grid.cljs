@@ -1,15 +1,13 @@
 (ns iwaswhere-web.ui.grid
   (:require [reagent.core :as rc]
             [iwaswhere-web.ui.charts.custom-fields :as cf2]
-            [cljs.pprint :as pp]
             [iwaswhere-web.ui.journal :as j]
             [clojure.string :as s]
             [cljsjs.react-grid-layout]
             [iwaswhere-web.helpers :as h]
             [iwaswhere-web.ui.search :as search]
             [iwaswhere-web.ui.stats :as stats]
-            [re-frame.core :refer [reg-event-db path reg-sub dispatch
-                                   dispatch-sync subscribe]]))
+            [re-frame.core :refer [subscribe]]))
 
 (defn tabs-header-view
   [tab-group put-fn]
@@ -73,7 +71,10 @@
 (defn grid
   [put-fn]
   (let [cfg (subscribe [:cfg])
-        widgets (subscribe [:widgets])]
+        widgets (subscribe [:widgets])
+        get-width #(.-innerWidth js/window)
+        width (rc/atom (get-width))]
+    (.addEventListener js/window "resize" #(reset! width (get-width)))
     (fn grid-render
       [put-fn]
       (let [configurable? (:reconfigure-grid @cfg)]
@@ -81,7 +82,7 @@
          (when (seq @widgets)
            (into
              [react-grid-layout
-              {:width            (.-innerWidth js/window)
+              {:width            @width
                :row-height       20
                :cols             24
                :margin           [5 5]

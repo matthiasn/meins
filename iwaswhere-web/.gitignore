@@ -5,6 +5,7 @@ data/audio
 data/videos
 data/daily-logs
 data/trash
+data/tiles
 data/import
 data/geo-import/
 test-data/
