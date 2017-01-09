@@ -44,7 +44,8 @@
 (defn save-cfg
   "Saves current configuration in localstorage."
   [{:keys [current-state]}]
-  (reset! app-cfg (:cfg current-state)))
+  (reset! app-cfg (:cfg current-state))
+  {})
 
 (defn toggle-key-fn
   "Toggles config key. If reset key is set, changes the value in path to the
