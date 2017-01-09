@@ -22,7 +22,7 @@
                  [com.drewnoakes/metadata-extractor "2.9.1"]
                  [ubergraph "0.3.0"]
                  [camel-snake-kebab "0.4.0"]
-                 [matthiasn/systems-toolbox "0.6.2"]
+                 [matthiasn/systems-toolbox "0.6.3"]
                  [matthiasn/systems-toolbox-ui "0.6.1"]
                  [matthiasn/systems-toolbox-sente "0.6.1"]
                  ;[matthiasn/systems-toolbox-probe "0.6.2"]
