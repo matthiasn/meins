@@ -1,1 +1,0 @@
-Place media files you want to import here. Currently looks for file names such as those produced by an iPhone.
