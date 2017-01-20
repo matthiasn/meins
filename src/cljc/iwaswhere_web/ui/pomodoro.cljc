@@ -8,13 +8,16 @@
   [ts]
   {:comment-for    ts
    :entry-type     :pomodoro
-   :planned-dur    1500  ; 25 min
+   ;:planned-dur    1500  ; 25 min
+   :planned-dur    -1  ; open end for better tracking
    :completed-time 0
    :interruptions  0})
 
 (defn time-left?
   [entry]
-  (> (:planned-dur entry) (:completed-time entry)))
+  (> (:planned-dur entry) (:completed-time entry))
+  ; for now always show start button to keep time running if necessary
+  true)
 
 (defn bolts
   [interruptions]

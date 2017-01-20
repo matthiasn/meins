@@ -44,7 +44,8 @@
         last-busy (get-in current-state [:last-busy])]
     (when (> (- now last-busy) 1000)
       (log/debug "blink green")
-      (blink (k green)))))
+      (blink (k green)))
+    {}))
 
 (defn blink-busy
   "Set light to red when busy and save last busy timestamp."

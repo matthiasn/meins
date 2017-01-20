@@ -68,7 +68,9 @@
         mouse-x (:x mouse-pos)
         page-w (.-scrollWidth (.-body js/document))
         page-h (.-scrollHeight (.-body js/document))]
-    {:style {:top  (min (:y mouse-pos) (- page-h 80))
+    {:style {
+             ;:top  (min (:y mouse-pos) (- page-h 80))
+             :top  (- (:y mouse-pos) 300)
              :left (if (< (- page-w mouse-x) 120)
                      (- mouse-x 100)
                      (+ mouse-x 20))}}))

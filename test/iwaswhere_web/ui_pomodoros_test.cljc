@@ -73,7 +73,7 @@
              [:span.fa.fa-clock-o.completed]
              [:span.fa.fa-clock-o.completed]]
             [:span [:span.fa.fa-clock-o.incomplete]]
-            [:span.dur "1h 6m"]
+            [:span.dur "1h 6m 40s"]
             [:span]])))
 
   (testing
@@ -87,7 +87,7 @@
              [:span.fa.fa-clock-o.completed]]
             [:span [:span.fa.fa-clock-o.incomplete]
              [:span.fa.fa-clock-o.incomplete]]
-            [:span.dur "1h 48m"]
+            [:span.dur "1h 48m 20s"]
             [:span
              [:span.fa.fa-bolt]
              [:span.fa.fa-bolt]
@@ -123,7 +123,7 @@
             [:span
              [:span.fa.fa-clock-o.incomplete]
              [:span.incomplete-cnt 4]]
-            [:span.dur "2h 46m"]
+            [:span.dur "2h 46m 40s"]
             [:span
              [:span.fa.fa-bolt]
              [:span.bolt-cnt 9]]]))))
@@ -136,11 +136,11 @@
 
   (testing "works on test entries"
     (is (= (p/pomodoro-stats-str (take 4 test-entries))
-           "Pomodoros: 2 of 3 completed, 1h 6m")))
+           "Pomodoros: 2 of 3 completed, 1h 6m 40s")))
 
   (testing "works on test entries with interruptions"
     (is (= (p/pomodoro-stats-str test-entries)
-           "Pomodoros: 3 of 5 completed, 1h 48m. Interruptions: 3"))))
+           "Pomodoros: 3 of 5 completed, 1h 48m 20s. Interruptions: 3"))))
 
 (def empty-test-entry
   {:mentions   #{}

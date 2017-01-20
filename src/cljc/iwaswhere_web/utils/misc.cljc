@@ -15,7 +15,7 @@
     (s/trim
       (str (when (pos? hours) (str hours "h "))
            (when (pos? min) (str min "m "))
-           (when (and (not (pos? hours)) (pos? sec)) (str sec "s"))))))
+           (when (pos? sec) (str sec "s"))))))
 
 (defn visit-duration
   "Formats duration string."

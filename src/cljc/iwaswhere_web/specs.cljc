@@ -35,8 +35,7 @@
 (s/def :iww.entry/comment-for possible-timestamp?)
 (s/def :iww.entry/latitude (s/nilable (number-in-range? -180.0 180.0)))
 (s/def :iww.entry/longitude (s/nilable (number-in-range? -180.0 180.0)))
-(s/def :iww.entry/planned-dur (s/and integer? pos?))
-(s/def :iww.entry/planned-dur (s/and integer? pos?))
+(s/def :iww.entry/planned-dur integer?)
 (s/def :iww.entry/interruptions (s/and integer? #(<= 0 %)))
 
 (def media-file-regex #"[ A-Za-z0-9_]+.(jpg|JPG|PNG|png|m4v|m4a)")

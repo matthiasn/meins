@@ -64,6 +64,12 @@ $activity-weekend: lighten($activity, 30);
     .total {
       fill: $total;
     }
+    .total-time {
+      fill: $completed;
+    }
+    .total-time-weekend {
+      fill: $completed-weekend;
+    }
     .total-weekend {
       fill: $total-weekend;
     }
@@ -162,7 +168,6 @@ $activity-weekend: lighten($activity, 30);
     border: 1px solid darken($hashtag-blue, 25%);
     border-radius: $info-border-radius;
     position: fixed;
-    top: 100px;
 
     div:first-of-type {
       font-weight: bold;
