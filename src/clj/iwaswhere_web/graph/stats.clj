@@ -224,7 +224,8 @@
   (future
     (let [stats-tags (make-stats-tags current-state)
           uid (:sente-uid msg-meta)]
-      (put-fn (with-meta [:state/stats-tags stats-tags] {:sente-uid uid})))))
+      (put-fn (with-meta [:state/stats-tags stats-tags] {:sente-uid uid}))))
+  {})
 
 (def stats-handler-map
   {:stats/get            get-stats-fn
