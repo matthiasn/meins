@@ -83,6 +83,10 @@ $ lein doo firefox cljs-test once
 $ lein doo firefox cljs-test auto
 
 
+[![CircleCI Build Status](https://circleci.com/gh/matthiasn/iWasWhere.svg?&style=shield)](https://circleci.com/gh/matthiasn/iWasWhere)
+[![TravisCI Build Status](https://travis-ci.org/matthiasn/iWasWhere.svg?branch=master)](https://travis-ci.org/matthiasn/iWasWhere)
+
+
 ## REPL
 
 Inspecting the store component:
