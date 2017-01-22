@@ -81,7 +81,7 @@
         upvotes-y (get y :upvotes 0)]
     (if-not (= upvotes-x upvotes-y)
       (clojure.lang.Util/compare upvotes-y upvotes-x)
-      (if (pos? upvotes-x)      ; when entries have upvotes, sort oldest on top
+      (if (pos? upvotes-x)                                  ; when entries have upvotes, sort oldest on top
         (clojure.lang.Util/compare (:timestamp x) (:timestamp y))
         (clojure.lang.Util/compare (:timestamp y) (:timestamp x))))))
 
@@ -262,9 +262,12 @@
         g (:graph current-state)
         entry-mapper (fn [entry] [(:timestamp entry) entry])
         entries (take n (filter (entries-filter-fn query g)
-                                (extract-sorted-entries current-state query)))]
-    {:entries     (map :timestamp entries)
-     :entries-map (into {} (map entry-mapper entries))}))
+                                (extract-sorted-entries current-state query)))
+        comment-timestamps (set (apply concat (map :comments entries)))
+        comments (map #(uc/attrs g %) comment-timestamps)]
+    {:entries     (mapv :timestamp entries)
+     :entries-map (into {} (concat (map entry-mapper entries)
+                                   (map entry-mapper comments)))}))
 
 (defn find-entry
   "Find single entry."

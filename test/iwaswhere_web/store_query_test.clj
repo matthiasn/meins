@@ -47,8 +47,8 @@
                  (count (get-in res [:entries simple-query-uid])))))
 
         (testing
-          "simple query2 returns all 105 results"
-          (is (= 106
+          "simple query2 returns all results"
+          (is (= 108
                  (count (get-in res [:entries simple-query2-uid])))))
 
         (testing
@@ -70,17 +70,83 @@
           "stats show expected numbers"
           (let [res (gs/make-stats-tags new-state)
                 stats (:stats res)]
-            (is (= 106
+            (is (= 107
                    (:entry-count stats)))
-            (is (= 126
+            (is (= 128
                    (:node-count stats)))))
 
         (testing
           "hashtags and mentions in result of stats-tags publish fn"
           (let [res (gs/make-stats-tags new-state)]
-            (is (= (set (:hashtags res)) #{"#task" "#entry" "#test" "#done"
-                                           "#completed" "#blah" "#new"}))
+            (is (= (set (:hashtags res)) #{"#task" "#entry" "#test" "#done" "#new"
+                                           "#completed" "#blah" "#comment"}))
             (is (= stc/private-tags
                    (:pvt-displayed res)))
             (is (= #{"@myself" "@someone"}
                    (:mentions res)))))))))
+
+(deftest query-test2
+  "Test that different queries return the expected results."
+  (let [test-ts (System/currentTimeMillis)
+        {:keys [current-state logs-path]} (st/mk-test-state test-ts)]
+    (with-redefs [f/daily-logs-path logs-path
+                  comp/now (fn [] 1485107134358)]
+      (let [new-state (reduce stc/persist-reducer current-state stc/test-entries)
+            req-msg {:queries {"query1" stc/tasks-done-query
+                               "query2" stc/tasks-not-done-query}}
+            res (second (:emit-msg (gq/query-fn {:current-state new-state
+                                                 :msg-payload   req-msg})))]
+        (testing
+          "all expected entries are fetched"
+          (is (= {:entries     {"query1" [1450998400000
+                                          1450998300000
+                                          1450998200000]
+                                "query2" [1450998100000
+                                          1450998000000]}
+                  :entries-map {1450998000000 {:comments            []
+                                               :last-saved          1485107134358
+                                               :linked-entries-list []
+                                               :md                  "Some #task"
+                                               :mentions            #{}
+                                               :tags                #{"#task"}
+                                               :timestamp           1450998000000}
+                                1450998100000 {:comments            []
+                                               :last-saved          1485107134358
+                                               :linked-entries-list []
+                                               :md                  "Some other #task"
+                                               :mentions            #{}
+                                               :tags                #{"#task"}
+                                               :timestamp           1450998100000}
+                                1450998200000 {:comments            []
+                                               :last-saved          1485107134358
+                                               :linked-entries-list []
+                                               :md                  "Some other #task #done"
+                                               :mentions            #{}
+                                               :tags                #{"#done"
+                                                                      "#task"}
+                                               :timestamp           1450998200000}
+                                1450998300000 {:comments            [1450998300001]
+                                               :last-saved          1485107134358
+                                               :linked-entries-list []
+                                               :md                  "Yet another completed #task - #done"
+                                               :mentions            #{}
+                                               :tags                #{"#completed"
+                                                                      "#done"
+                                                                      "#task"}
+                                               :timestamp           1450998300000}
+                                1450998300001 {:mentions    #{}
+                                               :last-saved  1485107134358
+                                               :tags        #{"#comment"}
+                                               :timestamp   1450998300001
+                                               :comment-for 1450998300000
+                                               :md          "Some #comment"}
+                                1450998400000 {:comments            []
+                                               :last-saved          1485107134358
+                                               :linked-entries-list []
+                                               :md                  "And yet another completed #task - #done"
+                                               :mentions            #{}
+                                               :tags                #{"#completed"
+                                                                      "#done"
+                                                                      "#task"}
+                                               :timestamp           1450998400000}}}
+                 (dissoc res :duration-ms))))))))

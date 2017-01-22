@@ -58,6 +58,11 @@
     :timestamp 1450998300000
     :md        "Yet another completed #task - #done"}
    {:mentions  #{}
+    :tags      #{"#comment"}
+    :timestamp 1450998300001
+    :comment-for 1450998300000
+    :md        "Some #comment"}
+   {:mentions  #{}
     :tags      #{"#task" "#completed" "#done"}
     :timestamp 1450998400000
     :md        "And yet another completed #task - #done"}])

@@ -56,7 +56,7 @@
         (testing
           "hashtags and mentions in result of stats-tags publish fn"
           (let [res (gs/make-stats-tags new-state2)]
-            (is (= #{"#task"  "#done" "#completed"}
+            (is (= #{"#task"  "#done" "#completed" "#comment"}
                    (set (:hashtags res))))
             (is (= #{"#new-pvt-tag"
                      "#pvt"
