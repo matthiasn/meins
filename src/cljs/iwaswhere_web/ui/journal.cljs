@@ -1,8 +1,7 @@
 (ns iwaswhere-web.ui.journal
   (:require [iwaswhere-web.utils.misc :as u]
             [iwaswhere-web.ui.entry.entry :as e]
-            [re-frame.core :refer [reg-event-db path reg-sub dispatch
-                                   dispatch-sync subscribe]]
+            [re-frame.core :refer [subscribe]]
             [iwaswhere-web.utils.parse :as ps]
             [reagent.ratom :refer-macros [reaction]]
             [clojure.set :as set]))

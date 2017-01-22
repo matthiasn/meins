@@ -58,8 +58,7 @@
                                  :query-id  (:query-id local-cfg)}])
         drop-fn (a/drop-linked-fn entry cfg put-fn)]
     (fn journal-entry-render [entry put-fn info local-cfg linked-desc]
-      (let [entry (merge {:md ""} entry)
-            edit-mode? @edit-mode
+      (let [edit-mode? @edit-mode
             toggle-edit #(if edit-mode? (put-fn [:entry/remove-local entry])
                                         (put-fn [:entry/update-local entry]))]
         [:div.entry {:on-drop       drop-fn
