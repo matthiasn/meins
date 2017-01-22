@@ -6,7 +6,22 @@
             [iwaswhere-web.utils.misc :as u]
             [clj-time.format :as ctf]
             [matthiasn.systems-toolbox.log :as l]
-            [clojure.tools.logging :as log]))
+            [clojure.tools.logging :as log]
+            [ubergraph.core :as uc]))
+
+(defn time-by-stories
+  "Calculate time spent per story, plus total time."
+  [g nodes]
+  (let [story-reducer (fn [acc entry]
+                        (let [comment-for (:comment-for entry)
+                              parent (uc/attrs g comment-for)
+                              story (or (:linked-story parent) :no-story)
+                              acc-time (get acc story 0)
+                              completed-time (:completed-time entry)]
+                          (assoc-in acc [story] (+ acc-time completed-time))))
+        by-story (reduce story-reducer {} nodes)]
+    {:total-time    (apply + (map :completed-time nodes))
+     :time-by-story by-story}))
 
 (defn pomodoro-mapper
   "Create mapper function for pomodoro stats"
@@ -21,11 +36,11 @@
           started (filter #(and (pos? (:completed-time %))
                                 (< (:completed-time %) (:planned-dur %)))
                           pomo-nodes)
-          day-stats {:date-string date-string
-                     :total       (count pomo-nodes)
-                     :completed   (count completed)
-                     :started     (count started)
-                     :total-time  (apply + (map :completed-time pomo-nodes))}]
+          day-stats (merge {:date-string date-string
+                            :total       (count pomo-nodes)
+                            :completed   (count completed)
+                            :started     (count started)}
+                           (time-by-stories g pomo-nodes))]
       [date-string day-stats])))
 
 (defn tasks-mapper

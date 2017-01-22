@@ -57,7 +57,7 @@
                           (assoc-in [:mouse-over] v)
                           (assoc-in [:mouse-pos] mouse-pos)))]
       (swap! local update-fn v)
-      (.setTimeout js/window (mouse-leave-fn local v) 5000))))
+      (.setTimeout js/window (mouse-leave-fn local v) 15000))))
 
 (defn info-div-pos
   "Determines position for info div in chart, depending on position on page.
