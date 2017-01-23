@@ -34,7 +34,10 @@
             date (:date-string day-stats)]
         (when date
           [:div.story-time
-           [:div [:strong date] ": " dur]
+           [:div [:strong date] ": " dur
+            " (total: " (:total day-stats)
+            ", completed: " (:completed day-stats)
+            ", started: " (:started day-stats) ")"]
            (for [[story v] (:time-by-story day-stats)]
              (let [story-name (or (:story-name (get stories story)) "No story")]
                ^{:key story}
@@ -68,11 +71,4 @@
            [bars indexed local :total chart-h y-scale put-fn]
            [bars indexed local :completed chart-h y-scale put-fn]
            [cc/path "M 0 50 l 600 0 z"]
-           [cc/path "M 0 100 l 600 0 z"]]]
-         (when-let [mouse-over (:mouse-over @local)]
-           [:div.mouse-over-info (cc/info-div-pos @local)
-            [:div.date (:date-string mouse-over)]
-            [:div "Total: " (:total mouse-over)]
-            [:div "Completed: " (:completed mouse-over)]
-            [:div "Started: " (:started mouse-over)]
-            [:div "Total time: " (u/duration-string (:total-time mouse-over))]])]))))
+           [cc/path "M 0 100 l 600 0 z"]]]]))))
