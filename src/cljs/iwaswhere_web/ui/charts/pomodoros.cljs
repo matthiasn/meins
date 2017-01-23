@@ -25,17 +25,20 @@
 
 (defn time-by-stories-list
   "Render list of times spent on individual stories, plus the total."
-  [mouse-over]
+  [day-stats]
   (let [options (subscribe [:options])
         stories (reaction (:stories @options))]
-    (fn [mouse-over]
-      (let [stories @stories]
-        [:div.story-time
-         [:div [:strong "Total time"] ": " (u/duration-string (:total-time mouse-over))]
-         (for [[story v] (:time-by-story mouse-over)]
-           (let [story-name (or (:story-name (get stories story)) "No story")]
-             ^{:key story}
-             [:div [:strong story-name] ": " (u/duration-string v)]))]))))
+    (fn [day-stats]
+      (let [stories @stories
+            dur (u/duration-string (:total-time day-stats))
+            date (:date-string day-stats)]
+        (when date
+          [:div.story-time
+           [:div [:strong date] ": " dur]
+           (for [[story v] (:time-by-story day-stats)]
+             (let [story-name (or (:story-name (get stories story)) "No story")]
+               ^{:key story}
+               [:div [:strong story-name] ": " (u/duration-string v)]))])))))
 
 (defn pomodoro-bar-chart
   [pomodoro-stats chart-h title y-scale put-fn]
@@ -51,8 +54,9 @@
            [bars indexed local :total-time chart-h 0.0025 put-fn]
            [cc/path "M 0 50 l 600 0 z"]
            [cc/path "M 0 100 l 600 0 z"]]]
-         (when-let [mouse-over (:mouse-over @local)]
-           [time-by-stories-list mouse-over])
+         (if-let [mouse-over (:mouse-over @local)]
+           [time-by-stories-list mouse-over]
+           [time-by-stories-list (second (last pomodoro-stats))])
          [:svg
           {:viewBox (str "0 0 600 " chart-h)}
           [:g
