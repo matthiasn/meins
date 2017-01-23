@@ -55,7 +55,7 @@
                     daily-summary-stats media-stats]} @chart-data]
         [:div.stats
          [:div.charts
-          [cp/pomodoro-bar-chart pomodoro-stats 150 "Pomodoros" 5 put-fn]
+          [cp/pomodoro-bar-chart pomodoro-stats 200 "Pomodoros" 5 put-fn]
           [ct/tasks-chart task-stats 250 put-fn]
           [ds/daily-summaries-chart daily-summary-stats 200 put-fn]
           [wc/wordcount-chart wordcount-stats 150 put-fn 1000]

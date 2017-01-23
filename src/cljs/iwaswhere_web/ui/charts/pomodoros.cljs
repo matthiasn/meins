@@ -32,7 +32,8 @@
                           (let [total (get acc :total 0)]
                             (-> acc
                                 (assoc-in [:total] (+ total v))
-                                (assoc-in [:items k] (+ total v)))))]
+                                (assoc-in [:items k :v] v)
+                                (assoc-in [:items k :y] total))))]
     (fn [day-stats local idx chart-h y-scale put-fn]
       (let [mouse-enter-fn (cc/mouse-enter-fn local day-stats)
             mouse-leave-fn (cc/mouse-leave-fn local day-stats)
@@ -43,15 +44,16 @@
         [:g
          {:on-mouse-enter mouse-enter-fn
           :on-mouse-leave mouse-leave-fn}
-         (for [[story v] time-by-story2]
+         (for [[story {:keys [y v]}] time-by-story2]
            (let [h (* y-scale v)
+                 y (- chart-h (+ h (* y-scale y)))
                  story-name (or (:story-name (get stories story)) "No story")]
              ^{:key (str story)}
              [:rect {:on-click (cc/open-day-fn v put-fn)
                      :fill     (cc/item-color story-name)
-                     :x        (* 20 idx)
-                     :y        (- chart-h h)
-                     :width    20
+                     :x        (* 30 idx)
+                     :y        y
+                     :width    26
                      :height   h}]))]))))
 
 (defn bars-by-story
@@ -94,14 +96,13 @@
         idx-fn (fn [idx [k v]] [idx v])]
     (fn [pomodoro-stats chart-h title y-scale put-fn]
       (let [indexed (map-indexed idx-fn pomodoro-stats)
-            indexed-30 (map-indexed idx-fn (take-last 30 pomodoro-stats))]
+            indexed-20 (map-indexed idx-fn (take-last 20 pomodoro-stats))]
         [:div
          [:svg
           {:viewBox (str "0 0 600 " chart-h)}
           [:g
            [cc/chart-title "Time tracked"]
-           [cc/bg-bars indexed local chart-h :pomodoro]
-           [bars-by-story indexed-30 local chart-h 0.0035 put-fn]]]
+           [bars-by-story indexed-20 local chart-h 0.0045 put-fn]]]
          (if-let [mouse-over (:mouse-over @local)]
            [time-by-stories-list mouse-over]
            [time-by-stories-list (second (last pomodoro-stats))])
