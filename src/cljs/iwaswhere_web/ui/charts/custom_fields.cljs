@@ -38,12 +38,6 @@
       (swap! local update-fn day-stats)
       (.setTimeout js/window (mouse-leave-fn local day-stats) 7500))))
 
-(defn item-color
-  "Calls randomColor with seed, which returns same color for seed in subsequent
-   invocations."
-  [seed]
-  (.randomColor js/window (clj->js {"seed" (str seed)})))
-
 (defn linechart-row
   "Draws line chart."
   [indexed local  cfg k]
@@ -57,7 +51,7 @@
                        y (- (+ chart-h y-start) (* y-scale (- v min-val)))]
                    (str x "," y)))
         points (cc/line-points vals mapper)
-        color (item-color path)]
+        color (cc/item-color path)]
     [:g {:class cls}
      [:g
       [:polyline {:points points

@@ -113,3 +113,9 @@
                      :y      0
                      :width  9
                      :height chart-h}]])])
+
+(defn item-color
+  "Calls randomColor with seed, which returns same color for seed in subsequent
+   invocations."
+  [seed]
+  (.randomColor js/window (clj->js {"seed" (str seed)})))

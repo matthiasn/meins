@@ -38,7 +38,10 @@
            (for [[story v] (:time-by-story day-stats)]
              (let [story-name (or (:story-name (get stories story)) "No story")]
                ^{:key story}
-               [:div [:strong story-name] ": " (u/duration-string v)]))])))))
+               [:div
+                [:span.legend
+                 {:style {:background-color (cc/item-color story-name)}}]
+                [:strong story-name] ": " (u/duration-string v)]))])))))
 
 (defn pomodoro-bar-chart
   [pomodoro-stats chart-h title y-scale put-fn]
