@@ -2,12 +2,9 @@
   (:require [reagent.core :as rc]
             [iwaswhere-web.ui.charts.common :as cc]
             [iwaswhere-web.charts.custom-fields-cfg :as cf]
-            [re-frame.core :refer [reg-event-db
-                                   path
-                                   reg-sub
-                                   dispatch
-                                   dispatch-sync
-                                   subscribe]]
+            [re-frame.core :refer [subscribe]]
+            [goog.string :as gstring]
+            [goog.string.format]
             [clojure.pprint :as pp]))
 
 (defn mouse-leave-fn
@@ -138,8 +135,9 @@
                 [linechart-row indexed local row-cfg k])))]
          (when-let [mouse-over (:mouse-over @local)]
            (let [path (:mouse-over-path @local)
-                 v (get-in mouse-over path)]
+                 v (get-in mouse-over path)
+                 fmt (when v (gstring/format "%.1f" v))]
              [:div.mouse-over-info (cc/info-div-pos2 @local)
               [:div (:date-string mouse-over)]
               (when path
-                [:div [:strong (:mouse-over-label @local)] ": " v])]))]))))
+                [:div [:strong (:mouse-over-label @local)] ": " fmt])]))]))))

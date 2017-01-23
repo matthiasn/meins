@@ -173,8 +173,7 @@
                                (case (:agg v)
                                  :min #(when (seq %) (apply min %))
                                  :max #(when (seq %) (apply max %))
-                                 :mean #(when (seq %)
-                                          (/ (apply + %) (count %)))
+                                 :mean #(when (seq %) (/ (apply + %) (count %)))
                                  :none nil
                                  #(apply + %))
                                nil)

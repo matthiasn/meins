@@ -47,7 +47,7 @@
             [:div "Follow-up in " follow-up-scheduled]
             [:div
              [:span "Follow-up after "]
-             [:select {:value     (get-in entry [:task :follow-up-hrs])
+             [:select {:value     (get-in entry [:task :follow-up-hrs] "")
                        :on-change (follow-up-select entry)}
               [:option ""]
               [:option {:value 1} "1 hour"]
