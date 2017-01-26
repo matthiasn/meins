@@ -62,13 +62,20 @@
       graph
       mentions)))
 
+(defn local-dt
+  "Return joda dt in local timezone for given entry."
+  [entry]
+  (-> (:timestamp entry)
+      (ctc/from-long)
+      (ct/to-time-zone (ct/default-time-zone))))
+
 (defn add-timeline-tree
   "Adds graph nodes for year, month and day of entry and connects those if they
    don't exist. In any case, connects new entry node to the entry node of the
    matching :timeline/day node."
   [state entry]
   (let [g (:graph state)
-        dt (ctc/from-long (:timestamp entry))
+        dt (local-dt entry)
         year (ct/year dt)
         month (ct/month dt)
         year-node {:type :timeline/year :year year}
@@ -86,11 +93,10 @@
 
 (defn add-daily-summary
   "Adds graph nodes for year, month and day of entry and connects those if they
-   don't exist. In any case, connects new entry node to the entry node of the
-   matching :timeline/day node."
+   don't exist."
   [state entry startup?]
   (let [g (:graph state)
-        dt (ctc/from-long (:timestamp entry))
+        dt (local-dt entry)
         year (ct/year dt)
         month (ct/month dt)
         day-node {:type :timeline/day :year year :month month :day (ct/day dt)}
