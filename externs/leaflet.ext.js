@@ -734,7 +734,6 @@ var L = {
     "getLayers": function () {},
     "eachLayer": function () {},
     "clearLayers": function () {},
-    "hasLayer": function () {},
     "toGeoJSON": function () {},
    },
   "FeatureGroup": function () {},

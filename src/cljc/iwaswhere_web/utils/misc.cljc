@@ -31,8 +31,7 @@
 (defn pvt-filter
   "Filter for entries considered private."
   [options]
-  (fn
-    [entry]
+  (fn [entry]
     (let [tags (set (map s/lower-case (:tags entry)))
           private-tags (:pvt-hashtags options)
           hashtags (:hashtags options)
