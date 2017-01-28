@@ -4,7 +4,7 @@
   :license {:name "GNU AFFERO GENERAL PUBLIC LICENSE"
             :url  "https://www.gnu.org/licenses/agpl-3.0.en.html"}
   :dependencies [[org.clojure/clojure "1.9.0-alpha14"]
-                 [org.clojure/clojurescript "1.9.456"]
+                 [org.clojure/clojurescript "1.9.293"]
                  [org.clojure/tools.logging "0.3.1"]
                  [org.clojure/tools.namespace "0.3.0-alpha3"]
                  [com.taoensso/encore "2.88.2"]
@@ -17,7 +17,6 @@
                  [markdown-clj "0.9.92"]
                  [cheshire "5.7.0"]
                  [cljsjs/moment "2.17.1-0"]
-                 [cljsjs/leaflet "0.7.7-7"]
                  [cljsjs/react-grid-layout "0.13.7-0"]
                  [com.drewnoakes/metadata-extractor "2.9.1"]
                  [ubergraph "0.3.0"]

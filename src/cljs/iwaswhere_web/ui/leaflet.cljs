@@ -1,6 +1,5 @@
 (ns iwaswhere-web.ui.leaflet
-  (:require [reagent.core :as rc]
-            [cljsjs.leaflet]))
+  (:require [reagent.core :as rc]))
 
 (defn leaflet-did-mount
   "Function using the did-mount lifecycle method. Uses :id from props map to

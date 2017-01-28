@@ -33,6 +33,7 @@
       [:source {:src "/mp3/old-clock-ringing-short.mp3" :type "audio/mp4"}]]
      [:audio#ticking-clock {:autoPlay false :loop false}
       [:source {:src "/mp3/tick.ogg" :type "audio/ogg"}]]
+     (include-js "/webjars/leaflet/0.7.7/dist/leaflet.js")
      (include-js "/webjars/intl/1.2.4/dist/Intl.min.js")
      (include-js "/webjars/intl/1.2.4/locale-data/jsonp/en.js")
      (include-js "/webjars/randomcolor/0.4.4/randomColor.js")
