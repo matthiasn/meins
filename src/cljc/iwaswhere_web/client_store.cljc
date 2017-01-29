@@ -106,5 +106,4 @@
                               :cmd/toggle-key     c/toggle-key-fn
                               :cmd/assoc-in       c/assoc-in-state
                               :cmd/keep-alive     ka/reset-fn
-                              :cmd/keep-alive-res ka/set-alive-fn
-                              :cmd/toggle-lines   c/toggle-lines})})
+                              :cmd/keep-alive-res ka/set-alive-fn})})

@@ -191,7 +191,6 @@
       (is (fn? (:cmd/toggle-active handler-map)))
       (is (fn? (:cmd/toggle handler-map)))
       (is (fn? (:cmd/toggle-key handler-map)))
-      (is (fn? (:cmd/toggle-lines handler-map)))
       (is (fn? (:cmd/set-opt handler-map)))
       (is (fn? (:cmd/set-dragged handler-map)))
       (is (fn? (:cmd/assoc-in handler-map)))

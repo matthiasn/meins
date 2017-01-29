@@ -12,7 +12,7 @@
    :show-pvt          true
    :thumbnails        true
    :reconfigure-grid  true
-   :lines-shortened   3
+   :lines-shortened   10
    :widgets           {:tabs-left     {:type      :tabs-view
                                        :query-id  :left
                                        :data-grid {:x 6 :y 0 :w 9 :h 19}}
@@ -57,14 +57,6 @@
                     (update-in current-state path not))]
     {:new-state    new-state
      :send-to-self [:cfg/save]}))
-
-(defn toggle-lines
-  "Toggle number of lines to show when comments are shortend. Cycles from
-   one to ten."
-  [{:keys [current-state]}]
-  {:new-state    (update-in current-state [:cfg :lines-shortened]
-                            #(if (< % 10) (inc %) 1))
-   :send-to-self [:cfg/save]})
 
 (defn set-currently-dragged
   "Set the currently dragged entry for drag and drop."

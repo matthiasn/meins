@@ -68,9 +68,7 @@
          [:span.fa.fa-refresh.toggle {:on-click refresh-cfg}]
          [:span.fa.fa-qrcode.toggle
           {:on-click toggle-qr-code
-           :class    (when-not (:qr-code @cfg) "inactive")}]
-         [:span.fa.fa-ellipsis-h.toggle
-          {:on-click #(put-fn [:cmd/toggle-lines])}]]))))
+           :class    (when-not (:qr-code @cfg) "inactive")}]]))))
 
 (defn upload-view
   "Renders QR-code with upload address."
