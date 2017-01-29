@@ -23,19 +23,11 @@
         (when (and edit-mode? (not (:task entry)))
           (let [d (* 24 60 60 1000)
                 now (st/now)
-                updated (assoc-in entry [:task] {:start (+ now d)
-                                                 :due   (+ now d d)})]
+                updated (assoc-in entry [:task] {:due (+ now d d)})]
             (put-fn [:entry/update-local updated])))
         [:form.task-details
          [:fieldset
           [:legend "Task details"]
-          [:div
-           [:span "Start: "]
-           (if edit-mode?
-             [:input {:type     :datetime-local
-                      :on-input (input-fn entry :start)
-                      :value    (format-time2 (-> entry :task :start))}]
-             [:time (format-time (-> entry :task :start))])]
           [:div
            [:span " Due: "]
            (if edit-mode?
