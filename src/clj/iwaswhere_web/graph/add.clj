@@ -189,6 +189,16 @@
         (uc/add-edges [:stories (:timestamp entry)]))
     graph))
 
+(defn add-book
+  "When entry is a :book, adds node for book.
+   Does nothing when entry is not of type :book."
+  [graph entry]
+  (if (= (:entry-type entry) :book)
+    (-> graph
+        (uc/add-nodes :book)
+        (uc/add-edges [:books (:timestamp entry)]))
+    graph))
+
 (defn add-story-set
   "When entry is linked to a story, add that entry timestamp to the set with
    the entry ids on that timeline."
@@ -242,6 +252,7 @@
         (update-in [:graph] add-linked-visit new-entry)
         (update-in [:graph] add-parent-ref new-entry)
         (update-in [:graph] add-story new-entry)
+        (update-in [:graph] add-book new-entry)
         (add-story-set new-entry)
         (add-tasks-set new-entry)
         (update-in [:sorted-entries] conj ts))))

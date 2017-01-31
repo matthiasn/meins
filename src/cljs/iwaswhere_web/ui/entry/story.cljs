@@ -30,7 +30,7 @@
           updated (assoc-in entry [:story-name] text)]
       (put-fn [:entry/update-local updated]))))
 
-(defn story-name
+(defn story-name-field
   "Renders editable field for story name when the entry is of type :story.
    Updates local entry on input, and saves the entry when CMD-S is pressed."
   [entry edit-mode? put-fn]
@@ -43,7 +43,7 @@
          [editable-field on-input-fn on-keydown-fn (:story-name entry)]]
         [:h2 "Story: " (:story-name entry)]))))
 
-(defn book-name
+(defn book-name-field
   "Renders editable field for book name when the entry is of type :book.
    Updates local entry on input, and saves the entry when CMD-S is pressed."
   [entry edit-mode? put-fn]
@@ -67,10 +67,8 @@
         select-handler
         (fn [ev]
           (let [selected (js/parseInt (-> ev .-nativeEvent .-target .-value))
-                custom-path (get-in @stories [selected :custom-path])
                 updated (-> (get-in @new-entries [ts])
-                            (assoc-in [:linked-story] selected)
-                            (assoc-in [:custom-path] custom-path))]
+                            (assoc-in [:linked-story] selected))]
             (put-fn [:entry/update-local updated])))]
     (fn story-select-render [entry put-fn edit-mode?]
       (let [linked-story (:linked-story entry)]
@@ -88,3 +86,35 @@
                   [:option {:value id} story-name]))]])
           (when linked-story
             [:div.story (:story-name (get @stories linked-story))]))))))
+
+(defn book-select
+  "In edit mode, allow editing of story, otherwise show story name."
+  [entry put-fn edit-mode?]
+  (let [options (subscribe [:options])
+        books (reaction (:books @options))
+        sorted-books (reaction (:sorted-books @options))
+        ts (:timestamp entry)
+        new-entries (subscribe [:new-entries])
+        select-handler
+        (fn [ev]
+          (let [selected (js/parseInt (-> ev .-nativeEvent .-target .-value))
+                updated (-> (get-in @new-entries [ts])
+                            (assoc-in [:linked-book] selected))]
+            (put-fn [:entry/update-local updated])))]
+    (fn story-select-render [entry put-fn edit-mode?]
+      (let [linked-book (:linked-book entry)
+            entry-type (:entry-type entry)]
+        (when (= entry-type :story)
+          (if edit-mode?
+            (when-not (:comment-for entry)
+              [:div.story
+               [:label "Book:"]
+               [:select {:value     (or linked-book "")
+                         :on-change select-handler}
+                [:option {:value ""} "no book selected"]
+                (for [[id book] @sorted-books]
+                  (let [book-name (:book-name book)]
+                    ^{:key (str ts book-name)}
+                    [:option {:value id} book-name]))]])
+            (when linked-book
+              [:div.story "Book: " (:book-name (get @books linked-book))])))))))

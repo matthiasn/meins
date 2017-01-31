@@ -14,7 +14,7 @@
 	<array>
 		<string>/Users/mn/Downloads/zulu8.17.0.3-jdk8.0.102-macosx_x64</string>
 		<string>/Users/mn/github/iWasWhere/bin/blink1-tool</string>
-		<string>/Users/mn/github/iWasWhere/target/iwaswhere-web-0.1.31-standalone.jar</string>
+		<string>/Users/mn/github/iWasWhere/target/iwaswhere-web-0.1.32-standalone.jar</string>
 	</array>
 	<key>Creator</key>
 	<string>Platypus-5.1</string>
@@ -261,6 +261,6 @@
 	<key>UseXMLPlistFormat</key>
 	<false/>
 	<key>Version</key>
-	<string>0.1.31</string>
+	<string>0.1.32</string>
 </dict>
 </plist>

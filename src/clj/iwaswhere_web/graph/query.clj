@@ -237,6 +237,15 @@
         stories (into {} (map (fn [id] [id (uc/attrs g id)]) story-ids))]
     stories))
 
+(defn find-all-books
+  "Finds all :book entries in graph and returns map with the id of the book
+   (creation timestamp) as key and the book node itself as value."
+  [current-state]
+  (let [g (:graph current-state)
+        book-ids (map :dest (uc/find-edges g {:src :books}))
+        books (into {} (map (fn [id] [id (uc/attrs g id)]) book-ids))]
+    books))
+
 (defn find-all-consumption-types
   "Finds all consumption types used in entries by finding the edges that
    originate from the :consumption-types node."

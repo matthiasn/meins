@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [0.1.32] - 2017-02-01
+### Changed
+- book entry type as parent for stories
+
 ## [0.1.31] - 2017-01-20
 ### Changed
 - open end time tracking for better measurement of where time is spent

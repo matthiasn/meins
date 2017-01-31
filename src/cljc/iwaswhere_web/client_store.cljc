@@ -30,6 +30,10 @@
         sorted-stories (sort (fn [[_ x] [_ y]]
                                (< (:story-name x) (:story-name y)))
                              stories)
+        books (:books msg-payload)
+        sorted-books (sort (fn [[_ x] [_ y]]
+                               (< (:book-name x) (:book-name y)))
+                             books)
         new-state
         (-> current-state
             (assoc-in [:options :hashtags] (:hashtags msg-payload))
@@ -40,6 +44,8 @@
             (assoc-in [:options :custom-field-charts] (:custom-field-charts msg-payload))
             (assoc-in [:options :stories] stories)
             (assoc-in [:options :sorted-stories] sorted-stories)
+            (assoc-in [:options :books] books)
+            (assoc-in [:options :sorted-books] sorted-books)
             (assoc-in [:options :mentions] (:mentions msg-payload))
             (assoc-in [:stats] (:stats msg-payload)))]
     #?(:cljs (stats/update-stats put-fn))
