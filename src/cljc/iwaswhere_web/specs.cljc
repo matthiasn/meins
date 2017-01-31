@@ -31,7 +31,7 @@
 
 (s/def :iww.entry/timezone (s/nilable string?))
 (s/def :iww.entry/utc-offset (number-in-range? -720 720))
-(s/def :iww.entry/entry-type #{:pomodoro :story})
+(s/def :iww.entry/entry-type #{:pomodoro :story :book})
 (s/def :iww.entry/comment-for possible-timestamp?)
 (s/def :iww.entry/latitude (s/nilable (number-in-range? -180.0 180.0)))
 (s/def :iww.entry/longitude (s/nilable (number-in-range? -180.0 180.0)))

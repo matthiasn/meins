@@ -12,29 +12,52 @@
     :on-key-down      on-keydown-fn}
    text])
 
+(defn keydown-fn
+  [entry k put-fn]
+  (fn [ev]
+    (let [text (aget ev "target" "innerText")
+          updated (assoc-in entry [k] text)
+          key-code (.. ev -keyCode)
+          meta-key (.. ev -metaKey)]
+      (when (and meta-key (= key-code 83)) ; CMD-s pressed
+        (put-fn [:entry/update updated])
+        (.preventDefault ev)))))
+
+(defn input-fn
+  [entry k put-fn]
+  (fn [ev]
+    (let [text (aget ev "target" "innerText")
+          updated (assoc-in entry [:story-name] text)]
+      (put-fn [:entry/update-local updated]))))
+
 (defn story-name
   "Renders editable field for story name when the entry is of type :story.
    Updates local entry on input, and saves the entry when CMD-S is pressed."
-  [entry put-fn]
+  [entry edit-mode? put-fn]
   (when (= (:entry-type entry) :story)
-    (let [on-input-fn (fn [ev]
-                        (let [text (aget ev "target" "innerText")
-                              updated (assoc-in entry [:story-name] text)]
-                          (put-fn [:entry/update-local updated])))
-          on-keydown-fn (fn [ev]
-                          (let [text (aget ev "target" "innerText")
-                                updated (assoc-in entry [:story-name] text)
-                                key-code (.. ev -keyCode)
-                                meta-key (.. ev -metaKey)]
-                            (when (and meta-key (= key-code 83)) ; CMD-s pressed
-                              (put-fn [:entry/update updated])
-                              (.preventDefault ev))))]
-      [:div.story
-       [:label "Story:"]
-       [editable-field on-input-fn on-keydown-fn (:story-name entry)]])))
+    (let [on-input-fn (input-fn entry :store-name put-fn)
+          on-keydown-fn (keydown-fn entry :store-name put-fn)]
+      (if edit-mode?
+        [:div.story
+         [:label "Story:"]
+         [editable-field on-input-fn on-keydown-fn (:story-name entry)]]
+        [:h2 "Story: " (:story-name entry)]))))
+
+(defn book-name
+  "Renders editable field for book name when the entry is of type :book.
+   Updates local entry on input, and saves the entry when CMD-S is pressed."
+  [entry edit-mode? put-fn]
+  (when (= (:entry-type entry) :book)
+    (let [on-input-fn (input-fn entry :book-name put-fn)
+          on-keydown-fn (keydown-fn entry :book-name put-fn)]
+      (if edit-mode?
+        [:div.story
+         [:label "Book:"]
+         [editable-field on-input-fn on-keydown-fn (:book-name entry)]]
+        [:h2 "Book: " (:book-name entry)]))))
 
 (defn story-select
-  "In edit mode, allow editing of activities, otherwise show a summary."
+  "In edit mode, allow editing of story, otherwise show story name."
   [entry put-fn edit-mode?]
   (let [options (subscribe [:options])
         stories (reaction (:stories @options))
@@ -52,7 +75,8 @@
     (fn story-select-render [entry put-fn edit-mode?]
       (let [linked-story (:linked-story entry)]
         (if edit-mode?
-          (when-not (or (= (:entry-type entry) :story) (:comment-for entry))
+          (when-not (or (contains? #{:book :story} (:entry-type entry))
+                        (:comment-for entry))
             [:div.story
              [:label "Story:"]
              [:select {:value     (or linked-story "")

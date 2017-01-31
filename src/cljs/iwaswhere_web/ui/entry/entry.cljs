@@ -82,7 +82,8 @@
                   (str " linked: " (count (:linked-entries-list entry)))]))]
           [a/entry-actions entry put-fn edit-mode? toggle-edit local-cfg]]
          [hashtags-mentions-list entry tab-group put-fn]
-         [es/story-name entry put-fn]
+         [es/story-name entry edit-mode? put-fn]
+         [es/book-name entry edit-mode? put-fn]
          (if edit-mode?
            [e/editable-md-render entry put-fn]
            (if (and (empty? (:md entry)) linked-desc)
