@@ -27,7 +27,7 @@
   [entry k put-fn]
   (fn [ev]
     (let [text (aget ev "target" "innerText")
-          updated (assoc-in entry [:story-name] text)]
+          updated (assoc-in entry [k] text)]
       (put-fn [:entry/update-local updated]))))
 
 (defn story-name-field
@@ -35,8 +35,8 @@
    Updates local entry on input, and saves the entry when CMD-S is pressed."
   [entry edit-mode? put-fn]
   (when (= (:entry-type entry) :story)
-    (let [on-input-fn (input-fn entry :store-name put-fn)
-          on-keydown-fn (keydown-fn entry :store-name put-fn)]
+    (let [on-input-fn (input-fn entry :story-name put-fn)
+          on-keydown-fn (keydown-fn entry :story-name put-fn)]
       (if edit-mode?
         [:div.story
          [:label "Story:"]

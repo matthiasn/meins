@@ -55,9 +55,9 @@
     (fn [query-id put-fn]
       (let [current-query (query-id (:queries @query-cfg))
             update-search-fn (fn [search-str]
-                               (put-fn [:search/update
-                                        (merge (:local-query @state)
-                                               (p/parse-search search-str))]))
+                               (let [s (merge (:local-query @state)
+                                              (p/parse-search search-str))]
+                                 (put-fn [:search/update s])))
             before-cursor (h/string-before-cursor (:search-text current-query))
             show-pvt? (:show-pvt @cfg)
             hashtags (:hashtags @options)

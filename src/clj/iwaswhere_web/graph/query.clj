@@ -53,14 +53,24 @@
                         (let [start-ts (:start (:task entry))]
                           (when start-ts
                             (> (st/now) start-ts)))
+
                         (contains? opts ":due")
                         (let [due-ts (:due (:task entry))]
                           (when due-ts
                             (> (st/now) due-ts)))
+
                         (contains? opts ":no-start")
                         (not (:start (:task entry)))
+
                         (contains? opts ":no-due")
                         (not (:due (:task entry)))
+
+                        (contains? opts ":story")
+                        (= :story (:entry-type entry))
+
+                        (contains? opts ":book")
+                        (= :book (:entry-type entry))
+
                         :else true)
 
           match? (and (set/subset? q-tags tags)
@@ -118,6 +128,11 @@
                                                      :day   (ct/day dt)}
                                       :relationship :DATE})))))
 
+(defn get-connected-nodes
+  "Extract matching timestamps for query."
+  [g node]
+  (set (map :dest (uc/find-edges g {:src node}))))
+
 (defn get-linked-entries
   "Extract all linked entries for entry, including their comments."
   [entry g n sort-by-upvotes?]
@@ -161,8 +176,17 @@
                       (get-in state [:sorted-story-entries (:story query)])
 
                       ; query is for tasks
-                      (seq (:opts query))
+                      (and (seq (:opts query))
+                           (contains? (:opts query) ":due"))
                       (get-in state [:sorted-tasks])
+
+                      (and (seq (:opts query))
+                           (contains? (:opts query) ":story"))
+                      (get-connected-nodes g :stories)
+
+                      (and (seq (:opts query))
+                           (contains? (:opts query) ":book"))
+                      (get-connected-nodes g :books)
 
                       ; set with timestamps matching tags and mentions
                       (or (seq (:tags query)) (seq (:mentions query)))
