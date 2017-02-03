@@ -242,7 +242,7 @@
         g (:graph current-state)
         ltags (map #(-> % :dest :ptag) (uc/find-edges g {:src :pvt-hashtags}))
         tags (map #(:val (uc/attrs g {:ptag %})) ltags)]
-    (set/union (set tags) (:pvt-tags cfg))))
+    (disj (set/union (set tags) (:pvt-tags cfg)) "#new")))
 
 (defn find-all-mentions
   "Finds all hashtags used in entries by finding the edges that originate from
