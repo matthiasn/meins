@@ -14,7 +14,7 @@
 (defn add-to-index
   "Adds entry to Lucene index. Removes older version of the same entry first."
   [{:keys [msg-payload]}]
-  (let [entry (select-keys msg-payload [:timestamp :md])]
+  (let [entry (select-keys msg-payload [:timestamp :md :story-name :book-name])]
     (remove-from-index {:msg-payload entry})
     (clucy/add index entry)))
 
