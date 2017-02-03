@@ -67,6 +67,51 @@
        ^{:key (str idx)}
        [day-bars v local idx chart-h y-scale put-fn]))])
 
+;; TODO: either DRY up or rethink
+(defn day-bars-by-book
+  "Renders group with rects for all stories of the particular day."
+  [day-stats local idx chart-h y-scale put-fn]
+  (let [options (subscribe [:options])
+        books (reaction (:books @options))
+        stacked-reducer (fn [acc [k v]]
+                          (let [total (get acc :total 0)]
+                            (-> acc
+                                (assoc-in [:total] (+ total v))
+                                (assoc-in [:items k :v] v)
+                                (assoc-in [:items k :y] total))))]
+    (fn [day-stats local idx chart-h y-scale put-fn]
+      (let [mouse-enter-fn (cc/mouse-enter-fn local day-stats)
+            mouse-leave-fn (cc/mouse-leave-fn local day-stats)
+            books @books
+            time-by-book (sort-by #(str (first %)) (:time-by-book day-stats))
+            stacked (reduce stacked-reducer {} time-by-book)
+            time-by-book (reverse (sort-by #(str (first %)) (:items stacked)))]
+        [:g
+         {:on-mouse-enter mouse-enter-fn
+          :on-mouse-leave mouse-leave-fn}
+         (for [[book {:keys [y v]}] time-by-book]
+           (let [h (* y-scale v)
+                 y (- chart-h (+ h (* y-scale y)))
+                 book-name (or (:book-name (get books book)) "No book")]
+             ^{:key (str book)}
+             [:rect {:on-click (cc/open-day-fn v put-fn)
+                     :fill     (cc/item-color book-name)
+                     :x        (* 30 idx)
+                     :y        y
+                     :width    26
+                     :height   h}]))]))))
+
+(defn bars-by-book
+  "Renders chart with daily recorded times, split up by story."
+  [indexed local chart-h y-scale put-fn]
+  [:g
+   (for [[idx v] indexed]
+     (let [h (* y-scale (:total-time v))
+           mouse-enter-fn (cc/mouse-enter-fn local v)
+           mouse-leave-fn (cc/mouse-leave-fn local v)]
+       ^{:key (str idx)}
+       [day-bars-by-book v local idx chart-h y-scale put-fn]))])
+
 (defn time-by-stories-list
   "Render list of times spent on individual stories, plus the total."
   [day-stats]
@@ -115,6 +160,11 @@
           [:g
            [cc/chart-title "Time tracked"]
            [bars-by-story indexed-20 local chart-h 0.0045 put-fn]]]
+         [:svg
+          {:viewBox (str "0 0 600 " chart-h)}
+          [:g
+           [cc/chart-title "Time tracked"]
+           [bars-by-book indexed-20 local chart-h 0.0045 put-fn]]]
          (if-let [mouse-over (:mouse-over @local)]
            [time-by-stories-list mouse-over]
            [time-by-stories-list (second (last pomodoro-stats))])
