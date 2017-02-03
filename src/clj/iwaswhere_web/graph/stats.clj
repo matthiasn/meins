@@ -18,18 +18,36 @@
                          (update-in acc [book] #(+ v (or % 0)))))]
     (reduce book-reducer {} by-story)))
 
+(defn summed-durations
+  "Calculate time spent as tracked in custom fields."
+  [entry]
+  (let [custom-fields (:custom-fields entry)
+        duration-secs (filter identity (map (fn [[k v]]
+                                              (let [dur (:duration v)]
+                                               (if (= k "#audio")
+                                                 dur
+                                                 (* 60 (or dur 0)))))
+                                            custom-fields))]
+    (apply + duration-secs)))
+
 (defn time-by-stories
   "Calculate time spent per story, plus total time."
   [g nodes]
   (let [story-reducer (fn [acc entry]
                         (let [comment-for (:comment-for entry)
-                              parent (uc/attrs g comment-for)
-                              story (or (:linked-story parent) :no-story)
+                              parent (when comment-for (uc/attrs g comment-for))
+                              story (or (:linked-story parent)
+                                        (:linked-story entry)
+                                        :no-story)
                               acc-time (get acc story 0)
-                              completed-time (:completed-time entry)]
-                          (assoc-in acc [story] (+ acc-time completed-time))))
+                              completed (get entry :completed-time 0)
+                              manual (summed-durations entry)
+                              summed (+ acc-time completed manual)]
+                          (if (pos? summed)
+                            (assoc-in acc [story] summed)
+                            acc)))
         by-story (reduce story-reducer {} nodes)]
-    {:total-time    (apply + (map :completed-time nodes))
+    {:total-time    (apply + (map #(or (:completed-time %) 0) nodes))
      :time-by-story by-story
      :time-by-book  (time-by-books g by-story)}))
 
@@ -50,7 +68,7 @@
                             :total       (count pomo-nodes)
                             :completed   (count completed)
                             :started     (count started)}
-                           (time-by-stories g pomo-nodes))]
+                           (time-by-stories g day-nodes-attrs))]
       [date-string day-stats])))
 
 (defn tasks-mapper
