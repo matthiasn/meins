@@ -71,9 +71,11 @@
   "Render list of times spent on individual stories, plus the total."
   [day-stats]
   (let [options (subscribe [:options])
-        stories (reaction (:stories @options))]
+        stories (reaction (:stories @options))
+        books (reaction (:books @options))]
     (fn [day-stats]
       (let [stories @stories
+            books @books
             dur (u/duration-string (:total-time day-stats))
             date (:date-string day-stats)]
         (when date
@@ -82,6 +84,15 @@
             " (total: " (:total day-stats)
             ", completed: " (:completed day-stats)
             ", started: " (:started day-stats) ")"]
+           [:hr]
+           (for [[book v] (:time-by-book day-stats)]
+             (let [book-name (or (:book-name (get books book)) "No book")]
+               ^{:key book}
+               [:div
+                [:span.legend
+                 {:style {:background-color (cc/item-color book-name)}}]
+                [:strong book-name] ": " (u/duration-string v)]))
+           [:hr]
            (for [[story v] (:time-by-story day-stats)]
              (let [story-name (or (:story-name (get stories story)) "No story")]
                ^{:key story}
@@ -93,7 +104,8 @@
 (defn pomodoro-bar-chart
   [pomodoro-stats chart-h title y-scale put-fn]
   (let [local (rc/atom {})
-        idx-fn (fn [idx [k v]] [idx v])]
+        idx-fn (fn [idx [k v]] [idx v])
+        chart-data (subscribe [:chart-data])]
     (fn [pomodoro-stats chart-h title y-scale put-fn]
       (let [indexed (map-indexed idx-fn pomodoro-stats)
             indexed-20 (map-indexed idx-fn (take-last 20 pomodoro-stats))]

@@ -116,6 +116,7 @@
                      :started     1
                      :total       4
                      :total-time  1301
+                     :time-by-book  {:no-book 1301}
                      :time-by-story {1484076392371 291
                                      1484076392372 899
                                      :no-story     111}}]

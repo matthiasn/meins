@@ -9,6 +9,15 @@
             [clojure.tools.logging :as log]
             [ubergraph.core :as uc]))
 
+(defn time-by-books
+  "Calculate time spent per book, plus time not assigned to any book."
+  [g by-story]
+  (let [stories (gq/find-all-stories {:graph g})
+        book-reducer (fn [acc [k v]]
+                       (let [book (get-in stories [k :linked-book] :no-book)]
+                         (update-in acc [book] #(+ v (or % 0)))))]
+    (reduce book-reducer {} by-story)))
+
 (defn time-by-stories
   "Calculate time spent per story, plus total time."
   [g nodes]
@@ -21,7 +30,8 @@
                           (assoc-in acc [story] (+ acc-time completed-time))))
         by-story (reduce story-reducer {} nodes)]
     {:total-time    (apply + (map :completed-time nodes))
-     :time-by-story by-story}))
+     :time-by-story by-story
+     :time-by-book  (time-by-books g by-story)}))
 
 (defn pomodoro-mapper
   "Create mapper function for pomodoro stats"
