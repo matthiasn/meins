@@ -24,9 +24,9 @@
   (let [custom-fields (:custom-fields entry)
         duration-secs (filter identity (map (fn [[k v]]
                                               (let [dur (:duration v)]
-                                               (if (= k "#audio")
-                                                 dur
-                                                 (* 60 (or dur 0)))))
+                                                (if (= k "#audio")
+                                                  dur
+                                                  (* 60 (or dur 0)))))
                                             custom-fields))]
     (apply + duration-secs)))
 
@@ -47,7 +47,7 @@
                             (assoc-in acc [story] summed)
                             acc)))
         by-story (reduce story-reducer {} nodes)]
-    {:total-time    (apply + (map #(or (:completed-time %) 0) nodes))
+    {:total-time    (apply + (map second by-story))
      :time-by-story by-story
      :time-by-book  (time-by-books g by-story)}))
 
