@@ -12,6 +12,7 @@
             [clojure.pprint :as pp]
             [matthiasn.systems-toolbox.component :as st]))
 
+;; TODO: migrate existing audio entries to use a different keyword
 (defn summed-durations
   "Calculate time spent as tracked in custom fields."
   [entry]
@@ -19,7 +20,7 @@
         duration-secs (filter identity (map (fn [[k v]]
                                               (let [dur (:duration v)]
                                                 (if (= k "#audio")
-                                                  dur
+                                                  0
                                                   (* 60 (or dur 0)))))
                                             custom-fields))]
     (apply + duration-secs)))
