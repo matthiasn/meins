@@ -197,3 +197,12 @@ $activity-weekend: lighten($activity, 30);
     margin-right: 4px;
   }
 }
+
+.times-by-day {
+  padding-left: 2px;
+  background-color: white;
+  time {
+    font-size: 0.8em;
+    font-weight: bold;
+  }
+}

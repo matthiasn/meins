@@ -125,10 +125,7 @@
             date (:date-string day-stats)]
         (when date
           [:div.story-time
-           [:div [:strong date] ": " dur
-            " (total: " (:total day-stats)
-            ", completed: " (:completed day-stats)
-            ", started: " (:started day-stats) ")"]
+           [:div "Logged: " [:strong dur] " in " (:total day-stats) " entries."]
            [:hr]
            (for [[book v] (:time-by-book day-stats)]
              (let [book-name (or (:book-name (get books book)) "No book")]
@@ -153,7 +150,8 @@
         chart-data (subscribe [:chart-data])]
     (fn [pomodoro-stats chart-h title y-scale put-fn]
       (let [indexed (map-indexed idx-fn pomodoro-stats)
-            indexed-20 (map-indexed idx-fn (take-last 20 pomodoro-stats))]
+            indexed-20 (map-indexed idx-fn (take-last 20 pomodoro-stats))
+            day-stats (or (:mouse-over @local) (second (last pomodoro-stats)))]
         [:div
          [:svg
           {:viewBox (str "0 0 600 " chart-h)}
@@ -165,9 +163,10 @@
           [:g
            [cc/chart-title "Time tracked"]
            [bars-by-book indexed-20 local chart-h 0.0045 put-fn]]]
-         (if-let [mouse-over (:mouse-over @local)]
-           [time-by-stories-list mouse-over]
-           [time-by-stories-list (second (last pomodoro-stats))])
+         [:div.times-by-day
+          [:time (:date-string day-stats)]
+
+          [time-by-stories-list day-stats]]
          [:svg
           {:viewBox (str "0 0 600 " chart-h)}
           [:g
