@@ -18,18 +18,6 @@
                          (update-in acc [book] #(+ v (or % 0)))))]
     (reduce book-reducer {} by-story)))
 
-(defn summed-durations
-  "Calculate time spent as tracked in custom fields."
-  [entry]
-  (let [custom-fields (:custom-fields entry)
-        duration-secs (filter identity (map (fn [[k v]]
-                                              (let [dur (:duration v)]
-                                                (if (= k "#audio")
-                                                  dur
-                                                  (* 60 (or dur 0)))))
-                                            custom-fields))]
-    (apply + duration-secs)))
-
 (defn time-by-stories
   "Calculate time spent per story, plus total time."
   [g nodes]
@@ -41,7 +29,7 @@
                                         :no-story)
                               acc-time (get acc story 0)
                               completed (get entry :completed-time 0)
-                              manual (summed-durations entry)
+                              manual (gq/summed-durations entry)
                               summed (+ acc-time completed manual)]
                           (if (pos? summed)
                             (assoc-in acc [story] summed)
@@ -149,7 +137,7 @@
     (count (set (:entries res)))))
 
 (defn task-summary-stats
-  "Generate some very basic stats about the graph size for display in UI."
+  "Generate some very basic stats about the graph for display in UI."
   [state]
   {:open-tasks-cnt    (res-count state {:tags     #{"#task"}
                                         :not-tags #{"#done" "#backlog" "#closed"}})

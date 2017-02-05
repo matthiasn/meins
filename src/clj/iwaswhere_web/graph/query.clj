@@ -12,11 +12,23 @@
             [clojure.pprint :as pp]
             [matthiasn.systems-toolbox.component :as st]))
 
+(defn summed-durations
+  "Calculate time spent as tracked in custom fields."
+  [entry]
+  (let [custom-fields (:custom-fields entry)
+        duration-secs (filter identity (map (fn [[k v]]
+                                              (let [dur (:duration v)]
+                                                (if (= k "#audio")
+                                                  dur
+                                                  (* 60 (or dur 0)))))
+                                            custom-fields))]
+    (apply + duration-secs)))
+
 (defn entries-filter-fn
   "Creates a filter function which ensures that all tags and mentions in the
    query are contained in the filtered entry or any of it's comments, and none
    of the not-tags. Also allows filtering per day."
-  [q graph]
+  [q g]
   (fn [entry]
     (let [local-fmt (ctf/with-zone (ctf/formatters :year-month-day)
                                    (ct/default-time-zone))
@@ -32,7 +44,7 @@
           q-mentions (set (map s/lower-case (:mentions q)))
 
           entry-tags (set (map s/lower-case (:tags entry)))
-          entry-comments (map #(uc/attrs graph %) (:comments entry))
+          entry-comments (map #(uc/attrs g %) (:comments entry))
           entry-comments-tags (apply set/union (map :tags entry-comments))
           tags (set (map s/lower-case (set/union entry-tags entry-comments-tags)))
 
@@ -50,9 +62,14 @@
           opts (:opts q)
           opts-match? (cond
                         (contains? opts ":started")
-                        (let [start-ts (:start (:task entry))]
-                          (when start-ts
-                            (> (st/now) start-ts)))
+                        (when (contains? entry-tags "#task")
+                          (let [nodes (into [entry] entry-comments)
+                                filter-fn (fn [n]
+                                            (let [completed (:completed-time n)]
+                                              (or (when completed (pos? completed))
+                                                  (pos? (summed-durations n)))))
+                                started (filter filter-fn nodes)]
+                            (seq started)))
 
                         (contains? opts ":due")
                         (let [due-ts (:due (:task entry))]
