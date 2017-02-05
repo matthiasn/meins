@@ -10,6 +10,7 @@
             [iwaswhere-web.ui.entry.actions :as a]
             [iwaswhere-web.ui.entry.capture :as c]
             [iwaswhere-web.ui.entry.task :as task]
+            [iwaswhere-web.ui.entry.briefing :as b]
             [iwaswhere-web.ui.entry.story :as es]
             [iwaswhere-web.ui.entry.thumbnails :as t]
             [cljsjs.moment]
@@ -100,6 +101,7 @@
          [m/videoplayer-view entry]
          [m/imdb-view entry put-fn]
          [task/task-details entry put-fn edit-mode?]
+         [b/briefing-view entry put-fn edit-mode?]
          [:div.footer
           [:div.likes (when-let [upvotes (:upvotes entry)]
                         (when (pos? upvotes)

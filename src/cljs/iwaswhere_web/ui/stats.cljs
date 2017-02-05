@@ -8,8 +8,7 @@
             [iwaswhere-web.ui.charts.media :as m]
             [iwaswhere-web.ui.charts.daily-summaries :as ds]
             [cljsjs.moment]
-            [re-frame.core :refer [reg-event-db path reg-sub dispatch
-                                   dispatch-sync subscribe]]
+            [re-frame.core :refer [subscribe]]
             [cljs.pprint :as pp]))
 
 (def ymd-format "YYYY-MM-DD")
