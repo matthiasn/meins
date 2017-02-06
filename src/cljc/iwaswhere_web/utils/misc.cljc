@@ -11,7 +11,7 @@
   (let [hours (int (/ seconds 3600))
         seconds (rem seconds 3600)
         min (int (/ seconds 60))
-        sec (rem seconds 60)]
+        sec (int (rem seconds 60))]
     (s/trim
       (str (when (pos? hours) (str hours "h "))
            (when (pos? min) (str min "m "))
@@ -24,7 +24,7 @@
         depart-ts (:departure-timestamp entry)
         secs (when (and arrival-ts depart-ts)
                (let [dur (- depart-ts arrival-ts)]
-                 (Math/floor (if (int? dur) (/ dur 1000) dur))))]
+                 (if (int? dur) (/ dur 1000) dur)))]
     (when (and secs (< secs 99999999))
       (str ", " (duration-string secs)))))
 

@@ -13,7 +13,8 @@
     (is (= (u/duration-string 111) "1m 51s"))
     (is (= (u/duration-string 1111) "18m 31s"))
     (is (= (u/duration-string 11111) "3h 5m 11s"))
-    (is (= (u/duration-string 111111) "30h 51m 51s"))))
+    (is (= (u/duration-string 111111) "30h 51m 51s"))
+    (is (= (u/duration-string 7931.999999999999) "2h 12m 11s"))))
 
 (def test-entry
   {:mentions       #{}
