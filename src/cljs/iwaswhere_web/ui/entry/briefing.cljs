@@ -41,11 +41,11 @@
                         x (* y-scale x)
                         book-name (or (:book-name (get books book)) "No book")]
                     ^{:key (str book)}
-                    [:rect {:fill    (cc/item-color book-name)
-                            :y       0
-                            :x       x
-                            :width   w
-                            :height  15}]))]]
+                    [:rect {:fill   (cc/item-color book-name)
+                            :y      0
+                            :x      x
+                            :width  w
+                            :height 15}]))]]
            (for [[book v] (:time-by-book day-stats)]
              (let [book-name (or (:book-name (get books book)) "No book")]
                ^{:key book}
@@ -61,11 +61,11 @@
                         x (* y-scale x)
                         story-name (or (:story-name (get stories story)) "No story")]
                     ^{:key (str story)}
-                    [:rect {:fill    (cc/item-color story-name)
-                            :y       0
-                            :x       x
-                            :width   w
-                            :height  15}]))]]
+                    [:rect {:fill   (cc/item-color story-name)
+                            :y      0
+                            :x      x
+                            :width  w
+                            :height 15}]))]]
            (for [[story v] (:time-by-story day-stats)]
              (let [story-name (or (:story-name (get stories story)) "No story")]
                ^{:key story}
@@ -78,19 +78,13 @@
   [entry put-fn edit-mode?]
   (let [chart-data (subscribe [:chart-data])
         stats (subscribe [:stats])
+        options (subscribe [:options])
+        books (reaction (:books @options))
         input-fn
         (fn [entry]
           (fn [ev]
-            (prn (-> ev .-nativeEvent .-target .-value))
             (let [day (-> ev .-nativeEvent .-target .-value)
                   updated (assoc-in entry [:briefing :day] day)]
-              (put-fn [:entry/update-local updated]))))
-        follow-up-select
-        (fn [entry]
-          (fn [ev]
-            (let [sel (js/parseInt (-> ev .-nativeEvent .-target .-value))
-                  follow-up-hrs (when-not (js/isNaN sel) sel)
-                  updated (assoc-in entry [:task :follow-up-hrs] follow-up-hrs)]
               (put-fn [:entry/update-local updated]))))]
     (fn briefing-render [entry put-fn edit-mode?]
       (let [{:keys [pomodoro-stats activity-stats task-stats wordcount-stats
@@ -101,7 +95,7 @@
             {:keys [tasks-cnt done-cnt closed-cnt]} (get task-stats day)
             started (:started-tasks-cnt @stats)]
         (when (contains? (:tags entry) "#briefing")
-          [:form.task-details
+          [:form.briefing-details
            [:fieldset
             [:legend (or day "date not set")]
             (when edit-mode?
@@ -118,5 +112,11 @@
             (when word-stats
               [:div
                [:strong (:started-tasks-cnt @stats)] " started tasks, "
-               [:strong (:word-count word-stats)] " words written." ])
-            (when day-stats [time-by-stories-list day-stats])]])))))
+               [:strong (:word-count word-stats)] " words written."])
+            (when day-stats [time-by-stories-list day-stats])
+            [:div
+             (for [[k v] @books]
+               ^{:key k}
+               [:div
+                [:label (:book-name v)]
+                [:input {:type :number}]])]]])))))
