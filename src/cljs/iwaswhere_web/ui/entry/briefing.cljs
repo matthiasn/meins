@@ -35,7 +35,7 @@
            [:div "Logged: " [:strong dur] " in " (:total day-stats) " entries."]
            [:hr]
            [:svg
-            {:viewBox (str "0 0 300 10")}
+            {:viewBox (str "0 0 300 15")}
             [:g (for [[book {:keys [x v]}] time-by-book]
                   (let [w (* y-scale v)
                         x (* y-scale x)
@@ -45,7 +45,7 @@
                             :y       0
                             :x       x
                             :width   w
-                            :height  10}]))]]
+                            :height  15}]))]]
            (for [[book v] (:time-by-book day-stats)]
              (let [book-name (or (:book-name (get books book)) "No book")]
                ^{:key book}
@@ -55,7 +55,7 @@
                 [:strong book-name] ": " (u/duration-string v)]))
            [:hr]
            [:svg
-            {:viewBox (str "0 0 300 10")}
+            {:viewBox (str "0 0 300 15")}
             [:g (for [[story {:keys [x v]}] time-by-story]
                   (let [w (* y-scale v)
                         x (* y-scale x)
@@ -65,7 +65,7 @@
                             :y       0
                             :x       x
                             :width   w
-                            :height  10}]))]]
+                            :height  15}]))]]
            (for [[story v] (:time-by-story day-stats)]
              (let [story-name (or (:story-name (get stories story)) "No story")]
                ^{:key story}
@@ -77,6 +77,7 @@
 (defn briefing-view
   [entry put-fn edit-mode?]
   (let [chart-data (subscribe [:chart-data])
+        stats (subscribe [:stats])
         input-fn
         (fn [entry]
           (fn [ev]
@@ -96,7 +97,9 @@
                     daily-summary-stats media-stats]} @chart-data
             day (-> entry :briefing :day)
             day-stats (get pomodoro-stats day)
-            {:keys [tasks-cnt done-cnt closed-cnt]} (get task-stats day)]
+            word-stats (get wordcount-stats day)
+            {:keys [tasks-cnt done-cnt closed-cnt]} (get task-stats day)
+            started (:started-tasks-cnt @stats)]
         (when (contains? (:tags entry) "#briefing")
           [:form.task-details
            [:fieldset
@@ -112,4 +115,8 @@
                "Tasks: " [:strong tasks-cnt] " created, "
                [:strong done-cnt] " done, "
                [:strong closed-cnt] " closed"])
+            (when word-stats
+              [:div
+               [:strong (:started-tasks-cnt @stats)] " started tasks, "
+               [:strong (:word-count word-stats)] " words written." ])
             (when day-stats [time-by-stories-list day-stats])]])))))
