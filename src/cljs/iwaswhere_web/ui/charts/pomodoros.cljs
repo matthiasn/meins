@@ -157,12 +157,12 @@
           {:viewBox (str "0 0 600 " chart-h)}
           [:g
            [cc/chart-title "Time tracked"]
-           [bars-by-story indexed-20 local chart-h 0.0045 put-fn]]]
+           [bars-by-story indexed-20 local chart-h 0.0035 put-fn]]]
          [:svg
           {:viewBox (str "0 0 600 " chart-h)}
           [:g
            [cc/chart-title "Time tracked"]
-           [bars-by-book indexed-20 local chart-h 0.0045 put-fn]]]
+           [bars-by-book indexed-20 local chart-h 0.0035 put-fn]]]
          [:div.times-by-day
           [:time (:date-string day-stats)]
 
