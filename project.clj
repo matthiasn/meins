@@ -4,17 +4,17 @@
   :license {:name "GNU AFFERO GENERAL PUBLIC LICENSE"
             :url  "https://www.gnu.org/licenses/agpl-3.0.en.html"}
   :dependencies [[org.clojure/clojure "1.9.0-alpha14"]
-                 [org.clojure/clojurescript "1.9.293"]
+                 [org.clojure/clojurescript "1.9.456"]
                  [org.clojure/tools.logging "0.3.1"]
                  [org.clojure/tools.namespace "0.3.0-alpha3"]
                  [com.taoensso/encore "2.88.2"]
-                 [ch.qos.logback/logback-classic "1.1.9"]
+                 [ch.qos.logback/logback-classic "1.1.10"]
                  [hiccup "1.0.5"]
                  [clj-pid "0.1.2"]
                  [clj-time "0.13.0"]
                  [clj-http "3.4.1"]
                  [me.raynes/fs "1.4.6"]
-                 [markdown-clj "0.9.92"]
+                 [markdown-clj "0.9.94"]
                  [cheshire "5.7.0"]
                  [cljsjs/moment "2.17.1-0"]
                  [cljsjs/react-grid-layout "0.13.7-0"]
@@ -50,7 +50,7 @@
 
   :plugins [[lein-cljsbuild "1.1.5"
              :exclusions [org.apache.commons/commons-compress]]
-            [lein-figwheel "0.5.8"]
+            [lein-figwheel "0.5.9"]
             [lein-sassy "1.0.8"
              :exclusions [org.clojure/clojure org.codehaus.plexus/plexus-utils]]
             [com.jakemccrary/lein-test-refresh "0.18.1"]
