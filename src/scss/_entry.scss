@@ -239,7 +239,7 @@
       width: 60px;
     }
     input[type="number"] {
-      width: 40px;
+      width: 35px;
       font-size: 0.9em;
       margin-left: 5px;
     }
@@ -253,7 +253,8 @@
       line-height: 1.5em;
     }
     .name {
-      width: 90px;
+      min-width: 80px;
+      margin-right: 5px;
       display: inline-block;
     }
   }

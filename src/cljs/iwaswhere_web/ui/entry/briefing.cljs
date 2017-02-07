@@ -117,17 +117,25 @@
             [:hr]
             [:div
              [horizontal-bar
-              books :book-name (-> entry :briefing :time-allocation) 0.0045]]
+              @books :book-name (-> entry :briefing :time-allocation) 0.0045]]
+            [:div
+             "Total planned: "
+             [:strong
+              (u/duration-string
+                (apply + (map second (-> entry :briefing :time-allocation))))]]
             [:div.story-time
              (for [[k v] @books]
-               ^{:key (str :time-allocation k)}
-               [:div
-                [:span.legend
-                 {:style {:background-color (cc/item-color (:book-name v))}}]
-                [:strong.name (:book-name v)]
-                [:input {:on-input (time-alloc-input-fn entry k)
-                         :value    (when-let [v (get-in
-                                                  entry
-                                                  [:briefing :time-allocation k])]
-                                     (/ v 60))
-                         :type     :number}]])]]])))))
+               (let [allocation (get-in entry [:briefing :time-allocation k] 0)
+                     actual (get-in (:time-by-book day-stats) [k] 0)
+                     remaining (- allocation actual)]
+                 ^{:key (str :time-allocation k)}
+                 [:div
+                  [:span.legend
+                   {:style {:background-color (cc/item-color (:book-name v))}}]
+                  [:strong.name (:book-name v)]
+                  [:input {:on-input (time-alloc-input-fn entry k)
+                           :value    (when-let [v allocation]
+                                       (/ v 60))
+                           :type     :number}]
+                  (when (pos? remaining)
+                    [:span (u/duration-string remaining)])]))]]])))))
