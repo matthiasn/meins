@@ -6,73 +6,66 @@
             [iwaswhere-web.ui.charts.common :as cc]
             [iwaswhere-web.utils.misc :as u]))
 
+(defn stacked-reducer [acc [k v]]
+  (let [total (get acc :total 0)]
+    (-> acc
+        (assoc-in [:total] (+ total v))
+        (assoc-in [:items k :v] v)
+        (assoc-in [:items k :x] total))))
+
+(defn horizontal-bar
+  [entities k time-by-entities y-scale]
+  (let [time-by-entity (sort-by #(str (first %)) time-by-entities)
+        stacked-by-entity (reduce stacked-reducer {} time-by-entity)
+        time-by-entity (reverse (sort-by #(str (first %)) (:items stacked-by-entity)))]
+    [:svg
+     {:viewBox (str "0 0 300 15")}
+     [:g (for [[entity {:keys [x v]}] time-by-entity]
+           (let [w (* y-scale v)
+                 x (* y-scale x)
+                 entity-name (or (k (get entities entity)) "none")]
+             ^{:key (str entity)}
+             [:rect {:fill   (cc/item-color entity-name)
+                     :y      0
+                     :x      x
+                     :width  w
+                     :height 15}]))]]))
+
 (defn time-by-stories-list
   "Render list of times spent on individual stories, plus the total."
   [day-stats]
   (let [options (subscribe [:options])
         stories (reaction (:stories @options))
-        books (reaction (:books @options))
-        stacked-reducer (fn [acc [k v]]
-                          (let [total (get acc :total 0)]
-                            (-> acc
-                                (assoc-in [:total] (+ total v))
-                                (assoc-in [:items k :v] v)
-                                (assoc-in [:items k :x] total))))]
+        books (reaction (:books @options))]
     (fn [day-stats]
       (let [stories @stories
             books @books
             dur (u/duration-string (:total-time day-stats))
             date (:date-string day-stats)
-            time-by-book (sort-by #(str (first %)) (:time-by-book day-stats))
-            stacked-by-book (reduce stacked-reducer {} time-by-book)
-            time-by-book (reverse (sort-by #(str (first %)) (:items stacked-by-book)))
-            time-by-story (sort-by #(str (first %)) (:time-by-story day-stats))
-            stacked-by-story (reduce stacked-reducer {} time-by-story)
-            time-by-story (reverse (sort-by #(str (first %)) (:items stacked-by-story)))
+            time-by-book (:time-by-book day-stats)
+            time-by-story (:time-by-story day-stats)
             y-scale 0.0045]
         (when date
           [:div.story-time
            [:div "Logged: " [:strong dur] " in " (:total day-stats) " entries."]
            [:hr]
-           [:svg
-            {:viewBox (str "0 0 300 15")}
-            [:g (for [[book {:keys [x v]}] time-by-book]
-                  (let [w (* y-scale v)
-                        x (* y-scale x)
-                        book-name (or (:book-name (get books book)) "No book")]
-                    ^{:key (str book)}
-                    [:rect {:fill   (cc/item-color book-name)
-                            :y      0
-                            :x      x
-                            :width  w
-                            :height 15}]))]]
-           (for [[book v] (:time-by-book day-stats)]
-             (let [book-name (or (:book-name (get books book)) "No book")]
-               ^{:key book}
-               [:div
-                [:span.legend
-                 {:style {:background-color (cc/item-color book-name)}}]
-                [:strong book-name] ": " (u/duration-string v)]))
-           [:hr]
-           [:svg
-            {:viewBox (str "0 0 300 15")}
-            [:g (for [[story {:keys [x v]}] time-by-story]
-                  (let [w (* y-scale v)
-                        x (* y-scale x)
-                        story-name (or (:story-name (get stories story)) "No story")]
-                    ^{:key (str story)}
-                    [:rect {:fill   (cc/item-color story-name)
-                            :y      0
-                            :x      x
-                            :width  w
-                            :height 15}]))]]
+           [horizontal-bar stories :story-name time-by-story y-scale]
            (for [[story v] (:time-by-story day-stats)]
              (let [story-name (or (:story-name (get stories story)) "No story")]
                ^{:key story}
                [:div
                 [:span.legend
                  {:style {:background-color (cc/item-color story-name)}}]
-                [:strong story-name] ": " (u/duration-string v)]))])))))
+                [:strong.name story-name] (u/duration-string v)]))
+           [:hr]
+           [horizontal-bar books :book-name time-by-book y-scale]
+           (for [[book v] (:time-by-book day-stats)]
+             (let [book-name (or (:book-name (get books book)) "No book")]
+               ^{:key book}
+               [:div
+                [:span.legend
+                 {:style {:background-color (cc/item-color book-name)}}]
+                [:strong.name book-name] (u/duration-string v)]))])))))
 
 (defn briefing-view
   [entry put-fn edit-mode?]
@@ -85,6 +78,13 @@
           (fn [ev]
             (let [day (-> ev .-nativeEvent .-target .-value)
                   updated (assoc-in entry [:briefing :day] day)]
+              (put-fn [:entry/update-local updated]))))
+        time-alloc-input-fn
+        (fn [entry book]
+          (fn [ev]
+            (let [m (js/parseInt (-> ev .-nativeEvent .-target .-value))
+                  s (* m 60)
+                  updated (assoc-in entry [:briefing :time-allocation book] s)]
               (put-fn [:entry/update-local updated]))))]
     (fn briefing-render [entry put-fn edit-mode?]
       (let [{:keys [pomodoro-stats activity-stats task-stats wordcount-stats
@@ -114,9 +114,20 @@
                [:strong (:started-tasks-cnt @stats)] " started tasks, "
                [:strong (:word-count word-stats)] " words written."])
             (when day-stats [time-by-stories-list day-stats])
+            [:hr]
             [:div
+             [horizontal-bar
+              books :book-name (-> entry :briefing :time-allocation) 0.0045]]
+            [:div.story-time
              (for [[k v] @books]
-               ^{:key k}
+               ^{:key (str :time-allocation k)}
                [:div
-                [:label (:book-name v)]
-                [:input {:type :number}]])]]])))))
+                [:span.legend
+                 {:style {:background-color (cc/item-color (:book-name v))}}]
+                [:strong.name (:book-name v)]
+                [:input {:on-input (time-alloc-input-fn entry k)
+                         :value    (when-let [v (get-in
+                                                  entry
+                                                  [:briefing :time-allocation k])]
+                                     (/ v 60))
+                         :type     :number}]])]]])))))
