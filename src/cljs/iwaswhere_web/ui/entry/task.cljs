@@ -17,6 +17,12 @@
             (let [sel (js/parseInt (-> ev .-nativeEvent .-target .-value))
                   follow-up-hrs (when-not (js/isNaN sel) sel)
                   updated (assoc-in entry [:task :follow-up-hrs] follow-up-hrs)]
+              (put-fn [:entry/update-local updated]))))
+        priority-select
+        (fn [entry]
+          (fn [ev]
+            (let [sel (keyword (-> ev .-nativeEvent .-target .-value))
+                  updated (assoc-in entry [:task :priority] sel)]
               (put-fn [:entry/update-local updated]))))]
     (fn [entry put-fn edit-mode?]
       (when (contains? (:tags entry) "#task")
@@ -35,12 +41,24 @@
                       :on-input (input-fn entry :due)
                       :value    (format-time2 (-> entry :task :due))}]
              [:time (format-time (-> entry :task :due))])]
+          [:div
+           [:span " Priority: "]
+           [:select {:value     (get-in entry [:task :priority] "")
+                     :disabled  (not edit-mode?)
+                     :on-change (priority-select entry)}
+            [:option ""]
+            [:option {:value :A} "A"]
+            [:option {:value :B} "B"]
+            [:option {:value :C} "C"]
+            [:option {:value :D} "D"]
+            [:option {:value :E} "E"]]]
           (if-let [follow-up-scheduled (:follow-up-scheduled (:task entry))]
             [:div "Follow-up in " follow-up-scheduled]
             [:div
              [:span "Follow-up after "]
              [:select {:value     (get-in entry [:task :follow-up-hrs] "")
-                       :on-change (follow-up-select entry)}
+                       :on-change (follow-up-select entry)
+                       :disabled  (not edit-mode?)}
               [:option ""]
               [:option {:value 1} "1 hour"]
               [:option {:value 3} "3 hours"]
