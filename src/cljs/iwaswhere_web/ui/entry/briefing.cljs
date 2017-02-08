@@ -130,12 +130,16 @@
                      remaining (- allocation actual)]
                  ^{:key (str :time-allocation k)}
                  [:div
-                  [:span.legend
-                   {:style {:background-color (cc/item-color (:book-name v))}}]
-                  [:strong.name (:book-name v)]
-                  [:input {:on-input (time-alloc-input-fn entry k)
-                           :value    (when-let [v allocation]
-                                       (/ v 60))
-                           :type     :number}]
-                  (when (pos? remaining)
-                    [:span (u/duration-string remaining)])]))]]])))))
+                  (when (or (pos? allocation) edit-mode?)
+                    [:div
+                     [:span.legend
+                      {:style {:background-color (cc/item-color (:book-name v))}}]
+                     [:strong.name (:book-name v)]
+                     (if edit-mode?
+                       [:input {:on-input (time-alloc-input-fn entry k)
+                                :value    (when allocation (/ allocation 60))
+                                :type     :number}]
+                       (when allocation
+                         [:span.allocated (u/duration-string allocation)]))
+                     (when (pos? remaining)
+                       [:span (u/duration-string remaining)])])]))]]])))))
