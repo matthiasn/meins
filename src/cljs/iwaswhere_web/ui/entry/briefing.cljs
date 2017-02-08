@@ -51,7 +51,7 @@
            [:hr]
            [horizontal-bar stories :story-name time-by-story y-scale]
            (for [[story v] (:time-by-story day-stats)]
-             (let [story-name (or (:story-name (get stories story)) "No story")]
+             (let [story-name (or (:story-name (get stories story)) "none")]
                ^{:key story}
                [:div
                 [:span.legend
@@ -60,7 +60,7 @@
            [:hr]
            [horizontal-bar books :book-name time-by-book y-scale]
            (for [[book v] (:time-by-book day-stats)]
-             (let [book-name (or (:book-name (get books book)) "No book")]
+             (let [book-name (or (:book-name (get books book)) "none")]
                ^{:key book}
                [:div
                 [:span.legend
@@ -87,7 +87,8 @@
                   updated (assoc-in entry [:briefing :time-allocation book] s)]
               (put-fn [:entry/update-local updated]))))]
     (fn briefing-render [entry put-fn edit-mode?]
-      (let [{:keys [pomodoro-stats activity-stats task-stats wordcount-stats
+      (let [books @books
+            {:keys [pomodoro-stats activity-stats task-stats wordcount-stats
                     daily-summary-stats media-stats]} @chart-data
             day (-> entry :briefing :day)
             day-stats (get pomodoro-stats day)
@@ -101,7 +102,13 @@
                                      remaining (- allocation actual)]
                                  [k remaining]))
             remaining-times (filter #(pos? (second %))
-                                    (map remaining-mapper time-allocation))]
+                                    (map remaining-mapper time-allocation))
+            last-7-days (->> pomodoro-stats
+                             (map (fn [[k v]] [k (:time-by-book v)]))
+                             (sort-by first)
+                             (take-last 7)
+                             (map second)
+                             (apply merge-with +))]
         (when (contains? (:tags entry) "#briefing")
           [:form.briefing-details
            [:fieldset
@@ -123,15 +130,15 @@
                [:strong (:word-count word-stats)] " words written."])
             (when day-stats [time-by-stories-list day-stats])
             [:hr]
-            [:div [horizontal-bar @books :book-name time-allocation 0.0045]]
-            [:div [horizontal-bar @books :book-name remaining-times 0.0045]]
+            [:div [horizontal-bar books :book-name time-allocation 0.0045]]
+            [:div [horizontal-bar books :book-name remaining-times 0.0045]]
             [:div
              "Total planned: "
              [:strong
               (u/duration-string
                 (apply + (map second (-> entry :briefing :time-allocation))))]]
             [:div.story-time
-             (for [[k v] @books]
+             (for [[k v] books]
                (let [allocation (get-in entry [:briefing :time-allocation k] 0)
                      actual (get-in (:time-by-book day-stats) [k] 0)
                      remaining (- allocation actual)]
@@ -149,4 +156,17 @@
                        (when allocation
                          [:span.allocated (u/duration-string allocation)]))
                      (when (pos? remaining)
-                       [:span (u/duration-string remaining)])])]))]]])))))
+                       [:span (u/duration-string remaining)])])]))]
+            [:hr]
+            [:div [horizontal-bar books :book-name last-7-days 0.001]]
+            [:div
+             "Past seven days: "
+             [:strong (u/duration-string (apply + (map second last-7-days)))]]
+            [:div.story-time
+             (for [[book v] last-7-days]
+               (let [book-name (or (:book-name (get books book)) "none")]
+                 ^{:key book}
+                 [:div
+                  [:span.legend
+                   {:style {:background-color (cc/item-color book-name)}}]
+                  [:strong.name book-name] (u/duration-string v)]))]]])))))
