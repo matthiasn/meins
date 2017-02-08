@@ -1,4 +1,4 @@
-(defproject matthiasn/iwaswhere-web "0.1.32"
+(defproject matthiasn/iwaswhere-web "0.1.33"
   :description "Sample application built with systems-toolbox library"
   :url "https://github.com/matthiasn/systems-toolbox"
   :license {:name "GNU AFFERO GENERAL PUBLIC LICENSE"
@@ -56,7 +56,7 @@
             [com.jakemccrary/lein-test-refresh "0.18.1"]
             [test2junit "1.2.5"]
             [lein-doo "0.1.7"]
-            [lein-codox "0.10.2"]]
+            [lein-codox "0.10.3"]]
 
   :sass {:src "src/scss/"
          :dst "resources/public/css/"}
