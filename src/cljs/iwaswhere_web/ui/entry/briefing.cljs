@@ -93,7 +93,15 @@
             day-stats (get pomodoro-stats day)
             word-stats (get wordcount-stats day)
             {:keys [tasks-cnt done-cnt closed-cnt]} (get task-stats day)
-            started (:started-tasks-cnt @stats)]
+            started (:started-tasks-cnt @stats)
+            time-allocation (-> entry :briefing :time-allocation)
+            remaining-mapper (fn [[k v]]
+                               (let [allocation (or v 0)
+                                     actual (get-in (:time-by-book day-stats) [k] 0)
+                                     remaining (- allocation actual)]
+                                 [k remaining]))
+            remaining-times (filter #(pos? (second %))
+                                    (map remaining-mapper time-allocation))]
         (when (contains? (:tags entry) "#briefing")
           [:form.briefing-details
            [:fieldset
@@ -115,9 +123,8 @@
                [:strong (:word-count word-stats)] " words written."])
             (when day-stats [time-by-stories-list day-stats])
             [:hr]
-            [:div
-             [horizontal-bar
-              @books :book-name (-> entry :briefing :time-allocation) 0.0045]]
+            [:div [horizontal-bar @books :book-name time-allocation 0.0045]]
+            [:div [horizontal-bar @books :book-name remaining-times 0.0045]]
             [:div
              "Total planned: "
              [:strong
