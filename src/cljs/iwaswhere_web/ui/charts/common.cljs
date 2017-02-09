@@ -1,6 +1,7 @@
 (ns iwaswhere-web.ui.charts.common
   (:require [clojure.string :as s]
             [iwaswhere-web.utils.parse :as up]
+            [iwaswhere-web.charts.data :as cd]
             [reagent.core :as rc]))
 
 (defn line-points
@@ -119,3 +120,20 @@
    invocations."
   [seed]
   (.randomColor js/window (clj->js {"seed" (str seed)})))
+
+(defn horizontal-bar
+  "Draws horizontal stacked bar."
+  [entities k time-by-entities y-scale]
+  (let [data (cd/time-by-entity-stacked time-by-entities)]
+    [:svg
+     {:viewBox (str "0 0 300 15")}
+     [:g (for [[entity {:keys [x v]}] data]
+           (let [w (* y-scale v)
+                 x (* y-scale x)
+                 entity-name (or (k (get entities entity)) "none")]
+             ^{:key (str entity)}
+             [:rect {:fill   (item-color entity-name)
+                     :y      0
+                     :x      x
+                     :width  w
+                     :height 15}]))]]))

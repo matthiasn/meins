@@ -3,33 +3,9 @@
             [iwaswhere-web.ui.charts.pomodoros :as p]
             [reagent.ratom :refer-macros [reaction]]
             [re-frame.core :refer [subscribe]]
+            [iwaswhere-web.charts.data :as cd]
             [iwaswhere-web.ui.charts.common :as cc]
             [iwaswhere-web.utils.misc :as u]))
-
-(defn stacked-reducer [acc [k v]]
-  (let [total (get acc :total 0)]
-    (-> acc
-        (assoc-in [:total] (+ total v))
-        (assoc-in [:items k :v] v)
-        (assoc-in [:items k :x] total))))
-
-(defn horizontal-bar
-  [entities k time-by-entities y-scale]
-  (let [time-by-entity (sort-by #(str (first %)) time-by-entities)
-        stacked-by-entity (reduce stacked-reducer {} time-by-entity)
-        time-by-entity (reverse (sort-by #(str (first %)) (:items stacked-by-entity)))]
-    [:svg
-     {:viewBox (str "0 0 300 15")}
-     [:g (for [[entity {:keys [x v]}] time-by-entity]
-           (let [w (* y-scale v)
-                 x (* y-scale x)
-                 entity-name (or (k (get entities entity)) "none")]
-             ^{:key (str entity)}
-             [:rect {:fill   (cc/item-color entity-name)
-                     :y      0
-                     :x      x
-                     :width  w
-                     :height 15}]))]]))
 
 (defn time-by-stories-list
   "Render list of times spent on individual stories, plus the total."
@@ -49,7 +25,7 @@
           [:div.story-time
            [:div "Logged: " [:strong dur] " in " (:total day-stats) " entries."]
            [:hr]
-           [horizontal-bar stories :story-name time-by-story y-scale]
+           [cc/horizontal-bar stories :story-name time-by-story y-scale]
            (for [[story v] (:time-by-story day-stats)]
              (let [story-name (or (:story-name (get stories story)) "none")]
                ^{:key story}
@@ -58,7 +34,7 @@
                  {:style {:background-color (cc/item-color story-name)}}]
                 [:strong.name story-name] (u/duration-string v)]))
            [:hr]
-           [horizontal-bar books :book-name time-by-book y-scale]
+           [cc/horizontal-bar books :book-name time-by-book y-scale]
            (for [[book v] (:time-by-book day-stats)]
              (let [book-name (or (:book-name (get books book)) "none")]
                ^{:key book}
@@ -87,29 +63,18 @@
                   updated (assoc-in entry [:briefing :time-allocation book] s)]
               (put-fn [:entry/update-local updated]))))]
     (fn briefing-render [entry put-fn edit-mode?]
-      (let [books @books
-            {:keys [pomodoro-stats activity-stats task-stats wordcount-stats
-                    daily-summary-stats media-stats]} @chart-data
-            day (-> entry :briefing :day)
-            day-stats (get pomodoro-stats day)
-            word-stats (get wordcount-stats day)
-            {:keys [tasks-cnt done-cnt closed-cnt]} (get task-stats day)
-            started (:started-tasks-cnt @stats)
-            time-allocation (-> entry :briefing :time-allocation)
-            remaining-mapper (fn [[k v]]
-                               (let [allocation (or v 0)
-                                     actual (get-in (:time-by-book day-stats) [k] 0)
-                                     remaining (- allocation actual)]
-                                 [k remaining]))
-            remaining-times (filter #(pos? (second %))
-                                    (map remaining-mapper time-allocation))
-            last-7-days (->> pomodoro-stats
-                             (map (fn [[k v]] [k (:time-by-book v)]))
-                             (sort-by first)
-                             (take-last 7)
-                             (map second)
-                             (apply merge-with +))]
-        (when (contains? (:tags entry) "#briefing")
+      (when (contains? (:tags entry) "#briefing")
+        (let [books @books
+              {:keys [pomodoro-stats activity-stats task-stats wordcount-stats
+                      daily-summary-stats media-stats]} @chart-data
+              day (-> entry :briefing :day)
+              day-stats (get pomodoro-stats day)
+              word-stats (get wordcount-stats day)
+              {:keys [tasks-cnt done-cnt closed-cnt]} (get task-stats day)
+              started (:started-tasks-cnt @stats)
+              allocation (-> entry :briefing :time-allocation)
+              remaining (cd/remaining-times (:time-by-book day-stats) allocation)
+              past-7-days (cd/past-7-days pomodoro-stats :time-by-book)]
           [:form.briefing-details
            [:fieldset
             [:legend (or day "date not set")]
@@ -130,8 +95,8 @@
                [:strong (:word-count word-stats)] " words written."])
             (when day-stats [time-by-stories-list day-stats])
             [:hr]
-            [:div [horizontal-bar books :book-name time-allocation 0.0045]]
-            [:div [horizontal-bar books :book-name remaining-times 0.0045]]
+            [:div [cc/horizontal-bar books :book-name allocation 0.0045]]
+            [:div [cc/horizontal-bar books :book-name remaining 0.0045]]
             [:div
              "Total planned: "
              [:strong
@@ -158,12 +123,12 @@
                      (when (pos? remaining)
                        [:span (u/duration-string remaining)])])]))]
             [:hr]
-            [:div [horizontal-bar books :book-name last-7-days 0.001]]
+            [:div [cc/horizontal-bar books :book-name past-7-days 0.001]]
             [:div
              "Past seven days: "
-             [:strong (u/duration-string (apply + (map second last-7-days)))]]
+             [:strong (u/duration-string (apply + (map second past-7-days)))]]
             [:div.story-time
-             (for [[book v] last-7-days]
+             (for [[book v] past-7-days]
                (let [book-name (or (:book-name (get books book)) "none")]
                  ^{:key book}
                  [:div
