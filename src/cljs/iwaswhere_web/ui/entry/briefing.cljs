@@ -10,9 +10,8 @@
 (defn time-by-stories-list
   "Render list of times spent on individual stories, plus the total."
   [day-stats]
-  (let [options (subscribe [:options])
-        stories (reaction (:stories @options))
-        books (reaction (:books @options))]
+  (let [stories (subscribe [:stories])
+        books (subscribe [:books])]
     (fn [day-stats]
       (let [stories @stories
             books @books
@@ -121,17 +120,4 @@
                        (when allocation
                          [:span.allocated (u/duration-string allocation)]))
                      (when (pos? remaining)
-                       [:span (u/duration-string remaining)])])]))]
-            [:hr]
-            [:div [cc/horizontal-bar books :book-name past-7-days 0.001]]
-            [:div
-             "Past seven days: "
-             [:strong (u/duration-string (apply + (map second past-7-days)))]]
-            [:div.story-time
-             (for [[book v] past-7-days]
-               (let [book-name (or (:book-name (get books book)) "none")]
-                 ^{:key book}
-                 [:div
-                  [:span.legend
-                   {:style {:background-color (cc/item-color book-name)}}]
-                  [:strong.name book-name] (u/duration-string v)]))]]])))))
+                       [:span (u/duration-string remaining)])])]))]]])))))

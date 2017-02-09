@@ -4,7 +4,8 @@
             [iwaswhere-web.utils.misc :as u]
             [re-frame.core :refer [subscribe]]
             [reagent.ratom :refer-macros [reaction]]
-            [clojure.pprint :as pp]))
+            [clojure.pprint :as pp]
+            [iwaswhere-web.charts.data :as cd]))
 
 (defn bars
   [indexed local k chart-h y-scale put-fn]
@@ -147,12 +148,28 @@
   [pomodoro-stats chart-h title y-scale put-fn]
   (let [local (rc/atom {})
         idx-fn (fn [idx [k v]] [idx v])
+        books (subscribe [:books])
         chart-data (subscribe [:chart-data])]
     (fn [pomodoro-stats chart-h title y-scale put-fn]
-      (let [indexed (map-indexed idx-fn pomodoro-stats)
+      (let [books @books
+            indexed (map-indexed idx-fn pomodoro-stats)
             indexed-20 (map-indexed idx-fn (take-last 20 pomodoro-stats))
-            day-stats (or (:mouse-over @local) (second (last pomodoro-stats)))]
+            day-stats (or (:mouse-over @local) (second (last pomodoro-stats)))
+            past-7-days (cd/past-7-days pomodoro-stats :time-by-book)]
         [:div
+         [:div.times-by-day
+          [:div [cc/horizontal-bar books :book-name past-7-days 0.001]]
+          [:div
+           "Past seven days: "
+           [:strong (u/duration-string (apply + (map second past-7-days)))]]
+          [:div.story-time
+           (for [[book v] past-7-days]
+             (let [book-name (or (:book-name (get books book)) "none")]
+               ^{:key book}
+               [:div
+                [:span.legend
+                 {:style {:background-color (cc/item-color book-name)}}]
+                [:strong.name book-name] (u/duration-string v)]))]]
          [:svg
           {:viewBox (str "0 0 600 " chart-h)}
           [:g
@@ -165,7 +182,6 @@
            [bars-by-book indexed-20 local chart-h 0.0035 put-fn]]]
          [:div.times-by-day
           [:time (:date-string day-stats)]
-
           [time-by-stories-list day-stats]]
          [:svg
           {:viewBox (str "0 0 600 " chart-h)}

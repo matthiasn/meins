@@ -190,11 +190,17 @@ $activity-weekend: lighten($activity, 30);
 }
 
 .story-time {
+  padding-top: 2px;
   background-color: white;
   font-size: 0.8em;
   .legend {
     padding-right: 12px;
     margin-right: 4px;
+  }
+  .name {
+    min-width: 80px;
+    margin-right: 5px;
+    display: inline-block;
   }
 }
 
