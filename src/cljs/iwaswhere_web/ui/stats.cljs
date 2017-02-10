@@ -37,6 +37,7 @@
           (:backlog-cnt @stats) " in backlog, "
           (:completed-cnt @stats) " completed, "
           (:closed-cnt @stats) " closed, "
+          (:open-habits-cnt @stats) " open habits, "
           (:import-cnt @stats) " tagged #import, "
           (:new-cnt @stats) " tagged #new."])
        (when-let [ms (:query @timing)]

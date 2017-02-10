@@ -104,9 +104,9 @@
                 edit-elem-atom]]
          [u/suggestions ts f-tags curr-tag replace-tag "hashtag"]
          [u/suggestions ts f-mentions curr-mention replace-tag "mention"]
-         (when
-           (not= (dissoc @local-display-entry :comments)
-                 (dissoc latest-entry :new-entry))
-           [:div
+         [:div.save
+          (when
+            (not= (dissoc @local-display-entry :comments)
+                  (dissoc latest-entry :new-entry))
             [:span.not-saved {:on-click save-fn}
-             [:span.fa.fa-floppy-o] "  click to save"]])]))))
+             [:span.fa.fa-floppy-o] "  click to save"])]]))))

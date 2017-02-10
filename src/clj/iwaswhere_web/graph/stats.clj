@@ -147,6 +147,8 @@
    :due-tasks-cnt     (res-count state {:tags     #{"#task"}
                                         :not-tags #{"#done" "#backlog" "#closed"}
                                         :opts     #{":due"}})
+   :open-habits-cnt   (res-count state {:tags     #{"#habit"}
+                                        :not-tags #{"#done"}})
    :backlog-cnt       (res-count state {:tags     #{"#task" "#backlog"}
                                         :not-tags #{"#done" "#closed"}})
    :completed-cnt     (res-count state {:tags #{"#task" "#done"}})

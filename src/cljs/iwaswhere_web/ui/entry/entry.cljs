@@ -101,7 +101,7 @@
          [m/videoplayer-view entry]
          [m/imdb-view entry put-fn]
          [task/task-details entry put-fn edit-mode?]
-         [task/chore-details entry put-fn edit-mode?]
+         [task/habit-details entry put-fn edit-mode?]
          [b/briefing-view entry put-fn edit-mode?]
          [:div.footer
           [:div.likes (when-let [upvotes (:upvotes entry)]

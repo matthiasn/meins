@@ -1,10 +1,20 @@
 (ns iwaswhere-web.ui.entry.task
-  (:require [matthiasn.systems-toolbox.component :as st]))
+  (:require [matthiasn.systems-toolbox.component :as st]
+            [clojure.string :as s]
+            [iwaswhere-web.helpers :as h]))
+
+(defn format-time2 [m]
+  (.format (js/moment m) "YYYY-MM-DDTHH:mm"))
+
+(defn hh-mm [m]
+  (.format (js/moment m) "HH:mm"))
+
+(defn ymd [m]
+  (.format (js/moment m) "YYYY-MM-DD"))
 
 (defn task-details
   [entry put-fn edit-mode?]
   (let [format-time #(.format (js/moment %) "ddd MMM DD - HH:mm")
-        format-time2 #(.format (js/moment %) "YYYY-MM-DDTHH:mm")
         input-fn
         (fn [entry k]
           (fn [ev]
@@ -71,29 +81,58 @@
               [:option {:value 96} "4 days"]
               [:option {:value 168} "1 week"]]])]]))))
 
-(defn chore-details
+(defn habit-details
   [entry put-fn edit-mode?]
-  (let [time-set
-        (fn [entry]
-          (fn [ev]
-            (let [time(-> ev .-nativeEvent .-target .-value)
-                  updated (assoc-in entry [:chore :active-time] time)]
-              (put-fn [:entry/update-local updated]))))
-        day-select
-        (fn [entry day]
-          (fn [ev]
-            (let [v (-> ev .-nativeEvent .-target .-value)
-                  updated (update-in entry [:chore :days day] not)]
-              (put-fn [:entry/update-local updated]))))
+  (let [active-from (fn [entry]
+                      (fn [ev]
+                        (let [dt (-> ev .-nativeEvent .-target .-value)
+                              updated (assoc-in entry [:habit :active-from] dt)]
+                          (prn updated)
+                          (put-fn [:entry/update-local updated]))))
+        day-select (fn [entry day]
+                     (fn [ev]
+                       (let [v (-> ev .-nativeEvent .-target .-value)
+                             updated (update-in entry [:habit :days day] not)]
+                         (put-fn [:entry/update-local updated]))))
         day-checkbox (fn [entry day]
-                       [:input {:type :checkbox
-                                :checked (get-in entry [:chore :days day])
-                                :on-change (day-select entry day)}])]
+                       [:input {:type      :checkbox
+                                :checked   (get-in entry [:habit :days day])
+                                :on-change (day-select entry day)}])
+        done (fn [entry]
+               (fn [ev]
+                 (if-not (-> entry :habit :next-entry)
+
+                   ;; check off and create next habit entry
+                   (let [next-hh-mm (-> entry
+                                        :habit
+                                        :active-from
+                                        (js/moment)
+                                        (hh-mm))
+                         next-day (ymd (.add (js/moment) 1 "d"))
+                         next-active (str next-day "T" next-hh-mm)
+                         next-entry (-> entry
+                                        (assoc-in [:timestamp] (st/now))
+                                        (assoc-in [:habit :active-from] next-active)
+                                        (assoc-in [:habit :done] false)
+                                        (dissoc :linked-entries-list)
+                                        (dissoc :last-saved)
+                                        (dissoc :latitude)
+                                        (dissoc :longitude))
+                         updated (-> entry
+                                     (update-in [:habit :done] not)
+                                     (assoc-in [:habit :next-entry] (:timestamp next-entry)))]
+                     (put-fn [:entry/update next-entry])
+                     (h/send-w-geolocation next-entry put-fn)
+                     (put-fn [:entry/update updated]))
+
+                   ;; otherwise just toggle - follow-up is scheduled already
+                   (let [updated (update-in entry [:habit :done] not)]
+                     (put-fn [:entry/update updated])))))]
     (fn [entry put-fn edit-mode?]
-      (when (contains? (:tags entry) "#chore")
+      (when (contains? (:tags entry) "#habit")
         [:form.task-details
          [:fieldset
-          [:legend "Chore details"]
+          [:legend "Habit details"]
           [:div
            [:label "Sun"] [day-checkbox entry :sun]
            [:label "Mon"] [day-checkbox entry :mon]
@@ -103,9 +142,11 @@
            [:label "Fri"] [day-checkbox entry :fri]
            [:label "Sat"] [day-checkbox entry :sat]]
           [:div
-           [:label "Active: "]
-           [:input {:type     :time
+           [:label "Active from: "]
+           [:input {:type      :datetime-local
                     :read-only (not edit-mode?)
-                    :on-input (time-set entry)
-                    :value    (get-in entry [:chore :active-time])}]]
-          [:div [:label "Done? "] [:input {:type :checkbox}]]]]))))
+                    :on-input  (active-from entry)
+                    :value     (get-in entry [:habit :active-from])}]]
+          [:div [:label "Done? "] [:input {:type      :checkbox
+                                           :checked   (get-in entry [:habit :done])
+                                           :on-change (done entry)}]]]]))))
