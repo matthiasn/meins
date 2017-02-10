@@ -70,3 +70,42 @@
               [:option {:value 72} "3 days"]
               [:option {:value 96} "4 days"]
               [:option {:value 168} "1 week"]]])]]))))
+
+(defn chore-details
+  [entry put-fn edit-mode?]
+  (let [time-set
+        (fn [entry]
+          (fn [ev]
+            (let [time(-> ev .-nativeEvent .-target .-value)
+                  updated (assoc-in entry [:chore :active-time] time)]
+              (put-fn [:entry/update-local updated]))))
+        day-select
+        (fn [entry day]
+          (fn [ev]
+            (let [v (-> ev .-nativeEvent .-target .-value)
+                  updated (update-in entry [:chore :days day] not)]
+              (put-fn [:entry/update-local updated]))))
+        day-checkbox (fn [entry day]
+                       [:input {:type :checkbox
+                                :checked (get-in entry [:chore :days day])
+                                :on-change (day-select entry day)}])]
+    (fn [entry put-fn edit-mode?]
+      (when (contains? (:tags entry) "#chore")
+        [:form.task-details
+         [:fieldset
+          [:legend "Chore details"]
+          [:div
+           [:label "Sun"] [day-checkbox entry :sun]
+           [:label "Mon"] [day-checkbox entry :mon]
+           [:label "Tue"] [day-checkbox entry :tue]
+           [:label "Wed"] [day-checkbox entry :wed]
+           [:label "Thu"] [day-checkbox entry :thu]
+           [:label "Fri"] [day-checkbox entry :fri]
+           [:label "Sat"] [day-checkbox entry :sat]]
+          [:div
+           [:label "Active: "]
+           [:input {:type     :time
+                    :read-only (not edit-mode?)
+                    :on-input (time-set entry)
+                    :value    (get-in entry [:chore :active-time])}]]
+          [:div [:label "Done? "] [:input {:type :checkbox}]]]]))))
