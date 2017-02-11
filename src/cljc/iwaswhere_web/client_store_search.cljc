@@ -135,7 +135,7 @@
   [{:keys [current-state]}]
   (let [query-cfg (:query-cfg current-state)]
     {:emit-msg [[:state/search query-cfg]
-                [:cmd/schedule-new {:timeout 2000
+                [:cmd/schedule-new {:timeout 1000
                                     :message [:state/stats-tags-get]}]]}))
 
 (def search-handler-map

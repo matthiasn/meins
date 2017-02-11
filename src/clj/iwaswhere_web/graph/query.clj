@@ -5,12 +5,15 @@
             [iwaswhere-web.fulltext-search :as ft]
             [clj-time.coerce :as ctc]
             [clj-time.core :as ct]
+            [clj-time.format :as ctf]
+            [clj-time.local :as ctl]
             [clojure.string :as s]
             [clojure.set :as set]
             [clojure.tools.logging :as log]
-            [clj-time.format :as ctf]
             [clojure.pprint :as pp]
-            [matthiasn.systems-toolbox.component :as st]))
+            [matthiasn.systems-toolbox.component :as st]
+            [clj-time.core :as t])
+  (:import (org.joda.time DateTimeZone)))
 
 ;; TODO: migrate existing audio entries to use a different keyword
 (defn summed-durations
@@ -61,35 +64,45 @@
                          true)
 
           opts (:opts q)
-          opts-match? (cond
-                        (contains? opts ":started")
-                        (when (contains? entry-tags "#task")
-                          (let [nodes (into [entry] entry-comments)
-                                filter-fn (fn [n]
-                                            (let [completed (:completed-time n)]
-                                              (or (when completed (pos? completed))
-                                                  (pos? (summed-durations n)))))
-                                started (filter filter-fn nodes)]
-                            (seq started)))
+          opts-match?
+          (cond
+            (contains? opts ":started")
+            (when (contains? entry-tags "#task")
+              (let [nodes (into [entry] entry-comments)
+                    filter-fn (fn [n]
+                                (let [completed (:completed-time n)]
+                                  (or (when completed (pos? completed))
+                                      (pos? (summed-durations n)))))
+                    started (filter filter-fn nodes)]
+                (seq started)))
 
-                        (contains? opts ":due")
-                        (let [due-ts (:due (:task entry))]
-                          (when due-ts
-                            (> (st/now) due-ts)))
+            (contains? opts ":waiting")
+            (when (contains? entry-tags "#habit")
+              (when-let [active-from (get-in entry [:habit :active-from])]
+                (let [active-from (get-in entry [:habit :active-from])
+                      dtz (ct/default-time-zone)
+                      fmt (ctf/formatter "yyyy-MM-dd'T'HH:mm" dtz)
+                      from (ctf/parse fmt active-from)]
+                  (t/after? (ct/now) from))))
 
-                        (contains? opts ":no-start")
-                        (not (:start (:task entry)))
+            (contains? opts ":due")
+            (let [due-ts (:due (:task entry))]
+              (when due-ts
+                (> (st/now) due-ts)))
 
-                        (contains? opts ":no-due")
-                        (not (:due (:task entry)))
+            (contains? opts ":no-start")
+            (not (:start (:task entry)))
 
-                        (contains? opts ":story")
-                        (= :story (:entry-type entry))
+            (contains? opts ":no-due")
+            (not (:due (:task entry)))
 
-                        (contains? opts ":book")
-                        (= :book (:entry-type entry))
+            (contains? opts ":story")
+            (= :story (:entry-type entry))
 
-                        :else true)
+            (contains? opts ":book")
+            (= :book (:entry-type entry))
+
+            :else true)
 
           match? (and (set/subset? q-tags tags)
                       (empty? (set/intersection q-not-tags tags))

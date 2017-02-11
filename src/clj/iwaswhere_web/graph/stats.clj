@@ -139,20 +139,23 @@
 (defn task-summary-stats
   "Generate some very basic stats about the graph for display in UI."
   [state]
-  {:open-tasks-cnt    (res-count state {:tags     #{"#task"}
-                                        :not-tags #{"#done" "#backlog" "#closed"}})
-   :started-tasks-cnt (res-count state {:tags     #{"#task"}
-                                        :not-tags #{"#done" "#backlog" "#closed"}
-                                        :opts     #{":started"}})
-   :due-tasks-cnt     (res-count state {:tags     #{"#task"}
-                                        :not-tags #{"#done" "#backlog" "#closed"}
-                                        :opts     #{":due"}})
-   :open-habits-cnt   (res-count state {:tags     #{"#habit"}
-                                        :not-tags #{"#done"}})
-   :backlog-cnt       (res-count state {:tags     #{"#task" "#backlog"}
-                                        :not-tags #{"#done" "#closed"}})
-   :completed-cnt     (res-count state {:tags #{"#task" "#done"}})
-   :closed-cnt        (res-count state {:tags #{"#task" "#closed"}})})
+  {:open-tasks-cnt     (res-count state {:tags     #{"#task"}
+                                         :not-tags #{"#done" "#backlog" "#closed"}})
+   :started-tasks-cnt  (res-count state {:tags     #{"#task"}
+                                         :not-tags #{"#done" "#backlog" "#closed"}
+                                         :opts     #{":started"}})
+   :due-tasks-cnt      (res-count state {:tags     #{"#task"}
+                                         :not-tags #{"#done" "#backlog" "#closed"}
+                                         :opts     #{":due"}})
+   :open-habits-cnt    (res-count state {:tags     #{"#habit"}
+                                         :not-tags #{"#done"}})
+   :waiting-habits-cnt (res-count state {:tags     #{"#habit"}
+                                         :not-tags #{"#done"}
+                                         :opts     #{":waiting"}})
+   :backlog-cnt        (res-count state {:tags     #{"#task" "#backlog"}
+                                         :not-tags #{"#done" "#closed"}})
+   :completed-cnt      (res-count state {:tags #{"#task" "#done"}})
+   :closed-cnt         (res-count state {:tags #{"#task" "#closed"}})})
 
 (defn daily-summaries-mapper
   "Create mapper function for daily summary stats"

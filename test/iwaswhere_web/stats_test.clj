@@ -45,11 +45,11 @@
     :comment-for    1450999000000
     :md             "and #done"}
 
-   {:mentions  #{"@someone"}
-    :tags      #{"#task"}
-    :timestamp 1450999300000
-    :linked-story   1484076392372
-    :md        "Yet another #task"}
+   {:mentions     #{"@someone"}
+    :tags         #{"#task"}
+    :timestamp    1450999300000
+    :linked-story 1484076392372
+    :md           "Yet another #task"}
    {:mentions    #{"@someone"}
     :tags        #{"#backlog"}
     :timestamp   1450999300001
@@ -68,14 +68,14 @@
     :tags      #{"#task"}
     :timestamp 1450999300010
     :md        "And yet another #task @JaneDoe"}
-   {:mentions    #{"@JaneDoe"}
-    :tags        #{"#closed"}
-    :timestamp   1450999300011
+   {:mentions       #{"@JaneDoe"}
+    :tags           #{"#closed"}
+    :timestamp      1450999300011
     :entry-type     :pomodoro
     :completed-time 111
     :planned-dur    -1
-    :comment-for 1450999300010
-    :md          "irrelevant #closed @JaneDoe"}])
+    :comment-for    1450999300010
+    :md             "irrelevant #closed @JaneDoe"}])
 
 (deftest summary-stats-test
   "test that daily summaries"
@@ -89,12 +89,14 @@
         (testing
           "task summary stats are correct"
           (let [stats (gs/task-summary-stats new-state)]
-            (is (= {:backlog-cnt       1
-                    :closed-cnt        1
-                    :completed-cnt     2
-                    :due-tasks-cnt     0
-                    :open-tasks-cnt    1
-                    :started-tasks-cnt 0}
+            (is (= {:backlog-cnt        1
+                    :closed-cnt         1
+                    :completed-cnt      2
+                    :due-tasks-cnt      0
+                    :open-habits-cnt    0
+                    :waiting-habits-cnt 0
+                    :open-tasks-cnt     1
+                    :started-tasks-cnt  0}
                    stats))))))))
 
 (deftest pomodoro-stats-test
@@ -111,11 +113,11 @@
           (let [mapper (gs/pomodoro-mapper new-state)
                 stats (mapper {:date-string "2015-12-24"})]
             (is (= ["2015-12-24"
-                    {:completed   0
-                     :date-string "2015-12-24"
-                     :started     1
-                     :total       4
-                     :total-time  1301
+                    {:completed     0
+                     :date-string   "2015-12-24"
+                     :started       1
+                     :total         4
+                     :total-time    1301
                      :time-by-book  {:no-book 1301}
                      :time-by-story {1484076392371 291
                                      1484076392372 899
