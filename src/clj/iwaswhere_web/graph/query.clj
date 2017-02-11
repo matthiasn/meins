@@ -83,7 +83,8 @@
                       dtz (ct/default-time-zone)
                       fmt (ctf/formatter "yyyy-MM-dd'T'HH:mm" dtz)
                       from (ctf/parse fmt active-from)]
-                  (t/after? (ct/now) from))))
+                  (and (not (:done (:habit entry)))
+                       (t/after? (ct/now) from)))))
 
             (contains? opts ":due")
             (let [due-ts (:due (:task entry))]
