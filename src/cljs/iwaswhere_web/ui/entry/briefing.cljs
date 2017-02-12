@@ -5,7 +5,10 @@
             [re-frame.core :refer [subscribe]]
             [iwaswhere-web.charts.data :as cd]
             [iwaswhere-web.ui.charts.common :as cc]
-            [iwaswhere-web.utils.misc :as u]))
+            [iwaswhere-web.utils.misc :as u]
+            [clojure.pprint :as pp]
+    ;[iwaswhere-web.ui.entry.entry :as e]
+            ))
 
 (defn time-by-stories-list
   "Render list of times spent on individual stories, plus the total."
@@ -22,8 +25,8 @@
             y-scale 0.0045]
         (when date
           [:div.story-time
-           [:div "Logged: " [:strong dur] " in " (:total day-stats) " entries."]
-           [:hr]
+           (when (seq dur)
+             [:div "Logged: " [:strong dur] " in " (:total day-stats) " entries."])
            [cc/horizontal-bar stories :story-name time-by-story y-scale]
            (for [[story v] (:time-by-story day-stats)]
              (let [story-name (or (:story-name (get stories story)) "none")]
@@ -32,7 +35,6 @@
                 [:span.legend
                  {:style {:background-color (cc/item-color story-name)}}]
                 [:strong.name story-name] (u/duration-string v)]))
-           [:hr]
            [cc/horizontal-bar books :book-name time-by-book y-scale]
            (for [[book v] (:time-by-book day-stats)]
              (let [book-name (or (:book-name (get books book)) "none")]
@@ -48,6 +50,12 @@
         stats (subscribe [:stats])
         options (subscribe [:options])
         books (reaction (:books @options))
+        entries-map (subscribe [:entries-map])
+        results (subscribe [:results])
+        waiting-habits (reaction
+                         (let [entries-map @entries-map]
+                           (map (fn [ts] (get entries-map ts))
+                                (:waiting-habits @results))))
         input-fn
         (fn [entry]
           (fn [ev]
@@ -74,50 +82,55 @@
               allocation (-> entry :briefing :time-allocation)
               remaining (cd/remaining-times (:time-by-book day-stats) allocation)
               past-7-days (cd/past-7-days pomodoro-stats :time-by-book)]
-          [:form.briefing-details
-           [:fieldset
-            [:legend (or day "date not set")]
-            (when edit-mode?
-              [:div
-               [:label " Day: "]
-               [:input {:type     :date
-                        :on-input (input-fn entry)
-                        :value    day}]])
-            (when tasks-cnt
-              [:div
-               "Tasks: " [:strong tasks-cnt] " created, "
-               [:strong done-cnt] " done, "
-               [:strong closed-cnt] " closed"])
-            (when word-stats
-              [:div
-               [:strong (:started-tasks-cnt @stats)] " started tasks, "
-               [:strong (:word-count word-stats)] " words written."])
-            (when day-stats [time-by-stories-list day-stats])
-            [:hr]
-            [:div [cc/horizontal-bar books :book-name allocation 0.0045]]
-            [:div [cc/horizontal-bar books :book-name remaining 0.0045]]
-            [:div
-             "Total planned: "
-             [:strong
-              (u/duration-string
-                (apply + (map second (-> entry :briefing :time-allocation))))]]
-            [:div.story-time
-             (for [[k v] books]
-               (let [allocation (get-in entry [:briefing :time-allocation k] 0)
-                     actual (get-in (:time-by-book day-stats) [k] 0)
-                     remaining (- allocation actual)]
-                 ^{:key (str :time-allocation k)}
-                 [:div
-                  (when (or (pos? allocation) edit-mode?)
-                    [:div
-                     [:span.legend
-                      {:style {:background-color (cc/item-color (:book-name v))}}]
-                     [:strong.name (:book-name v)]
-                     (if edit-mode?
-                       [:input {:on-input (time-alloc-input-fn entry k)
-                                :value    (when allocation (/ allocation 60))
-                                :type     :number}]
-                       (when allocation
-                         [:span.allocated (u/duration-string allocation)]))
-                     (when (pos? remaining)
-                       [:span (u/duration-string remaining)])])]))]]])))))
+          [:div
+           [:h6 "Waiting habits:"]
+           [:ul
+            (for [waiting-habit @waiting-habits]
+              ^{:key (:timestamp waiting-habit)}
+              [:li [:strong (:md waiting-habit)]])]
+           [:form.briefing-details
+            [:fieldset
+             [:legend (or day "date not set")]
+             (when edit-mode?
+               [:div
+                [:label " Day: "]
+                [:input {:type     :date
+                         :on-input (input-fn entry)
+                         :value    day}]])
+             (when tasks-cnt
+               [:div
+                "Tasks: " [:strong tasks-cnt] " created, "
+                [:strong done-cnt] " done, "
+                [:strong closed-cnt] " closed"])
+             (when word-stats
+               [:div
+                [:strong (:started-tasks-cnt @stats)] " started tasks, "
+                [:strong (:word-count word-stats)] " words written."])
+             (when day-stats [time-by-stories-list day-stats])
+             [:div [cc/horizontal-bar books :book-name allocation 0.0045]]
+             [:div [cc/horizontal-bar books :book-name remaining 0.0045]]
+             [:div
+              "Total planned: "
+              [:strong
+               (u/duration-string
+                 (apply + (map second (-> entry :briefing :time-allocation))))]]
+             [:div.story-time
+              (for [[k v] books]
+                (let [allocation (get-in entry [:briefing :time-allocation k] 0)
+                      actual (get-in (:time-by-book day-stats) [k] 0)
+                      remaining (- allocation actual)]
+                  ^{:key (str :time-allocation k)}
+                  [:div
+                   (when (or (pos? allocation) edit-mode?)
+                     [:div
+                      [:span.legend
+                       {:style {:background-color (cc/item-color (:book-name v))}}]
+                      [:strong.name (:book-name v)]
+                      (if edit-mode?
+                        [:input {:on-input (time-alloc-input-fn entry k)
+                                 :value    (when allocation (/ allocation 60))
+                                 :type     :number}]
+                        (when allocation
+                          [:span.allocated (u/duration-string allocation)]))
+                      (when (pos? remaining)
+                        [:span (u/duration-string remaining)])])]))]]]])))))

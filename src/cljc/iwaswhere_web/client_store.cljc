@@ -14,6 +14,7 @@
   [{:keys [current-state msg-payload msg-meta]}]
   (let [store-meta (:client/store-cmp msg-meta)
         {:keys [entries entries-map]} msg-payload
+        _ (prn entries)
         new-state (-> current-state
                       (assoc-in [:results] entries)
                       (update-in [:entries-map] merge entries-map)

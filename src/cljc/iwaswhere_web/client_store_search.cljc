@@ -7,7 +7,16 @@
     [clojure.set :as set]))
 
 (def initial-query-cfg
-  {:queries    {}
+  {:queries    {:waiting-habits {:tags        #{"#habit"}
+                                 :not-tags    #{}
+                                 :mentions    #{}
+                                 :ft-search   nil
+                                 :timestamp   nil
+                                 :date-string nil
+                                 :opts        #{":waiting"}
+                                 :search-text "#habit :waiting"
+                                 :n           100
+                                 :query-id    :waiting-habits}}
    :tab-groups {:left  {:active nil :all #{}}
                 :right {:active nil :all #{}}}})
 
@@ -23,7 +32,7 @@
         query-path [:query-cfg :queries query-id]
         query-msg (merge msg-payload
                          {:sort-by-upvotes (:sort-by-upvotes current-state)
-                          :sort-asc (:sort-asc (:cfg current-state))})
+                          :sort-asc        (:sort-asc (:cfg current-state))})
         new-state (assoc-in current-state query-path query-msg)]
     (swap! query-cfg assoc-in [:queries query-id] msg-payload)
     {:new-state new-state
@@ -34,7 +43,7 @@
   "Sets search in linked entries column."
   [{:keys [current-state msg-payload]}]
   (let [{:keys [search query-id]} msg-payload]
-    {:new-state (assoc-in current-state [:cfg :linked-filter query-id] search)
+    {:new-state    (assoc-in current-state [:cfg :linked-filter query-id] search)
      :send-to-self [:cfg/save]}))
 
 (defn set-active-query
