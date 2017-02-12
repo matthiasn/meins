@@ -364,7 +364,6 @@
   (let [queries (:queries msg-payload)
         start-ts (System/nanoTime)
         res-mapper (run-query current-state msg-meta)
-        _ (prn queries)
         res (mapv res-mapper queries)
         res2 (reduce (fn [acc [k v]]
                        (-> acc
@@ -375,4 +374,5 @@
         ms (/ (- (System/nanoTime) start-ts) 1000000)
         dur {:duration-ms (pp/cl-format nil "~,3f ms" ms)}]
     (log/info "Query" (:sente-uid msg-meta) "took" (:duration-ms dur))
+    (log/debug queries)
     {:emit-msg [:state/new (merge res2 dur)]}))

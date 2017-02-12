@@ -8,7 +8,7 @@
             [iwaswhere-web.utils.misc :as u]
             [clojure.pprint :as pp]
     ;[iwaswhere-web.ui.entry.entry :as e]
-            ))
+            [iwaswhere-web.utils.parse :as up]))
 
 (defn time-by-stories-list
   "Render list of times spent on individual stories, plus the total."
@@ -45,7 +45,7 @@
                 [:strong.name book-name] (u/duration-string v)]))])))))
 
 (defn briefing-view
-  [entry put-fn edit-mode?]
+  [entry put-fn edit-mode? local-cfg]
   (let [chart-data (subscribe [:chart-data])
         stats (subscribe [:stats])
         options (subscribe [:options])
@@ -69,7 +69,7 @@
                   s (* m 60)
                   updated (assoc-in entry [:briefing :time-allocation book] s)]
               (put-fn [:entry/update-local updated]))))]
-    (fn briefing-render [entry put-fn edit-mode?]
+    (fn briefing-render [entry put-fn edit-mode? local-cfg]
       (when (contains? (:tags entry) "#briefing")
         (let [books @books
               {:keys [pomodoro-stats activity-stats task-stats wordcount-stats
@@ -81,13 +81,17 @@
               started (:started-tasks-cnt @stats)
               allocation (-> entry :briefing :time-allocation)
               remaining (cd/remaining-times (:time-by-book day-stats) allocation)
-              past-7-days (cd/past-7-days pomodoro-stats :time-by-book)]
-          [:div
-           [:h6 "Waiting habits:"]
+              past-7-days (cd/past-7-days pomodoro-stats :time-by-book)
+              tab-group (:tab-group local-cfg)]
+          [:div.habits
+           [:h5 "Waiting habits:"]
            [:ul
             (for [waiting-habit @waiting-habits]
-              ^{:key (:timestamp waiting-habit)}
-              [:li [:strong (:md waiting-habit)]])]
+              (let [ts (:timestamp waiting-habit)]
+                ^{:key ts}
+                [:li.habit
+                 {:on-click (up/add-search ts tab-group put-fn)}
+                 [:strong (:md waiting-habit)]]))]
            [:form.briefing-details
             [:fieldset
              [:legend (or day "date not set")]

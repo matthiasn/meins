@@ -102,7 +102,7 @@
          [m/imdb-view entry put-fn]
          [task/task-details entry put-fn edit-mode?]
          [task/habit-details entry put-fn edit-mode?]
-         [b/briefing-view entry put-fn edit-mode?]
+         [b/briefing-view entry put-fn edit-mode? local-cfg]
          [:div.footer
           [:div.likes (when-let [upvotes (:upvotes entry)]
                         (when (pos? upvotes)
