@@ -8,7 +8,8 @@
             [iwaswhere-web.utils.misc :as u]
             [clojure.pprint :as pp]
     ;[iwaswhere-web.ui.entry.entry :as e]
-            [iwaswhere-web.utils.parse :as up]))
+            [iwaswhere-web.utils.parse :as up]
+            [clojure.string :as s]))
 
 (defn time-by-stories-list
   "Render list of times spent on individual stories, plus the total."
@@ -91,7 +92,7 @@
                 ^{:key ts}
                 [:li.habit
                  {:on-click (up/add-search ts tab-group put-fn)}
-                 [:strong (:md waiting-habit)]]))]
+                 [:strong (s/replace (:md waiting-habit) "#habit" "")]]))]
            [:form.briefing-details
             [:fieldset
              [:legend (or day "date not set")]

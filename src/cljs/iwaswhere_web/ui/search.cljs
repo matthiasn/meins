@@ -76,7 +76,7 @@
                                        (p/parse-search search))]
                 (update-search-fn search)
                 (aset target "innerHTML" search)
-                (.setTimeout js/window (fn [] (h/focus-on-end target)) 10)
+                (.setTimeout js/window (fn [] (h/focus-on-end target)) 150)
                 (swap! state assoc-in [:local-query] local-query)))
             on-keydown-fn
             (fn [ev]
