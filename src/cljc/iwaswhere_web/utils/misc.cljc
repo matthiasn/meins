@@ -30,14 +30,19 @@
 
 (defn pvt-filter
   "Filter for entries considered private."
-  [options]
+  [options entries-map]
   (fn [entry]
     (let [tags (set (map s/lower-case (:tags entry)))
           private-tags (:pvt-hashtags options)
           hashtags (:hashtags options)
           only-pvt-tags (set/difference private-tags hashtags)
-          matched (set/intersection tags only-pvt-tags)]
-      (empty? matched))))
+          matched (set/intersection tags only-pvt-tags)
+          linked-ts (:linked-timestamp entry)
+          linked (get entries-map linked-ts)
+          linked-tags (set (map s/lower-case (:tags linked)))
+          linked-matched (set/intersection linked-tags only-pvt-tags)]
+      (and (empty? matched)
+           (empty? linked-matched)))))
 
 (defn suggestions
   "Renders suggestions for hashtags or mentions if either occurs before the

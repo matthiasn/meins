@@ -144,7 +144,7 @@
             comments (mapv (u/find-missing-entry @entries-map put-fn) comments-set)
             comments (if @show-pvt?
                        comments
-                       (filter (u/pvt-filter @options) comments))
+                       (filter (u/pvt-filter @options @entries-map) comments))
             comments-map (into {} (map (fn [c] [(:timestamp c) c])) comments)
             all-comments (sort-by :timestamp (vals (merge comments-map
                                                           @local-comments)))]

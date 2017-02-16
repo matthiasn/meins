@@ -20,7 +20,7 @@
             with-imgs (filter :img-file (map get-or-retrieve linked-entries-set))
             filtered (if @show-pvt?
                        with-imgs
-                       (filter (u/pvt-filter @options) with-imgs))]
+                       (filter (u/pvt-filter @options @entries-map) with-imgs))]
         (when-not entry-active?
           [:div.thumbnails
            (for [img-entry filtered]

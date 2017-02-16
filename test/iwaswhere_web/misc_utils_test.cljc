@@ -60,7 +60,7 @@
 
 (deftest pvt-filter-test
   (testing "properly detects privacy status of entries"
-    (let [pvt-filter-fn (u/pvt-filter pvt-test-conf)]
+    (let [pvt-filter-fn (u/pvt-filter pvt-test-conf {})]
       (is (pvt-filter-fn test-entry))
       (is (pvt-filter-fn test-entry2))
       (is (not (pvt-filter-fn pvt-entry)))

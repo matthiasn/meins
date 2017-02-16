@@ -65,9 +65,10 @@
                              :activity-stats  (sorted-map)
                              :task-stats      (sorted-map)
                              :wordcount-stats (sorted-map)
+                             :options         {:pvt-hashtags #{"#pvt"}}
                              :cfg             @c/app-cfg})]
-    (put-fn [:state/search (:query-cfg @initial-state)])
     (put-fn [:state/stats-tags-get])
+    (put-fn [:state/search (:query-cfg @initial-state)])
     {:state initial-state}))
 
 (defn save-stats-fn

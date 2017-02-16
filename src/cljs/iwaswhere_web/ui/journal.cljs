@@ -36,7 +36,7 @@
                                    :query-id query-id}])
             linked-entries (if (:show-pvt conf)
                              linked-entries
-                             (filter (u/pvt-filter conf) linked-entries))
+                             (filter (u/pvt-filter conf @entries-map) linked-entries))
             linked-filter (query-id (:linked-filter conf))
             filter-fn (linked-filter-fn @entries-map linked-filter put-fn)
             linked-entries (filter filter-fn linked-entries)]
@@ -72,7 +72,7 @@
             show-pvt? (:show-pvt conf)
             filtered-entries (if show-pvt?
                                entries
-                               (filter (u/pvt-filter conf) entries))
+                               (filter (u/pvt-filter conf @entries-map) entries))
             show-context? (:show-context conf)
             comments-w-entries? (not (:comments-standalone conf))
             with-comments? (fn [entry] (and (or (and comments-w-entries?
