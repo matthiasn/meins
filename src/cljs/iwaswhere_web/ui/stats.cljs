@@ -1,6 +1,5 @@
 (ns iwaswhere-web.ui.stats
-  (:require [matthiasn.systems-toolbox-ui.reagent :as r]
-            [iwaswhere-web.ui.charts.activity :as ca]
+  (:require [iwaswhere-web.ui.charts.activity :as ca]
             [iwaswhere-web.ui.charts.tasks :as ct]
             [iwaswhere-web.ui.charts.custom-fields :as cf]
             [iwaswhere-web.ui.charts.wordcount :as wc]
@@ -21,8 +20,7 @@
   (let [stats (subscribe [:stats])
         options (subscribe [:options])
         timing (subscribe [:timing])]
-    (fn stats-text-render
-      []
+    (fn stats-text-render []
       [:div.stats-string
        (when stats
          [:div

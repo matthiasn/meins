@@ -84,7 +84,7 @@
                 (reset! local-display-entry updated)
                 (put-fn [:entry/update-local updated])
                 (.setTimeout js/window
-                             (fn [] (h/focus-on-end @edit-elem-atom)) 100)))
+                             (fn [] (h/focus-on-end @edit-elem-atom)) 50)))
 
             on-keydown-fn
             (fn [ev]

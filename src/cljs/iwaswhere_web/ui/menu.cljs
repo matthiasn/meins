@@ -1,8 +1,6 @@
 (ns iwaswhere-web.ui.menu
   (:require [iwaswhere-web.helpers :as h]
-            [matthiasn.systems-toolbox-ui.reagent :as r]
-            [re-frame.core :refer [reg-event-db path reg-sub dispatch
-                                   dispatch-sync subscribe]]
+            [re-frame.core :refer [subscribe]]
             [matthiasn.systems-toolbox.component :as stc]))
 
 (defn toggle-option-view

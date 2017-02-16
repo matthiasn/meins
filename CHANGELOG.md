@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [0.1.34] - 2017-02-15
+### Changed
+- carousel
+- external React and related JS libs
+
 ## [0.1.33] - 2017-02-08
 ### Changed
 - time allocations in briefing

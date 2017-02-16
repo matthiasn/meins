@@ -1,13 +1,11 @@
-(defproject matthiasn/iwaswhere-web "0.1.33"
+(defproject matthiasn/iwaswhere-web "0.1.34"
   :description "Sample application built with systems-toolbox library"
   :url "https://github.com/matthiasn/systems-toolbox"
   :license {:name "GNU AFFERO GENERAL PUBLIC LICENSE"
             :url  "https://www.gnu.org/licenses/agpl-3.0.en.html"}
   :dependencies [[org.clojure/clojure "1.9.0-alpha14"]
-                 [org.clojure/clojurescript "1.9.456"]
+                 [org.clojure/clojurescript "1.9.473"]
                  [org.clojure/tools.logging "0.3.1"]
-                 [org.clojure/tools.namespace "0.3.0-alpha3"]
-                 [com.taoensso/encore "2.88.2"]
                  [ch.qos.logback/logback-classic "1.2.1"]
                  [hiccup "1.0.5"]
                  [clj-pid "0.1.2"]
@@ -22,7 +20,7 @@
                  [ubergraph "0.3.0"]
                  [camel-snake-kebab "0.4.0"]
                  [matthiasn/systems-toolbox "0.6.4"]
-                 [matthiasn/systems-toolbox-ui "0.6.2"]
+                 [reagent "0.6.0" :exclusions [cljsjs/react cljsjs/react-dom]]
                  [matthiasn/systems-toolbox-sente "0.6.5"]
                  ;[matthiasn/systems-toolbox-probe "0.6.2"]
                  [re-frame "0.9.2"]
@@ -96,7 +94,7 @@
                     :externs       ["externs/misc.js"
                                     "externs/leaflet.ext.js"]
                     :output-to     "resources/public/js/build/iwaswhere.js"
-                    :optimizations :advanced}}
+                    :optimizations :whitespace}}
     {:id           "cljs-test"
      :source-paths ["src/cljs" "src/cljc" "test"]
      :compiler     {:output-to     "out/testable.js"

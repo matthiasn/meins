@@ -7,12 +7,16 @@
   flex-shrink: 0;
 
   .thumbnails {
-    display: flex;
     overflow-y: auto;
     margin: 0 4px;
 
-    img {
-      height: 100px;
+    .carousel .slide img {
+      height: 260px;
+      width: auto;
+    }
+
+    .carousel {
+
     }
   }
 }

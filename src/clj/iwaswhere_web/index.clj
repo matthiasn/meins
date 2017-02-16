@@ -24,6 +24,8 @@
      (include-css "https://fonts.googleapis.com/css?family=Oswald:300,400")
      (include-css "/webjars/fontawesome/4.7.0/css/font-awesome.css")
      (include-css "/webjars/leaflet/0.7.7/dist/leaflet.css")
+     (include-css "/css/draft.css")
+     (include-css "/css/carousel.css")
      (include-css "/css/iwaswhere.css")]
     [:body
      [:div#reframe]
@@ -37,6 +39,7 @@
      (include-js "/webjars/intl/1.2.4/dist/Intl.min.js")
      (include-js "/webjars/intl/1.2.4/locale-data/jsonp/en.js")
      (include-js "/webjars/randomcolor/0.4.4/randomColor.js")
+     (include-js "/js/bundle.js")
      (include-js "/js/build/iwaswhere.js")]))
 
 (defn routes-fn
