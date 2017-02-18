@@ -44,7 +44,8 @@
   :main iwaswhere-web.core
   :jvm-opts ["-XX:-OmitStackTraceInFastThrow"]
 
-  :profiles {:uberjar {:aot :all}}
+  :profiles {:uberjar {:aot :all}
+             :dev {:dependencies [[re-frisk "0.3.2"]]}}
 
   :plugins [[lein-cljsbuild "1.1.5"
              :exclusions [org.apache.commons/commons-compress]]
@@ -82,8 +83,8 @@
      :compiler     {:main          "iwaswhere-web.dev"
                     :asset-path    "js/build"
                     :optimizations :none
-                    :output-dir    "resources/public/js/build/"
-                    :output-to     "resources/public/js/build/iwaswhere.js"
+                    ;:output-dir    "resources/public/js/build/"
+                    ;:output-to     "resources/public/js/build/iwaswhere.js"
                     :source-map    true}}
 
     {:id           "release"
@@ -93,7 +94,9 @@
                     ;:elide-asserts true
                     :externs       ["externs/misc.js"
                                     "externs/leaflet.ext.js"]
+                    :output-dir    "resources/public/js/build/"
                     :output-to     "resources/public/js/build/iwaswhere.js"
+                    :source-map    "resources/public/js/build/iwaswhere.js.map"
                     :optimizations :whitespace}}
     {:id           "cljs-test"
      :source-paths ["src/cljs" "src/cljc" "test"]
