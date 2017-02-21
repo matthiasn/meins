@@ -19,6 +19,7 @@
 (reg-sub :entries-map (fn [db _] (:entries-map db)))
 (reg-sub :results (fn [db _] (:results db)))
 (reg-sub :new-entries (fn [db _] (:new-entries db)))
+(reg-sub :combined-entries (fn [db _] (merge (:entries-map db) (:new-entries db))))
 (reg-sub :cfg (fn [db _] (:cfg db)))
 (reg-sub :stats (fn [db _] (:stats db)))
 (reg-sub :timing (fn [db _] (:timing db)))

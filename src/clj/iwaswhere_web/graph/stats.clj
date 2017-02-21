@@ -224,6 +224,7 @@
         days (:days msg-payload)
         stats (when stats-mapper
                 (into {} (mapv (stats-mapper current-state) days)))]
+    (log/info stats-type (count (str stats)))
     (if stats
       (put-fn (with-meta [:stats/result {:stats stats
                                          :type  stats-type}] msg-meta))

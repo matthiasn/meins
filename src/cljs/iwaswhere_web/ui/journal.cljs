@@ -50,7 +50,7 @@
              (when (and (not (:comment-for entry))
                         (or (:new-entry entry) (:show-context conf)))
                ^{:key (str "linked-" (:timestamp entry))}
-               [e/entry-with-comments entry put-fn local-cfg]))])))))
+               [e/entry-with-comments (:timestamp entry) put-fn local-cfg]))])))))
 
 (defn journal-view
   "Renders journal div, one entry per item, with map if geo data exists in the
@@ -86,7 +86,7 @@
                               filtered-entries)]
             (when (with-comments? entry)
               ^{:key (:timestamp entry)}
-              [e/entry-with-comments entry put-fn local-cfg]))
+              [e/entry-with-comments (:timestamp entry) put-fn local-cfg]))
           (when (seq entries)
             (let [show-more #(put-fn [:show/more {:query-id query-id}])]
               [:div.show-more {:on-click show-more :on-mouse-over show-more}

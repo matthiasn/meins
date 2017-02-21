@@ -15,21 +15,59 @@
             [iwaswhere-web.ui.entry.thumbnails :as t]
             [cljsjs.moment]
             [iwaswhere-web.utils.misc :as u]
-            [iwaswhere-web.helpers :as h]))
+            [iwaswhere-web.helpers :as h]
+            [clojure.set :as set]))
+
+(defn entry-reaction
+  [ts]
+  (let [new-entries (subscribe [:new-entries])
+        entries-map (subscribe [:entries-map])
+        combined-entries (subscribe [:combined-entries])
+        entry (reaction (get-in @combined-entries [ts]))
+        edit-mode (reaction (contains? @new-entries ts))]
+    {:entry       entry
+     :entries-map entries-map
+     :combined-entries combined-entries
+     :new-entries new-entries
+     :edit-mode   edit-mode}))
+
+(defn all-comments-set
+  "Finds all comments for a particular entry."
+  [ts]
+  (let [{:keys [entry combined-entries new-entries]} (entry-reaction ts)
+        comments-set (reaction (set (:comments @entry)))
+        comments-filter (fn [[_ts c]] (= (:comment-for c) ts))
+        local-comments (reaction (into {} (filter comments-filter @new-entries)))]
+    (reaction (sort (set/union (set (:comments @entry))
+                               (set (keys @local-comments)))))))
+
+(defn total-time-logged
+  "Renders time logged in entry and its comments."
+  [ts]
+  (let [{:keys [entry combined-entries]} (entry-reaction ts)
+        all-comments-set (all-comments-set ts)
+        total-dur (reaction
+                    (apply + (map #(:completed-time (get @combined-entries %))
+                                  @all-comments-set)))]
+    (fn [ts]
+      (when (pos? @total-dur)
+        [:span [:span.fa.fa-clock-o.completed]
+         [:span.dur (u/duration-string @total-dur)]]))))
 
 (defn hashtags-mentions-list
   "Horizontally renders list with hashtags and mentions."
-  [entry tab-group put-fn]
+  [ts tab-group put-fn]
   (let [cfg (subscribe [:cfg])
+        entry (:entry (entry-reaction ts))
         redacted (reaction (:redacted @cfg))]
-    (fn hashtags-mentions-render [entry tab-group put-fn]
+    (fn hashtags-mentions-render [ts tab-group put-fn]
       [:div.hashtags
        (when @redacted {:class "redacted"})
-       (for [mention (:mentions entry)]
+       (for [mention (:mentions @entry)]
          ^{:key (str "tag-" mention)}
          [:span.mention {:on-click (up/add-search mention tab-group put-fn)}
           mention])
-       (for [hashtag (:tags entry)]
+       (for [hashtag (:tags @entry)]
          ^{:key (str "tag-" hashtag)}
          [:span.hashtag {:on-click (up/add-search hashtag tab-group put-fn)}
           hashtag])])))
@@ -41,11 +79,10 @@
    content component used in edit mode also sends a modified entry to the store
    component, which is useful for displaying updated hashtags, or also for
    showing the warning that the entry is not saved yet."
-  [entry put-fn info local-cfg linked-desc]
+  [ts put-fn local-cfg]
   (let [cfg (subscribe [:cfg])
-        ts (:timestamp entry)
-        new-entries (subscribe [:new-entries])
-        edit-mode (reaction (contains? @new-entries ts))
+        {:keys [entry edit-mode entries-map new-entries]} (entry-reaction ts)
+        linked-desc (reaction (get @entries-map (:linked-timestamp @entry)))
         show-map? (reaction (contains? (:show-maps-for @cfg) ts))
         active (reaction (:active @cfg))
         show-all-maps? (reaction (:show-all-maps @cfg))
@@ -53,15 +90,17 @@
         formatted-time (.format (js/moment ts) "ddd YY-MM-DD HH:mm")
         tab-group (:tab-group local-cfg)
         add-search (up/add-search q-date-string tab-group put-fn)
-        pomo-start #(put-fn [:cmd/pomodoro-start entry])
+        pomo-start #(put-fn [:cmd/pomodoro-start @entry])
         set-active-fn #(put-fn [:cmd/toggle-active
                                 {:timestamp ts
                                  :query-id  (:query-id local-cfg)}])
-        drop-fn (a/drop-linked-fn entry cfg put-fn)]
-    (fn journal-entry-render [entry put-fn info local-cfg linked-desc]
+        drop-fn (a/drop-linked-fn @entry cfg put-fn)
+        toggle-edit #(if @edit-mode (put-fn [:entry/remove-local @entry])
+                                    (put-fn [:entry/update-local @entry]))]
+    (fn journal-entry-render [ts put-fn local-cfg]
       (let [edit-mode? @edit-mode
-            toggle-edit #(if edit-mode? (put-fn [:entry/remove-local entry])
-                                        (put-fn [:entry/update-local entry]))]
+            entry @entry
+            linked-desc @linked-desc]
         [:div.entry {:on-drop       drop-fn
                      :on-drag-over  h/prevent-default
                      :on-drag-enter h/prevent-default}
@@ -73,17 +112,17 @@
            [:time (u/visit-duration entry)]]
           (if (= :pomodoro (:entry-type entry))
             [p/pomodoro-header entry pomo-start edit-mode?]
-            [:div info])
+            [:div (when-not (:comment-for entry) [total-time-logged ts])])
           [:div
-             (when (seq (:linked-entries-list entry))
-               (let [ts (:timestamp entry)
-                     entry-active? (when-let [query-id (:query-id local-cfg)]
-                                     (= (query-id @active) ts))]
-                 [:span.link-btn {:on-click set-active-fn
-                                  :class    (when entry-active? "active")}
-                  (str " linked: " (count (:linked-entries-list entry)))]))]
+           (when (seq (:linked-entries-list entry))
+             (let [ts (:timestamp entry)
+                   entry-active? (when-let [query-id (:query-id local-cfg)]
+                                   (= (query-id @active) ts))]
+               [:span.link-btn {:on-click set-active-fn
+                                :class    (when entry-active? "active")}
+                (str " linked: " (count (:linked-entries-list entry)))]))]
           [a/entry-actions entry put-fn edit-mode? toggle-edit local-cfg]]
-         [hashtags-mentions-list entry tab-group put-fn]
+         [hashtags-mentions-list ts tab-group put-fn]
          [es/story-name-field entry edit-mode? put-fn]
          [es/book-name-field entry edit-mode? put-fn]
          (if edit-mode?
@@ -121,12 +160,9 @@
    content component used in edit mode also sends a modified entry to the store
    component, which is useful for displaying updated hashtags, or also for
    showing the warning that the entry is not saved yet."
-  [entry put-fn local-cfg]
-  (let [new-entries (subscribe [:new-entries])
-        ts (:timestamp entry)
-        comments-filter (fn [[_ts c]] (= (:comment-for c) ts))
-        local-comments (reaction (into {} (filter comments-filter @new-entries)))
-        entries-map (subscribe [:entries-map])
+  [ts put-fn local-cfg]
+  (let [{:keys [entry new-entries]} (entry-reaction ts)
+        all-comments-set (all-comments-set ts)
         new-entry (reaction (get @new-entries ts))
         cfg (subscribe [:cfg])
         options (subscribe [:options])
@@ -134,37 +170,28 @@
         thumbnails? (reaction (:thumbnails @cfg))
         show-comments-for? (reaction (get-in @cfg [:show-comments-for ts]))
         query-id (:query-id local-cfg)
-        toggle-comments
-        #(put-fn [:cmd/assoc-in
-                  {:path  [:cfg :show-comments-for ts]
-                   :value (when-not (= @show-comments-for? query-id) query-id)}])]
-    (fn entry-with-comments-render [entry put-fn local-cfg]
-      (let [entry (or @new-entry entry)
-            comments-set (set (:comments entry))
-            comments (mapv (u/find-missing-entry @entries-map put-fn) comments-set)
-            comments (if @show-pvt?
-                       comments
-                       (filter (u/pvt-filter @options @entries-map) comments))
-            comments-map (into {} (map (fn [c] [(:timestamp c) c])) comments)
-            all-comments (sort-by :timestamp (vals (merge comments-map
-                                                          @local-comments)))]
+        toggle-comments #(put-fn [:cmd/assoc-in
+                                  {:path  [:cfg :show-comments-for ts]
+                                   :value (when-not (= @show-comments-for? query-id)
+                                            query-id)}])]
+    (fn entry-with-comments-render [ts put-fn local-cfg]
+      (let [entry @entry
+            all-comments-set @all-comments-set]
         [:div.entry-with-comments
-         [journal-entry entry put-fn
-          (p/pomodoro-stats-view all-comments) local-cfg
-          (get @entries-map (:linked-timestamp entry))]
-         (when (seq all-comments)
+         [journal-entry ts put-fn local-cfg]
+         (when (seq all-comments-set)
            (if (= query-id @show-comments-for?)
              [:div.comments
-              (let [n (count comments)]
+              (let [n (count all-comments-set)]
                 [:div.show-comments
                  (when (pos? n)
                    [:span {:on-click toggle-comments}
                     (str "hide " n " comment" (when (> n 1) "s"))])])
-              (for [comment all-comments]
-                ^{:key (str "c" (:timestamp comment))}
-                [journal-entry comment put-fn nil local-cfg nil])]
+              (for [comment all-comments-set]
+                ^{:key (str "c" comment)}
+                [journal-entry comment put-fn local-cfg])]
              [:div.show-comments
-              (let [n (count all-comments)]
+              (let [n (count all-comments-set)]
                 [:span {:on-click toggle-comments}
                  (str "show " n " comment" (when (> n 1) "s"))])]))
          (when @thumbnails? [t/thumbnails entry put-fn])]))))

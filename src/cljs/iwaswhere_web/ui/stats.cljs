@@ -73,7 +73,7 @@
   [put-fn]
   (get-stats :stats/pomodoro put-fn 60)
   (get-stats :stats/activity put-fn 60)
-  (get-stats :stats/custom-fields put-fn 120)
+  (get-stats :stats/custom-fields put-fn 60)
   (get-stats :stats/tasks put-fn 60)
   (get-stats :stats/wordcount put-fn 60)
   (get-stats :stats/media put-fn 60)

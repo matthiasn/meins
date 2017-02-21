@@ -91,12 +91,12 @@
      :source-paths ["src/cljc" "src/cljs"]
      :compiler     {:main          "iwaswhere-web.core"
                     :asset-path    "js/build"
-                    ;:elide-asserts true
+                    :elide-asserts true
                     :externs       ["externs/misc.js"
                                     "externs/leaflet.ext.js"]
                     :output-dir    "resources/public/js/build/"
                     :output-to     "resources/public/js/build/iwaswhere.js"
-                    :source-map    "resources/public/js/build/iwaswhere.js.map"
+                    ;:source-map    "resources/public/js/build/iwaswhere.js.map"
                     :optimizations :whitespace}}
     {:id           "cljs-test"
      :source-paths ["src/cljs" "src/cljc" "test"]

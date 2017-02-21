@@ -1,7 +1,6 @@
 (ns iwaswhere-web.ui.new-entries
   (:require [iwaswhere-web.ui.entry.entry :as e]
-            [re-frame.core :refer [reg-event-db path reg-sub dispatch
-                                   dispatch-sync subscribe]]))
+            [re-frame.core :refer [subscribe]]))
 
 (defn new-entries-view
   "Renders view for editing new entries. New entries are those that are only
@@ -21,4 +20,4 @@
            [:div.new-entries-list
             (for [entry filtered-entries]
               ^{:key (:timestamp entry)}
-              [e/entry-with-comments entry put-fn {}])]])))))
+              [e/entry-with-comments (:timestamp entry) put-fn {}])]])))))

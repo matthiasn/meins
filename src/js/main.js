@@ -1,6 +1,7 @@
 window.deps = {
     'react' : require('react'),
     'react-dom' : require('react-dom'),
+    'react-addons-perf' : require('react-addons-perf'),
     'draft-js' : require('draft-js'),
     'react-responsive-carousel' : require('react-responsive-carousel').Carousel
 };
@@ -8,3 +9,4 @@ window.deps = {
 window.React = window.deps['react'];
 window.ReactDOM = window.deps['react-dom'];
 window.Draft = window.deps['draft-js'];
+window.ReactPerf = window.deps['react-addons-perf'];
