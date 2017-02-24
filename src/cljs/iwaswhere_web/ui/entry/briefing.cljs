@@ -53,10 +53,18 @@
         books (reaction (:books @options))
         entries-map (subscribe [:entries-map])
         results (subscribe [:results])
-        waiting-habits (reaction
-                         (let [entries-map @entries-map]
-                           (map (fn [ts] (get entries-map ts))
-                                (:waiting-habits @results))))
+        cfg (subscribe [:cfg])
+
+        waiting-habits
+        (reaction
+          (let [entries-map @entries-map
+                conf (merge @cfg @options)
+                entries (map (fn [ts] (get entries-map ts))
+                             (:waiting-habits @results))]
+            (if (:show-pvt @cfg)
+              entries
+              (filter (u/pvt-filter conf entries-map) entries))))
+
         input-fn
         (fn [entry]
           (fn [ev]
