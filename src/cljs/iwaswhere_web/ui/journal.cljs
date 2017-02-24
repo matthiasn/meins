@@ -28,7 +28,7 @@
       (let [conf (merge @cfg @options)
             linked-entries-set (into (sorted-set) (:linked-entries-list active-entry))
             linked-mapper (u/find-missing-entry @entries-map put-fn)
-            linked-entries (map linked-mapper linked-entries-set)
+            linked-entries (mapv linked-mapper linked-entries-set)
             query-id (:query-id local-cfg)
             on-input-fn #(put-fn [:linked-filter/set
                                   {:search   (ps/parse-search

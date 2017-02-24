@@ -4,6 +4,7 @@
             [cljsjs.moment]
             [iwaswhere-web.helpers :as h]
             [reagent.core :as r]
+            [iwaswhere-web.ui.entry.utils :as eu]
             [iwaswhere-web.utils.misc :as u]))
 
 (defn trash-icon
@@ -75,15 +76,15 @@
 (defn upvote-fn [entry op put-fn]
   "Create click function for like. Can handle both upvotes and downvotes."
   (fn [_ev]
-    (put-fn [:entry/update (update-in entry [:upvotes] op)])))
+    (put-fn [:entry/update (update-in @entry [:upvotes] op)])))
 
 (defn entry-actions
   "Entry-related action buttons. Hidden by default, become visible when mouse
    hovers over element, stays visible for a little while after mose leaves."
-  [entry put-fn edit-mode? toggle-edit local-cfg]
+  [ts put-fn edit-mode? toggle-edit local-cfg]
   (let [visible (r/atom false)
+        entry (:entry (eu/entry-reaction ts))
         hide-fn (fn [_ev] (.setTimeout js/window #(reset! visible false) 60000))
-        ts (:timestamp entry)
         query-id (:query-id local-cfg)
         tab-group (:tab-group local-cfg)
         toggle-map #(put-fn [:cmd/toggle
@@ -105,11 +106,11 @@
         open-external (up/add-search ts tab-group put-fn)
         upvote (upvote-fn entry inc put-fn)
         mouse-enter #(reset! visible true)]
-    (fn entry-actions-render [entry put-fn edit-mode? toggle-edit local-cfg]
-      (let [map? (:latitude entry)
-            upvotes (:upvotes entry)
-            prev-saved? (or (:last-saved entry)
-                            (< ts 1479563777132))]
+    (fn entry-actions-render [ts put-fn edit-mode? toggle-edit local-cfg]
+      (let [map? (:latitude @entry)
+            upvotes (:upvotes @entry)
+            prev-saved? (or (:last-saved @entry) (< ts 1479563777132))
+            comment? (:comment-for @entry)]
         [:div {:on-mouse-enter mouse-enter
                :on-mouse-leave hide-fn
                :style          {:opacity (if (or edit-mode? @visible) 1 0)}}
@@ -118,14 +119,11 @@
             {:on-click upvote
              :class    (if (pos? upvotes) "fa-thumbs-up" "fa-thumbs-o-up")}])
          (when map? [:span.fa.fa-map-o.toggle {:on-click toggle-map}])
-         (when prev-saved?
-           [edit-icon toggle-edit edit-mode? entry])
-         (when-not (:comment-for entry)
-           [:span.fa.fa-clock-o.toggle {:on-click new-pomodoro}])
-         (when-not (:comment-for entry)
+         (when prev-saved? [edit-icon toggle-edit edit-mode? @entry])
+         (when-not comment? [:span.fa.fa-clock-o.toggle {:on-click new-pomodoro}])
+         (when-not comment?
            [:span.fa.fa-comment-o.toggle {:on-click create-comment}])
-         (when (and (not (:comment-for entry)) prev-saved?)
+         (when (and (not comment?) prev-saved?)
            [:span.fa.fa-external-link.toggle {:on-click open-external}])
-         (when-not (:comment-for entry)
-           [new-link entry put-fn create-linked-entry])
+         (when-not comment? [new-link @entry put-fn create-linked-entry])
          [trash-icon trash-entry]]))))

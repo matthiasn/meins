@@ -12,29 +12,17 @@
             [iwaswhere-web.ui.entry.task :as task]
             [iwaswhere-web.ui.entry.briefing :as b]
             [iwaswhere-web.ui.entry.story :as es]
+            [iwaswhere-web.ui.entry.utils :as eu]
             [iwaswhere-web.ui.entry.thumbnails :as t]
             [cljsjs.moment]
             [iwaswhere-web.utils.misc :as u]
             [iwaswhere-web.helpers :as h]
             [clojure.set :as set]))
 
-(defn entry-reaction
-  [ts]
-  (let [new-entries (subscribe [:new-entries])
-        entries-map (subscribe [:entries-map])
-        combined-entries (subscribe [:combined-entries])
-        entry (reaction (get-in @combined-entries [ts]))
-        edit-mode (reaction (contains? @new-entries ts))]
-    {:entry       entry
-     :entries-map entries-map
-     :combined-entries combined-entries
-     :new-entries new-entries
-     :edit-mode   edit-mode}))
-
 (defn all-comments-set
   "Finds all comments for a particular entry."
   [ts]
-  (let [{:keys [entry combined-entries new-entries]} (entry-reaction ts)
+  (let [{:keys [entry combined-entries new-entries]} (eu/entry-reaction ts)
         comments-set (reaction (set (:comments @entry)))
         comments-filter (fn [[_ts c]] (= (:comment-for c) ts))
         local-comments (reaction (into {} (filter comments-filter @new-entries)))]
@@ -44,7 +32,7 @@
 (defn total-time-logged
   "Renders time logged in entry and its comments."
   [ts]
-  (let [{:keys [entry combined-entries]} (entry-reaction ts)
+  (let [{:keys [entry combined-entries]} (eu/entry-reaction ts)
         all-comments-set (all-comments-set ts)
         total-dur (reaction
                     (apply + (map #(:completed-time (get @combined-entries %))
@@ -58,7 +46,7 @@
   "Horizontally renders list with hashtags and mentions."
   [ts tab-group put-fn]
   (let [cfg (subscribe [:cfg])
-        entry (:entry (entry-reaction ts))
+        entry (:entry (eu/entry-reaction ts))
         redacted (reaction (:redacted @cfg))]
     (fn hashtags-mentions-render [ts tab-group put-fn]
       [:div.hashtags
@@ -81,7 +69,7 @@
    showing the warning that the entry is not saved yet."
   [ts put-fn local-cfg]
   (let [cfg (subscribe [:cfg])
-        {:keys [entry edit-mode entries-map new-entries]} (entry-reaction ts)
+        {:keys [entry edit-mode entries-map new-entries]} (eu/entry-reaction ts)
         linked-desc (reaction (get @entries-map (:linked-timestamp @entry)))
         show-map? (reaction (contains? (:show-maps-for @cfg) ts))
         active (reaction (:active @cfg))
@@ -99,59 +87,58 @@
                                     (put-fn [:entry/update-local @entry]))]
     (fn journal-entry-render [ts put-fn local-cfg]
       (let [edit-mode? @edit-mode
-            entry @entry
             linked-desc @linked-desc]
         [:div.entry {:on-drop       drop-fn
                      :on-drag-over  h/prevent-default
                      :on-drag-enter h/prevent-default}
-         [es/story-select entry put-fn edit-mode?]
-         [es/book-select entry put-fn edit-mode?]
+         [es/story-select @entry put-fn edit-mode?]
+         [es/book-select @entry put-fn edit-mode?]
          [:div.header
           [:div
            [:a [:time {:on-click add-search} formatted-time]]
-           [:time (u/visit-duration entry)]]
-          (if (= :pomodoro (:entry-type entry))
-            [p/pomodoro-header entry pomo-start edit-mode?]
-            [:div (when-not (:comment-for entry) [total-time-logged ts])])
+           [:time (u/visit-duration @entry)]]
+          (if (= :pomodoro (:entry-type @entry))
+            [p/pomodoro-header @entry pomo-start edit-mode?]
+            [:div (when-not (:comment-for @entry) [total-time-logged ts])])
           [:div
-           (when (seq (:linked-entries-list entry))
-             (let [ts (:timestamp entry)
+           (when (seq (:linked-entries-list @entry))
+             (let [ts (:timestamp @entry)
                    entry-active? (when-let [query-id (:query-id local-cfg)]
                                    (= (query-id @active) ts))]
                [:span.link-btn {:on-click set-active-fn
                                 :class    (when entry-active? "active")}
-                (str " linked: " (count (:linked-entries-list entry)))]))]
-          [a/entry-actions entry put-fn edit-mode? toggle-edit local-cfg]]
+                (str " linked: " (count (:linked-entries-list @entry)))]))]
+          [a/entry-actions ts put-fn edit-mode? toggle-edit local-cfg]]
          [hashtags-mentions-list ts tab-group put-fn]
-         [es/story-name-field entry edit-mode? put-fn]
-         [es/book-name-field entry edit-mode? put-fn]
+         [es/story-name-field @entry edit-mode? put-fn]
+         [es/book-name-field @entry edit-mode? put-fn]
          (if edit-mode?
-           [e/editable-md-render entry put-fn]
-           (if (and (empty? (:md entry)) linked-desc)
+           [e/editable-md-render @entry put-fn]
+           (if (and (empty? (:md @entry)) linked-desc)
              [md/markdown-render
               (update-in linked-desc [:md]
                          #(str % " <span class=\"fa fa-link\"></span>"))
               h/prevent-default]
-             [md/markdown-render entry toggle-edit]))
-         [c/custom-fields-div entry put-fn edit-mode?]
-         [m/audioplayer-view entry put-fn]
-         [l/leaflet-map entry (or @show-map? @show-all-maps?) local-cfg put-fn]
-         [m/image-view entry]
-         [m/videoplayer-view entry]
-         [m/imdb-view entry put-fn]
-         [task/task-details entry put-fn edit-mode?]
-         [task/habit-details entry put-fn edit-mode?]
-         [b/briefing-view entry put-fn edit-mode? local-cfg]
+             [md/markdown-render @entry toggle-edit]))
+         [c/custom-fields-div @entry put-fn edit-mode?]
+         [m/audioplayer-view @entry put-fn]
+         [l/leaflet-map @entry (or @show-map? @show-all-maps?) local-cfg put-fn]
+         [m/image-view @entry]
+         [m/videoplayer-view @entry]
+         [m/imdb-view @entry put-fn]
+         [task/task-details @entry put-fn edit-mode?]
+         [task/habit-details @entry put-fn edit-mode?]
+         [b/briefing-view @entry put-fn edit-mode? local-cfg]
          [:div.footer
-          [:div.likes (when-let [upvotes (:upvotes entry)]
+          [:div.likes (when-let [upvotes (:upvotes @entry)]
                         (when (pos? upvotes)
                           [:div
                            [:span.fa.fa-thumbs-up
-                            {:on-click (a/upvote-fn entry inc put-fn)}]
+                            {:on-click (a/upvote-fn @entry inc put-fn)}]
                            [:span.upvotes upvotes]
                            [:span.fa.fa-thumbs-down.toggle
-                            {:on-click (a/upvote-fn entry dec put-fn)}]]))]
-          [:div.word-count (u/count-words-formatted entry)]]]))))
+                            {:on-click (a/upvote-fn @entry dec put-fn)}]]))]
+          [:div.word-count (u/count-words-formatted @entry)]]]))))
 
 (defn entry-with-comments
   "Renders individual journal entry. Interaction with application state happens
@@ -161,7 +148,7 @@
    component, which is useful for displaying updated hashtags, or also for
    showing the warning that the entry is not saved yet."
   [ts put-fn local-cfg]
-  (let [{:keys [entry new-entries]} (entry-reaction ts)
+  (let [{:keys [entry new-entries]} (eu/entry-reaction ts)
         all-comments-set (all-comments-set ts)
         new-entry (reaction (get @new-entries ts))
         cfg (subscribe [:cfg])
