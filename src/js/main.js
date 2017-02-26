@@ -3,10 +3,14 @@ window.deps = {
     'react-dom' : require('react-dom'),
     'react-addons-perf' : require('react-addons-perf'),
     'draft-js' : require('draft-js'),
-    'react-responsive-carousel' : require('react-responsive-carousel').Carousel
+    'react-responsive-carousel' : require('react-responsive-carousel').Carousel,
+    'editor' : require ('./editor'),
+    'SearchFieldEditor' : require ('./SearchFieldEditor'),
 };
 
 window.React = window.deps['react'];
 window.ReactDOM = window.deps['react-dom'];
 window.Draft = window.deps['draft-js'];
 window.ReactPerf = window.deps['react-addons-perf'];
+window.MyEditor = window.deps['editor'];
+window.SearchFieldEditor = window.deps['SearchFieldEditor'];

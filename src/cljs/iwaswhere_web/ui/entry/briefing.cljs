@@ -100,11 +100,11 @@
                 ^{:key ts}
                 [:li.habit
                  {:on-click (up/add-search ts tab-group put-fn)}
-                 [:strong (-> waiting-habit
-                              :md
-                              (s/replace "#habit" "")
-                              s/split-lines
-                              first)]]))]
+                 [:strong (some-> waiting-habit
+                                  :md
+                                  (s/replace "#habit" "")
+                                  s/split-lines
+                                  first)]]))]
            [:form.briefing-details
             [:fieldset
              [:legend (or day "date not set")]

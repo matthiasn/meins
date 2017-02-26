@@ -188,6 +188,7 @@
 (s/def :iww.search-result/stats search-stats-spec)
 (s/def :iww.search-result/duration-ms string?)
 
+#_
 (s/def :state/new
   (s/keys :req-un [:iww.search-result/entries
                    :iww.search-result/entries-map

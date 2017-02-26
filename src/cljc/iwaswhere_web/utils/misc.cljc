@@ -84,7 +84,6 @@
       (or entry
           (let [missing-entry {:timestamp ts}]
             (put-fn [:entry/find missing-entry])
-            (prn missing-entry)
             missing-entry)))))
 
 (defn count-words

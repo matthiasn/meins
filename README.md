@@ -1,6 +1,6 @@
 # iWasWhere
 
-**iWasWhere** is a **personal information manager**, with a **geo-aware diary** or **log** and **task tracking**. It allows me to make sense of where I was and what I did there.
+**iWasWhere** is a **personal information manager** for improving your life, past, present and future. It starts with a **geo-aware diary** or **log** where each entry captures your geo-location and whatever you want to note about that moment. You can use hashtags and mentions to better organize your information. You can also track your **tasks** and **habits**.
 
 
 ## Motivation
@@ -11,7 +11,7 @@ I recently had tea with my 92-year-old grandma, and we were looking at her colle
 
 Then I decided to build an application that will provide me with the tools to plan (and record) my life better. It should allow me to write down every thought, note, photo, video or whatnot while keeping track of the location. In addition, I should be able to **retrieve information** so that I can always find anything later on. Since there will be a lot of private information that will accumulate over time, the data should not be stored in the cloud but rather locally.
 
-**iWasWhere** is what I came up with as a solution. I use it every day and I have so far recorded over **4,200** entries, in about 10 weeks. It is also a suitable sample application for my book **[Building a System in Clojure](https://leanpub.com/building-a-system-in-clojure)**. As a bonus, it could also be useful for anyone who would like to keep a record of their thoughts, ideas, and projects, all while recording the exact whereabouts on what took place and where it happened.
+**iWasWhere** is what I came up with as a solution. I use it every day and I have so far recorded over **21K** entries, in about 10 weeks. It is also a suitable sample application for my book **[Building a System in Clojure](https://leanpub.com/building-a-system-in-clojure)**. As a bonus, it could also be useful for anyone who would like to keep a record of their thoughts, ideas, and projects, all while recording the exact whereabouts on what took place and where it happened.
 
 
 ## Components

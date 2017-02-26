@@ -10,6 +10,22 @@ const config = {
         path: BUILD_DIR,
         filename: 'bundle.js'
     },
+    module: {
+        loaders: [
+            {
+                test: /.jsx?$/,
+                loader: 'babel-loader',
+                exclude: /node_modules/,
+                query: {
+                    presets: ['es2015', 'stage-0', 'react']
+                }
+            },
+            {
+                test: /\.css$/,
+                loader: "style-loader!css-loader"
+            }
+        ]
+    },
 };
 
 module.exports = config;

@@ -4,7 +4,8 @@
             [re-frame.core :refer [subscribe]]
             [iwaswhere-web.utils.parse :as ps]
             [reagent.ratom :refer-macros [reaction]]
-            [clojure.set :as set]))
+            [clojure.set :as set]
+            [iwaswhere-web.ui.draft :as draft]))
 
 (defn linked-filter-fn
   "Filter linked entries by search."
@@ -30,22 +31,32 @@
             linked-mapper (u/find-missing-entry @entries-map put-fn)
             linked-entries (mapv linked-mapper linked-entries-set)
             query-id (:query-id local-cfg)
-            on-input-fn #(put-fn [:linked-filter/set
-                                  {:search   (ps/parse-search
-                                               (.. % -target -innerText))
-                                   :query-id query-id}])
             linked-entries (if (:show-pvt conf)
                              linked-entries
                              (filter (u/pvt-filter conf @entries-map) linked-entries))
             linked-filter (query-id (:linked-filter conf))
             filter-fn (linked-filter-fn @entries-map linked-filter put-fn)
-            linked-entries (filter filter-fn linked-entries)]
+            linked-entries (filter filter-fn linked-entries)
+            hashtags (:hashtags @options)
+            pvt-hashtags (:pvt-hashtags @options)
+            show-pvt? (:show-pvt @cfg)
+            hashtags (if show-pvt? (concat hashtags pvt-hashtags) hashtags)
+            mentions (:mentions @options)
+            mentions-list (map (fn [m] {:name m}) mentions)
+            hashtags-list (map (fn [h] {:name h}) hashtags)
+            search-send (fn [plain state]
+                          (let [s (merge (ps/parse-search plain)
+                                         {:editor-state state})
+                                filter {:search s :query-id query-id}]
+                            (put-fn [:linked-filter/set filter])))
+            search-editor-state (if-let [editor-state (:editor-state linked-filter)]
+                                  (draft/editor-state-from-raw (clj->js editor-state))
+                                  (draft/editor-state-from-text ""))]
         (when linked-entries
           [:div.journal-entries
            (when (query-id (:active conf))
-             [:div.linked-search-field
-              {:content-editable true :on-input on-input-fn}
-              (:search-text (query-id (:linked-filter conf)))])
+             [draft/draft-search-field
+              search-editor-state search-send mentions-list hashtags-list])
            (for [entry linked-entries]
              (when (and (not (:comment-for entry))
                         (or (:new-entry entry) (:show-context conf)))

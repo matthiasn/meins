@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-PORT=7777 UPLOAD_PORT=3002 DATA_PATH="${HOME}/iWasWhere/data" java -jar bin/iwaswhere-web-0.1.34-standalone.jar
+PORT=7777 UPLOAD_PORT=3002 DATA_PATH="${HOME}/iWasWhere/data" java -jar bin/iwaswhere-web-0.1.35-standalone.jar

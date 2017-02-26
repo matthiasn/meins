@@ -22,6 +22,10 @@
   padding: 4px;
   min-height: 2em;
   background-color: $search-field-color;
+
+  .DraftEditor-root {
+    width: 100%;
+  }
 }
 
 .linked-search-field {

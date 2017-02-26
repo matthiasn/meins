@@ -50,6 +50,10 @@
   overflow-x: hidden;
   overflow-y: scroll;
   width: 100%;
+
+  .search-field {
+    flex-grow: 0;
+  }
 }
 
 .new-entries {
