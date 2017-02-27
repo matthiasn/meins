@@ -17,7 +17,9 @@
                     path)]
       [:div
        [:img {:src resized}]
-       #_[:p.legend (:md entry)]])))
+       [:p.legend
+        [:a {:href path :target "_blank"}
+         [:span.fa.fa-expand]]]])))
 
 (defn carousel
   "Renders react-responsive-carousel with linked images."

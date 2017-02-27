@@ -235,4 +235,4 @@
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.9);
     color: #fff; }
   .carousel:hover .slide .legend {
-    opacity: 1; }
+    opacity: 0.4; }
