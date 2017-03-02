@@ -102,9 +102,9 @@
                        put-fn (p/pomodoro-defaults ts) show-comments)
         trash-entry #(if edit-mode?
                        (put-fn [:entry/remove-local {:timestamp ts}])
-                       (put-fn [:entry/trash entry]))
+                       (put-fn [:entry/trash @entry]))
         open-external (up/add-search ts tab-group put-fn)
-        upvote (upvote-fn entry inc put-fn)
+        upvote (upvote-fn @entry inc put-fn)
         mouse-enter #(reset! visible true)]
     (fn entry-actions-render [ts put-fn edit-mode? toggle-edit local-cfg]
       (let [map? (:latitude @entry)

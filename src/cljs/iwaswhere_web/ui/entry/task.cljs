@@ -81,6 +81,31 @@
               [:option {:value 96} "4 days"]
               [:option {:value 168} "1 week"]]])]]))))
 
+(defn next-habit-entry
+  "Generate next habit entry, as appropriate at the time of calling.
+   Store this to actually create entry."
+  [entry]
+  (let [next-hh-mm (-> entry
+                       :habit
+                       :active-from
+                       (js/moment)
+                       (hh-mm))
+        active-days (filter identity (map (fn [[k v]] (when v k)) (get-in entry [:habit :days])))
+        active-days (concat active-days (map #(+ % 7) active-days))
+        active-days (filter number? active-days)
+        current-day (.day (js/moment))
+        next-day-int (first (drop-while #(>= current-day %) active-days))
+        next-day (ymd (.add (js/moment) (- next-day-int current-day) "d"))
+        next-active (str next-day "T" next-hh-mm)]
+    (-> entry
+        (assoc-in [:timestamp] (st/now))
+        (assoc-in [:habit :active-from] next-active)
+        (assoc-in [:habit :done] false)
+        (dissoc :linked-entries-list)
+        (dissoc :last-saved)
+        (dissoc :latitude)
+        (dissoc :longitude))))
+
 (defn habit-details
   [entry put-fn edit-mode?]
   (let [active-from (fn [entry]
@@ -92,32 +117,23 @@
         day-select (fn [entry day]
                      (fn [ev]
                        (let [v (-> ev .-nativeEvent .-target .-value)
-                             updated (update-in entry [:habit :days day] not)]
+                             updated (update-in entry [:habit :days day] not)
+                             ; updated (update-in entry [:habit :days day] #(set))
+                             ]
+                         (prn updated)
                          (put-fn [:entry/update-local updated]))))
         day-checkbox (fn [entry day]
                        [:input {:type      :checkbox
                                 :checked   (get-in entry [:habit :days day])
                                 :on-change (day-select entry day)}])
-        done (fn [entry]
+
+        done
+        (fn [entry]
                (fn [ev]
                  (if-not (-> entry :habit :next-entry)
 
                    ;; check off and create next habit entry
-                   (let [next-hh-mm (-> entry
-                                        :habit
-                                        :active-from
-                                        (js/moment)
-                                        (hh-mm))
-                         next-day (ymd (.add (js/moment) 1 "d"))
-                         next-active (str next-day "T" next-hh-mm)
-                         next-entry (-> entry
-                                        (assoc-in [:timestamp] (st/now))
-                                        (assoc-in [:habit :active-from] next-active)
-                                        (assoc-in [:habit :done] false)
-                                        (dissoc :linked-entries-list)
-                                        (dissoc :last-saved)
-                                        (dissoc :latitude)
-                                        (dissoc :longitude))
+                   (let [next-entry (next-habit-entry entry)
                          updated (-> entry
                                      (update-in [:habit :done] not)
                                      (assoc-in [:habit :next-entry] (:timestamp next-entry)))]
@@ -134,13 +150,13 @@
          [:fieldset
           [:legend "Habit details"]
           [:div
-           [:label "Sun"] [day-checkbox entry :sun]
-           [:label "Mon"] [day-checkbox entry :mon]
-           [:label "Tue"] [day-checkbox entry :tue]
-           [:label "Wed"] [day-checkbox entry :wed]
-           [:label "Thu"] [day-checkbox entry :thu]
-           [:label "Fri"] [day-checkbox entry :fri]
-           [:label "Sat"] [day-checkbox entry :sat]]
+           [:label "Sun"] [day-checkbox entry 0]
+           [:label "Mon"] [day-checkbox entry 1]
+           [:label "Tue"] [day-checkbox entry 2]
+           [:label "Wed"] [day-checkbox entry 3]
+           [:label "Thu"] [day-checkbox entry 4]
+           [:label "Fri"] [day-checkbox entry 5]
+           [:label "Sat"] [day-checkbox entry 6]]
           [:div
            [:label "Active from: "]
            [:input {:type      :datetime-local
