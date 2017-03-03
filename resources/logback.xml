@@ -18,9 +18,9 @@
             <!-- keep 30 days' worth of history -->
             <maxHistory>30</maxHistory>
         </rollingPolicy>
+        <immediateFlush>true</immediateFlush>
         <encoder>
             <pattern>%d{dd-MM-yy HH:mm:ss.SSS} [%-20.20thread] %-5level %25.25logger{25} - %msg%n</pattern>
-            <immediateFlush>true</immediateFlush>
         </encoder>
     </appender>
 
@@ -30,9 +30,9 @@
             <fileNamePattern>/tmp/iwaswhere.misc.log.%d{yyyy-MM-dd}</fileNamePattern>
             <maxHistory>30</maxHistory>
         </rollingPolicy>
+        <immediateFlush>true</immediateFlush>
         <encoder>
             <pattern>%d{dd-MM-yy HH:mm:ss.SSS} [%-20.20thread] %-5level %25.25logger{25} %class - %msg%n</pattern>
-            <immediateFlush>true</immediateFlush>
         </encoder>
     </appender>
 

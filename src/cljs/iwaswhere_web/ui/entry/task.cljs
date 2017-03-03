@@ -117,16 +117,12 @@
         day-select (fn [entry day]
                      (fn [ev]
                        (let [v (-> ev .-nativeEvent .-target .-value)
-                             updated (update-in entry [:habit :days day] not)
-                             ; updated (update-in entry [:habit :days day] #(set))
-                             ]
-                         (prn updated)
+                             updated (update-in entry [:habit :days day] not)]
                          (put-fn [:entry/update-local updated]))))
         day-checkbox (fn [entry day]
                        [:input {:type      :checkbox
                                 :checked   (get-in entry [:habit :days day])
                                 :on-change (day-select entry day)}])
-
         done
         (fn [entry]
                (fn [ev]

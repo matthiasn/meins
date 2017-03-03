@@ -3,10 +3,10 @@
             [iwaswhere-web.utils.misc :as u]
             [iwaswhere-web.utils.parse :as p]
             [iwaswhere-web.ui.draft :as draft]
+            [reagent.ratom :refer-macros [reaction]]
             [clojure.string :as s]
             [clojure.set :as set]
-            [re-frame.core :refer [reg-event-db path reg-sub dispatch
-                                   dispatch-sync subscribe]]
+            [re-frame.core :refer [subscribe]]
             [reagent.core :as r]))
 
 (defn tags-view
@@ -40,40 +40,29 @@
   (let [query-cfg (subscribe [:query-cfg])
         cfg (subscribe [:cfg])
         options (subscribe [:options])
-        state (r/atom {:local-query (query-id (:queries @query-cfg))
-                       :query-id    query-id
-                       :focused     true})
-        q (query-id (:queries @query-cfg))
-        search-editor-state (editor-state q)]
+        state (r/atom {:query-id query-id
+                       :focused  true})
+        initial-query (query-id (:queries @query-cfg))
+        search-editor-state (editor-state initial-query)]
     (fn [query-id put-fn]
-      (let [current-query (query-id (:queries @query-cfg))
-
+      (let [query (query-id (:queries @query-cfg))
             search-send (fn [text editor-state]
-                          (let [s (merge current-query
+                          (let [s (merge query
                                          (p/parse-search text)
                                          {:editor-state editor-state})]
                             (put-fn [:search/update s])))
 
-            update-search-fn (fn [search-str]
-                               (let [s (merge (:local-query @state)
-                                              (p/parse-search search-str))]
-                                 (put-fn [:search/update s])))
-
-            before-cursor (h/string-before-cursor (:search-text current-query))
             show-pvt? (:show-pvt @cfg)
             hashtags (:hashtags @options)
             pvt-hashtags (:pvt-hashtags @options)
             hashtags (if show-pvt? (concat hashtags pvt-hashtags) hashtags)
             mentions (:mentions @options)
-            [curr-tag f-tags] (p/autocomplete-tags before-cursor "#" hashtags)
-            [curr-mention f-mentions] (p/autocomplete-tags before-cursor "@" mentions)
 
             story-select-handler
             (fn [ev]
               (let [v (-> ev .-nativeEvent .-target .-value)
                     story (js/parseInt v)
-                    q (merge current-query
-                             {:story (when-not (js/isNaN story) story)})]
+                    q (merge query {:story (when-not (js/isNaN story) story)})]
                 (put-fn [:search/update q])))
 
             ;mentions-list (map (fn [m] {:name (subs m 1)}) mentions)
@@ -83,19 +72,18 @@
             hashtags-list (map (fn [h] {:name h}) hashtags)]
 
         (when (not= (:query-id @state) query-id)
-          (let [q (query-id (:queries @query-cfg))
-                new-editor-state (editor-state q)]
+          (let [new-editor-state (editor-state query)]
             (reset! search-editor-state @new-editor-state))
           (swap! state assoc-in [:query-id] query-id))
 
         [:div.search
-         [tags-view current-query]
+         [tags-view query]
          (when (seq mentions-list)
            ^{:key query-id}
            [:div.search-row
             [draft/draft-search-field
              search-editor-state search-send mentions-list hashtags-list]
-            [:select {:value     (or (:story current-query) "")
+            [:select {:value     (or (:story query) "")
                       :on-change story-select-handler}
              [:option {:value ""} "no story selected"]
              (for [[id story] (:sorted-stories @options)]
