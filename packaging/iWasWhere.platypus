@@ -243,13 +243,13 @@
 	<key>Suffixes</key>
 	<array/>
 	<key>TextBackground</key>
-	<string>#ffffff</string>
+	<string>#515151</string>
 	<key>TextEncoding</key>
 	<integer>4</integer>
 	<key>TextFont</key>
 	<string>Monaco</string>
 	<key>TextForeground</key>
-	<string>#000000</string>
+	<string>#55fc3b</string>
 	<key>TextSize</key>
 	<real>8</real>
 	<key>UniformTypes</key>
