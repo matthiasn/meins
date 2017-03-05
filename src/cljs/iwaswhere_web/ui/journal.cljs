@@ -7,18 +7,6 @@
             [clojure.set :as set]
             [iwaswhere-web.ui.draft :as draft]))
 
-(defn linked-filter-fn
-  "Filter linked entries by search."
-  [entries-map linked-filter put-fn]
-  (fn [entry]
-    (let [comments-mapper (u/find-missing-entry entries-map put-fn)
-          comments (mapv comments-mapper (:comments entry))
-          combined-tags (reduce #(set/union %1 (:tags %2)) (:tags entry)
-                                comments)]
-      (and (set/subset? (:tags linked-filter) combined-tags)
-           (empty? (set/intersection (:not-tags linked-filter)
-                                     combined-tags))))))
-
 (defn linked-entries-view
   "Renders linked entries in right side column, filtered by local search."
   [put-fn local-cfg active-entry]
@@ -35,7 +23,7 @@
                              linked-entries
                              (filter (u/pvt-filter conf @entries-map) linked-entries))
             linked-filter (query-id (:linked-filter conf))
-            filter-fn (linked-filter-fn @entries-map linked-filter put-fn)
+            filter-fn (u/linked-filter-fn @entries-map linked-filter put-fn)
             linked-entries (filter filter-fn linked-entries)
             hashtags (:hashtags @options)
             pvt-hashtags (:pvt-hashtags @options)

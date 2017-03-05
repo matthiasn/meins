@@ -118,3 +118,14 @@
       (dissoc :new-entry)
       (dissoc :pomodoro-running)
       (dissoc :linked-entries-list)))
+
+(defn linked-filter-fn
+  "Filter linked entries by search."
+  [entries-map linked-filter put-fn]
+  (fn [entry]
+    (let [comments-mapper (find-missing-entry entries-map put-fn)
+          comments (mapv comments-mapper (:comments entry))
+          combined-tags (reduce #(set/union %1 (:tags %2)) (:tags entry) comments)]
+      (and (set/subset? (:tags linked-filter) combined-tags)
+           (empty? (set/intersection (:not-tags linked-filter)
+                                     combined-tags))))))

@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [0.1.36] - 2017-03-04
+### Changed
+- open tasks for briefing
+
 ## [0.1.35] - 2017-02-26
 ### Changed
 - Draft.js
