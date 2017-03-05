@@ -9,7 +9,8 @@
             [clojure.pprint :as pp]
             [iwaswhere-web.utils.parse :as up]
             [clojure.string :as s]
-            [iwaswhere-web.ui.entry.utils :as eu]))
+            [iwaswhere-web.ui.entry.utils :as eu]
+            [reagent.core :as r]))
 
 (defn time-by-stories-list
   "Render list of times spent on individual stories, plus the total."
@@ -63,12 +64,12 @@
       (let [waiting-habits @waiting-habits]
         (when (seq waiting-habits)
           [:div.habits
-           [:h5 "Waiting habits:"]
+           [:h6 "Waiting habits:"]
            [:ul
             (for [waiting-habit waiting-habits]
               (let [ts (:timestamp waiting-habit)]
                 ^{:key ts}
-                [:li.habit
+                [:li
                  {:on-click (up/add-search ts tab-group put-fn)}
                  [:strong (some-> waiting-habit
                                   :md
@@ -80,11 +81,19 @@
   "Show open tasks that are also linked with the briefing entry."
   [ts local-cfg put-fn]
   (let [entry (:entry (eu/entry-reaction ts))
+        local (r/atom {:filter :open})
         cfg (subscribe [:cfg])
         results (subscribe [:results])
         options (subscribe [:options])
         entries-map (subscribe [:entries-map])
-        linked-filter (up/parse-search "#task ~#done ~#closed ~#backlog")]
+        linked-filters {:open    (up/parse-search "#task ~#done ~#closed ~#backlog")
+                        :done    (up/parse-search "#task #done")
+                        :closed  (up/parse-search "#task #closed")
+                        :backlog (up/parse-search "#task #backlog")}
+        filter-btn (fn [fk]
+                     [:span.filter {:class    (when (= fk (:filter @local)) "current")
+                                    :on-click #(swap! local assoc-in [:filter] fk)}
+                      (name fk)])]
     (fn open-linked-tasks-render [ts local-cfg put-fn]
       (let [{:keys [tab-group query-id]} local-cfg
             linked-entries-set (into (sorted-set) (:linked-entries-list @entry))
@@ -94,24 +103,29 @@
             linked-entries (if (:show-pvt conf)
                              linked-entries
                              (filter (u/pvt-filter conf @entries-map) linked-entries))
-            filter-fn (u/linked-filter-fn @entries-map linked-filter put-fn)
+            current-filter (get linked-filters (:filter @local))
+            filter-fn (u/linked-filter-fn @entries-map current-filter put-fn)
             linked-entries (filter filter-fn linked-entries)]
-        (when (seq linked-entries)
-          [:div.habits
-           [:h5 "Open tasks:"]
-           [:ul
-            (for [linked linked-entries]
-              (let [ts (:timestamp linked)]
-                ^{:key ts}
-                [:li.habit
-                 {:on-click (up/add-search ts tab-group put-fn)}
-                 [:strong (some-> linked
-                                  :md
-                                  (s/replace "#habit" "")
-                                  (s/replace "##" "")
-                                  s/trim
-                                  s/split-lines
-                                  first)]]))]])))))
+        [:div.linked-tasks
+         [:div
+          [:strong "Tasks:"]
+          [filter-btn :open]
+          [filter-btn :done]
+          [filter-btn :closed]
+          [filter-btn :backlog]]
+         [:ul
+          (for [linked linked-entries]
+            (let [ts (:timestamp linked)]
+              ^{:key ts}
+              [:li
+               {:on-click (up/add-search ts tab-group put-fn)}
+               [:strong (some-> linked
+                                :md
+                                (s/replace "#habit" "")
+                                (s/replace "##" "")
+                                s/trim
+                                s/split-lines
+                                first)]]))]]))))
 
 (defn briefing-view
   [entry put-fn edit-mode? local-cfg]
@@ -141,7 +155,7 @@
       (when (contains? (:tags entry) "#briefing")
         (let [books @books
               ts (:timestamp entry)
-              {:keys [pomodoro-stats  task-stats wordcount-stats]} @chart-data
+              {:keys [pomodoro-stats task-stats wordcount-stats]} @chart-data
               day (-> entry :briefing :day)
               day-stats (get pomodoro-stats day)
               word-stats (get wordcount-stats day)

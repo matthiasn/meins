@@ -115,3 +115,19 @@ a .toggle {
 .toggle-cmds {
   margin-right: 30px;
 }
+
+.linked-tasks {
+  .filter {
+    background-color: #DDD;
+    color: #AAA;
+    font-size: 0.8em;
+    padding: 1px 5px;
+    margin: 0 2px 0 3px;
+    cursor: pointer;
+  }
+
+  .current {
+    background-color: $show-more;
+    color: whitesmoke;
+  }
+}
