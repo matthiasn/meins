@@ -29,6 +29,7 @@
          [:span.mention tag])])))
 
 (defn editor-state
+  "Create editor-state, either from deserialized state or from search string."
   [q]
   (if-let [editor-state (:editor-state q)]
     (draft/editor-state-from-raw (clj->js editor-state))
@@ -40,41 +41,33 @@
   (let [query-cfg (subscribe [:query-cfg])
         cfg (subscribe [:cfg])
         options (subscribe [:options])
-        state (r/atom {:query-id query-id
-                       :focused  true})
         initial-query (query-id (:queries @query-cfg))
         search-editor-state (editor-state initial-query)]
     (fn [query-id put-fn]
       (let [query (query-id (:queries @query-cfg))
+            show-pvt? (:show-pvt @cfg)
+            hashtags (:hashtags @options)
+            pvt-hashtags (:pvt-hashtags @options)
+            hashtags (if show-pvt? (concat hashtags pvt-hashtags) hashtags)
+            mentions-list (map (fn [m] {:name m}) (:mentions @options))
+            hashtags-list (map (fn [h] {:name h}) hashtags)
+
             search-send (fn [text editor-state]
                           (let [s (merge query
                                          (p/parse-search text)
                                          {:editor-state editor-state})]
                             (put-fn [:search/update s])))
 
-            show-pvt? (:show-pvt @cfg)
-            hashtags (:hashtags @options)
-            pvt-hashtags (:pvt-hashtags @options)
-            hashtags (if show-pvt? (concat hashtags pvt-hashtags) hashtags)
-            mentions (:mentions @options)
-
             story-select-handler
             (fn [ev]
               (let [v (-> ev .-nativeEvent .-target .-value)
                     story (js/parseInt v)
                     q (merge query {:story (when-not (js/isNaN story) story)})]
-                (put-fn [:search/update q])))
+                (put-fn [:search/update q])))]
 
-            ;mentions-list (map (fn [m] {:name (subs m 1)}) mentions)
-            ;hashtags-list (map (fn [m] {:name (subs m 1)}) hashtags)
-
-            mentions-list (map (fn [m] {:name m}) mentions)
-            hashtags-list (map (fn [h] {:name h}) hashtags)]
-
-        (when (not= (:query-id @state) query-id)
+        (when (not= initial-query query)
           (let [new-editor-state (editor-state query)]
-            (reset! search-editor-state @new-editor-state))
-          (swap! state assoc-in [:query-id] query-id))
+            (reset! search-editor-state @new-editor-state)))
 
         [:div.search
          [tags-view query]
