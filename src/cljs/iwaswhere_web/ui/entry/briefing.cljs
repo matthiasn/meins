@@ -45,6 +45,37 @@
                  {:style {:background-color (cc/item-color book-name)}}]
                 [:strong.name book-name] (u/duration-string v)]))])))))
 
+(defn waiting-habits-list
+  [tab-group put-fn]
+  (let [cfg (subscribe [:cfg])
+        results (subscribe [:results])
+        options (subscribe [:options])
+        entries-map (subscribe [:entries-map])
+        waiting-habits (reaction
+                         (let [entries-map @entries-map
+                               entries (map (fn [ts] (get entries-map ts))
+                                            (:waiting-habits @results))
+                               conf (merge @cfg @options)]
+                           (if (:show-pvt @cfg)
+                             entries
+                             (filter (u/pvt-filter conf entries-map) entries))))]
+    (fn waiting-habits-list-render [tab-group put-fn]
+      (let [waiting-habits @waiting-habits]
+        (when (seq waiting-habits)
+          [:div.habits
+           [:h5 "Waiting habits:"]
+           [:ul
+            (for [waiting-habit waiting-habits]
+              (let [ts (:timestamp waiting-habit)]
+                ^{:key ts}
+                [:li.habit
+                 {:on-click (up/add-search ts tab-group put-fn)}
+                 [:strong (some-> waiting-habit
+                                  :md
+                                  (s/replace "#habit" "")
+                                  s/split-lines
+                                  first)]]))]])))))
+
 (defn briefing-view
   [entry put-fn edit-mode? local-cfg]
   (let [chart-data (subscribe [:chart-data])
@@ -55,22 +86,13 @@
         results (subscribe [:results])
         cfg (subscribe [:cfg])
 
-        waiting-habits
-        (reaction
-          (let [entries-map @entries-map
-                conf (merge @cfg @options)
-                entries (map (fn [ts] (get entries-map ts))
-                             (:waiting-habits @results))]
-            (if (:show-pvt @cfg)
-              entries
-              (filter (u/pvt-filter conf entries-map) entries))))
-
         input-fn
         (fn [entry]
           (fn [ev]
             (let [day (-> ev .-nativeEvent .-target .-value)
                   updated (assoc-in entry [:briefing :day] day)]
               (put-fn [:entry/update-local updated]))))
+
         time-alloc-input-fn
         (fn [entry book]
           (fn [ev]
@@ -81,8 +103,7 @@
     (fn briefing-render [entry put-fn edit-mode? local-cfg]
       (when (contains? (:tags entry) "#briefing")
         (let [books @books
-              {:keys [pomodoro-stats activity-stats task-stats wordcount-stats
-                      daily-summary-stats media-stats]} @chart-data
+              {:keys [pomodoro-stats  task-stats wordcount-stats]} @chart-data
               day (-> entry :briefing :day)
               day-stats (get pomodoro-stats day)
               word-stats (get wordcount-stats day)
@@ -92,19 +113,8 @@
               remaining (cd/remaining-times (:time-by-book day-stats) allocation)
               past-7-days (cd/past-7-days pomodoro-stats :time-by-book)
               tab-group (:tab-group local-cfg)]
-          [:div.habits
-           [:h5 "Waiting habits:"]
-           [:ul
-            (for [waiting-habit @waiting-habits]
-              (let [ts (:timestamp waiting-habit)]
-                ^{:key ts}
-                [:li.habit
-                 {:on-click (up/add-search ts tab-group put-fn)}
-                 [:strong (some-> waiting-habit
-                                  :md
-                                  (s/replace "#habit" "")
-                                  s/split-lines
-                                  first)]]))]
+          [:div
+           [waiting-habits-list tab-group put-fn]
            [:form.briefing-details
             [:fieldset
              [:legend (or day "date not set")]
