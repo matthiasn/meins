@@ -52,14 +52,17 @@
         results (subscribe [:results])
         options (subscribe [:options])
         entries-map (subscribe [:entries-map])
-        waiting-habits (reaction
-                         (let [entries-map @entries-map
-                               entries (map (fn [ts] (get entries-map ts))
-                                            (:waiting-habits @results))
-                               conf (merge @cfg @options)]
-                           (if (:show-pvt @cfg)
-                             entries
-                             (filter (u/pvt-filter conf entries-map) entries))))]
+        
+        waiting-habits
+        (reaction
+          (let [entries-map @entries-map
+                entries (->> (:waiting-habits @results)
+                             (map (fn [ts] (get entries-map ts)))
+                             (sort-by #(or (-> % :habit :priority) :X)))
+                conf (merge @cfg @options)]
+            (if (:show-pvt @cfg)
+              entries
+              (filter (u/pvt-filter conf entries-map) entries))))]
     (fn waiting-habits-list-render [tab-group put-fn]
       (let [waiting-habits @waiting-habits]
         (when (seq waiting-habits)
@@ -108,7 +111,7 @@
             filter-fn (u/linked-filter-fn @entries-map current-filter put-fn)
             linked-entries (->> linked-entries
                                 (filter filter-fn)
-                                (sort-by #(-> % :task :priority)))]
+                                (sort-by #(or (-> % :task :priority) :X)))]
         [:div.linked-tasks
          [:div
           [:strong "Tasks:"]
