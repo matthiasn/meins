@@ -23,13 +23,13 @@
 
 (defn carousel
   "Renders react-responsive-carousel with linked images."
-  [entry linked]
-  (let [react-responsive-carousel (aget js/window "deps" "react-responsive-carousel")
-        ts (:timestamp entry)]
-    (when (seq linked)
-      (into
-        [:> react-responsive-carousel]
-        (mapv (fn [img-entry] (image-view img-entry "?width=600")) linked)))))
+  [ts linked]
+  (let [responsive-carousel (aget js/window "deps" "react-responsive-carousel")]
+    (fn [ts linked]
+      (when (seq linked)
+        (into
+          [:> responsive-carousel]
+          (mapv (fn [img-entry] (image-view img-entry "?width=600")) linked))))))
 
 (defn thumbnails
   "Renders thumbnails of photos in linked entries. Respects private entries."
@@ -50,4 +50,4 @@
                        (filter (u/pvt-filter @options @entries-map) with-imgs))]
         (when-not entry-active?
           [:div.thumbnails
-           [carousel entry filtered]])))))
+           [carousel ts filtered]])))))
