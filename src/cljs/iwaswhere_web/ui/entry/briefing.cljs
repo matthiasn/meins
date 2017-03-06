@@ -29,14 +29,6 @@
           [:div.story-time
            (when (seq dur)
              [:div "Logged: " [:strong dur] " in " (:total day-stats) " entries."])
-           [cc/horizontal-bar stories :story-name time-by-story y-scale]
-           (for [[story v] (:time-by-story day-stats)]
-             (let [story-name (or (:story-name (get stories story)) "none")]
-               ^{:key story}
-               [:div
-                [:span.legend
-                 {:style {:background-color (cc/item-color story-name)}}]
-                [:strong.name story-name] (u/duration-string v)]))
            [cc/horizontal-bar books :book-name time-by-book y-scale]
            (for [[book v] (:time-by-book day-stats)]
              (let [book-name (or (:book-name (get books book)) "none")]
@@ -44,7 +36,15 @@
                [:div
                 [:span.legend
                  {:style {:background-color (cc/item-color book-name)}}]
-                [:strong.name book-name] (u/duration-string v)]))])))))
+                [:strong.name book-name] (u/duration-string v)]))
+           [cc/horizontal-bar stories :story-name time-by-story y-scale]
+           (for [[story v] (:time-by-story day-stats)]
+             (let [story-name (or (:story-name (get stories story)) "none")]
+               ^{:key story}
+               [:div
+                [:span.legend
+                 {:style {:background-color (cc/item-color story-name)}}]
+                [:strong.name story-name] (u/duration-string v)]))])))))
 
 (defn waiting-habits-list
   [tab-group put-fn]
@@ -52,7 +52,7 @@
         results (subscribe [:results])
         options (subscribe [:options])
         entries-map (subscribe [:entries-map])
-        
+
         waiting-habits
         (reaction
           (let [entries-map @entries-map
@@ -83,12 +83,12 @@
 
 (defn open-linked-tasks-list
   "Show open tasks that are also linked with the briefing entry."
-  [ts local-cfg put-fn]
+  [ts local local-cfg put-fn]
   (let [entry (:entry (eu/entry-reaction ts))
-        local (r/atom {:filter :open})
         cfg (subscribe [:cfg])
         results (subscribe [:results])
         options (subscribe [:options])
+        stories (reaction (:stories @options))
         entries-map (subscribe [:entries-map])
         linked-filters {:open    (up/parse-search "#task ~#done ~#closed ~#backlog")
                         :done    (up/parse-search "#task #done")
@@ -98,7 +98,7 @@
                      [:span.filter {:class    (when (= fk (:filter @local)) "current")
                                     :on-click #(swap! local assoc-in [:filter] fk)}
                       (name fk)])]
-    (fn open-linked-tasks-render [ts local-cfg put-fn]
+    (fn open-linked-tasks-render [ts local local-cfg put-fn]
       (let [{:keys [tab-group query-id]} local-cfg
             linked-entries-set (into (sorted-set) (:linked-entries-list @entry))
             linked-mapper (u/find-missing-entry @entries-map put-fn)
@@ -109,8 +109,14 @@
                              (filter (u/pvt-filter conf @entries-map) linked-entries))
             current-filter (get linked-filters (:filter @local))
             filter-fn (u/linked-filter-fn @entries-map current-filter put-fn)
+            book-filter (fn [entry]
+                          (if-let [selected (:selected @local)]
+                            (let [story (get @stories (:linked-story entry))]
+                              (= selected (:linked-book story)))
+                            true))
             linked-entries (->> linked-entries
                                 (filter filter-fn)
+                                (filter book-filter)
                                 (sort-by #(or (-> % :task :priority) :X)))]
         [:div.linked-tasks
          [:div
@@ -137,6 +143,7 @@
 (defn briefing-view
   [entry put-fn edit-mode? local-cfg]
   (let [chart-data (subscribe [:chart-data])
+        local (r/atom {:filter :open})
         stats (subscribe [:stats])
         options (subscribe [:options])
         books (reaction (:books @options))
@@ -174,7 +181,7 @@
               tab-group (:tab-group local-cfg)]
           [:div
            [waiting-habits-list tab-group put-fn]
-           [open-linked-tasks-list ts local-cfg put-fn]
+           [open-linked-tasks-list ts local local-cfg put-fn]
            [:form.briefing-details
             [:fieldset
              [:legend (or day "date not set")]
@@ -193,7 +200,6 @@
                [:div
                 [:strong (:started-tasks-cnt @stats)] " started tasks, "
                 [:strong (:word-count word-stats)] " words written."])
-             (when day-stats [time-by-stories-list day-stats])
              [:div [cc/horizontal-bar books :book-name allocation 0.0045]]
              [:div [cc/horizontal-bar books :book-name remaining 0.0045]]
              [:div
@@ -205,11 +211,15 @@
               (for [[k v] books]
                 (let [allocation (get-in entry [:briefing :time-allocation k] 0)
                       actual (get-in (:time-by-book day-stats) [k] 0)
-                      remaining (- allocation actual)]
+                      remaining (- allocation actual)
+                      click (fn [_]
+                              (swap! local update-in [:selected] #(if (= k %) nil k)))]
                   ^{:key (str :time-allocation k)}
                   [:div
                    (when (or (pos? allocation) edit-mode?)
                      [:div
+                      {:on-click click
+                       :class    (when (= k (:selected @local)) "selected")}
                       [:span.legend
                        {:style {:background-color (cc/item-color (:book-name v))}}]
                       [:strong.name (:book-name v)]
@@ -220,4 +230,5 @@
                         (when allocation
                           [:span.allocated (u/duration-string allocation)]))
                       (when (pos? remaining)
-                        [:span (u/duration-string remaining)])])]))]]]])))))
+                        [:span (u/duration-string remaining)])])]))]
+             (when day-stats [time-by-stories-list day-stats])]]])))))

@@ -202,6 +202,12 @@ $activity-weekend: lighten($activity, 30);
     margin-right: 5px;
     display: inline-block;
   }
+  div {
+    cursor: pointer;
+  }
+  .selected {
+    background-color: #CCC;
+  }
 }
 
 .times-by-day {
