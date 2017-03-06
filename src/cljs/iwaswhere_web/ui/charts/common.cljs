@@ -127,7 +127,7 @@
   (let [data (cd/time-by-entity-stacked time-by-entities)]
     (when (seq time-by-entities)
       [:svg
-       {:viewBox (str "0 0 300 15")}
+       {:viewBox (str "0 0 300 12")}
        [:g (for [[entity {:keys [x v]}] data]
              (let [w (* y-scale v)
                    x (* y-scale x)

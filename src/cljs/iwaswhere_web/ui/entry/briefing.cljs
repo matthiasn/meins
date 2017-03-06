@@ -14,31 +14,26 @@
 
 (defn time-by-stories-list
   "Render list of times spent on individual stories, plus the total."
-  [day-stats]
+  [day-stats local]
   (let [stories (subscribe [:stories])
-        books (subscribe [:books])]
-    (fn [day-stats]
+        books (subscribe [:books])
+        book-filter (fn [[k v]]
+                      (if-let [selected (:selected @local)]
+                        (let [story (get @stories k)]
+                          (= selected (:linked-book story)))
+                        true))]
+    (fn [day-stats local]
       (let [stories @stories
             books @books
             dur (u/duration-string (:total-time day-stats))
             date (:date-string day-stats)
-            time-by-book (:time-by-book day-stats)
             time-by-story (:time-by-story day-stats)
+            time-by-story (->> day-stats :time-by-story (filter book-filter))
             y-scale 0.0045]
         (when date
           [:div.story-time
-           (when (seq dur)
-             [:div "Logged: " [:strong dur] " in " (:total day-stats) " entries."])
-           [cc/horizontal-bar books :book-name time-by-book y-scale]
-           (for [[book v] (:time-by-book day-stats)]
-             (let [book-name (or (:book-name (get books book)) "none")]
-               ^{:key book}
-               [:div
-                [:span.legend
-                 {:style {:background-color (cc/item-color book-name)}}]
-                [:strong.name book-name] (u/duration-string v)]))
            [cc/horizontal-bar stories :story-name time-by-story y-scale]
-           (for [[story v] (:time-by-story day-stats)]
+           (for [[story v] time-by-story]
              (let [story-name (or (:story-name (get stories story)) "none")]
                ^{:key story}
                [:div
@@ -172,11 +167,13 @@
               {:keys [pomodoro-stats task-stats wordcount-stats]} @chart-data
               day (-> entry :briefing :day)
               day-stats (get pomodoro-stats day)
+              dur (u/duration-string (:total-time day-stats))
               word-stats (get wordcount-stats day)
               {:keys [tasks-cnt done-cnt closed-cnt]} (get task-stats day)
               started (:started-tasks-cnt @stats)
               allocation (-> entry :briefing :time-allocation)
-              remaining (cd/remaining-times (:time-by-book day-stats) allocation)
+              actual-times (:time-by-book day-stats)
+              remaining (cd/remaining-times actual-times allocation)
               past-7-days (cd/past-7-days pomodoro-stats :time-by-book)
               tab-group (:tab-group local-cfg)]
           [:div
@@ -195,20 +192,22 @@
                [:div
                 "Tasks: " [:strong tasks-cnt] " created, "
                 [:strong done-cnt] " done, "
-                [:strong closed-cnt] " closed"])
-             (when word-stats
-               [:div
-                [:strong (:started-tasks-cnt @stats)] " started tasks, "
-                [:strong (:word-count word-stats)] " words written."])
+                [:strong closed-cnt] " closed, "
+                [:strong (:started-tasks-cnt @stats)] " started. "
+                [:strong (or (:word-count word-stats) 0)] " words written."])
              [:div [cc/horizontal-bar books :book-name allocation 0.0045]]
+             [:div [cc/horizontal-bar books :book-name actual-times 0.0045]]
              [:div [cc/horizontal-bar books :book-name remaining 0.0045]]
              [:div
               "Total planned: "
               [:strong
                (u/duration-string
-                 (apply + (map second (-> entry :briefing :time-allocation))))]]
+                 (apply + (map second (-> entry :briefing :time-allocation))))]
+              (when (seq dur)
+                [:span
+                 " Logged: " [:strong dur] " in " (:total day-stats) " entries."])]
              [:div.story-time
-              (for [[k v] books]
+              (for [[k v] (sort-by #(-> % second :book-name) books)]
                 (let [allocation (get-in entry [:briefing :time-allocation k] 0)
                       actual (get-in (:time-by-book day-stats) [k] 0)
                       remaining (- allocation actual)
@@ -216,7 +215,7 @@
                               (swap! local update-in [:selected] #(if (= k %) nil k)))]
                   ^{:key (str :time-allocation k)}
                   [:div
-                   (when (or (pos? allocation) edit-mode?)
+                   (when (or (pos? allocation) (get actual-times k) edit-mode?)
                      [:div
                       {:on-click click
                        :class    (when (= k (:selected @local)) "selected")}
@@ -230,5 +229,7 @@
                         (when allocation
                           [:span.allocated (u/duration-string allocation)]))
                       (when (pos? remaining)
-                        [:span (u/duration-string remaining)])])]))]
-             (when day-stats [time-by-stories-list day-stats])]]])))))
+                        [:span.remaining (u/duration-string remaining)])
+                      (when (pos? actual)
+                        [:span.actual (u/duration-string actual)])])]))]
+             (when day-stats [time-by-stories-list day-stats local])]]])))))
