@@ -105,7 +105,9 @@
                              (filter (u/pvt-filter conf @entries-map) linked-entries))
             current-filter (get linked-filters (:filter @local))
             filter-fn (u/linked-filter-fn @entries-map current-filter put-fn)
-            linked-entries (filter filter-fn linked-entries)]
+            linked-entries (->> linked-entries
+                                (filter filter-fn)
+                                (sort-by #(-> % :task :priority)))]
         [:div.linked-tasks
          [:div
           [:strong "Tasks:"]
@@ -117,13 +119,12 @@
           (for [linked linked-entries]
             (let [ts (:timestamp linked)]
               ^{:key ts}
-              [:li
-               {:on-click (up/add-search ts tab-group put-fn)}
+              [:li {:on-click (up/add-search ts tab-group put-fn)}
                (when-let [prio (-> linked :task :priority)]
                  [:span.prio {:class prio} prio])
                [:strong (some-> linked
                                 :md
-                                (s/replace "#habit" "")
+                                (s/replace "#task" "")
                                 (s/replace "##" "")
                                 s/trim
                                 s/split-lines
