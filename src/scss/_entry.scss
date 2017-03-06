@@ -289,13 +289,7 @@
   }
 }
 
-.habits {
-  li {
-    cursor: pointer;
-  }
-}
-
-.linked-tasks {
+.habits, .linked-tasks {
   div {
     display: flex;
   }

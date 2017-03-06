@@ -139,7 +139,13 @@
 
                    ;; otherwise just toggle - follow-up is scheduled already
                    (let [updated (update-in entry [:habit :done] not)]
-                     (put-fn [:entry/update updated])))))]
+                     (put-fn [:entry/update updated])))))
+        priority-select
+        (fn [entry]
+          (fn [ev]
+            (let [sel (keyword (-> ev .-nativeEvent .-target .-value))
+                  updated (assoc-in entry [:habit :priority] sel)]
+              (put-fn [:entry/update-local updated]))))]
     (fn [entry put-fn edit-mode?]
       (when (contains? (:tags entry) "#habit")
         [:form.task-details
@@ -153,6 +159,17 @@
            [:label "Thu"] [day-checkbox entry 4]
            [:label "Fri"] [day-checkbox entry 5]
            [:label "Sat"] [day-checkbox entry 6]]
+          [:div
+           [:span " Priority: "]
+           [:select {:value     (get-in entry [:habit :priority] "")
+                     :disabled  (not edit-mode?)
+                     :on-change (priority-select entry)}
+            [:option ""]
+            [:option {:value :A} "A"]
+            [:option {:value :B} "B"]
+            [:option {:value :C} "C"]
+            [:option {:value :D} "D"]
+            [:option {:value :E} "E"]]]
           [:div
            [:label "Active from: "]
            [:input {:type      :datetime-local

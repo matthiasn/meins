@@ -69,8 +69,9 @@
             (for [waiting-habit waiting-habits]
               (let [ts (:timestamp waiting-habit)]
                 ^{:key ts}
-                [:li
-                 {:on-click (up/add-search ts tab-group put-fn)}
+                [:li {:on-click (up/add-search ts tab-group put-fn)}
+                 (when-let [prio (-> waiting-habit :habit :priority)]
+                   [:span.prio {:class prio} prio])
                  [:strong (some-> waiting-habit
                                   :md
                                   (s/replace "#habit" "")
