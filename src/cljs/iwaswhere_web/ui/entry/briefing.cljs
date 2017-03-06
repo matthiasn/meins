@@ -226,10 +226,7 @@
                         [:input {:on-input (time-alloc-input-fn entry k)
                                  :value    (when allocation (/ allocation 60))
                                  :type     :number}]
-                        (when allocation
-                          [:span.allocated (u/duration-string allocation)]))
-                      (when (pos? remaining)
-                        [:span.remaining (u/duration-string remaining)])
-                      (when (pos? actual)
-                        [:span.actual (u/duration-string actual)])])]))]
+                        [:span.allocated (u/duration-string allocation)])
+                      [:span.remaining (u/duration-string remaining)]
+                      [:span.actual (u/duration-string actual)]])]))]
              (when day-stats [time-by-stories-list day-stats local])]]])))))
