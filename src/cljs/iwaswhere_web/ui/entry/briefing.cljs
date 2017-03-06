@@ -119,6 +119,8 @@
               ^{:key ts}
               [:li
                {:on-click (up/add-search ts tab-group put-fn)}
+               (when-let [prio (-> linked :task :priority)]
+                 [:span.prio {:class prio} prio])
                [:strong (some-> linked
                                 :md
                                 (s/replace "#habit" "")
