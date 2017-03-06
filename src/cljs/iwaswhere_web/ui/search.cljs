@@ -40,9 +40,7 @@
   [query-id put-fn]
   (let [query-cfg (subscribe [:query-cfg])
         cfg (subscribe [:cfg])
-        options (subscribe [:options])
-        initial-query (query-id (:queries @query-cfg))
-        search-editor-state (editor-state initial-query)]
+        options (subscribe [:options])]
     (fn [query-id put-fn]
       (let [query (query-id (:queries @query-cfg))
             show-pvt? (:show-pvt @cfg)
@@ -64,18 +62,13 @@
                     story (js/parseInt v)
                     q (merge query {:story (when-not (js/isNaN story) story)})]
                 (put-fn [:search/update q])))]
-
-        (when (not= initial-query query)
-          (let [new-editor-state (editor-state query)]
-            (reset! search-editor-state @new-editor-state)))
-
         [:div.search
          [tags-view query]
          (when (seq mentions-list)
            ^{:key query-id}
            [:div.search-row
             [draft/draft-search-field
-             search-editor-state search-send mentions-list hashtags-list]
+             (editor-state query) search-send mentions-list hashtags-list]
             [:select {:value     (or (:story query) "")
                       :on-change story-select-handler}
              [:option {:value ""} "no story selected"]
