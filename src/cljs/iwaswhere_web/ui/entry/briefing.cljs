@@ -21,25 +21,31 @@
                       (if-let [selected (:selected @local)]
                         (let [story (get @stories k)]
                           (= selected (:linked-book story)))
-                        true))]
+                        true))
+        story-name-mapper (fn [[k v]]
+                            (let [s (or (:story-name (get @stories k)) "none")]
+                              [s v]))]
     (fn [day-stats local]
       (let [stories @stories
             books @books
             dur (u/duration-string (:total-time day-stats))
             date (:date-string day-stats)
             time-by-story (:time-by-story day-stats)
-            time-by-story (->> day-stats :time-by-story (filter book-filter))
+            time-by-story2 (->> day-stats
+                                :time-by-story
+                                (filter book-filter)
+                                (map story-name-mapper)
+                                (sort-by first))
             y-scale 0.0045]
         (when date
           [:div.story-time
            [cc/horizontal-bar stories :story-name time-by-story y-scale]
-           (for [[story v] time-by-story]
-             (let [story-name (or (:story-name (get stories story)) "none")]
-               ^{:key story}
-               [:div
-                [:span.legend
-                 {:style {:background-color (cc/item-color story-name)}}]
-                [:strong.name story-name] (u/duration-string v)]))])))))
+           (for [[story v] time-by-story2]
+             ^{:key story}
+             [:div
+              [:span.legend
+               {:style {:background-color (cc/item-color story)}}]
+              [:strong.name story] (u/duration-string v)])])))))
 
 (defn waiting-habits-list
   [tab-group put-fn]
