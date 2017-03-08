@@ -115,9 +115,18 @@
                             (let [story (get @stories (:linked-story entry))]
                               (= selected (:linked-book story)))
                             true))
+            active-filter (fn [t]
+                            (let [active-from (-> t :task :active-from)
+                                  current-filter (get linked-filters (:filter @local))]
+                              (if (and active-from (= current-filter
+                                                      (:open linked-filters)))
+                                (let [from-now (.fromNow (js/moment active-from))]
+                                  (s/includes? from-now "ago"))
+                                true)))
             linked-entries (->> linked-entries
                                 (filter filter-fn)
                                 (filter book-filter)
+                                (filter active-filter)
                                 (sort-by #(or (-> % :task :priority) :X)))]
         [:div.linked-tasks
          [:div

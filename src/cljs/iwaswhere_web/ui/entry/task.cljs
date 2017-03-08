@@ -15,12 +15,16 @@
 (defn task-details
   [entry put-fn edit-mode?]
   (let [format-time #(.format (js/moment %) "ddd MMM DD - HH:mm")
-        input-fn
-        (fn [entry k]
-          (fn [ev]
-            (let [dt (js/moment (-> ev .-nativeEvent .-target .-value))
-                  updated (assoc-in entry [:task k] (.valueOf dt))]
-              (put-fn [:entry/update-local updated]))))
+        input-fn (fn [entry k]
+                   (fn [ev]
+                     (let [dt (js/moment (-> ev .-nativeEvent .-target .-value))
+                           updated (assoc-in entry [:task k] (.valueOf dt))]
+                       (put-fn [:entry/update-local updated]))))
+        active-from (fn [entry]
+                      (fn [ev]
+                        (let [dt (-> ev .-nativeEvent .-target .-value)
+                              updated (assoc-in entry [:task :active-from] dt)]
+                          (put-fn [:entry/update-local updated]))))
         follow-up-select
         (fn [entry]
           (fn [ev]
@@ -28,12 +32,11 @@
                   follow-up-hrs (when-not (js/isNaN sel) sel)
                   updated (assoc-in entry [:task :follow-up-hrs] follow-up-hrs)]
               (put-fn [:entry/update-local updated]))))
-        priority-select
-        (fn [entry]
-          (fn [ev]
-            (let [sel (keyword (-> ev .-nativeEvent .-target .-value))
-                  updated (assoc-in entry [:task :priority] sel)]
-              (put-fn [:entry/update-local updated]))))]
+        prio-select (fn [entry]
+                      (fn [ev]
+                        (let [sel (keyword (-> ev .-nativeEvent .-target .-value))
+                              updated (assoc-in entry [:task :priority] sel)]
+                          (put-fn [:entry/update-local updated]))))]
     (fn [entry put-fn edit-mode?]
       (when (contains? (:tags entry) "#task")
         (when (and edit-mode? (not (:task entry)))
@@ -55,13 +58,19 @@
            [:span " Priority: "]
            [:select {:value     (get-in entry [:task :priority] "")
                      :disabled  (not edit-mode?)
-                     :on-change (priority-select entry)}
+                     :on-change (prio-select entry)}
             [:option ""]
             [:option {:value :A} "A"]
             [:option {:value :B} "B"]
             [:option {:value :C} "C"]
             [:option {:value :D} "D"]
             [:option {:value :E} "E"]]]
+          [:div
+           [:label "Active from: "]
+           [:input {:type      :datetime-local
+                    :read-only (not edit-mode?)
+                    :on-input  (active-from entry)
+                    :value     (get-in entry [:task :active-from])}]]
           (if-let [follow-up-scheduled (:follow-up-scheduled (:task entry))]
             [:div "Follow-up in " follow-up-scheduled]
             [:div
@@ -125,21 +134,19 @@
                                 :on-change (day-select entry day)}])
         done
         (fn [entry]
-               (fn [ev]
-                 (if-not (-> entry :habit :next-entry)
-
-                   ;; check off and create next habit entry
-                   (let [next-entry (next-habit-entry entry)
-                         updated (-> entry
-                                     (update-in [:habit :done] not)
-                                     (assoc-in [:habit :next-entry] (:timestamp next-entry)))]
-                     (put-fn [:entry/update next-entry])
-                     (h/send-w-geolocation next-entry put-fn)
-                     (put-fn [:entry/update updated]))
-
-                   ;; otherwise just toggle - follow-up is scheduled already
-                   (let [updated (update-in entry [:habit :done] not)]
-                     (put-fn [:entry/update updated])))))
+          (fn [ev]
+            (if-not (-> entry :habit :next-entry)
+              ;; check off and create next habit entry
+              (let [next-entry (next-habit-entry entry)
+                    updated (-> entry
+                                (update-in [:habit :done] not)
+                                (assoc-in [:habit :next-entry] (:timestamp next-entry)))]
+                (put-fn [:entry/update next-entry])
+                (h/send-w-geolocation next-entry put-fn)
+                (put-fn [:entry/update updated]))
+              ;; otherwise just toggle - follow-up is scheduled already
+              (let [updated (update-in entry [:habit :done] not)]
+                (put-fn [:entry/update updated])))))
         priority-select
         (fn [entry]
           (fn [ev]

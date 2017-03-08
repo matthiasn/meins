@@ -26,7 +26,6 @@
   {:mentions   #{}
    :tags       #{}
    :timezone   "Europe/Berlin"
-   :new-entry  true
    :utc-offset -120
    :longitude  9.9
    :latitude   53.5
