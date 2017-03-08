@@ -20,11 +20,11 @@
                      (let [dt (js/moment (-> ev .-nativeEvent .-target .-value))
                            updated (assoc-in entry [:task k] (.valueOf dt))]
                        (put-fn [:entry/update-local updated]))))
-        active-from (fn [entry]
-                      (fn [ev]
-                        (let [dt (-> ev .-nativeEvent .-target .-value)
-                              updated (assoc-in entry [:task :active-from] dt)]
-                          (put-fn [:entry/update-local updated]))))
+        set-active-from (fn [entry]
+                          (fn [ev]
+                            (let [dt (-> ev .-nativeEvent .-target .-value)
+                                  updated (assoc-in entry [:task :active-from] dt)]
+                              (put-fn [:entry/update-local updated]))))
         follow-up-select
         (fn [entry]
           (fn [ev]
@@ -65,30 +65,33 @@
             [:option {:value :C} "C"]
             [:option {:value :D} "D"]
             [:option {:value :E} "E"]]]
-          [:div
-           [:label "Active from: "]
-           [:input {:type      :datetime-local
-                    :read-only (not edit-mode?)
-                    :on-input  (active-from entry)
-                    :value     (get-in entry [:task :active-from])}]]
+          (let [active-from (get-in entry [:task :active-from])]
+            (when (or edit-mode? active-from)
+              [:div
+               [:label "Active from: "]
+               [:input {:type      :datetime-local
+                        :read-only (not edit-mode?)
+                        :on-input  (set-active-from entry)
+                        :value     (or active-from "")}]]))
           (if-let [follow-up-scheduled (:follow-up-scheduled (:task entry))]
             [:div "Follow-up in " follow-up-scheduled]
-            [:div
-             [:span "Follow-up after "]
-             [:select {:value     (get-in entry [:task :follow-up-hrs] "")
-                       :on-change (follow-up-select entry)
-                       :disabled  (not edit-mode?)}
-              [:option ""]
-              [:option {:value 1} "1 hour"]
-              [:option {:value 3} "3 hours"]
-              [:option {:value 6} "6 hours"]
-              [:option {:value 12} "12 hours"]
-              [:option {:value 18} "18 hours"]
-              [:option {:value 24} "24 hours"]
-              [:option {:value 48} "48 hours"]
-              [:option {:value 72} "3 days"]
-              [:option {:value 96} "4 days"]
-              [:option {:value 168} "1 week"]]])]]))))
+            (when edit-mode?
+              [:div
+               [:span "Follow-up after "]
+               [:select {:value     (get-in entry [:task :follow-up-hrs] "")
+                         :on-change (follow-up-select entry)
+                         :disabled  (not edit-mode?)}
+                [:option ""]
+                [:option {:value 1} "1 hour"]
+                [:option {:value 3} "3 hours"]
+                [:option {:value 6} "6 hours"]
+                [:option {:value 12} "12 hours"]
+                [:option {:value 18} "18 hours"]
+                [:option {:value 24} "24 hours"]
+                [:option {:value 48} "48 hours"]
+                [:option {:value 72} "3 days"]
+                [:option {:value 96} "4 days"]
+                [:option {:value 168} "1 week"]]]))]]))))
 
 (defn next-habit-entry
   "Generate next habit entry, as appropriate at the time of calling.
