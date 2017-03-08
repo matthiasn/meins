@@ -60,23 +60,37 @@
       (reset! query-cfg (:query-cfg new-state))
       {:new-state new-state})))
 
+(defn find-existing
+  "Finds existing query in the same tab group with the same search-text."
+  [query-cfg tab-group query]
+  (let [all-path [:tab-groups tab-group :all]
+        queries (map #(get-in query-cfg [:queries %]) (get-in query-cfg all-path))
+        matching (filter #(= (:search-text query) (:search-text %)) queries)]
+    (first matching)))
+
 (defn add-query
-  "Adds query inside tab group specified in msg."
+  "Adds query inside tab group specified in msg if none exists already with the
+   same search-text. Otherwise opens the existing one."
   [{:keys [current-state msg-payload]}]
   (let [{:keys [tab-group query]} msg-payload
         query-id (keyword (st/make-uuid))
         active-path [:query-cfg :tab-groups tab-group :active]
-        all-path [:query-cfg :tab-groups tab-group :all]
-        new-state (-> current-state
-                      (assoc-in active-path query-id)
-                      (update-in all-path conj query-id)
-                      (update-in [:query-cfg :tab-groups tab-group :history]
-                                 #(conj (take 50 %1) %2)
-                                 query-id))
-        new-query (merge {:query-id query-id} (p/parse-search "") query)]
-    (reset! query-cfg (:query-cfg new-state))
-    {:new-state    new-state
-     :send-to-self [:search/update new-query]}))
+        all-path [:query-cfg :tab-groups tab-group :all]]
+    (if-let [existing (find-existing (:query-cfg current-state) tab-group query)]
+      (let [query-id (:query-id existing)
+            new-state (assoc-in current-state active-path query-id)]
+        (reset! query-cfg (:query-cfg new-state))
+        {:new-state new-state})
+      (let [new-state (-> current-state
+                          (assoc-in active-path query-id)
+                          (update-in all-path conj query-id)
+                          (update-in [:query-cfg :tab-groups tab-group :history]
+                                     #(conj (take 20 %1) %2)
+                                     query-id))
+            new-query (merge {:query-id query-id} (p/parse-search "") query)]
+        (reset! query-cfg (:query-cfg new-state))
+        {:new-state    new-state
+         :send-to-self [:search/update new-query]}))))
 
 (defn previously-active
   "Sets active query for the tab group to the previously active query."
