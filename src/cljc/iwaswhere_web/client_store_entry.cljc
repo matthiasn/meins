@@ -43,10 +43,11 @@
    Does nothing when entry is already saved in backend."
   [{:keys [current-state msg-payload put-fn]}]
   (let [ts (:timestamp msg-payload)
+        geo-info (select-keys msg-payload [:timestamp :latitude :longitude])
         local-entry (get-in current-state [:new-entries ts])
-        new-state (update-in current-state [:new-entries ts] #(merge msg-payload %))]
+        new-state (update-in current-state [:new-entries ts] #(merge geo-info %))]
     (when-not local-entry
-      (put-fn [:entry/update msg-payload]))
+      (put-fn [:entry/update geo-info]))
     (when local-entry
       (update-local-storage new-state)
       {:new-state new-state})))
