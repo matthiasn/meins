@@ -50,8 +50,9 @@
   [entry cfg put-fn]
   (fn [_ev]
     (let [ts (:currently-dragged @cfg)
-          new-entry (update-in entry [:linked-entries] #(set (conj % ts)))]
-      (put-fn [:entry/update (u/clean-entry new-entry)]))))
+          updated (update-in entry [:linked-entries] #(set (conj % ts)))]
+      (when-not (= ts (:timestamp updated))
+        (put-fn [:entry/update (u/clean-entry updated)])))))
 
 (defn new-link
   "Renders input for adding link entry."

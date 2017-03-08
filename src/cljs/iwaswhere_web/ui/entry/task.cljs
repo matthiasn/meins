@@ -94,12 +94,9 @@
   "Generate next habit entry, as appropriate at the time of calling.
    Store this to actually create entry."
   [entry]
-  (let [next-hh-mm (-> entry
-                       :habit
-                       :active-from
-                       (js/moment)
-                       (hh-mm))
-        active-days (filter identity (map (fn [[k v]] (when v k)) (get-in entry [:habit :days])))
+  (let [next-hh-mm (-> entry :habit :active-from (js/moment) (hh-mm))
+        active-days (filter identity (map (fn [[k v]] (when v k))
+                                          (get-in entry [:habit :days])))
         active-days (concat active-days (map #(+ % 7) active-days))
         active-days (filter number? active-days)
         current-day (.day (js/moment))
@@ -121,7 +118,6 @@
                       (fn [ev]
                         (let [dt (-> ev .-nativeEvent .-target .-value)
                               updated (assoc-in entry [:habit :active-from] dt)]
-                          (prn updated)
                           (put-fn [:entry/update-local updated]))))
         day-select (fn [entry day]
                      (fn [ev]
