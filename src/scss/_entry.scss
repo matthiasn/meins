@@ -302,7 +302,9 @@
   }
 
   .prio {
-    width: 10px;
+    min-width: 12px;
+    text-align: center;
+    display: inline-block;
     color: white;
     font-size: 0.8em;
     font-weight: bold;

@@ -7,6 +7,7 @@
             [iwaswhere-web.ui.charts.common :as cc]
             [iwaswhere-web.utils.misc :as u]
             [clojure.pprint :as pp]
+            [iwaswhere-web.ui.entry.actions :as a]
             [iwaswhere-web.utils.parse :as up]
             [clojure.string :as s]
             [iwaswhere-web.ui.entry.utils :as eu]
@@ -137,11 +138,15 @@
           [filter-btn :backlog]]
          [:ul
           (for [linked linked-entries]
-            (let [ts (:timestamp linked)]
+            (let [ts (:timestamp linked)
+                  on-drag-start (a/drag-start-fn linked put-fn)]
               ^{:key ts}
               [:li {:on-click (up/add-search ts tab-group put-fn)}
-               (when-let [prio (-> linked :task :priority)]
-                 [:span.prio {:class prio} prio])
+               (let [prio (or (-> linked :task :priority) "-")]
+                 [:span.prio {:class prio
+                              :draggable     true
+                              :on-drag-start on-drag-start}
+                  prio])
                [:strong (some-> linked
                                 :md
                                 (s/replace "#task" "")

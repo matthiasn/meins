@@ -51,19 +51,24 @@
   (fn [_ev]
     (let [ts (:currently-dragged @cfg)
           updated (update-in entry [:linked-entries] #(set (conj % ts)))]
-      (when-not (= ts (:timestamp updated))
+      (when (and ts (not= ts (:timestamp updated)))
         (put-fn [:entry/update (u/clean-entry updated)])))))
+
+(defn drag-start-fn
+  "Generates function for handling drag-start event."
+  [entry put-fn]
+  (fn [ev]
+    (let [dt (.-dataTransfer ev)]
+      (put-fn [:cmd/set-dragged entry])
+      (aset dt "effectAllowed" "move")
+      (aset dt "dropEffect" "link"))))
 
 (defn new-link
   "Renders input for adding link entry."
   [entry put-fn create-linked-entry]
   (let [local (r/atom {:visible false})
         toggle-visible #(swap! local update-in [:visible] not)
-        on-drag-start (fn [ev]
-                        (let [dt (.-dataTransfer ev)]
-                          (put-fn [:cmd/set-dragged entry])
-                          (aset dt "effectAllowed" "move")
-                          (aset dt "dropEffect" "link")))]
+        on-drag-start (drag-start-fn entry put-fn)]
     (fn [entry put-fn create-linked-entry]
       [:span.new-link-btn
        [:span.fa.fa-link.toggle {:on-click      toggle-visible
