@@ -51,7 +51,8 @@
             hashtags-list (map (fn [h] {:name h}) hashtags)
 
             search-send (fn [text editor-state]
-                          (let [s (merge query
+                          (let [query (query-id (:queries @query-cfg))
+                                s (merge query
                                          (p/parse-search text)
                                          {:editor-state editor-state})]
                             (put-fn [:search/update s])))
