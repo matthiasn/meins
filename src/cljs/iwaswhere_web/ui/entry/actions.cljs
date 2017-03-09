@@ -79,6 +79,19 @@
           {:on-click #(do (create-linked-entry) (toggle-visible))}
           [:span.fa.fa-plus-square] "add linked"])])))
 
+(defn add-location
+  "Renders context menu for adding location."
+  [entry put-fn]
+  (let [local (r/atom {:visible false})
+        toggle-visible #(swap! local update-in [:visible] not)]
+    (fn [entry put-fn]
+      [:span.new-link-btn
+       [:span.fa.fa-map-marker.toggle {:on-click toggle-visible}]
+       (when (:visible @local)
+         [:span.new-link
+          {:on-click #(do (toggle-visible))}
+          [:span.fa.fa-plus-square] "add location"])])))
+
 (defn upvote-fn [entry op put-fn]
   "Create click function for like. Can handle both upvotes and downvotes."
   (fn [_ev]
@@ -103,7 +116,7 @@
         create-comment (h/new-entry-fn put-fn {:comment-for ts} show-comments)
         story (:linked-story entry)
         create-linked-entry (h/new-entry-fn put-fn {:linked-entries [ts]
-                                                    :linked-story story} nil)
+                                                    :linked-story   story} nil)
         new-pomodoro (h/new-entry-fn
                        put-fn (p/pomodoro-defaults ts) show-comments)
         trash-entry #(if edit-mode?
@@ -132,4 +145,5 @@
          (when (and (not comment?) prev-saved?)
            [:span.fa.fa-external-link.toggle {:on-click open-external}])
          (when-not comment? [new-link @entry put-fn create-linked-entry])
+         [add-location @entry put-fn]
          [trash-icon trash-entry]]))))
