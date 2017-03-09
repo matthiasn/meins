@@ -48,6 +48,16 @@
                {:style {:background-color (cc/item-color story)}}]
               [:strong.name story] (u/duration-string v)])])))))
 
+(defn by-prio-by-active-from
+  "Compare by prio first, then by active-from."
+  [x y]
+  (let [prio-x (get-in x [:habit :priority] :X)
+        prio-y (get-in y [:habit :priority] :X)
+        c (compare prio-x prio-y)
+        active-x (get-in x [:habit :active-from])
+        active-y (get-in y [:habit :active-from])]
+    (if (not= c 0) c (compare active-x active-y))))
+
 (defn waiting-habits-list
   [tab-group put-fn]
   (let [cfg (subscribe [:cfg])
@@ -60,7 +70,7 @@
           (let [entries-map @entries-map
                 entries (->> (:waiting-habits @results)
                              (map (fn [ts] (get entries-map ts)))
-                             (sort-by #(or (-> % :habit :priority) :X)))
+                             (sort by-prio-by-active-from ))
                 conf (merge @cfg @options)]
             (if (:show-pvt @cfg)
               entries
