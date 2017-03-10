@@ -80,7 +80,7 @@
       (let [waiting-habits @waiting-habits]
         (when (seq waiting-habits)
           [:div.habits
-           [:h6 "Waiting habits:"]
+           [:strong "Waiting habits:"]
            [:ul
             (for [waiting-habit waiting-habits]
               (let [ts (:timestamp waiting-habit)]
@@ -91,6 +91,44 @@
                  [:strong (some-> waiting-habit
                                   :md
                                   (s/replace "#habit" "")
+                                  (s/replace "##" "")
+                                  s/split-lines
+                                  first)]]))]])))))
+
+(defn started-tasks-list
+  [tab-group put-fn]
+  (let [cfg (subscribe [:cfg])
+        results (subscribe [:results])
+        options (subscribe [:options])
+        entries-map (subscribe [:entries-map])
+
+        started-tasks
+        (reaction
+          (let [entries-map @entries-map
+                entries (->> (:started-tasks @results)
+                             (map (fn [ts] (get entries-map ts)))
+                             ;(sort by-prio-by-active-from)
+                             )
+                conf (merge @cfg @options)]
+            (if (:show-pvt @cfg)
+              entries
+              (filter (u/pvt-filter conf entries-map) entries))))]
+    (fn started-tasks-list-list-render [tab-group put-fn]
+      (let [waiting-habits @started-tasks]
+        (when (seq waiting-habits)
+          [:div.habits
+           [:strong "Started tasks:"]
+           [:ul
+            (for [waiting-habit waiting-habits]
+              (let [ts (:timestamp waiting-habit)]
+                ^{:key ts}
+                [:li {:on-click (up/add-search ts tab-group put-fn)}
+                 (when-let [prio (-> waiting-habit :task :priority)]
+                   [:span.prio {:class prio} prio])
+                 [:strong (some-> waiting-habit
+                                  :md
+                                  (s/replace "#task" "")
+                                  (s/replace "##" "")
                                   s/split-lines
                                   first)]]))]])))))
 
@@ -210,6 +248,7 @@
           [:div
            [waiting-habits-list tab-group put-fn]
            [open-linked-tasks-list ts local local-cfg put-fn]
+           [started-tasks-list tab-group put-fn]
            [:form.briefing-details
             [:fieldset
              [:legend (or day "date not set")]
@@ -261,5 +300,5 @@
                                  :type     :number}]
                         [:span (u/duration-string allocation)])]
                      [:td.time (u/duration-string actual)]
-                     [:td.time (u/duration-string remaining)]])))]
+                     [:td.time [:strong (u/duration-string remaining)]]])))]
              (when day-stats [time-by-stories-list day-stats local])]]])))))

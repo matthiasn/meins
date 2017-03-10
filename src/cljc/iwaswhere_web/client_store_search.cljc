@@ -16,7 +16,17 @@
                                  :opts        #{":waiting"}
                                  :search-text "#habit :waiting"
                                  :n           100
-                                 :query-id    :waiting-habits}}
+                                 :query-id    :waiting-habits}
+                :started-tasks  {:tags        #{"#task"}
+                                 :not-tags    #{"#done" "#backlog" "#closed"}
+                                 :mentions    #{}
+                                 :ft-search   nil
+                                 :timestamp   nil
+                                 :date-string nil
+                                 :opts        #{":started"}
+                                 :search-text "#task ~#done ~#closed ~#backlog :started"
+                                 :n           100
+                                 :query-id    :started-tasks}}
    :tab-groups {:left  {:active nil :all #{}}
                 :right {:active nil :all #{}}}})
 
