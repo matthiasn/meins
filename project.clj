@@ -97,10 +97,10 @@
                     :output-dir    "resources/public/js/build/"
                     :output-to     "resources/public/js/build/iwaswhere.js"
                     ;:source-map    "resources/public/js/build/iwaswhere.js.map"
-                    :optimizations :whitespace}}
+                    :optimizations :simple}}
     {:id           "cljs-test"
      :source-paths ["src/cljs" "src/cljc" "test"]
      :compiler     {:output-to     "out/testable.js"
                     :output-dir    "out/"
                     :main          iwaswhere-web.runner
-                    :optimizations :advanced}}]})
+                    :optimizations :simple}}]})
