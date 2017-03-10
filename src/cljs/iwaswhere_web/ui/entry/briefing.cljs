@@ -40,97 +40,66 @@
             y-scale 0.0045]
         (when date
           [:table
-           [:tr [:th ""] [:th "story"] [:th "actual"]]
-           (for [[story v] time-by-story2]
-             (let [color (cc/item-color story)]
-               ^{:key story}
-               [:tr
-                [:td [:div.legend {:style {:background-color color}}]]
-                [:td [:strong story]]
-                [:td.time (u/duration-string v)]]))])))))
+           [:tbody
+            [:tr [:th ""] [:th "story"] [:th "actual"]]
+            (for [[story v] time-by-story2]
+              (let [color (cc/item-color story)]
+                ^{:key story}
+                [:tr
+                 [:td [:div.legend {:style {:background-color color}}]]
+                 [:td [:strong story]]
+                 [:td.time (u/duration-string v)]]))]])))))
 
-(defn by-prio-by-active-from
+(defn entry-compare
   "Compare by prio first, then by active-from."
-  [x y]
-  (let [prio-x (get-in x [:habit :priority] :X)
-        prio-y (get-in y [:habit :priority] :X)
-        c (compare prio-x prio-y)
-        active-x (get-in x [:habit :active-from])
-        active-y (get-in y [:habit :active-from])]
-    (if (not= c 0) c (compare active-x active-y))))
+  [k]
+  (fn [x y]
+    (let [prio-x (get-in x [k :priority] :X)
+          prio-y (get-in y [k :priority] :X)
+          c (compare prio-x prio-y)
+          active-x (get-in x [k :active-from])
+          active-y (get-in y [k :active-from])]
+      (if (not= c 0) c (compare active-x active-y)))))
 
-(defn waiting-habits-list
-  [tab-group put-fn]
+(defn open-entries-list
+  "Renders table with open entries, such as started tasks and open habits."
+  [tab-group qk k header put-fn]
   (let [cfg (subscribe [:cfg])
         results (subscribe [:results])
         options (subscribe [:options])
         entries-map (subscribe [:entries-map])
-
-        waiting-habits
+        entries-list
         (reaction
           (let [entries-map @entries-map
-                entries (->> (:waiting-habits @results)
+                sorter (entry-compare k)
+                entries (->> (qk @results)
                              (map (fn [ts] (get entries-map ts)))
-                             (sort by-prio-by-active-from))
+                             (sort sorter))
                 conf (merge @cfg @options)]
             (if (:show-pvt @cfg)
               entries
               (filter (u/pvt-filter conf entries-map) entries))))]
-    (fn waiting-habits-list-render [tab-group put-fn]
-      (let [waiting-habits @waiting-habits]
-        (when (seq waiting-habits)
-          [:div.habits
-           [:strong "Waiting habits:"]
-           [:ul
-            (for [waiting-habit waiting-habits]
-              (let [ts (:timestamp waiting-habit)]
-                ^{:key ts}
-                [:li {:on-click (up/add-search ts tab-group put-fn)}
-                 (when-let [prio (-> waiting-habit :habit :priority)]
-                   [:span.prio {:class prio} prio])
-                 [:strong (some-> waiting-habit
-                                  :md
-                                  (s/replace "#habit" "")
-                                  (s/replace "##" "")
-                                  s/split-lines
-                                  first)]]))]])))))
-
-(defn started-tasks-list
-  [tab-group put-fn]
-  (let [cfg (subscribe [:cfg])
-        results (subscribe [:results])
-        options (subscribe [:options])
-        entries-map (subscribe [:entries-map])
-
-        started-tasks
-        (reaction
-          (let [entries-map @entries-map
-                entries (->> (:started-tasks @results)
-                             (map (fn [ts] (get entries-map ts)))
-                             ;(sort by-prio-by-active-from)
-                             )
-                conf (merge @cfg @options)]
-            (if (:show-pvt @cfg)
-              entries
-              (filter (u/pvt-filter conf entries-map) entries))))]
-    (fn started-tasks-list-list-render [tab-group put-fn]
-      (let [waiting-habits @started-tasks]
-        (when (seq waiting-habits)
-          [:div.habits
-           [:strong "Started tasks:"]
-           [:ul
-            (for [waiting-habit waiting-habits]
-              (let [ts (:timestamp waiting-habit)]
-                ^{:key ts}
-                [:li {:on-click (up/add-search ts tab-group put-fn)}
-                 (when-let [prio (-> waiting-habit :task :priority)]
-                   [:span.prio {:class prio} prio])
-                 [:strong (some-> waiting-habit
-                                  :md
-                                  (s/replace "#task" "")
-                                  (s/replace "##" "")
-                                  s/split-lines
-                                  first)]]))]])))))
+    (fn open-entries-list-render [tab-group qk k header put-fn]
+      (let [entries-list @entries-list]
+        (when (seq entries-list)
+          [:div
+           [:table.habits
+            [:tbody
+             [:tr [:th ""] [:th header]]
+             (for [entry entries-list]
+               (let [ts (:timestamp entry)]
+                 ^{:key ts}
+                 [:tr {:on-click (up/add-search ts tab-group put-fn)}
+                  [:td
+                   (when-let [prio (-> entry k :priority)]
+                     [:span.prio {:class prio} prio])]
+                  [:td
+                   [:strong (some-> entry
+                                    :md
+                                    (s/replace "#task" "")
+                                    (s/replace "##" "")
+                                    s/split-lines
+                                    first)]]]))]]])))))
 
 (defn open-linked-tasks-list
   "Show open tasks that are also linked with the briefing entry."
@@ -179,30 +148,33 @@
                                 (filter active-filter)
                                 (sort-by #(or (-> % :task :priority) :X)))]
         [:div.linked-tasks
-         [:div
-          [:strong "Tasks:"]
-          [filter-btn :open]
-          [filter-btn :done]
-          [filter-btn :closed]
-          [filter-btn :backlog]]
-         [:ul
-          (for [linked linked-entries]
-            (let [ts (:timestamp linked)
-                  on-drag-start (a/drag-start-fn linked put-fn)]
-              ^{:key ts}
-              [:li {:on-click (up/add-search ts tab-group put-fn)}
-               (let [prio (or (-> linked :task :priority) "-")]
-                 [:span.prio {:class         prio
-                              :draggable     true
-                              :on-drag-start on-drag-start}
-                  prio])
-               [:strong (some-> linked
-                                :md
-                                (s/replace "#task" "")
-                                (s/replace "##" "")
-                                s/trim
-                                s/split-lines
-                                first)]]))]]))))
+         [:table
+          [:tbody
+           [:tr [:th ""]
+            [:th [:div
+                  [:strong "tasks:"]
+                  [filter-btn :open]
+                  [filter-btn :done]
+                  [filter-btn :closed]
+                  [filter-btn :backlog]]]]
+           (for [linked linked-entries]
+             (let [ts (:timestamp linked)
+                   on-drag-start (a/drag-start-fn linked put-fn)]
+               ^{:key ts}
+               [:tr {:on-click (up/add-search ts tab-group put-fn)}
+                (let [prio (or (-> linked :task :priority) "-")]
+                  [:td
+                   [:span.prio {:class         prio
+                                :draggable     true
+                                :on-drag-start on-drag-start}
+                    prio]])
+                [:td.left [:strong (some-> linked
+                                           :md
+                                           (s/replace "#task" "")
+                                           (s/replace "##" "")
+                                           s/trim
+                                           s/split-lines
+                                           first)]]]))]]]))))
 
 (defn briefing-view
   [entry put-fn edit-mode? local-cfg]
@@ -246,9 +218,6 @@
               past-7-days (cd/past-7-days pomodoro-stats :time-by-book)
               tab-group (:tab-group local-cfg)]
           [:div
-           [waiting-habits-list tab-group put-fn]
-           [open-linked-tasks-list ts local local-cfg put-fn]
-           [started-tasks-list tab-group put-fn]
            [:form.briefing-details
             [:fieldset
              [:legend (or day "date not set")]
@@ -276,29 +245,34 @@
               (when (seq dur)
                 [:span
                  " Logged: " [:strong dur] " in " (:total day-stats) " entries."])]
-             [:table
-              [:tr [:th ""] [:th "book"] [:th "planned"] [:th "actual"] [:th "remaining"]]
-              (for [[k v] (sort-by #(-> % second :book-name) books)]
-                (let [allocation (get-in entry [:briefing :time-allocation k] 0)
-                      actual (get-in (:time-by-book day-stats) [k] 0)
-                      remaining (- allocation actual)
-                      color (cc/item-color (:book-name v))
-                      click
-                      (fn [_]
-                        (when-not edit-mode?
-                          (swap! local update-in [:selected] #(if (= k %) nil k))))]
-                  (when (or (pos? allocation) (get actual-times k) edit-mode?)
-                    ^{:key (str :time-allocation k)}
-                    [:tr {:on-click click
-                          :class    (when (= k (:selected @local)) "selected")}
-                     [:td [:div.legend {:style {:background-color color}}]]
-                     [:td [:strong (:book-name v)]]
-                     [:td.time
-                      (if edit-mode?
-                        [:input {:on-input (time-alloc-input-fn entry k)
-                                 :value    (when allocation (/ allocation 60))
-                                 :type     :number}]
-                        [:span (u/duration-string allocation)])]
-                     [:td.time (u/duration-string actual)]
-                     [:td.time [:strong (u/duration-string remaining)]]])))]
+             [:div.linked-tasks
+              [:table
+               [:tbody
+                [:tr [:th ""] [:th "book"] [:th "planned"] [:th "actual"] [:th "remaining"]]
+                (for [[k v] (sort-by #(-> % second :book-name) books)]
+                  (let [allocation (get-in entry [:briefing :time-allocation k] 0)
+                        actual (get-in (:time-by-book day-stats) [k] 0)
+                        remaining (- allocation actual)
+                        color (cc/item-color (:book-name v))
+                        click
+                        (fn [_]
+                          (when-not edit-mode?
+                            (swap! local update-in [:selected] #(if (= k %) nil k))))]
+                    (when (or (pos? allocation) (get actual-times k) edit-mode?)
+                      ^{:key (str :time-allocation k)}
+                      [:tr {:on-click click
+                            :class    (when (= k (:selected @local)) "selected")}
+                       [:td [:div.legend {:style {:background-color color}}]]
+                       [:td [:strong (:book-name v)]]
+                       [:td.time
+                        (if edit-mode?
+                          [:input {:on-input (time-alloc-input-fn entry k)
+                                   :value    (when allocation (/ allocation 60))
+                                   :type     :number}]
+                          [:span (u/duration-string allocation)])]
+                       [:td.time (u/duration-string actual)]
+                       [:td.time [:strong (u/duration-string remaining)]]])))]]]
+             [open-entries-list tab-group :started-tasks :task "started tasks" put-fn]
+             [open-linked-tasks-list ts local local-cfg put-fn]
+             [open-entries-list tab-group :waiting-habits :habit "waiting habits" put-fn]
              (when day-stats [time-by-stories-list day-stats local])]]])))))

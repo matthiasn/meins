@@ -237,16 +237,34 @@
     }
 
     table {
-      font-size: 0.8em;
       border-collapse: collapse;
+      margin-bottom: 4px;
+      min-width: 200px;
+
+      .prio {
+        min-width: 12px;
+        text-align: center;
+        display: inline-block;
+        color: white;
+        font-size: 0.8em;
+        font-weight: bold;
+        background-color: #BBB;
+        padding: 0 2px;
+      }
+      .A {
+        background-color: $red;
+      }
+      .B {
+        background-color: $link-color;
+      }
 
       th {
         background-color: lighten($tab-bg, 28);
-        padding: 2px;
       }
 
       tr {
         cursor: pointer;
+        height: 1.3em;
 
         &.selected {
           background-color: desaturate(lighten($hashtag-blue, 30), 15);
@@ -255,11 +273,15 @@
 
       td {
         .legend {
-          height: 12px;
+          height: 1.3em;
           width: 12px;
         }
 
-        padding: 0 2px 0 0;
+        padding: 0 3px 0 0;
+
+        &.left {
+          text-align: left;
+        }
 
         &.time {
           text-align: center;
@@ -321,33 +343,9 @@
   }
 }
 
-.habits, .linked-tasks {
+.linked-tasks {
   div {
     display: flex;
   }
-  ul {
-    list-style-type: none;
-  }
-  li {
-    cursor: pointer;
-    margin-left: 0;
-  }
-
-  .prio {
-    min-width: 12px;
-    text-align: center;
-    display: inline-block;
-    color: white;
-    font-size: 0.8em;
-    font-weight: bold;
-    background-color: #BBB;
-    padding: 1px 2px;
-    margin-right: 5px;
-  }
-  .A {
-    background-color: $red;
-  }
-  .B {
-    background-color: $link-color;
-  }
 }
+
