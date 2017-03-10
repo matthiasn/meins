@@ -24,7 +24,6 @@
      (include-css "https://fonts.googleapis.com/css?family=Oswald:300,400")
      (include-css "/webjars/fontawesome/4.7.0/css/font-awesome.css")
      (include-css "/webjars/leaflet/0.7.7/dist/leaflet.css")
-     (include-css "/css/draft.css")
      (include-css "/css/carousel.css")
      (include-css "/css/iwaswhere.css")]
     [:body

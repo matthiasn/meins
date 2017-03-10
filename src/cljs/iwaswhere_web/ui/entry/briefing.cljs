@@ -70,7 +70,7 @@
           (let [entries-map @entries-map
                 entries (->> (:waiting-habits @results)
                              (map (fn [ts] (get entries-map ts)))
-                             (sort by-prio-by-active-from ))
+                             (sort by-prio-by-active-from))
                 conf (merge @cfg @options)]
             (if (:show-pvt @cfg)
               entries
@@ -153,7 +153,7 @@
               ^{:key ts}
               [:li {:on-click (up/add-search ts tab-group put-fn)}
                (let [prio (or (-> linked :task :priority) "-")]
-                 [:span.prio {:class prio
+                 [:span.prio {:class         prio
                               :draggable     true
                               :on-drag-start on-drag-start}
                   prio])
@@ -236,29 +236,29 @@
               (when (seq dur)
                 [:span
                  " Logged: " [:strong dur] " in " (:total day-stats) " entries."])]
-             [:div.story-time
+             [:table
+              [:tr [:th ""] [:th "book"] [:th "planned"] [:th "actual"] [:th "remaining"]]
               (for [[k v] (sort-by #(-> % second :book-name) books)]
                 (let [allocation (get-in entry [:briefing :time-allocation k] 0)
                       actual (get-in (:time-by-book day-stats) [k] 0)
                       remaining (- allocation actual)
+                      color (cc/item-color (:book-name v))
                       click
                       (fn [_]
                         (when-not edit-mode?
                           (swap! local update-in [:selected] #(if (= k %) nil k))))]
-                  ^{:key (str :time-allocation k)}
-                  [:div
-                   (when (or (pos? allocation) (get actual-times k) edit-mode?)
-                     [:div
-                      {:on-click click
-                       :class    (when (= k (:selected @local)) "selected")}
-                      [:span.legend
-                       {:style {:background-color (cc/item-color (:book-name v))}}]
-                      [:strong.name (:book-name v)]
+                  (when (or (pos? allocation) (get actual-times k) edit-mode?)
+                    ^{:key (str :time-allocation k)}
+                    [:tr {:on-click click
+                          :class    (when (= k (:selected @local)) "selected")}
+                     [:td [:div.legend {:style {:background-color color}}]]
+                     [:td [:strong (:book-name v)]]
+                     [:td.time
                       (if edit-mode?
                         [:input {:on-input (time-alloc-input-fn entry k)
                                  :value    (when allocation (/ allocation 60))
                                  :type     :number}]
-                        [:span.allocated (u/duration-string allocation)])
-                      [:span.remaining (u/duration-string remaining)]
-                      [:span.actual (u/duration-string actual)]])]))]
+                        [:span (u/duration-string allocation)])]
+                     [:td.time (u/duration-string actual)]
+                     [:td.time (u/duration-string remaining)]])))]
              (when day-stats [time-by-stories-list day-stats local])]]])))))

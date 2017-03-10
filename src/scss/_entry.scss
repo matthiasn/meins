@@ -235,6 +235,39 @@
     legend {
       font-weight: 400;
     }
+
+    table {
+      font-size: 0.8em;
+      border-collapse: collapse;
+
+      th {
+        background-color: lighten($tab-bg, 28);
+        padding: 2px;
+      }
+
+      tr {
+        cursor: pointer;
+
+        &.selected {
+          background-color: desaturate(lighten($hashtag-blue, 30), 15);
+        }
+      }
+
+      td {
+        .legend {
+          height: 12px;
+          width: 12px;
+        }
+
+        padding: 0 2px 0 0;
+
+        &.time {
+          text-align: center;
+          min-width: 50px;
+        }
+      }
+    }
+
     label {
       white-space: nowrap;
       margin-right: 2px;
@@ -242,7 +275,6 @@
     input {
       margin-right: 6px;
       width: 60px;
-      background-color: #eee;
       padding: 1px 3px;
     }
     input[type="number"] {
