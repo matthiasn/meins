@@ -241,8 +241,10 @@
                 (let [allocation (get-in entry [:briefing :time-allocation k] 0)
                       actual (get-in (:time-by-book day-stats) [k] 0)
                       remaining (- allocation actual)
-                      click (fn [_]
-                              (swap! local update-in [:selected] #(if (= k %) nil k)))]
+                      click
+                      (fn [_]
+                        (when-not edit-mode?
+                          (swap! local update-in [:selected] #(if (= k %) nil k))))]
                   ^{:key (str :time-allocation k)}
                   [:div
                    (when (or (pos? allocation) (get actual-times k) edit-mode?)
