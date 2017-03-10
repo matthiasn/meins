@@ -86,7 +86,6 @@
                     ;:output-dir    "resources/public/js/build/"
                     ;:output-to     "resources/public/js/build/iwaswhere.js"
                     :source-map    true}}
-
     {:id           "release"
      :source-paths ["src/cljc" "src/cljs"]
      :compiler     {:main          "iwaswhere-web.core"
@@ -97,7 +96,7 @@
                     :output-dir    "resources/public/js/build/"
                     :output-to     "resources/public/js/build/iwaswhere.js"
                     ;:source-map    "resources/public/js/build/iwaswhere.js.map"
-                    :optimizations :simple}}
+                    :optimizations :whitespace}}
     {:id           "cljs-test"
      :source-paths ["src/cljs" "src/cljc" "test"]
      :compiler     {:output-to     "out/testable.js"

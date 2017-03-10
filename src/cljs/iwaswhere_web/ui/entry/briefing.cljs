@@ -39,14 +39,15 @@
                                 (sort-by first))
             y-scale 0.0045]
         (when date
-          [:div.story-time
-           [cc/horizontal-bar stories :story-name time-by-story y-scale]
+          [:table
+           [:tr [:th ""] [:th "story"] [:th "actual"]]
            (for [[story v] time-by-story2]
-             ^{:key story}
-             [:div
-              [:span.legend
-               {:style {:background-color (cc/item-color story)}}]
-              [:strong.name story] (u/duration-string v)])])))))
+             (let [color (cc/item-color story)]
+               ^{:key story}
+               [:tr
+                [:td [:div.legend {:style {:background-color color}}]]
+                [:td [:strong story]]
+                [:td.time (u/duration-string v)]]))])))))
 
 (defn by-prio-by-active-from
   "Compare by prio first, then by active-from."
