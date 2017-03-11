@@ -228,6 +228,24 @@
   line-height: 1.2em;
 }
 
+.briefing {
+  display: flex;
+
+  form {
+    flex-grow: 1;
+  }
+
+  .stacked-bars {
+    width: 60px;
+    padding: 10px 0 0 10px;
+    display: flex;
+
+    div {
+      width: 14px;
+    }
+  }
+}
+
 .custom-fields, .briefing-details, .task-details {
   fieldset {
     font-size: 0.8em;

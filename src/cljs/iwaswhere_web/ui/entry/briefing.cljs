@@ -104,18 +104,24 @@
 
 (defn started-tasks-list
   "Renders table with open entries, such as started tasks and open habits."
-  [tab-group put-fn]
-  (let [local (r/atom {:on-hold false})
-        cfg (subscribe [:cfg])
+  [tab-group local put-fn]
+  (let [cfg (subscribe [:cfg])
         results (subscribe [:results])
         options (subscribe [:options])
         entries-map (subscribe [:entries-map])
+        options (subscribe [:options])
+        stories (reaction (:stories @options))
         not-on-hold #(not (:on-hold (:task %)))
         on-hold-filter (fn [entry]
                          (let [on-hold (:on-hold (:task entry))]
                            (if (:on-hold @local)
                              on-hold
                              (not on-hold))))
+        book-filter (fn [entry]
+                      (if-let [selected (:selected @local)]
+                        (let [story (get @stories (:linked-story entry))]
+                          (= selected (:linked-book story)))
+                        true))
         filter-btn (fn [fk]
                      [:span.filter {:class    (when (:on-hold @local) "current")
                                     :on-click #(swap! local update-in [:on-hold] not)}
@@ -126,12 +132,13 @@
                              entries (->> (:started-tasks @results)
                                           (map (fn [ts] (get entries-map ts)))
                                           (filter on-hold-filter)
+                                          (filter book-filter)
                                           (sort sorter))
                              conf (merge @cfg @options)]
                          (if (:show-pvt @cfg)
                            entries
                            (filter (u/pvt-filter conf entries-map) entries))))]
-    (fn started-tasks-list-render [tab-group put-fn]
+    (fn started-tasks-list-render [tab-group local put-fn]
       (let [entries-list @entries-list]
         (when (seq entries-list)
           [:div.linked-tasks
@@ -234,10 +241,29 @@
                                            s/split-lines
                                            first)]]]))]]]))))
 
+(defn vertical-bar
+  "Draws vertical stacked barchart."
+  [entities k time-by-entities y-scale]
+  (let [data (cd/time-by-entity-stacked time-by-entities)]
+    (when (seq time-by-entities)
+      [:svg
+       ;{:viewBox (str "0 0 12 300")}
+       [:g (for [[entity {:keys [x v]}] data]
+             (let [h (* y-scale v)
+                   x (* y-scale x)
+                   entity-name (or (k (get entities entity)) "none")]
+               ^{:key (str entity)}
+               [:rect {:fill   (cc/item-color entity-name)
+                       :y      x
+                       :x      0
+                       :width  12
+                       :height h}]))]])))
+
 (defn briefing-view
   [entry put-fn edit-mode? local-cfg]
   (let [chart-data (subscribe [:chart-data])
-        local (r/atom {:filter :open})
+        local (r/atom {:filter :open
+                       :on-hold false})
         stats (subscribe [:stats])
         options (subscribe [:options])
         books (reaction (:books @options))
@@ -275,7 +301,7 @@
               remaining (cd/remaining-times actual-times allocation)
               past-7-days (cd/past-7-days pomodoro-stats :time-by-book)
               tab-group (:tab-group local-cfg)]
-          [:div
+          [:div.briefing
            [:form.briefing-details
             [:fieldset
              [:legend (or day "date not set")]
@@ -292,9 +318,6 @@
                 [:strong closed-cnt] " closed, "
                 [:strong (:started-tasks-cnt @stats)] " started. "
                 [:strong (or (:word-count word-stats) 0)] " words written."])
-             [:div [cc/horizontal-bar books :book-name allocation 0.0045]]
-             [:div [cc/horizontal-bar books :book-name actual-times 0.0045]]
-             [:div [cc/horizontal-bar books :book-name remaining 0.0045]]
              [:div
               "Total planned: "
               [:strong
@@ -330,7 +353,11 @@
                           [:span (u/duration-string allocation)])]
                        [:td.time (u/duration-string actual)]
                        [:td.time [:strong (u/duration-string remaining)]]])))]]]
-             [started-tasks-list tab-group put-fn]
+             [started-tasks-list tab-group local put-fn]
              [open-linked-tasks-list ts local local-cfg put-fn]
              [open-entries-list tab-group :waiting-habits :habit "waiting habits" put-fn]
-             (when day-stats [time-by-stories-list day-stats local])]]])))))
+             (when day-stats [time-by-stories-list day-stats local])]]
+           [:div.stacked-bars
+            [:div [vertical-bar books :book-name allocation 0.0045]]
+            [:div [vertical-bar books :book-name actual-times 0.0045]]
+            [:div [vertical-bar books :book-name remaining 0.0045]]]])))))
