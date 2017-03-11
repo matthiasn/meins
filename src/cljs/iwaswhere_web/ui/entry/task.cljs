@@ -36,7 +36,11 @@
                       (fn [ev]
                         (let [sel (keyword (-> ev .-nativeEvent .-target .-value))
                               updated (assoc-in entry [:task :priority] sel)]
-                          (put-fn [:entry/update-local updated]))))]
+                          (put-fn [:entry/update-local updated]))))
+        hold (fn [entry]
+               (fn [ev]
+                 (let [updated (update-in entry [:task :on-hold] not)]
+                   (put-fn [:entry/update updated]))))]
     (fn [entry put-fn edit-mode?]
       (when (contains? (:tags entry) "#task")
         (when (and edit-mode? (not (:task entry)))
@@ -65,6 +69,11 @@
             [:option {:value :C} "C"]
             [:option {:value :D} "D"]
             [:option {:value :E} "E"]]]
+          [:div
+           [:label "On hold? "]
+           [:input {:type      :checkbox
+                    :checked   (get-in entry [:task :on-hold])
+                    :on-change (hold entry)}]]
           (let [active-from (get-in entry [:task :active-from])]
             (when (or edit-mode? active-from)
               [:div
@@ -182,6 +191,8 @@
                     :read-only (not edit-mode?)
                     :on-input  (active-from entry)
                     :value     (get-in entry [:habit :active-from])}]]
-          [:div [:label "Done? "] [:input {:type      :checkbox
-                                           :checked   (get-in entry [:habit :done])
-                                           :on-change (done entry)}]]]]))))
+          [:div
+           [:label "Done? "]
+           [:input {:type      :checkbox
+                    :checked   (get-in entry [:habit :done])
+                    :on-change (done entry)}]]]]))))

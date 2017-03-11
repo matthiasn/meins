@@ -102,6 +102,63 @@
                                     s/split-lines
                                     first)]]]))]]])))))
 
+(defn started-tasks-list
+  "Renders table with open entries, such as started tasks and open habits."
+  [tab-group put-fn]
+  (let [local (r/atom {:on-hold false})
+        cfg (subscribe [:cfg])
+        results (subscribe [:results])
+        options (subscribe [:options])
+        entries-map (subscribe [:entries-map])
+        not-on-hold #(not (:on-hold (:task %)))
+        on-hold-filter (fn [entry]
+                         (let [on-hold (:on-hold (:task entry))]
+                           (if (:on-hold @local)
+                             on-hold
+                             (not on-hold))))
+        filter-btn (fn [fk]
+                     [:span.filter {:class    (when (:on-hold @local) "current")
+                                    :on-click #(swap! local update-in [:on-hold] not)}
+                      (name fk)])
+        entries-list (reaction
+                       (let [entries-map @entries-map
+                             sorter (entry-compare :task)
+                             entries (->> (:started-tasks @results)
+                                          (map (fn [ts] (get entries-map ts)))
+                                          (filter on-hold-filter)
+                                          (sort sorter))
+                             conf (merge @cfg @options)]
+                         (if (:show-pvt @cfg)
+                           entries
+                           (filter (u/pvt-filter conf entries-map) entries))))]
+    (fn started-tasks-list-render [tab-group put-fn]
+      (let [entries-list @entries-list]
+        (when (seq entries-list)
+          [:div.linked-tasks
+           [:table.habits
+            [:tbody
+             [:tr
+              [:th ""]
+              [:th
+               [:div
+                "started tasks: "
+                [filter-btn :on-hold]]]]
+             (for [entry entries-list]
+               (let [ts (:timestamp entry)]
+                 ^{:key ts}
+                 [:tr {:on-click (up/add-search ts tab-group put-fn)}
+                  [:td
+                   (when-let [prio (-> entry :task :priority)]
+                     [:span.prio {:class prio} prio])]
+                  [:td
+                   [:strong (some-> entry
+                                    :md
+                                    (s/replace "#task" "")
+                                    (s/replace "#habit" "")
+                                    (s/replace "##" "")
+                                    s/split-lines
+                                    first)]]]))]]])))))
+
 (defn open-linked-tasks-list
   "Show open tasks that are also linked with the briefing entry."
   [ts local local-cfg put-fn]
@@ -273,7 +330,7 @@
                           [:span (u/duration-string allocation)])]
                        [:td.time (u/duration-string actual)]
                        [:td.time [:strong (u/duration-string remaining)]]])))]]]
-             [open-entries-list tab-group :started-tasks :task "started tasks" put-fn]
+             [started-tasks-list tab-group put-fn]
              [open-linked-tasks-list ts local local-cfg put-fn]
              [open-entries-list tab-group :waiting-habits :habit "waiting habits" put-fn]
              (when day-stats [time-by-stories-list day-stats local])]]])))))
