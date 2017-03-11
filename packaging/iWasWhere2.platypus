@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>AcceptsFiles</key>
-	<true/>
+	<false/>
 	<key>AcceptsText</key>
 	<false/>
 	<key>Authentication</key>
@@ -12,21 +12,19 @@
 	<string>mn</string>
 	<key>BundledFiles</key>
 	<array>
-		<string>/Users/mn/Downloads/zulu8.17.0.3-jdk8.0.102-macosx_x64</string>
 		<string>/Users/mn/github/iWasWhere/bin/blink1-tool</string>
 		<string>/Users/mn/github/iWasWhere/target/iwaswhere-web-0.1.36-standalone.jar</string>
+		<string>/Users/mn/Downloads/zulu8.20.0.5-jdk8.0.121-macosx_x64</string>
 	</array>
 	<key>Creator</key>
-	<string>Platypus-5.1</string>
+	<string>Platypus-5.2</string>
 	<key>DeclareService</key>
 	<false/>
 	<key>Destination</key>
 	<string>/Users/mn/Desktop/Application.app</string>
-	<key>DestinationOverride</key>
-	<false/>
 	<key>DevelopmentVersion</key>
 	<false/>
-	<key>DocIcon</key>
+	<key>DocIconPath</key>
 	<string></string>
 	<key>Droppable</key>
 	<false/>
@@ -36,32 +34,32 @@
 	<string>/Users/mn/Library/Application Support/Platypus/PlatypusIcon-67221.icns</string>
 	<key>Identifier</key>
 	<string>org.mn.iWasWhere</string>
-	<key>Interpreter</key>
-	<string>/usr/bin/env</string>
+	<key>InterfaceType</key>
+	<string>Text Window</string>
 	<key>InterpreterArgs</key>
 	<array>
 		<string>bash</string>
 	</array>
+	<key>InterpreterPath</key>
+	<string>/usr/bin/env</string>
 	<key>Name</key>
 	<string>iWasWhere</string>
 	<key>NibPath</key>
 	<string>/usr/local/share/platypus/MainMenu.nib</string>
 	<key>OptimizeApplication</key>
 	<true/>
-	<key>Output</key>
-	<string>Text Window</string>
+	<key>Overwrite</key>
+	<false/>
 	<key>PromptForFileOnLaunch</key>
 	<false/>
 	<key>RemainRunning</key>
 	<true/>
+	<key>RunInBackground</key>
+	<false/>
 	<key>ScriptArgs</key>
 	<array/>
 	<key>ScriptPath</key>
 	<string>/Users/mn/github/iWasWhere/run-packaged2.sh</string>
-	<key>Secure</key>
-	<false/>
-	<key>ShowInDock</key>
-	<false/>
 	<key>StatusItemDisplayType</key>
 	<string>Text</string>
 	<key>StatusItemIcon</key>
@@ -236,7 +234,7 @@
 	uv5L/tz/bf//
 	</data>
 	<key>StatusItemIconIsTemplate</key>
-	<false/>
+	<true/>
 	<key>StatusItemTitle</key>
 	<string>Title</string>
 	<key>StatusItemUseSystemFont</key>
@@ -244,15 +242,15 @@
 	<key>Suffixes</key>
 	<array/>
 	<key>TextBackground</key>
-	<string>#ffffff</string>
-	<key>TextEncoding</key>
-	<integer>4</integer>
+	<string>#333333</string>
 	<key>TextFont</key>
 	<string>Monaco</string>
 	<key>TextForeground</key>
-	<string>#000000</string>
+	<string>#00ff80</string>
 	<key>TextSize</key>
 	<real>8</real>
+	<key>URISchemes</key>
+	<array/>
 	<key>UniformTypes</key>
 	<array>
 		<string>public.item</string>
@@ -261,6 +259,6 @@
 	<key>UseXMLPlistFormat</key>
 	<false/>
 	<key>Version</key>
-	<string>0.1.36</string>
+	<string>1.0</string>
 </dict>
 </plist>
