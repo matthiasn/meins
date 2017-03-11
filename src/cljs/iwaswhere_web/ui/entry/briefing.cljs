@@ -97,6 +97,7 @@
                    [:strong (some-> entry
                                     :md
                                     (s/replace "#task" "")
+                                    (s/replace "#habit" "")
                                     (s/replace "##" "")
                                     s/split-lines
                                     first)]]]))]]])))))

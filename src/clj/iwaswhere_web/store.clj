@@ -13,10 +13,8 @@
             [me.raynes.fs :as fs]
             [iwaswhere-web.fulltext-search :as ft]
             [clojure.pprint :as pp]
-            [clojure.edn :as edn]))
-
-(def default-config {:pvt-tags      #{}
-                     :pvt-displayed #{"#pvt" "#private" "#nsfw" "#consumption"}})
+            [clojure.edn :as edn]
+            [clojure.java.io :as io]))
 
 (defn read-dir
   [state entries-to-index cfg custom-path]
@@ -38,10 +36,16 @@
                 (log/error "Exception" ex "when parsing line:\n" line)))))))))
 
 (defn load-cfg
-  "Load config from file, or default config."
+  "Load config from file. When not exists, use default config and write the
+   default to data path."
   []
-  (try (edn/read-string (slurp (str f/data-path "/conf.edn")))
-       (catch Exception ex (log/error ex) default-config)))
+  (let [conf-path (str f/data-path "/conf.edn")
+        default (edn/read-string (slurp (io/resource "default-conf.edn")))]
+    (try (edn/read-string (slurp conf-path))
+         (catch Exception ex
+           (do (log/warn "No config found -> copying from default.")
+               (spit conf-path (with-out-str (pp/pprint default)))
+               default)))))
 
 (defn state-fn
   "Initial state function, creates state atom and then parses all files in
