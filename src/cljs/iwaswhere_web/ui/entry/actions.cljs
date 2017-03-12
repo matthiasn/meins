@@ -85,12 +85,16 @@
   (let [local (r/atom {:visible false})
         toggle-visible #(swap! local update-in [:visible] not)]
     (fn [entry put-fn]
-      [:span.new-link-btn
-       [:span.fa.fa-map-marker.toggle {:on-click toggle-visible}]
-       (when (:visible @local)
-         [:span.new-link
-          {:on-click #(do (toggle-visible))}
-          [:span.fa.fa-plus-square] "add location"])])))
+      (let [new-loc #(put-fn [:entry/update-local
+                              (assoc-in % [:location :type] :location)])]
+        (when-not (:location entry)
+          [:span.new-link-btn
+           [:span.fa.fa-map-marker.toggle
+            {:on-click toggle-visible}]
+           (when (:visible @local)
+             [:span.new-link
+              {:on-click #(do (toggle-visible) (new-loc entry))}
+              [:span.fa.fa-plus-square] "add location"])])))))
 
 (defn upvote-fn [entry op put-fn]
   "Create click function for like. Can handle both upvotes and downvotes."

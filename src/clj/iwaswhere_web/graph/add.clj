@@ -179,6 +179,15 @@
       (do (log/warn "remove-node cannot find node: " ts)
           current-state))))
 
+(defn add-location
+  "When entry defines a :location, adds node for location. Does nothing otherwise."
+  [graph entry]
+  (if (:location entry)
+    (-> graph
+        (uc/add-nodes :locations)
+        (uc/add-edges [:locations (:timestamp entry)]))
+    graph))
+
 (defn add-story
   "When entry is a :story, adds node for story.
    Does nothing when entry is not of type :story."
@@ -253,6 +262,7 @@
         (update-in [:graph] add-parent-ref new-entry)
         (update-in [:graph] add-story new-entry)
         (update-in [:graph] add-book new-entry)
+        (update-in [:graph] add-location new-entry)
         (add-story-set new-entry)
         (add-tasks-set new-entry)
         (update-in [:sorted-entries] conj ts))))

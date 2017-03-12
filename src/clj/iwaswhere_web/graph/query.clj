@@ -100,6 +100,9 @@
             (contains? opts ":story")
             (= :story (:entry-type entry))
 
+            (contains? opts ":location")
+            (:location entry)
+
             (contains? opts ":book")
             (= :book (:entry-type entry))
 
@@ -303,6 +306,15 @@
         book-ids (map :dest (uc/find-edges g {:src :books}))
         books (into {} (map (fn [id] [id (uc/attrs g id)]) book-ids))]
     books))
+
+(defn find-all-locations
+  "Finds all location in graph and returns map with the id of the location
+   (creation timestamp) as key and the location node itself as value."
+  [current-state]
+  (let [g (:graph current-state)
+        location-ids (map :dest (uc/find-edges g {:src :locations}))
+        locations (into {} (map (fn [id] [id (uc/attrs g id)]) location-ids))]
+    locations))
 
 (defn find-all-consumption-types
   "Finds all consumption types used in entries by finding the edges that

@@ -249,6 +249,7 @@
    :pvt-displayed       (:pvt-displayed (:cfg current-state))
    :mentions            (gq/find-all-mentions current-state)
    :stories             (gq/find-all-stories current-state)
+   :locations           (gq/find-all-locations current-state)
    :books               (gq/find-all-books current-state)
    :custom-fields       (:custom-fields (:cfg current-state))
    :custom-field-charts (:custom-field-charts (:cfg current-state))

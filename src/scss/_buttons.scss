@@ -81,6 +81,10 @@ a, a:visited {
   padding: 2px;
   margin-left: 4px;
   cursor: pointer;
+
+  &.green {
+    color: darken($green, 10);
+  }
 }
 
 .fa-thumbs-up, .fa-thumbs-down {

@@ -18,6 +18,7 @@
                  [cljsjs/react-grid-layout "0.13.7-0"]
                  [com.drewnoakes/metadata-extractor "2.10.1"]
                  [ubergraph "0.3.1"]
+                 [factual/geo "1.0.0"]
                  [camel-snake-kebab "0.4.0"]
                  [matthiasn/systems-toolbox "0.6.5"]
                  [reagent "0.6.1" :exclusions [cljsjs/react cljsjs/react-dom]]

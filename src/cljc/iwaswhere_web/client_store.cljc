@@ -43,11 +43,13 @@
             (assoc-in [:options :custom-fields] (:custom-fields msg-payload))
             (assoc-in [:options :custom-field-charts] (:custom-field-charts msg-payload))
             (assoc-in [:options :stories] stories)
+            (assoc-in [:options :locations] (:locations msg-payload))
             (assoc-in [:options :sorted-stories] sorted-stories)
             (assoc-in [:options :books] books)
             (assoc-in [:options :sorted-books] sorted-books)
             (assoc-in [:options :mentions] (:mentions msg-payload))
             (assoc-in [:stats] (:stats msg-payload)))]
+    (prn (:locations msg-payload))
     #?(:cljs (stats/update-stats put-fn))
     {:new-state new-state}))
 
