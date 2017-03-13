@@ -12,7 +12,7 @@
                  [clj-time "0.13.0"]
                  [clj-http "3.4.1"]
                  [me.raynes/fs "1.4.6"]
-                 [markdown-clj "0.9.97"]
+                 [markdown-clj "0.9.98"]
                  [cheshire "5.7.0"]
                  [cljsjs/moment "2.17.1-0"]
                  [cljsjs/react-grid-layout "0.13.7-0"]
@@ -46,7 +46,7 @@
   :jvm-opts ["-XX:-OmitStackTraceInFastThrow"]
 
   :profiles {:uberjar {:aot :all}
-             :dev {:dependencies [[re-frisk "0.3.2"]]}}
+             :dev {:dependencies [[re-frisk "0.4.4"]]}}
 
   :plugins [[lein-cljsbuild "1.1.5"
              :exclusions [org.apache.commons/commons-compress]]
