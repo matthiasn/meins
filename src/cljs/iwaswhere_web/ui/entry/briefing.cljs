@@ -61,9 +61,9 @@
           active-y (get-in y [k :active-from])]
       (if (not= c 0) c (compare active-x active-y)))))
 
-(defn open-entries-list
+(defn waiting-habits-list
   "Renders table with open entries, such as started tasks and open habits."
-  [tab-group qk k header put-fn]
+  [tab-group entry put-fn]
   (let [cfg (subscribe [:cfg])
         results (subscribe [:results])
         options (subscribe [:options])
@@ -71,27 +71,29 @@
         entries-list
         (reaction
           (let [entries-map @entries-map
-                sorter (entry-compare k)
-                entries (->> (qk @results)
+                sorter (entry-compare :habit)
+                entries (->> (:waiting-habits @results)
                              (map (fn [ts] (get entries-map ts)))
                              (sort sorter))
                 conf (merge @cfg @options)]
             (if (:show-pvt @cfg)
               entries
               (filter (u/pvt-filter conf entries-map) entries))))]
-    (fn open-entries-list-render [tab-group qk k header put-fn]
-      (let [entries-list @entries-list]
-        (when (seq entries-list)
+    (fn waiting-habits-list-render [tab-group entry put-fn]
+      (let [entries-list @entries-list
+            today (.format (js/moment.) "YYYY-MM-DD")
+            briefing-day (-> entry :briefing :day)]
+        (when (and (= today briefing-day) (seq entries-list))
           [:div
            [:table.habits
             [:tbody
-             [:tr [:th ""] [:th header]]
+             [:tr [:th ""] [:th "waiting habits"]]
              (for [entry entries-list]
                (let [ts (:timestamp entry)]
                  ^{:key ts}
                  [:tr {:on-click (up/add-search ts tab-group put-fn)}
                   [:td
-                   (when-let [prio (-> entry k :priority)]
+                   (when-let [prio (-> entry :habit :priority)]
                      [:span.prio {:class prio} prio])]
                   [:td
                    [:strong (some-> entry
@@ -355,7 +357,7 @@
                        [:td.time [:strong (u/duration-string remaining)]]])))]]]
              [started-tasks-list tab-group local put-fn]
              [open-linked-tasks-list ts local local-cfg put-fn]
-             [open-entries-list tab-group :waiting-habits :habit "waiting habits" put-fn]
+             [waiting-habits-list tab-group entry put-fn]
              (when day-stats [time-by-stories-list day-stats local])]]
            [:div.stacked-bars
             [:div [vertical-bar books :book-name allocation 0.0045]]
