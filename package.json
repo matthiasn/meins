@@ -1,6 +1,6 @@
 {
   "name": "iWasWhere",
-  "version": "0.1.36",
+  "version": "0.1.37",
   "author": "matthias.nehlsen@gmail.com",
   "scripts": {
     "watch": "webpack -d --watch",
@@ -17,6 +17,8 @@
     "draft-js-mention-plugin": "^2.0.0-beta9",
     "draft-js-plugins-editor": "^2.0.0-beta9",
     "extract-text-webpack-plugin": "^2.0.0",
+    "moment": "^2.17.1",
+    "rc-calendar": "^7.6.7",
     "react": "15.4.2",
     "react-addons-perf": "^15.4.2",
     "react-dom": "15.4.2",

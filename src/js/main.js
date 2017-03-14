@@ -6,6 +6,7 @@ window.deps = {
     'react-responsive-carousel' : require('react-responsive-carousel').Carousel,
     'editor' : require ('./editor'),
     'SearchFieldEditor' : require ('./SearchFieldEditor'),
+    'Calendar' : require ('./calendar'),
 };
 
 window.React = window.deps['react'];

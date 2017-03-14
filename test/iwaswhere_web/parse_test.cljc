@@ -45,6 +45,7 @@
    :mentions    #{}
    :opts        #{}
    :date-string nil
+   :briefing    nil
    :timestamp   nil
    :n           20})
 
@@ -56,6 +57,7 @@
    :mentions    #{}
    :opts        #{}
    :date-string nil
+   :briefing    nil
    :timestamp   nil
    :n           20})
 
@@ -67,6 +69,7 @@
    :mentions    #{}
    :opts        #{}
    :date-string nil
+   :briefing    nil
    :timestamp   nil
    :n           20})
 
@@ -78,6 +81,7 @@
    :mentions    #{}
    :opts        #{":started"}
    :date-string nil
+   :briefing    nil
    :timestamp   nil
    :n           20})
 
@@ -89,6 +93,7 @@
    :mentions    #{"@myself"}
    :opts        #{}
    :date-string nil
+   :briefing    nil
    :timestamp   nil
    :n           20})
 
@@ -100,6 +105,19 @@
    :mentions    #{"@myself"}
    :opts        #{}
    :date-string "2016-06-07"
+   :briefing    nil
+   :timestamp   nil
+   :n           20})
+
+(def briefing-search
+  {:search-text "briefing:2016-06-07"
+   :ft-search   nil
+   :tags        #{}
+   :not-tags    #{}
+   :mentions    #{}
+   :opts        #{}
+   :date-string nil
+   :briefing    "2016-06-07"
    :timestamp   nil
    :n           20})
 
@@ -111,36 +129,49 @@
    :mentions    #{}
    :opts        #{}
    :date-string nil
+   :briefing    nil
    :timestamp   "1465325998053"
    :n           20})
 
 (deftest parse-search-test
   (testing
     "empty query is parsed correctly"
-    (is (= (p/parse-search (:search-text empty-search)) empty-search)))
+    (is (= (p/parse-search (:search-text empty-search))
+           empty-search)))
 
   (testing
     "open tasks query is parsed correctly"
-    (is (= (p/parse-search (:search-text open-tasks-search)) open-tasks-search)))
+    (is (= (p/parse-search (:search-text open-tasks-search))
+           open-tasks-search)))
 
   (testing
     "tasks done query is parsed correctly"
-    (is (= (p/parse-search (:search-text tasks-done-search)) tasks-done-search)))
+    (is (= (p/parse-search (:search-text tasks-done-search))
+           tasks-done-search)))
 
   (testing
     "fulltext search string is parsed correctly"
-    (is (= (p/parse-search (:search-text started-tasks-search)) started-tasks-search)))
+    (is (= (p/parse-search (:search-text started-tasks-search))
+           started-tasks-search)))
 
   (testing
     "fulltext search string is parsed correctly"
-    (is (= (p/parse-search (:search-text fulltext-search)) fulltext-search)))
+    (is (= (p/parse-search (:search-text fulltext-search))
+           fulltext-search)))
 
   (testing
     "day query is parsed correctly"
-    (is (= (p/parse-search (:search-text day-search)) day-search)))
+    (is (= (p/parse-search (:search-text day-search))
+           day-search)))
+
+  (testing
+    "briefing for day query is parsed correctly"
+    (is (= (p/parse-search (:search-text briefing-search))
+           briefing-search)))
 
   (testing "timestamp query is parsed correctly"
-    (is (= (p/parse-search (:search-text timestamp-search)) timestamp-search))))
+    (is (= (p/parse-search (:search-text timestamp-search))
+           timestamp-search))))
 
 
 (def tags #{"#task" "#goal" "#autocomplete" "#autosuggestion" "#Clojure"

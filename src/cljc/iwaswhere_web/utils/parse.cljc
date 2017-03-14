@@ -7,11 +7,13 @@
 (def search-tag-regex (re-pattern (str "(?m)(?:^|[^~])(#" tag-char-cls "+)")))
 (def search-not-tags-regex (re-pattern (str "(?m)~#" tag-char-cls "+")))
 (def search-mention-regex (re-pattern (str "(?m)@" tag-char-cls "+")))
-(def search-opts-regex (re-pattern (str "(?m):" tag-char-cls "+")))
+(def search-opts-regex (re-pattern (str "(?m):[a-zA-Z]+")))
 (def entry-tag-regex
   (re-pattern (str "(?m)(?!^) ?#" tag-char-cls "+(?!" tag-char-cls ")")))
 (def entry-mentions-regex
   (re-pattern (str "(?m) ?@" tag-char-cls "+(?!" tag-char-cls ")")))
+(def date-regex #"(?m)(?:^|[^:])([0-9]{4}-[0-9]{2}-[0-9]{2})")
+(def briefing-date-regex #"(?m)(?:briefing:)([0-9]{4}-[0-9]{2}-[0-9]{2})")
 
 (defn parse-entry
   "Parses entry for hashtags and mentions. Either can consist of any of the word
@@ -41,7 +43,8 @@
                             (re-seq search-not-tags-regex text)))
      :mentions    (set (re-seq search-mention-regex text))
      :opts        (set (re-seq search-opts-regex text))
-     :date-string (re-find #"[0-9]{4}-[0-9]{2}-[0-9]{2}" text)
+     :briefing    (second (re-find briefing-date-regex text))
+     :date-string (second (re-find date-regex text))
      :timestamp   (re-find #"[0-9]{13}" text)
      :n           20}))
 

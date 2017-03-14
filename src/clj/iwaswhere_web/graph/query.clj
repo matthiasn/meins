@@ -163,6 +163,18 @@
                                                      :day   (ct/day dt)}
                                       :relationship :DATE})))))
 
+(defn get-briefing-for-day
+  "Extract matching timestamps for query."
+  [g query]
+  (when-let [briefing-day (:briefing query)]
+    (let [dt (ctf/parse (ctf/formatters :year-month-day) briefing-day)
+          day-node {:type  :timeline/day
+                    :year  (ct/year dt)
+                    :month (ct/month dt)
+                    :day   (ct/day dt)}]
+      (set (map :dest (uc/find-edges g {:src day-node
+                                        :relationship :BRIEFING}))))))
+
 (defn get-connected-nodes
   "Extract matching timestamps for query."
   [g node]
@@ -207,6 +219,10 @@
                       ; set with timestamps matching the day
                       (:date-string query)
                       (get-nodes-for-day g query)
+
+                      ; set with timestamps matching the day
+                      (:briefing query)
+                      (get-briefing-for-day g query)
 
                       ; query is for specific story
                       (:story query)

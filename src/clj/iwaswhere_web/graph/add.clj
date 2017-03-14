@@ -188,6 +188,20 @@
         (uc/add-edges [:locations (:timestamp entry)]))
     graph))
 
+(defn add-briefing
+  "When entry defines a :briefing, adds node. Does nothing otherwise."
+  [graph entry]
+  (if-let [briefing-day (-> entry :briefing :day)]
+    (let [dt (ctf/parse (ctf/formatters :year-month-day) briefing-day)
+          year (ct/year dt)
+          month (ct/month dt)
+          day (ct/day dt)
+          day-node {:type :timeline/day :year year :month month :day day}]
+      (-> graph
+          (uc/add-nodes day-node)
+          (uc/add-edges [day-node (:timestamp entry) {:relationship :BRIEFING}])))
+    graph))
+
 (defn add-story
   "When entry is a :story, adds node for story.
    Does nothing when entry is not of type :story."
@@ -263,6 +277,7 @@
         (update-in [:graph] add-story new-entry)
         (update-in [:graph] add-book new-entry)
         (update-in [:graph] add-location new-entry)
+        (update-in [:graph] add-briefing new-entry)
         (add-story-set new-entry)
         (add-tasks-set new-entry)
         (update-in [:sorted-entries] conj ts))))

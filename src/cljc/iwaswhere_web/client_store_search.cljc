@@ -91,16 +91,16 @@
             new-state (assoc-in current-state active-path query-id)]
         (reset! query-cfg (:query-cfg new-state))
         {:new-state new-state})
-      (let [new-state (-> current-state
+      (let [new-query (merge {:query-id query-id} (p/parse-search "") query)
+            new-state (-> current-state
                           (assoc-in active-path query-id)
+                          (assoc-in [:query-cfg :queries query-id] new-query)
                           (update-in all-path conj query-id)
                           (update-in [:query-cfg :tab-groups tab-group :history]
                                      #(conj (take 20 %1) %2)
-                                     query-id))
-            new-query (merge {:query-id query-id} (p/parse-search "") query)]
+                                     query-id))]
         (reset! query-cfg (:query-cfg new-state))
-        {:new-state    new-state
-         :send-to-self [:search/update new-query]}))))
+        {:new-state new-state}))))
 
 (defn previously-active
   "Sets active query for the tab group to the previously active query."

@@ -19,10 +19,12 @@
                        :tabs-right    {:type      :tabs-view
                                        :query-id  :right
                                        :data-grid {:x 15 :y 0 :w 9 :h 19}}
-                       :custom-fields {:type      :custom-fields-chart
+                       :calendar      {:type      :calendar
                                        :data-grid {:x 0 :y 0 :w 6 :h 10}}
+                       :custom-fields {:type      :custom-fields-chart
+                                       :data-grid {:x 0 :y 3 :w 6 :h 10}}
                        :all-stats     {:type      :all-stats-chart
-                                       :data-grid {:x 0 :y 0 :w 6 :h 9}}}})
+                                       :data-grid {:x 0 :y 6 :w 6 :h 9}}}})
 
 #?(:clj  (defonce app-cfg (atom default-config))
    :cljs (defonce app-cfg (sa/local-storage (atom default-config)

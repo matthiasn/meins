@@ -4,6 +4,7 @@
             [iwaswhere-web.ui.journal :as j]
             [clojure.string :as s]
             [cljsjs.react-grid-layout]
+            [iwaswhere-web.ui.calendar :as cal]
             [iwaswhere-web.helpers :as h]
             [iwaswhere-web.ui.search :as search]
             [iwaswhere-web.ui.stats :as stats]
@@ -66,6 +67,7 @@
        :tabs-view [tabs-view (:query-id widget-cfg) put-fn]
        :custom-fields-chart [cf2/custom-fields-chart put-fn]
        :all-stats-chart [stats/stats-view put-fn]
+       :calendar [cal/calendar-view put-fn]
        [:div "unknown type"])]))
 
 (defn grid
