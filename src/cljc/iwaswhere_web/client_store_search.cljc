@@ -75,7 +75,9 @@
   [query-cfg tab-group query]
   (let [all-path [:tab-groups tab-group :all]
         queries (map #(get-in query-cfg [:queries %]) (get-in query-cfg all-path))
-        matching (filter #(= (:search-text query) (:search-text %)) queries)]
+        matching (filter #(and (= (:search-text query) (:search-text %))
+                               (= (:story query) (:story %)))
+                         queries)]
     (first matching)))
 
 (defn add-query

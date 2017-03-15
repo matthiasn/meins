@@ -48,7 +48,7 @@
 
         (testing
           "simple query2 returns all results"
-          (is (= 108
+          (is (= 107
                  (count (get-in res [:entries simple-query2-uid])))))
 
         (testing

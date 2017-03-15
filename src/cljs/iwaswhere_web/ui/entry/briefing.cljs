@@ -15,7 +15,7 @@
 
 (defn time-by-stories-list
   "Render list of times spent on individual stories, plus the total."
-  [day-stats local]
+  [day-stats local put-fn]
   (let [stories (subscribe [:stories])
         books (subscribe [:books])
         book-filter (fn [[k v]]
@@ -25,8 +25,8 @@
                         true))
         story-name-mapper (fn [[k v]]
                             (let [s (or (:story-name (get @stories k)) "none")]
-                              [s v]))]
-    (fn [day-stats local]
+                              [k s v]))]
+    (fn [day-stats local put-fn]
       (let [stories @stories
             books @books
             dur (u/duration-string (:total-time day-stats))
@@ -36,16 +36,22 @@
                                 :time-by-story
                                 (filter book-filter)
                                 (map story-name-mapper)
-                                (sort-by first))
+                                (sort-by second))
             y-scale 0.0045]
         (when date
           [:table
            [:tbody
             [:tr [:th ""] [:th "story"] [:th "actual"]]
-            (for [[story v] time-by-story2]
-              (let [color (cc/item-color story)]
+            (for [[id story v] time-by-story2]
+              (let [color (cc/item-color story)
+                    q (merge
+                        (up/parse-search date)
+                        {:story (when-not (js/isNaN id) id)})
+                    click-fn (fn [_]
+                               (put-fn [:search/add {:tab-group :right
+                                                     :query q}]))]
                 ^{:key story}
-                [:tr
+                [:tr {:on-click click-fn}
                  [:td [:div.legend {:style {:background-color color}}]]
                  [:td [:strong story]]
                  [:td.time (u/duration-string v)]]))]])))))
@@ -358,7 +364,7 @@
              [started-tasks-list tab-group local put-fn]
              [open-linked-tasks-list ts local local-cfg put-fn]
              [waiting-habits-list tab-group entry put-fn]
-             (when day-stats [time-by-stories-list day-stats local])]]
+             (when day-stats [time-by-stories-list day-stats local put-fn])]]
            [:div.stacked-bars
             [:div [vertical-bar books :book-name allocation 0.0045]]
             [:div [vertical-bar books :book-name actual-times 0.0045]]

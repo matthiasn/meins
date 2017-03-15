@@ -368,7 +368,7 @@
                                 (extract-sorted-entries current-state query)))
         comment-timestamps (set (apply concat (map :comments entries)))
         comments (map #(uc/attrs g %) comment-timestamps)]
-    {:entries     (mapv :timestamp entries)
+    {:entries     (vec (into (sorted-set-by >) (mapv :timestamp entries)))
      :entries-map (into {} (concat (map entry-mapper entries)
                                    (map entry-mapper comments)))}))
 
