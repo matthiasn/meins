@@ -248,7 +248,7 @@
 
 .custom-fields, .briefing-details, .task-details {
   fieldset {
-    font-size: 0.8em;
+    font-size: 0.9em;
     margin-top: 0.5em;
     legend {
       font-weight: 400;
@@ -286,6 +286,9 @@
 
         &.selected {
           background-color: desaturate(lighten($hashtag-blue, 30), 15);
+        }
+        &:hover {
+          background-color: antiquewhite;
         }
       }
 
