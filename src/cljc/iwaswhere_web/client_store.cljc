@@ -39,7 +39,6 @@
             (assoc-in [:options :hashtags] (:hashtags msg-payload))
             (assoc-in [:options :pvt-hashtags] (:pvt-hashtags msg-payload))
             (assoc-in [:options :pvt-displayed] (:pvt-displayed msg-payload))
-            (assoc-in [:options :consumption-types] (:consumption-types msg-payload))
             (assoc-in [:options :custom-fields] (:custom-fields (:cfg msg-payload)))
             (assoc-in [:options :custom-field-charts] (:custom-field-charts (:cfg msg-payload)))
             (assoc-in [:options :stories] stories)

@@ -348,14 +348,6 @@
                                 briefing-ids))]
     briefings))
 
-(defn find-all-consumption-types
-  "Finds all consumption types used in entries by finding the edges that
-   originate from the :consumption-types node."
-  [current-state]
-  (let [g (:graph current-state)]
-    (set (map #(-> % :dest :name)
-              (uc/find-edges g {:src :consumption-types})))))
-
 (defn comments-linked-for-entry
   "Enrich entry with comments and linked entries."
   [graph sort-by-upvotes?]
