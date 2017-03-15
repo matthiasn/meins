@@ -22,6 +22,7 @@
 (reg-sub :combined-entries (fn [db _] (merge (:entries-map db) (:new-entries db))))
 (reg-sub :cfg (fn [db _] (:cfg db)))
 (reg-sub :stats (fn [db _] (:stats db)))
+(reg-sub :briefings (fn [db _] (:briefings db)))
 (reg-sub :timing (fn [db _] (:timing db)))
 (reg-sub :chart-data (fn [db _]
                        (select-keys db [:pomodoro-stats

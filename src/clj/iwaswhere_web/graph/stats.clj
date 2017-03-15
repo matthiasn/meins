@@ -250,9 +250,9 @@
    :mentions            (gq/find-all-mentions current-state)
    :stories             (gq/find-all-stories current-state)
    :locations           (gq/find-all-locations current-state)
+   :briefings           (gq/find-all-briefings current-state)
    :books               (gq/find-all-books current-state)
-   :custom-fields       (:custom-fields (:cfg current-state))
-   :custom-field-charts (:custom-field-charts (:cfg current-state))
+   :cfg                 (:cfg current-state)
    :consumption-types   (gq/find-all-consumption-types current-state)})
 
 (defn stats-tags-fn

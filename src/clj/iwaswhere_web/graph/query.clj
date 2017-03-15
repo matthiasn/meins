@@ -335,6 +335,19 @@
         locations (into {} (map (fn [id] [id (uc/attrs g id)]) location-ids))]
     locations))
 
+(defn find-all-briefings
+  "Finds all briefings in graph and returns map with the day as key and the
+   briefing node id as value."
+  [current-state]
+  (let [g (:graph current-state)
+        briefing-ids (map :dest (uc/find-edges g {:src :briefings}))
+        briefings (into {} (map (fn [id]
+                                  (let [entry (uc/attrs g id)
+                                        day (-> entry :briefing :day)]
+                                    [day id]))
+                                briefing-ids))]
+    briefings))
+
 (defn find-all-consumption-types
   "Finds all consumption types used in entries by finding the edges that
    originate from the :consumption-types node."
