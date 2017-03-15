@@ -82,9 +82,12 @@
                 (let [active-from (get-in entry [:habit :active-from])
                       dtz (ct/default-time-zone)
                       fmt (ctf/formatter "yyyy-MM-dd'T'HH:mm" dtz)
-                      from (ctf/parse fmt active-from)]
+                      from (ctf/parse fmt active-from)
+                      now (ct/now)
+                      today-at (ct/today-at (ct/hour from) (ct/minute from))]
                   (and (not (:done (:habit entry)))
-                       (t/after? (ct/now) from)))))
+                       (t/after? now from)
+                       (t/after? now today-at)))))
 
             (contains? opts ":due")
             (let [due-ts (:due (:task entry))]
