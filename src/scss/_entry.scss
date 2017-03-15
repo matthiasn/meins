@@ -317,25 +317,25 @@
     }
     input {
       margin-right: 6px;
-      width: 60px;
+      width: 90px;
       padding: 1px 3px;
     }
     input[type="number"] {
-      width: 45px;
+      width: 65px;
       font-size: 0.9em;
       margin-left: 5px;
     }
     input[type="text"] {
-      width: 60px;
+      width: 120px;
     }
     input[type="checkbox"] {
-      width: 12px;
+      width: 15px;
     }
     input[type="date"] {
-      width: 110px;
+      width: 130px;
     }
     input[type="datetime-local"] {
-      width: 140px;
+      width: 160px;
     }
     div {
       line-height: 1.5em;
@@ -370,3 +370,6 @@
   }
 }
 
+u {
+  text-decoration-skip: ink;
+}
