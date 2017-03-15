@@ -10,7 +10,7 @@
 (defn calendar-view
   "Renders calendar component."
   [put-fn]
-  (let [calendar (r/adapt-react-class (aget js/window "deps" "Calendar" "default"))
+  (let [calendar (r/adapt-react-class (aget js/window "deps" "FullCalendar" "default"))
         briefings (subscribe [:briefings])
         cfg (subscribe [:cfg])
         select-fn (fn [dt]
@@ -21,13 +21,24 @@
                               md (str "## " weekday "'s #briefing")
                               new-entry (merge
                                           (p/parse-entry md)
-                                          {:briefing {:day fmt}
+                                          {:briefing     {:day fmt}
                                            :linked-story (:briefing-story @cfg)})
                               new-entry-fn (h/new-entry-fn put-fn new-entry nil)]
                           (new-entry-fn)))
-                      (put-fn [:search/add {:tab-group :left :query q}])))]
+                      (put-fn [:search/add {:tab-group :left :query q}])))
+        cell-render (r/reactify-component
+                      (fn [props]
+                        (let [m (js/moment (:_d props))
+                              fmt (.format m "YYYY-MM-DD")
+                              cls (when (get @briefings fmt) "briefing-exists")]
+                          [:div.rc-calendar-date
+                           {:class cls}
+                           (.date m)])))]
     (fn stats-view-render [put-fn]
-      (let []
+      (let [briefings @briefings]
         [:div.calendar
-         [calendar {:events    []
-                    :on-select select-fn}]]))))
+         [calendar {:events      []
+                    :on-select   select-fn
+                    :foo         "bar"
+                    :briefings   briefings
+                    :cell-render cell-render}]]))))

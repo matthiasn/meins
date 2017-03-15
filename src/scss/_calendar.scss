@@ -1,6 +1,3 @@
-.rc-calendar {
-  box-sizing: border-box;
-}
 .rc-calendar * {
   box-sizing: border-box;
 }
@@ -1092,7 +1089,7 @@
   float: left;
 }
 .rc-calendar-full {
-  width: 275px;
+  //width: 275px;
 }
 .rc-calendar-full-header {
   padding: 5px 10px;
@@ -1113,6 +1110,7 @@
 .rc-calendar-full-header-switcher {
   float: right;
   display: inline-block;
+  opacity: 0;
 }
 .rc-calendar-full-header-switcher-normal:hover {
   border-color: #23c0fa;
@@ -1179,3 +1177,8 @@
 }
 
 /*# sourceMappingURL=rc-calendar.css.map*/
+
+.briefing-exists {
+  font-weight: bold;
+  border: 1px solid #DDD;
+}
