@@ -12,7 +12,6 @@
    :utc-offset     -120
    :entry-type     :pomodoro
    :planned-dur    1500
-   :interruptions  0
    :comment-for    1465059139281
    :completed-time 0
    :timestamp      1465059173965
@@ -214,10 +213,6 @@
         "pomodoro set to not running"
         (is (not (:pomodoro-running
                    (get-in new-state3 [:new-entries 1465059173965])))))
-      (testing
-        "one interruption recorded"
-        (is (= 1 (get-in new-state3
-                         [:new-entries 1465059173965 :interruptions]))))
       (testing
         "new entries atom properly updated - this would be backed by
          localstorage on client"

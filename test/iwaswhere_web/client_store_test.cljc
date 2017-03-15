@@ -37,7 +37,6 @@
    :utc-offset     -120
    :entry-type     :pomodoro
    :planned-dur    1500
-   :interruptions  0
    :comment-for    1465059139281
    :completed-time 0
    :timestamp      1465059173965

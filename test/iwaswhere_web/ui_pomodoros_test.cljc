@@ -11,136 +11,42 @@
    {:timestamp      12346
     :entry-type     :pomodoro
     :planned-dur    1500
-    :completed-time 1000
-    :interruptions  0}
+    :completed-time 1000}
    {:timestamp      12347
     :entry-type     :pomodoro
     :planned-dur    1500
-    :completed-time 1500
-    :interruptions  0}
+    :completed-time 1500}
    {:timestamp      12348
     :entry-type     :pomodoro
     :planned-dur    1500
-    :completed-time 1500
-    :interruptions  0}
+    :completed-time 1500}
    {:timestamp      12349
     :entry-type     :pomodoro
     :planned-dur    1500
-    :completed-time 1500
-    :interruptions  2}
+    :completed-time 1500}
    {:timestamp      12350
     :entry-type     :pomodoro
     :planned-dur    1500
-    :completed-time 1000
-    :interruptions  1}])
+    :completed-time 1000}])
 
 (deftest pomodoro-stats-test
   "Test that the pomodoro-stats properly summarizes pomodoro stats."
   (testing "works on empty seq of entries"
     (is (= (p/pomodoro-stats []) {:pomodoros           0
                                   :completed-pomodoros 0
-                                  :total-time          0
-                                  :interruptions       0
-                                  :interruptions-str   nil})))
+                                  :total-time          0})))
 
   (testing "works on test entries"
     (is (= (p/pomodoro-stats (take 4 test-entries))
            {:pomodoros           3
             :completed-pomodoros 2
-            :total-time          4000
-            :interruptions       0
-            :interruptions-str   nil})))
+            :total-time          4000})))
 
   (testing "works on test entries with interruptions"
     (is (= (p/pomodoro-stats test-entries)
            {:pomodoros           5
             :completed-pomodoros 3
-            :total-time          6500
-            :interruptions       3
-            :interruptions-str   ". Interruptions: 3"}))))
-
-(deftest pomodoro-stats-view-test
-  "Test that the pomodoro-stats-view function properly formats the pomodoro
-   stats view, with the correct number of formatted icons and summary string."
-  (testing "works on empty seq of entries"
-    (is (nil? (p/pomodoro-stats-view []))))
-
-  (testing
-    "works on first 4 test entries, with 2 completed and 1 incomplete icons"
-    (is (= (p/pomodoro-stats-view (take 4 test-entries))
-           [:span
-            [:span
-             [:span.fa.fa-clock-o.completed]
-             [:span.fa.fa-clock-o.completed]]
-            [:span [:span.fa.fa-clock-o.incomplete]]
-            [:span.dur "1h 6m 40s"]
-            [:span]])))
-
-  (testing
-    "works on test entries with interruptions, with 3 completed and 2 incomplete
-     icons"
-    (is (= (p/pomodoro-stats-view test-entries)
-           [:span
-            [:span
-             [:span.fa.fa-clock-o.completed]
-             [:span.fa.fa-clock-o.completed]
-             [:span.fa.fa-clock-o.completed]]
-            [:span [:span.fa.fa-clock-o.incomplete]
-             [:span.fa.fa-clock-o.incomplete]]
-            [:span.dur "1h 48m 20s"]
-            [:span
-             [:span.fa.fa-bolt]
-             [:span.fa.fa-bolt]
-             [:span.fa.fa-bolt]]]))))
-
-(def test-entries2
-  (concat test-entries
-          [{:timestamp      12350
-            :entry-type     :pomodoro
-            :planned-dur    1500
-            :completed-time 1000
-            :interruptions  3}
-           {:timestamp      12350
-            :entry-type     :pomodoro
-            :planned-dur    1500
-            :completed-time 1000
-            :interruptions  0}
-           {:timestamp      12350
-            :entry-type     :pomodoro
-            :planned-dur    1500
-            :completed-time 1500
-            :interruptions  3}]))
-
-(deftest pomodoro-stats-view-test2
-  "Test that the pomodoro-stats-view function properly formats the pomodoro
-   stats view when there are more than three interruptions and pomodoros."
-  (testing "shows combination of icon and count"
-    (is (= (p/pomodoro-stats-view test-entries2)
-           [:span
-            [:span
-             [:span.fa.fa-clock-o.completed]
-             [:span.completed-cnt 4]]
-            [:span
-             [:span.fa.fa-clock-o.incomplete]
-             [:span.incomplete-cnt 4]]
-            [:span.dur "2h 46m 40s"]
-            [:span
-             [:span.fa.fa-bolt]
-             [:span.bolt-cnt 9]]]))))
-
-(deftest pomodoro-stats-str-test
-  "Test that the pomodoro-stats-str function properly formats the pomodoro stats
-   string."
-  (testing "works on empty seq of entries"
-    (is (nil? (p/pomodoro-stats-str []))))
-
-  (testing "works on test entries"
-    (is (= (p/pomodoro-stats-str (take 4 test-entries))
-           "Pomodoros: 2 of 3 completed, 1h 6m 40s")))
-
-  (testing "works on test entries with interruptions"
-    (is (= (p/pomodoro-stats-str test-entries)
-           "Pomodoros: 3 of 5 completed, 1h 48m 20s. Interruptions: 3"))))
+            :total-time          6500}))))
 
 (def empty-test-entry
   {:mentions   #{}
@@ -157,7 +63,6 @@
    :utc-offset     -120
    :entry-type     :pomodoro
    :planned-dur    1500
-   :interruptions  0
    :comment-for    1465059139281
    :completed-time 0
    :timestamp      1465059173965
@@ -170,7 +75,6 @@
    :utc-offset     -120
    :entry-type     :pomodoro
    :planned-dur    1500
-   :interruptions  0
    :comment-for    1465059139281
    :completed-time 100
    :timestamp      1465059173965
@@ -184,7 +88,6 @@
    :entry-type       :pomodoro
    :pomodoro-running true
    :planned-dur      1500
-   :interruptions    0
    :comment-for      1465059139281
    :completed-time   100
    :timestamp        1465059173965
@@ -197,7 +100,6 @@
    :utc-offset     -120
    :entry-type     :pomodoro
    :planned-dur    1500
-   :interruptions  0
    :comment-for    1465059139281
    :completed-time 1500
    :timestamp      1465059173965
@@ -210,7 +112,6 @@
    :utc-offset     -120
    :entry-type     :pomodoro
    :planned-dur    1500
-   :interruptions  3
    :comment-for    1465059139281
    :completed-time 1500
    :timestamp      1465059173965
