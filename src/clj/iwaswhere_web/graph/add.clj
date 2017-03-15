@@ -198,8 +198,9 @@
           day (ct/day dt)
           day-node {:type :timeline/day :year year :month month :day day}]
       (-> graph
-          (uc/add-nodes day-node)
-          (uc/add-edges [day-node (:timestamp entry) {:relationship :BRIEFING}])))
+          (uc/add-nodes :briefings day-node)
+          (uc/add-edges [day-node (:timestamp entry) {:relationship :BRIEFING}]
+                        [:briefings (:timestamp entry)])))
     graph))
 
 (defn add-story

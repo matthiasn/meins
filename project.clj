@@ -3,7 +3,7 @@
   :url "https://github.com/matthiasn/systems-toolbox"
   :license {:name "GNU AFFERO GENERAL PUBLIC LICENSE"
             :url  "https://www.gnu.org/licenses/agpl-3.0.en.html"}
-  :dependencies [[org.clojure/clojure "1.9.0-alpha14"]
+  :dependencies [[org.clojure/clojure "1.9.0-alpha15"]
                  [org.clojure/clojurescript "1.9.495"]
                  [org.clojure/tools.logging "0.3.1"]
                  [ch.qos.logback/logback-classic "1.2.1"]
@@ -20,7 +20,7 @@
                  [ubergraph "0.3.1"]
                  [factual/geo "1.0.0"]
                  [camel-snake-kebab "0.4.0"]
-                 [matthiasn/systems-toolbox "0.6.5"]
+                 [matthiasn/systems-toolbox "0.6.6"]
                  [reagent "0.6.1" :exclusions [cljsjs/react cljsjs/react-dom]]
                  [matthiasn/systems-toolbox-sente "0.6.6"]
                  ;[matthiasn/systems-toolbox-probe "0.6.2"]

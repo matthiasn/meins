@@ -382,7 +382,7 @@
           res (get-filtered-results current-state query)
           ms (/ (- (System/nanoTime) start-ts) 1000000)
           dur {:duration-ms (pp/cl-format nil "~,3f ms" ms)}]
-      (log/info "Query" (:sente-uid msg-meta) query-id "took" (:duration-ms dur))
+      (log/info "Query '" (:search-text query) "' took" (:duration-ms dur))
       [query-id res])))
 
 (defn query-fn
@@ -401,6 +401,6 @@
                      res)
         ms (/ (- (System/nanoTime) start-ts) 1000000)
         dur {:duration-ms (pp/cl-format nil "~,3f ms" ms)}]
-    (log/info "Query" (:sente-uid msg-meta) "took" (:duration-ms dur))
+    (log/info "Queries took" (:duration-ms dur))
     (log/debug queries)
     {:emit-msg [:state/new (merge res2 dur)]}))
