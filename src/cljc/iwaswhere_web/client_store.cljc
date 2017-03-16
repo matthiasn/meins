@@ -48,6 +48,8 @@
             (assoc-in [:options :sorted-books] sorted-books)
             (assoc-in [:options :mentions] (:mentions msg-payload))
             (assoc-in [:briefings] (:briefings msg-payload))
+            (assoc-in [:started-tasks] (:started-tasks msg-payload))
+            (assoc-in [:waiting-habits] (:waiting-habits msg-payload))
             (assoc-in [:cfg :briefing-story] (:briefing-story (:cfg msg-payload)))
             (assoc-in [:stats] (:stats msg-payload)))]
     #?(:cljs (stats/update-stats put-fn))

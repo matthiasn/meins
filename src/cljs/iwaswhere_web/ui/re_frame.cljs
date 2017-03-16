@@ -23,6 +23,8 @@
 (reg-sub :cfg (fn [db _] (:cfg db)))
 (reg-sub :stats (fn [db _] (:stats db)))
 (reg-sub :briefings (fn [db _] (:briefings db)))
+(reg-sub :started-tasks (fn [db _] (:started-tasks db)))
+(reg-sub :waiting-habits (fn [db _] (:waiting-habits db)))
 (reg-sub :timing (fn [db _] (:timing db)))
 (reg-sub :chart-data (fn [db _]
                        (select-keys db [:pomodoro-stats

@@ -49,7 +49,7 @@
                         {:story (when-not (js/isNaN id) id)})
                     click-fn (fn [_]
                                (put-fn [:search/add {:tab-group :right
-                                                     :query q}]))]
+                                                     :query     q}]))]
                 ^{:key story}
                 [:tr {:on-click click-fn}
                  [:td [:div.legend {:style {:background-color color}}]]
@@ -71,15 +71,16 @@
   "Renders table with open entries, such as started tasks and open habits."
   [tab-group entry put-fn]
   (let [cfg (subscribe [:cfg])
-        results (subscribe [:results])
+        waiting-habits (subscribe [:waiting-habits])
         options (subscribe [:options])
         entries-map (subscribe [:entries-map])
         entries-list
         (reaction
           (let [entries-map @entries-map
                 sorter (entry-compare :habit)
-                entries (->> (:waiting-habits @results)
-                             (map (fn [ts] (get entries-map ts)))
+                find-missing (u/find-missing-entry entries-map put-fn)
+                entries (->> @waiting-habits
+                             (map (fn [ts] (find-missing ts)))
                              (sort sorter))
                 conf (merge @cfg @options)]
             (if (:show-pvt @cfg)
@@ -114,7 +115,7 @@
   "Renders table with open entries, such as started tasks and open habits."
   [tab-group local put-fn]
   (let [cfg (subscribe [:cfg])
-        results (subscribe [:results])
+        started-tasks (subscribe [:started-tasks])
         options (subscribe [:options])
         entries-map (subscribe [:entries-map])
         options (subscribe [:options])
@@ -137,8 +138,9 @@
         entries-list (reaction
                        (let [entries-map @entries-map
                              sorter (entry-compare :task)
-                             entries (->> (:started-tasks @results)
-                                          (map (fn [ts] (get entries-map ts)))
+                             find-missing (u/find-missing-entry entries-map put-fn)
+                             entries (->> @started-tasks
+                                          (map (fn [ts] (find-missing ts)))
                                           (filter on-hold-filter)
                                           (filter book-filter)
                                           (sort sorter))
@@ -270,7 +272,7 @@
 (defn briefing-view
   [entry put-fn edit-mode? local-cfg]
   (let [chart-data (subscribe [:chart-data])
-        local (r/atom {:filter :open
+        local (r/atom {:filter  :open
                        :on-hold false})
         stats (subscribe [:stats])
         options (subscribe [:options])

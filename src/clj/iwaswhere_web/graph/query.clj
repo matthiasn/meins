@@ -175,7 +175,7 @@
                     :year  (ct/year dt)
                     :month (ct/month dt)
                     :day   (ct/day dt)}]
-      (set (map :dest (uc/find-edges g {:src day-node
+      (set (map :dest (uc/find-edges g {:src          day-node
                                         :relationship :BRIEFING}))))))
 
 (defn get-connected-nodes
@@ -203,6 +203,7 @@
   [state query]
   (let [sort-by-upvotes? (:sort-by-upvotes query)
         g (:graph state)
+        n (:n query)
         mapper-fn (fn [n]
                     (if (uc/has-node? g n)
                       (-> (uc/attrs g n)
@@ -247,8 +248,9 @@
                       ; set with timestamps matching tags and mentions
                       (or (seq (:tags query)) (seq (:mentions query)))
                       (get-tags-mentions-matches g query)
+
                       ; set with all timestamps
-                      :else (:sorted-entries state))
+                      :else (take n (:sorted-entries state)))
         matched-entries (map mapper-fn (sort-fn matched-ids))
         parent-ids (filter identity (map :comment-for matched-entries))
         parents (map mapper-fn parent-ids)
@@ -357,11 +359,11 @@
           (get-comments graph ts)
           (get-linked-entries graph ts sort-by-upvotes?)))))
 
-(defn get-filtered-results
+(defn get-filtered
   "Retrieve items to show in UI, also deliver all hashtags for autocomplete and
    some basic stats."
   [current-state query]
-  (let [n (:n query)
+  (let [n (or (:n query) Integer/MAX_VALUE)
         g (:graph current-state)
         entry-mapper (fn [entry] [(:timestamp entry) entry])
         entries (take n (filter (entries-filter-fn query g)
@@ -387,10 +389,10 @@
   [current-state msg-meta]
   (fn [[query-id query]]
     (let [start-ts (System/nanoTime)
-          res (get-filtered-results current-state query)
+          res (get-filtered current-state query)
           ms (/ (- (System/nanoTime) start-ts) 1000000)
           dur {:duration-ms (pp/cl-format nil "~,3f ms" ms)}]
-      (log/info "Query '" (:search-text query) "' took" (:duration-ms dur))
+      (log/info (str "Query \"" (:search-text query) "\" took " (:duration-ms dur)))
       [query-id res])))
 
 (defn query-fn

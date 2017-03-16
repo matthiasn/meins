@@ -68,7 +68,7 @@
         (let [{:keys [new-state emit-msg]}
               (f/geo-entry-persist-fn {:current-state current-state
                                        :msg-payload   test-entry})
-              res (gq/get-filtered-results new-state simple-query)]
+              res (gq/get-filtered new-state simple-query)]
 
           (testing
             "entry added to graph"
@@ -148,10 +148,10 @@
               {:keys [new-state emit-msg]} (f/geo-entry-persist-fn
                                              {:current-state new-state
                                               :msg-payload   updated-test-entry})
-              res (gq/get-filtered-results new-state simple-query)
+              res (gq/get-filtered new-state simple-query)
 
               state-from-disk (:current-state (mk-test-state test-ts))
-              res-from-disk (gq/get-filtered-results state-from-disk simple-query)]
+              res-from-disk (gq/get-filtered state-from-disk simple-query)]
           ;; test with in-memory graph
           (geo-entry-update-assertions new-state res updated-test-entry)
 
@@ -214,10 +214,10 @@
                                      :msg-payload   test-entry})
               {:keys [new-state]} (f/trash-entry-fn {:current-state new-state
                                                      :msg-payload   delete-msg})
-              res (gq/get-filtered-results new-state simple-query)
+              res (gq/get-filtered new-state simple-query)
 
               state-from-disk (:current-state (mk-test-state test-ts))
-              res-from-disk (gq/get-filtered-results state-from-disk simple-query)]
+              res-from-disk (gq/get-filtered state-from-disk simple-query)]
 
           ;; run tests for in-memory graph
           (trash-entry-assertions new-state res test-entry)

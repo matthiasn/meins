@@ -131,7 +131,7 @@
 (defn res-count
   "Count results for specified query."
   [current-state query]
-  (let [res (gq/get-filtered-results
+  (let [res (gq/get-filtered
               current-state
               (merge {:n Integer/MAX_VALUE} query))]
     (count (set (:entries res)))))
@@ -240,19 +240,30 @@
           :import-cnt  (res-count state {:tags #{"#import"}})
           :new-cnt     (res-count state {:tags #{"#new"}})}))
 
+(def started-tasks
+  {:tags     #{"#task"}
+   :not-tags #{"#done" "#backlog" "#closed"}
+   :opts     #{":started"}})
+
+(def waiting-habits
+  {:tags #{"#habit"}
+   :opts #{":waiting"}})
+
 (defn make-stats-tags
   "Generate stats and tags from current-state."
-  [current-state]
-  {:stats         (get-basic-stats current-state)
-   :hashtags      (gq/find-all-hashtags current-state)
-   :pvt-hashtags  (gq/find-all-pvt-hashtags current-state)
-   :pvt-displayed (:pvt-displayed (:cfg current-state))
-   :mentions      (gq/find-all-mentions current-state)
-   :stories       (gq/find-all-stories current-state)
-   :locations     (gq/find-all-locations current-state)
-   :briefings     (gq/find-all-briefings current-state)
-   :books         (gq/find-all-books current-state)
-   :cfg           (:cfg current-state)})
+  [state]
+  {:stats          (get-basic-stats state)
+   :hashtags       (gq/find-all-hashtags state)
+   :pvt-hashtags   (gq/find-all-pvt-hashtags state)
+   :started-tasks  (:entries (gq/get-filtered state started-tasks))
+   :waiting-habits (:entries (gq/get-filtered state waiting-habits))
+   :pvt-displayed  (:pvt-displayed (:cfg state))
+   :mentions       (gq/find-all-mentions state)
+   :stories        (gq/find-all-stories state)
+   :locations      (gq/find-all-locations state)
+   :briefings      (gq/find-all-briefings state)
+   :books          (gq/find-all-books state)
+   :cfg            (:cfg state)})
 
 (defn stats-tags-fn
   "Generates stats and tags (they only change on insert anyway) and initiates
