@@ -57,7 +57,6 @@
             (fn [_ev]
               (let [msg {:path [:cfg :qr-code]}
                     reset-msg (merge msg {:reset-to false})]
-                (prn :toggle-qr-code)
                 (put-fn [:cmd/schedule-new {:timeout 20000
                                             :message [:cmd/toggle-key reset-msg]}])
                 (put-fn [:cmd/toggle-key (merge msg {:reset-to true})])))]

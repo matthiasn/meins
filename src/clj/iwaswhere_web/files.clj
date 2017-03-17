@@ -84,13 +84,14 @@
         entry (merge msg-payload {:last-saved (st/now)})
         new-state (ga/add-node current-state ts entry false)
         cfg (:cfg current-state)]
-    (append-daily-log cfg entry)
+    (when (not= current-state new-state)
+      (append-daily-log cfg entry))
     {:new-state    new-state
      :send-to-self (when-let [comment-for (:comment-for msg-payload)]
                      (with-meta [:entry/find {:timestamp comment-for}] msg-meta))
      :emit-msg     [[:entry/saved entry]
                     [:ft/add entry]
-                    [:cmd/schedule-new {:timeout 2000
+                    [:cmd/schedule-new {:timeout 200
                                         :message [:state/stats-tags-get]}]]}))
 
 (defn move-attachment-to-trash

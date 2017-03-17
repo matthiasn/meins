@@ -155,7 +155,7 @@
              (catch Exception ex (log/error (str "Error while importing "
                                                  filename) ex)))))
     {:emit-msg [:cmd/schedule-new
-                {:timeout 5000 :message (with-meta [:search/refresh] msg-meta)}]}))
+                {:timeout 3000 :message (with-meta [:search/refresh] msg-meta)}]}))
 
 (defn import-visits-fn
   [rdr put-fn msg-meta filename]
