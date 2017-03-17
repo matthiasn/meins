@@ -185,7 +185,8 @@
         options (subscribe [:options])
         stories (reaction (:stories @options))
         entries-map (subscribe [:entries-map])
-        linked-filters {:open    (up/parse-search "#task ~#done ~#closed ~#backlog")
+        linked-filters {:active  (up/parse-search "#task ~#done ~#closed ~#backlog")
+                        :open    (up/parse-search "#task ~#done ~#closed ~#backlog")
                         :done    (up/parse-search "#task #done")
                         :closed  (up/parse-search "#task #closed")
                         :backlog (up/parse-search "#task #backlog")}
@@ -212,8 +213,7 @@
             active-filter (fn [t]
                             (let [active-from (-> t :task :active-from)
                                   current-filter (get linked-filters (:filter @local))]
-                              (if (and active-from (= current-filter
-                                                      (:open linked-filters)))
+                              (if (and active-from (= (:filter @local) :active))
                                 (let [from-now (.fromNow (js/moment active-from))]
                                   (s/includes? from-now "ago"))
                                 true)))
@@ -228,6 +228,7 @@
            [:tr [:th ""]
             [:th [:div
                   [:strong "tasks:"]
+                  [filter-btn :active]
                   [filter-btn :open]
                   [filter-btn :done]
                   [filter-btn :closed]
@@ -256,7 +257,7 @@
   [entities k time-by-entities y-scale]
   (let [data (cd/time-by-entity-stacked time-by-entities)]
     (when (seq time-by-entities)
-      [:svg
+      [:svg.vertical-bar
        ;{:viewBox (str "0 0 12 300")}
        [:g (for [[entity {:keys [x v]}] data]
              (let [h (* y-scale v)
@@ -272,7 +273,10 @@
 (defn briefing-view
   [entry put-fn edit-mode? local-cfg]
   (let [chart-data (subscribe [:chart-data])
-        local (r/atom {:filter  :open
+        day (-> entry :briefing :day)
+        today (.format (js/moment.) "YYYY-MM-DD")
+        filter-btn (if (= day today) :active :open)
+        local (r/atom {:filter  filter-btn
                        :on-hold false})
         stats (subscribe [:stats])
         options (subscribe [:options])

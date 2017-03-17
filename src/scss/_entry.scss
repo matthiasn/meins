@@ -231,6 +231,13 @@
 .briefing {
   display: flex;
 
+  svg {
+    &.vertical-bar {
+      width: 100vw;
+      height: 100vh;
+    }
+  }
+
   form {
     flex-grow: 1;
   }
