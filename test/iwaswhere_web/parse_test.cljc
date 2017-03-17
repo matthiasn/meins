@@ -110,7 +110,7 @@
    :n           20})
 
 (def briefing-search
-  {:search-text "briefing:2016-06-07"
+  {:search-text "b:2016-06-07"
    :ft-search   nil
    :tags        #{}
    :not-tags    #{}

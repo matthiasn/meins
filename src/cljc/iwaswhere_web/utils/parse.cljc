@@ -13,7 +13,7 @@
 (def entry-mentions-regex
   (re-pattern (str "(?m) ?@" tag-char-cls "+(?!" tag-char-cls ")")))
 (def date-regex #"(?m)(?:^|[^:])([0-9]{4}-[0-9]{2}-[0-9]{2})")
-(def briefing-date-regex #"(?m)(?:briefing:)([0-9]{4}-[0-9]{2}-[0-9]{2})")
+(def briefing-date-regex #"(?m)(?:b:)([0-9]{4}-[0-9]{2}-[0-9]{2})")
 
 (defn parse-entry
   "Parses entry for hashtags and mentions. Either can consist of any of the word

@@ -15,7 +15,7 @@
         cfg (subscribe [:cfg])
         select-fn (fn [dt]
                     (let [fmt (.format dt "YYYY-MM-DD")
-                          q (up/parse-search (str "briefing:" fmt))]
+                          q (up/parse-search (str "b:" fmt))]
                       (when-not (get @briefings fmt)
                         (let [weekday (.format dt "dddd")
                               md (str "## " weekday "'s #briefing")
