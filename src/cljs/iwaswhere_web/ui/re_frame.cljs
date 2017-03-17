@@ -1,13 +1,14 @@
 (ns iwaswhere-web.ui.re-frame
   (:require-macros [reagent.ratom :refer [reaction]])
   (:require [reagent.core :as reagent]
-            [cljsjs.react-grid-layout]
             [iwaswhere-web.ui.menu :as menu]
             [re-frame.core :refer [reg-sub]]
             [iwaswhere-web.ui.grid :as g]
             [iwaswhere-web.ui.new-entries :as n]
             [iwaswhere-web.ui.stats :as stats]
-            [re-frame.db :as rdb]))
+            [re-frame.db :as rdb]
+            [iwaswhere-web.ui.calendar :as cal]
+            [iwaswhere-web.ui.charts.custom-fields :as cf2]))
 
 ;; Subscription Handlers
 (reg-sub :custom-field-stats (fn [db _] (:custom-field-stats db)))
@@ -38,9 +39,22 @@
   "Main view component"
   [put-fn]
   [:div.flex-container
-   [menu/menu-view put-fn]
-   [g/grid put-fn]
-   [stats/stats-text]
+   [:div.grid
+    [:div.wrapper
+     [:div.menu
+      [menu/menu-view put-fn]]
+     [:div.cal
+      [cal/calendar-view put-fn]]
+     [:div.custom
+      [cf2/custom-fields-chart put-fn]]
+     [:div.stats
+      [stats/stats-view put-fn]]
+     [:div.left
+      [g/tabs-view :left put-fn]]
+     [:div.right
+      [g/tabs-view :right put-fn]]
+     [:div.footer
+      [stats/stats-text]]]]
    [n/new-entries-view put-fn]])
 
 (defn state-fn

@@ -131,7 +131,7 @@
            (let [path (:mouse-over-path @local)
                  v (get-in mouse-over path)
                  fmt (when v (gstring/format "%.1f" v))]
-             [:div.mouse-over-info (cc/info-div-pos2 @local)
+             [:div.mouse-over-info (cc/info-div-pos @local)
               [:div (:date-string mouse-over)]
               (when path
                 [:div [:strong (:mouse-over-label @local)] ": " fmt])]))]))))

@@ -1,13 +1,9 @@
 (ns iwaswhere-web.ui.grid
   (:require [reagent.core :as rc]
-            [iwaswhere-web.ui.charts.custom-fields :as cf2]
             [iwaswhere-web.ui.journal :as j]
             [clojure.string :as s]
-            [cljsjs.react-grid-layout]
-            [iwaswhere-web.ui.calendar :as cal]
             [iwaswhere-web.helpers :as h]
             [iwaswhere-web.ui.search :as search]
-            [iwaswhere-web.ui.stats :as stats]
             [re-frame.core :refer [subscribe]]))
 
 (defn tabs-header-view
@@ -55,43 +51,3 @@
            [search/search-field-view query-id put-fn])
          (when query-id
            [j/journal-view local-cfg put-fn])]))))
-
-(def react-grid-layout (rc/adapt-react-class js/ReactGridLayout))
-
-(defn widget-view
-  [id widget-cfg put-fn]
-  (let [t (:type widget-cfg)]
-    [:div.widget {:key       id
-                  :data-grid (:data-grid widget-cfg)}
-     (case t
-       :tabs-view [tabs-view (:query-id widget-cfg) put-fn]
-       :custom-fields-chart [cf2/custom-fields-chart put-fn]
-       :all-stats-chart [stats/stats-view put-fn]
-       :calendar [cal/calendar-view put-fn]
-       [:div "unknown type"])]))
-
-(defn grid
-  [put-fn]
-  (let [cfg (subscribe [:cfg])
-        widgets (subscribe [:widgets])
-        get-width #(.-innerWidth js/window)
-        width (rc/atom (get-width))]
-    (.addEventListener js/window "resize" #(reset! width (get-width)))
-    (fn grid-render
-      [put-fn]
-      (let [configurable? (:reconfigure-grid @cfg)]
-        [:div.grid-view
-         (when (seq @widgets)
-           (into
-             [react-grid-layout
-              {:width            @width
-               :row-height       20
-               :cols             24
-               :margin           [5 5]
-               :is-draggable     configurable?
-               :is-resizable     configurable?
-               :class            "tile-journal"
-               :on-layout-change (fn [layout]
-                                   (let [new (js->clj layout :keywordize-keys true)]
-                                     (put-fn [:layout/save new])))}]
-             (mapv (fn [[k v]] (widget-view k v put-fn)) @widgets)))]))))

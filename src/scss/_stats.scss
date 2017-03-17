@@ -187,6 +187,7 @@ $activity-weekend: lighten($activity, 30);
 .stats-string {
   background-color: $stats-bg-color;
   color: $tab-bg;
+  padding: 2px;
 }
 
 .story-time {

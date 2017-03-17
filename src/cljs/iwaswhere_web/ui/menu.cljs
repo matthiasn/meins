@@ -22,7 +22,6 @@
    {:option :hide-hashtags :cls "fa-hashtag"}
    {:option :show-all-maps :cls "fa-map-o"}
    {:option :thumbnails :cls "fa-photo"}
-   {:option :reconfigure-grid :cls "fa-arrows"}
    {:option :sort-asc :cls " fa-sort-asc"}])
 
 (defn new-import-view

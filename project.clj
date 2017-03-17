@@ -1,4 +1,4 @@
-(defproject matthiasn/iwaswhere-web "0.1.37"
+(defproject matthiasn/iwaswhere-web "0.1.38"
   :description "Sample application built with systems-toolbox library"
   :url "https://github.com/matthiasn/systems-toolbox"
   :license {:name "GNU AFFERO GENERAL PUBLIC LICENSE"
@@ -15,13 +15,12 @@
                  [markdown-clj "0.9.98"]
                  [cheshire "5.7.0"]
                  [cljsjs/moment "2.17.1-0"]
-                 [cljsjs/react-grid-layout "0.13.7-0"]
                  [com.drewnoakes/metadata-extractor "2.10.1"]
                  [ubergraph "0.3.1"]
                  [factual/geo "1.0.0"]
                  [camel-snake-kebab "0.4.0"]
                  [matthiasn/systems-toolbox "0.6.6"]
-                 [reagent "0.6.1" :exclusions [cljsjs/react cljsjs/react-dom]]
+                 [reagent "0.6.1"]
                  [matthiasn/systems-toolbox-sente "0.6.6"]
                  ;[matthiasn/systems-toolbox-probe "0.6.2"]
                  [re-frame "0.9.2"]
@@ -103,4 +102,4 @@
      :compiler     {:output-to     "out/testable.js"
                     :output-dir    "out/"
                     :main          iwaswhere-web.runner
-                    :optimizations :simple}}]})
+                    :optimizations :whitespace}}]})

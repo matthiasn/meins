@@ -185,7 +185,6 @@
       (is (fn? (:state/new handler-map)))
       (is (fn? (:stats/result handler-map)))
       (is (fn? (:state/stats-tags  handler-map)))
-      (is (fn? (:layout/save handler-map)))
       (is (fn? (:cfg/save    handler-map)))
       (is (fn? (:cmd/toggle-active handler-map)))
       (is (fn? (:cmd/toggle handler-map)))

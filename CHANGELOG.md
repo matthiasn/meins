@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [0.1.38] - 2017-03-17
+### Changed
+- CSS grid instead of react-grid-layout
+
 ## [0.1.37] - 2017-03-14
 ### Changed
 - calendar for selecting briefings
