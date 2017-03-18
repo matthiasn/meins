@@ -105,7 +105,6 @@
             month-node {:type :timeline/month :year year :month month}
             day-node {:type :timeline/day :year year :month month :day (ct/day dt)}
             day-node-exists? (uc/has-node? g day-node)]
-        (prn :add-for-day for-day dt)
         (assoc-in state [:graph] (-> g
                                      (uc/add-nodes year-node month-node day-node)
                                      (uc/add-edges

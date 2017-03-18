@@ -3,7 +3,7 @@
             [iwaswhere-web.ui.charts.tasks :as ct]
             [iwaswhere-web.ui.charts.custom-fields :as cf]
             [iwaswhere-web.ui.charts.wordcount :as wc]
-            [iwaswhere-web.ui.charts.pomodoros :as cp]
+            [iwaswhere-web.ui.charts.durations :as cd]
             [iwaswhere-web.ui.charts.media :as m]
             [iwaswhere-web.ui.charts.daily-summaries :as ds]
             [cljsjs.moment]
@@ -54,7 +54,7 @@
                     daily-summary-stats media-stats]} @chart-data]
         [:div.stats
          [:div.charts
-          [cp/pomodoro-bar-chart pomodoro-stats 200 "Pomodoros" 5 put-fn]
+          [cd/durations-bar-chart pomodoro-stats 200 "Pomodoros" 5 put-fn]
           [ct/tasks-chart task-stats 250 put-fn]
           [ds/daily-summaries-chart daily-summary-stats 200 put-fn]
           [wc/wordcount-chart wordcount-stats 150 put-fn 1000]

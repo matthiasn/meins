@@ -1,6 +1,6 @@
 (ns iwaswhere-web.ui.entry.briefing
   (:require [matthiasn.systems-toolbox.component :as st]
-            [iwaswhere-web.ui.charts.pomodoros :as p]
+            [iwaswhere-web.ui.charts.durations :as p]
             [reagent.ratom :refer-macros [reaction]]
             [re-frame.core :refer [subscribe]]
             [iwaswhere-web.charts.data :as cd]

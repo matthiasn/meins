@@ -1,4 +1,4 @@
-(ns iwaswhere-web.ui.charts.pomodoros
+(ns iwaswhere-web.ui.charts.durations
   (:require [reagent.core :as rc]
             [iwaswhere-web.ui.charts.common :as cc]
             [iwaswhere-web.utils.misc :as u]
@@ -144,18 +144,18 @@
                  {:style {:background-color (cc/item-color story-name)}}]
                 [:strong story-name] ": " (u/duration-string v)]))])))))
 
-(defn pomodoro-bar-chart
-  [pomodoro-stats chart-h title y-scale put-fn]
+(defn durations-bar-chart
+  [stats chart-h title y-scale put-fn]
   (let [local (rc/atom {})
         idx-fn (fn [idx [k v]] [idx v])
         books (subscribe [:books])
         chart-data (subscribe [:chart-data])]
-    (fn [pomodoro-stats chart-h title y-scale put-fn]
+    (fn [stats chart-h title y-scale put-fn]
       (let [books @books
-            indexed (map-indexed idx-fn pomodoro-stats)
-            indexed-20 (map-indexed idx-fn (take-last 20 pomodoro-stats))
-            day-stats (or (:mouse-over @local) (second (last pomodoro-stats)))
-            past-7-days (cd/past-7-days pomodoro-stats :time-by-book)]
+            indexed (map-indexed idx-fn stats)
+            indexed-20 (map-indexed idx-fn (take-last 20 stats))
+            day-stats (or (:mouse-over @local) (second (last stats)))
+            past-7-days (cd/past-7-days stats :time-by-book)]
         [:div
          [:div.times-by-day
           [:div [cc/horizontal-bar books :book-name past-7-days 0.001]]
@@ -173,22 +173,13 @@
          [:svg
           {:viewBox (str "0 0 600 " chart-h)}
           [:g
-           [cc/chart-title "Time tracked"]
+           [cc/chart-title "by story"]
            [bars-by-story indexed-20 local chart-h 0.0035 put-fn]]]
          [:svg
           {:viewBox (str "0 0 600 " chart-h)}
           [:g
-           [cc/chart-title "Time tracked"]
+           [cc/chart-title "by book"]
            [bars-by-book indexed-20 local chart-h 0.0035 put-fn]]]
          [:div.times-by-day
           [:time (:date-string day-stats)]
-          [time-by-stories-list day-stats]]
-         [:svg
-          {:viewBox (str "0 0 600 " chart-h)}
-          [:g
-           [cc/chart-title title]
-           [cc/bg-bars indexed local chart-h :pomodoro]
-           [bars indexed local :total chart-h y-scale put-fn]
-           [bars indexed local :completed chart-h y-scale put-fn]
-           [cc/path "M 0 50 l 600 0 z"]
-           [cc/path "M 0 100 l 600 0 z"]]]]))))
+          [time-by-stories-list day-stats]]]))))
