@@ -10,6 +10,7 @@
             [iwaswhere-web.utils.misc :as u]
             [iwaswhere-web.graph.query :as gq]
             [iwaswhere-web.specs :as specs]
+            [iwaswhere-web.datetime :as dt]
             [clj-time.coerce :as c]
             [clj-time.core :as t]
             [iwaswhere-web.graph.stats :as gs]))
@@ -90,6 +91,30 @@
                                    [day-node
                                     (:timestamp entry)
                                     {:relationship :DATE}])))))
+
+(defn add-for-day
+  "Adds links to timeline nodes when when entry is for another day and time.
+   When exists, does the same as in add-timeline-tree."
+  [state entry]
+  (let [g (:graph state)]
+    (if-let [for-day (:for-day entry)]
+      (let [dt (ctf/parse dt/datetime-local-fmt for-day)
+            year (ct/year dt)
+            month (ct/month dt)
+            year-node {:type :timeline/year :year year}
+            month-node {:type :timeline/month :year year :month month}
+            day-node {:type :timeline/day :year year :month month :day (ct/day dt)}
+            day-node-exists? (uc/has-node? g day-node)]
+        (prn :add-for-day for-day dt)
+        (assoc-in state [:graph] (-> g
+                                     (uc/add-nodes year-node month-node day-node)
+                                     (uc/add-edges
+                                       [year-node month-node]
+                                       [month-node day-node]
+                                       [day-node
+                                        (:timestamp entry)
+                                        {:relationship :DATE}]))))
+      state)))
 
 (defn add-daily-summary
   "Adds graph nodes for year, month and day of entry and connects those if they
@@ -275,6 +300,7 @@
           (update-in [:graph] add-linked new-entry)
           (add-daily-summary new-entry startup?)
           (add-timeline-tree new-entry)
+          (add-for-day new-entry)
           (update-in [:graph] add-linked-visit new-entry)
           (update-in [:graph] add-parent-ref new-entry)
           (update-in [:graph] add-story new-entry)

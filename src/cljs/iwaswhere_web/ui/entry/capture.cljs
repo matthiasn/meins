@@ -23,6 +23,25 @@
        ^{:key (str ts opt)}
        [:option {:value opt} opt])]))
 
+(defn for-day
+  [entry edit-mode? put-fn]
+  (when (and (contains? (:tags entry) "#for-day")
+             (not (= (:entry-type entry) :pomodoro)))
+    (let [input-fn (fn [entry]
+                     (fn [ev]
+                       (let [day (-> ev .-nativeEvent .-target .-value)
+                             updated (assoc-in entry [:for-day] day)]
+                         (put-fn [:entry/update-local updated]))))
+          for-day (:for-day entry)]
+      [:fieldset
+       [:legend "#for-day"]
+       (if edit-mode?
+         [:div [:label "Day: "]
+          [:input {:type     :datetime-local
+                   :on-input (input-fn entry)
+                   :value    for-day}]]
+         [:div for-day])])))
+
 (defn custom-fields-div
   "In edit mode, allow editing of custom fields, otherwise show a summary."
   [entry put-fn edit-mode?]
@@ -40,6 +59,23 @@
             (put-fn [:entry/update-local (merge entry
                                                 {:linked-story default-story})]))
           [:form.custom-fields
+           [for-day entry edit-mode? put-fn]
+           #_
+           (when (contains? (:tags entry) "#for-day")
+             (let [input-fn (fn [entry]
+                              (fn [ev]
+                                (let [day (-> ev .-nativeEvent .-target .-value)
+                                      updated (assoc-in entry [:for-day] day)]
+                                  (put-fn [:entry/update-local updated]))))
+                   for-day (:for-day entry)]
+               [:fieldset
+                [:legend "#for-day"]
+                (if edit-mode?
+                  [:div [:label "Day: "]
+                   [:input {:type     :datetime-local
+                            :on-input (input-fn entry)
+                            :value    for-day}]]
+                  [:div for-day])]))
            (for [[tag conf] entry-field-tags]
              ^{:key (str "cf" ts tag)}
              [:fieldset

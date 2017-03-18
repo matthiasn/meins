@@ -18,9 +18,20 @@
                          (update-in acc [book] #(+ v (or % 0)))))]
     (reduce book-reducer {} by-story)))
 
+(defn manually-logged
+  "Calculates summed duration and returns it when entry is either not for a
+   different day, or, if so, when date string from query is equal to the
+   referencenced day. Otherwise returns zero."
+  [entry date-string]
+  (let [manual (gq/summed-durations entry)]
+    (if-let [for-day (:for-day entry)]
+      (let [ymd (subs for-day 0 10)]
+        (if (= date-string ymd) manual 0))
+      manual)))
+
 (defn time-by-stories
   "Calculate time spent per story, plus total time."
-  [g nodes]
+  [g nodes date-string]
   (let [story-reducer (fn [acc entry]
                         (let [comment-for (:comment-for entry)
                               parent (when comment-for (uc/attrs g comment-for))
@@ -29,7 +40,7 @@
                                         :no-story)
                               acc-time (get acc story 0)
                               completed (get entry :completed-time 0)
-                              manual (gq/summed-durations entry)
+                              manual (manually-logged entry date-string)
                               summed (+ acc-time completed manual)]
                           (if (pos? summed)
                             (assoc-in acc [story] summed)
@@ -56,7 +67,7 @@
                             :total       (count pomo-nodes)
                             :completed   (count completed)
                             :started     (count started)}
-                           (time-by-stories g day-nodes-attrs))]
+                           (time-by-stories g day-nodes-attrs date-string))]
       [date-string day-stats])))
 
 (defn tasks-mapper
