@@ -32,7 +32,8 @@
 (defn time-by-stories
   "Calculate time spent per story, plus total time."
   [g nodes date-string]
-  (let [story-reducer (fn [acc entry]
+  (let [stories (gq/find-all-stories {:graph g})
+        story-reducer (fn [acc entry]
                         (let [comment-for (:comment-for entry)
                               parent (when comment-for (uc/attrs g comment-for))
                               story (or (:linked-story parent)
@@ -45,8 +46,28 @@
                           (if (pos? summed)
                             (assoc-in acc [story] summed)
                             acc)))
-        by-story (reduce story-reducer {} nodes)]
+        by-ts-reducer (fn [acc entry]
+                        (let [comment-for (:comment-for entry)
+                              parent (when comment-for (uc/attrs g comment-for))
+                              story (or (:linked-story parent)
+                                        (:linked-story entry)
+                                        :no-story)
+                              acc-time (get acc story 0)
+                              story-name (:story-name (get-in stories [story]))
+                              ts (:timestamp entry)
+                              completed (get entry :completed-time 0)
+                              manual (manually-logged entry date-string)
+                              summed (+ acc-time completed manual)]
+                          (if (pos? summed)
+                            (assoc-in acc [ts] {:story-name story-name
+                                                :summed     summed
+                                                :completed  completed
+                                                :manual     manual})
+                            acc)))
+        by-story (reduce story-reducer {} nodes)
+        by-ts (reduce by-ts-reducer {} nodes)]
     {:total-time    (apply + (map second by-story))
+     :time-by-ts    by-ts
      :time-by-story by-story
      :time-by-book  (time-by-books g by-story)}))
 

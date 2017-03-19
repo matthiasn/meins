@@ -121,5 +121,21 @@
                      :time-by-book  {:no-book 1301}
                      :time-by-story {1484076392371 291
                                      1484076392372 899
-                                     :no-story     111}}]
+                                     :no-story     111}
+                     :time-by-ts    {1450999000001 {:completed  699
+                                                    :manual     0
+                                                    :story-name nil
+                                                    :summed     699}
+                                     1450999200001 {:completed  291
+                                                    :manual     0
+                                                    :story-name nil
+                                                    :summed     291}
+                                     1450999300002 {:completed  200
+                                                    :manual     0
+                                                    :story-name nil
+                                                    :summed     200}
+                                     1450999300011 {:completed  111
+                                                    :manual     0
+                                                    :story-name nil
+                                                    :summed     111}}}]
                    stats))))))))
