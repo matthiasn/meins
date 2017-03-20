@@ -44,18 +44,18 @@
          [editable-field on-input-fn on-keydown-fn (:story-name entry)]]
         [:h2 "Story: " (:story-name entry)]))))
 
-(defn book-name-field
-  "Renders editable field for book name when the entry is of type :book.
+(defn saga-name-field
+  "Renders editable field for saga name when the entry is of type :saga.
    Updates local entry on input, and saves the entry when CMD-S is pressed."
   [entry edit-mode? put-fn]
-  (when (= (:entry-type entry) :book)
-    (let [on-input-fn (input-fn entry :book-name put-fn)
-          on-keydown-fn (keydown-fn entry :book-name put-fn)]
+  (when (= (:entry-type entry) :saga)
+    (let [on-input-fn (input-fn entry :saga-name put-fn)
+          on-keydown-fn (keydown-fn entry :saga-name put-fn)]
       (if edit-mode?
         [:div.story
-         [:label "Book:"]
-         [editable-field on-input-fn on-keydown-fn (:book-name entry)]]
-        [:h2 "Book: " (:book-name entry)]))))
+         [:label "Saga:"]
+         [editable-field on-input-fn on-keydown-fn (:saga-name entry)]]
+        [:h2 "Saga: " (:saga-name entry)]))))
 
 (defn story-select
   "In edit mode, allow editing of story, otherwise show story name."
@@ -74,7 +74,7 @@
     (fn story-select-render [entry put-fn edit-mode?]
       (let [linked-story (:linked-story entry)]
         (if edit-mode?
-          (when-not (or (contains? #{:book :story} (:entry-type entry))
+          (when-not (or (contains? #{:saga :story} (:entry-type entry))
                         (:comment-for entry))
             [:div.story
              [:label "Story:"]
@@ -88,34 +88,34 @@
           (when linked-story
             [:div.story (:story-name (get @stories linked-story))]))))))
 
-(defn book-select
+(defn saga-select
   "In edit mode, allow editing of story, otherwise show story name."
   [entry put-fn edit-mode?]
   (let [options (subscribe [:options])
-        books (reaction (:books @options))
-        sorted-books (reaction (:sorted-books @options))
+        sagas (reaction (:sagas @options))
+        sorted-sagas (reaction (:sorted-sagas @options))
         ts (:timestamp entry)
         new-entries (subscribe [:new-entries])
         select-handler
         (fn [ev]
           (let [selected (js/parseInt (-> ev .-nativeEvent .-target .-value))
                 updated (-> (get-in @new-entries [ts])
-                            (assoc-in [:linked-book] selected))]
+                            (assoc-in [:linked-saga] selected))]
             (put-fn [:entry/update-local updated])))]
     (fn story-select-render [entry put-fn edit-mode?]
-      (let [linked-book (:linked-book entry)
+      (let [linked-saga (:linked-saga entry)
             entry-type (:entry-type entry)]
         (when (= entry-type :story)
           (if edit-mode?
             (when-not (:comment-for entry)
               [:div.story
-               [:label "Book:"]
-               [:select {:value     (or linked-book "")
+               [:label "Saga:"]
+               [:select {:value     (or linked-saga "")
                          :on-change select-handler}
-                [:option {:value ""} "no book selected"]
-                (for [[id book] @sorted-books]
-                  (let [book-name (:book-name book)]
-                    ^{:key (str ts book-name)}
-                    [:option {:value id} book-name]))]])
-            (when linked-book
-              [:div.story "Book: " (:book-name (get @books linked-book))])))))))
+                [:option {:value ""} "no saga selected"]
+                (for [[id saga] @sorted-sagas]
+                  (let [saga-name (:saga-name saga)]
+                    ^{:key (str ts saga-name)}
+                    [:option {:value id} saga-name]))]])
+            (when linked-saga
+              [:div.story "Saga: " (:saga-name (get @sagas linked-saga))])))))))

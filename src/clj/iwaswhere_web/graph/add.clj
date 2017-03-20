@@ -245,14 +245,14 @@
         (uc/add-edges [:stories (:timestamp entry)]))
     graph))
 
-(defn add-book
-  "When entry is a :book, adds node for book.
-   Does nothing when entry is not of type :book."
+(defn add-saga
+  "When entry is a :saga, adds node for saga.
+   Does nothing when entry is not of type :saga."
   [graph entry]
-  (if (= (:entry-type entry) :book)
+  (if (= (:entry-type entry) :saga)
     (-> graph
-        (uc/add-nodes :book)
-        (uc/add-edges [:books (:timestamp entry)]))
+        (uc/add-nodes :saga)
+        (uc/add-edges [:sagas (:timestamp entry)]))
     graph))
 
 (defn add-story-set
@@ -312,7 +312,7 @@
           (update-in [:graph] add-linked-visit new-entry)
           (update-in [:graph] add-parent-ref new-entry)
           (update-in [:graph] add-story new-entry)
-          (update-in [:graph] add-book new-entry)
+          (update-in [:graph] add-saga new-entry)
           (update-in [:graph] add-location new-entry)
           (update-in [:graph] add-briefing new-entry)
           (add-story-set new-entry)

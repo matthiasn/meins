@@ -107,8 +107,8 @@
             (contains? opts ":location")
             (:location entry)
 
-            (contains? opts ":book")
-            (= :book (:entry-type entry))
+            (contains? opts ":saga")
+            (= :saga (:entry-type entry))
 
             :else true)
 
@@ -247,8 +247,12 @@
                       (get-connected-nodes g :stories)
 
                       (and (seq (:opts query))
-                           (contains? (:opts query) ":book"))
-                      (get-connected-nodes g :books)
+                           (contains? (:opts query) ":saga"))
+                      (get-connected-nodes g :sagas)
+
+                      (and (seq (:opts query))
+                           (contains? (:opts query) ":saga"))
+                      (get-connected-nodes g :sagas)
 
                       ; set with timestamps matching tags and mentions
                       (or (seq (:tags query)) (seq (:mentions query)))
@@ -324,14 +328,14 @@
         stories (into {} (map (fn [id] [id (uc/attrs g id)]) story-ids))]
     stories))
 
-(defn find-all-books
-  "Finds all :book entries in graph and returns map with the id of the book
-   (creation timestamp) as key and the book node itself as value."
+(defn find-all-sagas
+  "Finds all :saga entries in graph and returns map with the id of the saga
+   (creation timestamp) as key and the saga node itself as value."
   [current-state]
   (let [g (:graph current-state)
-        book-ids (map :dest (uc/find-edges g {:src :books}))
-        books (into {} (map (fn [id] [id (uc/attrs g id)]) book-ids))]
-    books))
+        saga-ids (map :dest (uc/find-edges g {:src :sagas}))
+        sagas (into {} (map (fn [id] [id (uc/attrs g id)]) saga-ids))]
+    sagas))
 
 (defn find-all-locations
   "Finds all location in graph and returns map with the id of the location

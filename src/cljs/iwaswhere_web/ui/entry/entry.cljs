@@ -93,7 +93,7 @@
                      :on-drag-over  h/prevent-default
                      :on-drag-enter h/prevent-default}
          [es/story-select @entry put-fn edit-mode?]
-         [es/book-select @entry put-fn edit-mode?]
+         [es/saga-select @entry put-fn edit-mode?]
          [:div.header
           [:div
            [:a [:time {:on-click add-search} formatted-time]]
@@ -112,7 +112,7 @@
           [a/entry-actions ts put-fn edit-mode? toggle-edit local-cfg]]
          [hashtags-mentions-list ts tab-group put-fn]
          [es/story-name-field @entry edit-mode? put-fn]
-         [es/book-name-field @entry edit-mode? put-fn]
+         [es/saga-name-field @entry edit-mode? put-fn]
          (if edit-mode?
            [e/editable-md-render @entry put-fn]
            (if (and (empty? (:md @entry)) linked-desc)

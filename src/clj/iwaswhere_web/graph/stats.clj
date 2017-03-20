@@ -9,14 +9,14 @@
             [clojure.tools.logging :as log]
             [ubergraph.core :as uc]))
 
-(defn time-by-books
-  "Calculate time spent per book, plus time not assigned to any book."
+(defn time-by-sagas
+  "Calculate time spent per saga, plus time not assigned to any saga."
   [g by-story]
   (let [stories (gq/find-all-stories {:graph g})
-        book-reducer (fn [acc [k v]]
-                       (let [book (get-in stories [k :linked-book] :no-book)]
-                         (update-in acc [book] #(+ v (or % 0)))))]
-    (reduce book-reducer {} by-story)))
+        saga-reducer (fn [acc [k v]]
+                       (let [saga (get-in stories [k :linked-saga] :no-saga)]
+                         (update-in acc [saga] #(+ v (or % 0)))))]
+    (reduce saga-reducer {} by-story)))
 
 (defn manually-logged
   "Calculates summed duration and returns it when entry is either not for a
@@ -69,7 +69,7 @@
     {:total-time    (apply + (map second by-story))
      :time-by-ts    by-ts
      :time-by-story by-story
-     :time-by-book  (time-by-books g by-story)}))
+     :time-by-saga  (time-by-sagas g by-story)}))
 
 (defn pomodoro-mapper
   "Create mapper function for pomodoro stats"
@@ -294,7 +294,7 @@
    :stories        (gq/find-all-stories state)
    :locations      (gq/find-all-locations state)
    :briefings      (gq/find-all-briefings state)
-   :books          (gq/find-all-books state)
+   :sagas          (gq/find-all-sagas state)
    :cfg            (:cfg state)})
 
 (defn stats-tags-fn

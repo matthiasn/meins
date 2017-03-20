@@ -17,24 +17,24 @@
   "Render list of times spent on individual stories, plus the total."
   [day-stats local put-fn]
   (let [stories (subscribe [:stories])
-        books (subscribe [:books])
-        book-filter (fn [[k v]]
+        sagas (subscribe [:sagas])
+        saga-filter (fn [[k v]]
                       (if-let [selected (:selected @local)]
                         (let [story (get @stories k)]
-                          (= selected (:linked-book story)))
+                          (= selected (:linked-saga story)))
                         true))
         story-name-mapper (fn [[k v]]
                             (let [s (or (:story-name (get @stories k)) "none")]
                               [k s v]))]
     (fn [day-stats local put-fn]
       (let [stories @stories
-            books @books
+            sagas @sagas
             dur (u/duration-string (:total-time day-stats))
             date (:date-string day-stats)
             time-by-story (:time-by-story day-stats)
             time-by-story2 (->> day-stats
                                 :time-by-story
-                                (filter book-filter)
+                                (filter saga-filter)
                                 (map story-name-mapper)
                                 (sort-by second))
             y-scale 0.0045]
@@ -126,10 +126,10 @@
                            (if (:on-hold @local)
                              on-hold
                              (not on-hold))))
-        book-filter (fn [entry]
+        saga-filter (fn [entry]
                       (if-let [selected (:selected @local)]
                         (let [story (get @stories (:linked-story entry))]
-                          (= selected (:linked-book story)))
+                          (= selected (:linked-saga story)))
                         true))
         filter-btn (fn [fk]
                      [:span.filter {:class    (when (:on-hold @local) "current")
@@ -142,7 +142,7 @@
                              entries (->> @started-tasks
                                           (map (fn [ts] (find-missing ts)))
                                           (filter on-hold-filter)
-                                          (filter book-filter)
+                                          (filter saga-filter)
                                           (sort sorter))
                              conf (merge @cfg @options)]
                          (if (:show-pvt @cfg)
@@ -205,10 +205,10 @@
                              (filter (u/pvt-filter conf @entries-map) linked-entries))
             current-filter (get linked-filters (:filter @local))
             filter-fn (u/linked-filter-fn @entries-map current-filter put-fn)
-            book-filter (fn [entry]
+            saga-filter (fn [entry]
                           (if-let [selected (:selected @local)]
                             (let [story (get @stories (:linked-story entry))]
-                              (= selected (:linked-book story)))
+                              (= selected (:linked-saga story)))
                             true))
             active-filter (fn [t]
                             (let [active-from (-> t :task :active-from)
@@ -219,7 +219,7 @@
                                 true)))
             linked-entries (->> linked-entries
                                 (filter filter-fn)
-                                (filter book-filter)
+                                (filter saga-filter)
                                 (filter active-filter)
                                 (sort-by #(or (-> % :task :priority) :X)))]
         [:div.linked-tasks
@@ -280,7 +280,7 @@
                        :on-hold false})
         stats (subscribe [:stats])
         options (subscribe [:options])
-        books (reaction (:books @options))
+        sagas (reaction (:sagas @options))
         entries-map (subscribe [:entries-map])
         results (subscribe [:results])
         cfg (subscribe [:cfg])
@@ -293,15 +293,15 @@
               (put-fn [:entry/update-local updated]))))
 
         time-alloc-input-fn
-        (fn [entry book]
+        (fn [entry saga]
           (fn [ev]
             (let [m (js/parseInt (-> ev .-nativeEvent .-target .-value))
                   s (* m 60)
-                  updated (assoc-in entry [:briefing :time-allocation book] s)]
+                  updated (assoc-in entry [:briefing :time-allocation saga] s)]
               (put-fn [:entry/update-local updated]))))]
     (fn briefing-render [entry put-fn edit-mode? local-cfg]
       (when (contains? (:tags entry) "#briefing")
-        (let [books @books
+        (let [sagas @sagas
               ts (:timestamp entry)
               {:keys [pomodoro-stats task-stats wordcount-stats]} @chart-data
               day (-> entry :briefing :day)
@@ -311,9 +311,9 @@
               {:keys [tasks-cnt done-cnt closed-cnt]} (get task-stats day)
               started (:started-tasks-cnt @stats)
               allocation (-> entry :briefing :time-allocation)
-              actual-times (:time-by-book day-stats)
+              actual-times (:time-by-saga day-stats)
               remaining (cd/remaining-times actual-times allocation)
-              past-7-days (cd/past-7-days pomodoro-stats :time-by-book)
+              past-7-days (cd/past-7-days pomodoro-stats :time-by-saga)
               tab-group (:tab-group local-cfg)]
           [:div.briefing
            [:form.briefing-details
@@ -343,12 +343,12 @@
              [:div.linked-tasks
               [:table
                [:tbody
-                [:tr [:th ""] [:th "book"] [:th "planned"] [:th "actual"] [:th "remaining"]]
-                (for [[k v] (sort-by #(-> % second :book-name) books)]
+                [:tr [:th ""] [:th "saga"] [:th "planned"] [:th "actual"] [:th "remaining"]]
+                (for [[k v] (sort-by #(-> % second :saga-name) sagas)]
                   (let [allocation (get-in entry [:briefing :time-allocation k] 0)
-                        actual (get-in (:time-by-book day-stats) [k] 0)
+                        actual (get-in (:time-by-saga day-stats) [k] 0)
                         remaining (- allocation actual)
-                        color (cc/item-color (:book-name v))
+                        color (cc/item-color (:saga-name v))
                         click
                         (fn [_]
                           (when-not edit-mode?
@@ -358,7 +358,7 @@
                       [:tr {:on-click click
                             :class    (when (= k (:selected @local)) "selected")}
                        [:td [:div.legend {:style {:background-color color}}]]
-                       [:td [:strong (:book-name v)]]
+                       [:td [:strong (:saga-name v)]]
                        [:td.time
                         (if edit-mode?
                           [:input {:on-input (time-alloc-input-fn entry k)
@@ -372,6 +372,6 @@
              [waiting-habits-list tab-group entry put-fn]
              (when day-stats [time-by-stories-list day-stats local put-fn])]]
            [:div.stacked-bars
-            [:div [vertical-bar books :book-name allocation 0.0045]]
-            [:div [vertical-bar books :book-name actual-times 0.0045]]
-            [:div [vertical-bar books :book-name remaining 0.0045]]]])))))
+            [:div [vertical-bar sagas :saga-name allocation 0.0045]]
+            [:div [vertical-bar sagas :saga-name actual-times 0.0045]]
+            [:div [vertical-bar sagas :saga-name remaining 0.0045]]]])))))

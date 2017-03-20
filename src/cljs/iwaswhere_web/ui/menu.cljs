@@ -31,8 +31,8 @@
    [:button.menu-new {:on-click (h/new-entry-fn put-fn {} nil)}
     [:span.fa.fa-plus-square] " new"]
    [:button.menu-new
-    {:on-click (h/new-entry-fn put-fn {:entry-type :book} nil)}
-    [:span.fa.fa-plus-square] " new book"]
+    {:on-click (h/new-entry-fn put-fn {:entry-type :saga} nil)}
+    [:span.fa.fa-plus-square] " new saga"]
    [:button.menu-new
     {:on-click (h/new-entry-fn put-fn {:entry-type :story} nil)}
     [:span.fa.fa-plus-square] " new story"]

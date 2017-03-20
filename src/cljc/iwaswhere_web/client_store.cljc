@@ -30,10 +30,10 @@
         sorted-stories (sort (fn [[_ x] [_ y]]
                                (< (:story-name x) (:story-name y)))
                              stories)
-        books (:books msg-payload)
-        sorted-books (sort (fn [[_ x] [_ y]]
-                               (< (:book-name x) (:book-name y)))
-                             books)
+        sagas (:sagas msg-payload)
+        sorted-sagas (sort (fn [[_ x] [_ y]]
+                               (< (:saga-name x) (:saga-name y)))
+                             sagas)
         new-state
         (-> current-state
             (assoc-in [:options :hashtags] (:hashtags msg-payload))
@@ -44,8 +44,8 @@
             (assoc-in [:options :stories] stories)
             (assoc-in [:options :locations] (:locations msg-payload))
             (assoc-in [:options :sorted-stories] sorted-stories)
-            (assoc-in [:options :books] books)
-            (assoc-in [:options :sorted-books] sorted-books)
+            (assoc-in [:options :sagas] sagas)
+            (assoc-in [:options :sorted-sagas] sorted-sagas)
             (assoc-in [:options :mentions] (:mentions msg-payload))
             (assoc-in [:briefings] (:briefings msg-payload))
             (assoc-in [:started-tasks] (:started-tasks msg-payload))
