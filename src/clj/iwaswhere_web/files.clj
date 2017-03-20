@@ -5,6 +5,7 @@
   replayed to recreate the application state. This mechanism is inspired
   by Event Sourcing (http://martinfowler.com/eaaDev/EventSourcing.html)."
   (:require [iwaswhere-web.graph.add :as ga]
+            [clj-uuid :as uuid]
             [clj-time.core :as time]
             [clj-time.format :as tf]
             [clojure.tools.logging :as log]
@@ -52,7 +53,8 @@
 (defn entry-import-fn
   "Handler function for persisting an imported journal entry."
   [{:keys [current-state msg-payload]}]
-  (let [entry (merge msg-payload {:last-saved (st/now)})
+  (let [id (or (:id msg-payload) (uuid/v1))
+        entry (merge msg-payload {:last-saved (st/now) :id id})
         ts (:timestamp entry)
         graph (:graph current-state)
         exists? (uber/has-node? graph ts)
@@ -81,7 +83,8 @@
   "Handler function for persisting journal entry."
   [{:keys [current-state msg-payload msg-meta]}]
   (let [ts (:timestamp msg-payload)
-        entry (merge msg-payload {:last-saved (st/now)})
+        id (or (:id msg-payload) (uuid/v1))
+        entry (merge msg-payload {:last-saved (st/now) :id id})
         new-state (ga/add-node current-state ts entry false)
         cfg (:cfg current-state)]
     (when (not= current-state new-state)
@@ -91,8 +94,8 @@
                      (with-meta [:entry/find {:timestamp comment-for}] msg-meta))
      :emit-msg     [[:entry/saved entry]
                     [:ft/add entry]
-                    [:cmd/schedule-new {:timeout 200
-                                        :message [:state/stats-tags-get]}]]}))
+                    [:cmd/schedule-new {:message [:state/stats-tags-get]
+                                        :timeout 200}]]}))
 
 (defn move-attachment-to-trash
   "Moves attached media file to trash folder."

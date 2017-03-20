@@ -72,7 +72,7 @@
                 stats (:stats res)]
             (is (= 107
                    (:entry-count stats)))
-            (is (= 128
+            (is (= 235
                    (:node-count stats)))))
 
         (testing
@@ -149,4 +149,8 @@
                                                                       "#done"
                                                                       "#task"}
                                                :timestamp           1450998400000}}}
-                 (dissoc res :duration-ms))))))))
+                 (-> res
+                     (update-in [:entries-map] #(into {} (map (fn [[k v]]
+                                                                [k (dissoc v :id)])
+                                                              %)))
+                     (dissoc :duration-ms)))))))))

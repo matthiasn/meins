@@ -1,7 +1,9 @@
 (ns iwaswhere-web.migrations
   "This namespace is used for migrating entries to new versions."
   (:require [iwaswhere-web.files :as f]
-            [clojure.pprint :as pp]))
+            [clojure.pprint :as pp]
+            [clojure.tools.logging :as log]
+            [clj-uuid :as uuid]))
 
 (defn add-tags-mentions
   "Parses entry for hashtags and mentions."
@@ -25,11 +27,28 @@
         (when converted
           (spit filename (with-out-str (pp/pprint converted))))))))
 
-(defn migrate-to-append-log
-  "Initial state function, creates state atom and then parses all files in
-  data directory into the component state."
-  []
-  (let [files (file-seq (clojure.java.io/file "./data"))]
-    (doseq [f (f/filter-by-name files #"\d{13}.edn")]
-      (let [parsed (clojure.edn/read-string (slurp f))]
-        (f/append-daily-log {:msg-payload parsed})))))
+
+(defn migrate-to-uuids
+  ; (migrate-to-uuids "./data/migration/daily-logs" "./data/daily-logs/2017-03-19.jrn")
+  [path out-file]
+  (let [files (file-seq (clojure.java.io/file path))
+        ts-uuid (atom {})]
+    (doseq [f (f/filter-by-name files #"\d{4}-\d{2}-\d{2}a?.jrn")]
+      (with-open [reader (clojure.java.io/reader f)]
+        (prn f)
+        (let [lines (line-seq reader)]
+          (doseq [line lines]
+            (try
+              (let [parsed (clojure.edn/read-string line)
+                    ts (:timestamp parsed)
+                    id (or (:id parsed)
+                           (get-in @ts-uuid [ts])
+                           (uuid/v1))
+                    entry (merge parsed {:id id})
+                    without-raw-exif (dissoc entry :raw-exif)
+                    serialized (str (pr-str without-raw-exif) "\n")]
+                (swap! ts-uuid assoc-in [ts] id)
+                (spit out-file serialized :append true))
+              (catch Exception ex
+                (log/error "Exception" ex "when parsing line:\n" line)))))))
+    (log/info (count @ts-uuid) "migrated")))

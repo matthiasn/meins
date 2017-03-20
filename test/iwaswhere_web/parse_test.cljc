@@ -47,6 +47,7 @@
    :date-string nil
    :briefing    nil
    :timestamp   nil
+   :id          nil
    :n           20})
 
 (def fulltext-search
@@ -59,6 +60,7 @@
    :date-string nil
    :briefing    nil
    :timestamp   nil
+   :id          nil
    :n           20})
 
 (def open-tasks-search
@@ -71,6 +73,7 @@
    :date-string nil
    :briefing    nil
    :timestamp   nil
+   :id          nil
    :n           20})
 
 (def started-tasks-search
@@ -83,6 +86,7 @@
    :date-string nil
    :briefing    nil
    :timestamp   nil
+   :id          nil
    :n           20})
 
 (def tasks-done-search
@@ -95,6 +99,7 @@
    :date-string nil
    :briefing    nil
    :timestamp   nil
+   :id          nil
    :n           20})
 
 (def day-search
@@ -107,6 +112,7 @@
    :date-string "2016-06-07"
    :briefing    nil
    :timestamp   nil
+   :id          nil
    :n           20})
 
 (def briefing-search
@@ -119,6 +125,7 @@
    :date-string nil
    :briefing    "2016-06-07"
    :timestamp   nil
+   :id          nil
    :n           20})
 
 (def timestamp-search
@@ -131,6 +138,20 @@
    :date-string nil
    :briefing    nil
    :timestamp   "1465325998053"
+   :id          nil
+   :n           20})
+
+(def id-search
+  {:search-text "48cde500-0d4f-11e7-8d14-42a2f9d2d24d"
+   :ft-search   nil
+   :tags        #{}
+   :not-tags    #{}
+   :mentions    #{}
+   :opts        #{}
+   :date-string nil
+   :briefing    nil
+   :timestamp   nil
+   :id          "48cde500-0d4f-11e7-8d14-42a2f9d2d24d"
    :n           20})
 
 (deftest parse-search-test
@@ -171,7 +192,11 @@
 
   (testing "timestamp query is parsed correctly"
     (is (= (p/parse-search (:search-text timestamp-search))
-           timestamp-search))))
+           timestamp-search)))
+
+  (testing "id query is parsed correctly"
+    (is (= (p/parse-search (:search-text id-search))
+           id-search))))
 
 
 (def tags #{"#task" "#goal" "#autocomplete" "#autosuggestion" "#Clojure"

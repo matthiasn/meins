@@ -12,7 +12,8 @@
             [clojure.tools.logging :as log]
             [clojure.pprint :as pp]
             [matthiasn.systems-toolbox.component :as st]
-            [clj-time.core :as t])
+            [clj-time.core :as t]
+            [clj-uuid :as uuid])
   (:import (org.joda.time DateTimeZone)))
 
 ;; TODO: migrate existing audio entries to use a different keyword
@@ -219,6 +220,10 @@
                       ; set with the one timestamp in query
                       (:timestamp query)
                       #{(Long/parseLong (:timestamp query))}
+
+                      ; set with the one id in query
+                      (:id query)
+                      #{(uuid/as-uuid (:id query))}
 
                       ; set with timestamps matching the day
                       (:date-string query)

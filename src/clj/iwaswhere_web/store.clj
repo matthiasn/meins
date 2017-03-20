@@ -68,8 +68,6 @@
                                       :edge-count      0
                                       :daily-summaries {}}})]
     (read-dir state entries-to-index conf nil)
-    (doseq [[k _] (:custom-data-paths conf)]
-      (read-dir state entries-to-index conf k))
 
     (future
       (log/info "Summary stats creation started")

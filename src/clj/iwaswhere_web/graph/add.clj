@@ -15,6 +15,13 @@
             [clj-time.core :as t]
             [iwaswhere-web.graph.stats :as gs]))
 
+(defn add-entry
+  "Adds entry to graph."
+  [graph entry]
+  (let [ts (:timestamp entry)
+        id (:id entry)]
+    (uc/add-nodes-with-attrs graph [ts entry] [id entry])))
+
 (defn add-hashtags
   "Add hashtag edges to graph for a new entry. When a hashtag exists already,
    an edge to the existing node will be added, otherwise a new hashtag node will
@@ -40,8 +47,7 @@
                 (uc/add-nodes ht-parent)
                 (uc/add-nodes-with-attrs [{tag-type ltag} {:val tag}])
                 (uc/add-edges
-                  [{tag-type ltag} (:timestamp entry)
-                   {:relationship :CONTAINS}]
+                  [{tag-type ltag} (:timestamp entry) {:relationship :CONTAINS}]
                   [ht-parent {tag-type ltag} {:relationship :IS}]))))]
     (assoc-in current-state [:graph] (reduce tag-add-fn graph tags))))
 
@@ -135,7 +141,8 @@
   "Adds an edge to parent node when :comment-for key on the entry exists."
   [graph entry]
   (if-let [comment-for (:comment-for entry)]
-    (uc/add-edges graph [(:timestamp entry) comment-for {:relationship :COMMENT}])
+    (uc/add-edges graph
+                  [(:timestamp entry) comment-for {:relationship :COMMENT}])
     graph))
 
 (defn add-linked
@@ -147,8 +154,9 @@
     (reduce (fn [acc linked-entry]
               (let [with-linked (if (uc/has-node? acc linked-entry)
                                   acc (uc/add-nodes acc linked-entry))]
-                (uc/add-edges with-linked [(:timestamp entry) linked-entry
-                                           {:relationship :LINKED}])))
+                (uc/add-edges with-linked
+                              [(:timestamp entry) linked-entry
+                               {:relationship :LINKED}])))
             graph
             linked-entries)))
 
@@ -275,7 +283,8 @@
   (let [graph (:graph current-state)
         old-entry (when (uc/has-node? graph ts) (uc/attrs graph ts))
         merged (merge old-entry entry)
-        geo-only? (= (set (keys merged)) #{:timestamp :latitude :longitude :last-saved})
+        geo-only? (= (set (keys merged))
+                     #{:timestamp :latitude :longitude :last-saved})
         old-tags (:tags old-entry)
         old-mentions (:mentions old-entry)
         remove-tag-edges (fn [g tags k]
@@ -293,7 +302,7 @@
           (update-in [:graph] remove-tag-edges old-mentions :mention)
           (update-in [:graph] remove-unused-tags old-tags :tag)
           (update-in [:graph] remove-unused-tags old-mentions :mention)
-          (update-in [:graph] uc/add-nodes-with-attrs [ts new-entry])
+          (update-in [:graph] add-entry new-entry)
           (add-hashtags new-entry)
           (update-in [:graph] add-mentions new-entry)
           (update-in [:graph] add-linked new-entry)

@@ -28,6 +28,7 @@
                  [seesaw "1.4.5"]
                  [clj.qrgen "0.4.0"]
                  [image-resizer "0.1.9"]
+                 [danlentz/clj-uuid "0.1.7"]
                  [org.webjars.bower/fontawesome "4.7.0"]
                  [org.webjars.npm/randomcolor "0.4.4"]
                  [org.webjars.bower/normalize-css "5.0.0"]
