@@ -7,23 +7,6 @@
             [clojure.pprint :as pp]
             [iwaswhere-web.charts.data :as cd]))
 
-(defn bars
-  [indexed local k chart-h y-scale put-fn]
-  [:g
-   (for [[idx v] indexed]
-     (let [h (* y-scale (k v))
-           mouse-enter-fn (cc/mouse-enter-fn local v)
-           mouse-leave-fn (cc/mouse-leave-fn local v)]
-       ^{:key (str "pbar" k idx)}
-       [:rect {:class          (cc/weekend-class (name k) v)
-               :on-click       (cc/open-day-fn v put-fn)
-               :x              (* 10 idx)
-               :y              (- chart-h h)
-               :width          9
-               :height         h
-               :on-mouse-enter mouse-enter-fn
-               :on-mouse-leave mouse-leave-fn}]))])
-
 (defn ts-bars
   "Renders group with rects for all stories of the particular day."
   [day-stats local idx chart-h y-scale put-fn]
@@ -53,12 +36,12 @@
                  y (* y-scale (+ hh 2) 60 60)
                  y (if (pos? manual) (- y h) y)]
              ^{:key (str story-name hh)}
-             [:rect {:fill   (cc/item-color story-name)
+             [:rect {:fill           (cc/item-color story-name)
                      :on-mouse-enter #(prn story-name hh summed)
-                     :x      (* 30 idx)
-                     :y      y
-                     :width  26
-                     :height h}]))]))))
+                     :x              (* 30 idx)
+                     :y              y
+                     :width          26
+                     :height         h}]))]))))
 
 (defn bars-by-ts
   "Renders chart with daily recorded times, split up by story."
@@ -97,7 +80,8 @@
             stories @stories
             time-by-story (sort-by #(str (first %)) (:time-by-story day-stats))
             stacked (reduce stacked-reducer {} time-by-story)
-            time-by-story2 (reverse (sort-by #(str (first %)) (:items stacked)))]
+            time-by-story2 (reverse (sort-by #(str (first %)) (:items stacked)))
+            weekend? (cc/weekend? (:date-string day-stats))]
         [:g
          {:on-mouse-enter mouse-enter-fn
           :on-mouse-leave mouse-leave-fn}
@@ -111,7 +95,14 @@
                      :x        (* 30 idx)
                      :y        y
                      :width    26
-                     :height   h}]))]))))
+                     :height   h}]))
+         (when weekend?
+           [:rect {:fill    :white
+                   :x       (* 30 idx)
+                   :y       0
+                   :opacity 0.5
+                   :width   26
+                   :height  chart-h}])]))))
 
 (defn bars-by-story
   "Renders chart with daily recorded times, split up by story."
@@ -146,21 +137,30 @@
             sagas @sagas
             time-by-saga (sort-by #(str (first %)) (:time-by-saga day-stats))
             stacked (reduce stacked-reducer {} time-by-saga)
-            time-by-saga (reverse (sort-by #(str (first %)) (:items stacked)))]
+            time-by-saga (reverse (sort-by #(str (first %)) (:items stacked)))
+            weekend? (cc/weekend? (:date-string day-stats))]
         [:g
          {:on-mouse-enter mouse-enter-fn
           :on-mouse-leave mouse-leave-fn}
          (for [[saga {:keys [y v]}] time-by-saga]
            (let [h (* y-scale v)
                  y (- chart-h (+ h (* y-scale y)))
-                 saga-name (or (:saga-name (get sagas saga)) "No saga")]
+                 saga-name (or (:saga-name (get sagas saga)) "No saga")
+                 weekday? (not (cc/weekend? (:date-string day-stats)))]
              ^{:key (str saga)}
              [:rect {:on-click (cc/open-day-fn v put-fn)
                      :fill     (cc/item-color saga-name)
                      :x        (* 30 idx)
                      :y        y
                      :width    26
-                     :height   h}]))]))))
+                     :height   h}]))
+         (when weekend?
+           [:rect {:fill    :white
+                   :x       (* 30 idx)
+                   :y       0
+                   :opacity 0.5
+                   :width   26
+                   :height  chart-h}])]))))
 
 (defn bars-by-saga
   "Renders chart with daily recorded times, split up by story."
@@ -168,14 +168,14 @@
   [:svg
    {:viewBox (str "0 0 600 " chart-h)}
    [:g
-    [cc/chart-title "by saga"]
     [:g
      (for [[idx v] indexed]
        (let [h (* y-scale (:total-time v))
              mouse-enter-fn (cc/mouse-enter-fn local v)
              mouse-leave-fn (cc/mouse-leave-fn local v)]
          ^{:key (str idx)}
-         [day-bars-by-saga v local idx chart-h y-scale put-fn]))]]])
+         [day-bars-by-saga v local idx chart-h y-scale put-fn]))]
+    [cc/chart-title "by saga"]]])
 
 (defn time-by-stories-list
   "Render list of times spent on individual stories, plus the total."
@@ -219,7 +219,8 @@
             indexed (map-indexed idx-fn stats)
             indexed-20 (map-indexed idx-fn (take-last 20 stats))
             day-stats (or (:mouse-over @local) (second (last stats)))
-            past-7-days (cd/past-7-days stats :time-by-saga)]
+            past-7-days (cd/past-7-days stats :time-by-saga)
+            fmt-date (.format (js/moment (:date-string day-stats)) "ddd YY-MM-DD")]
         [:div
          [:div.times-by-day
           [:div [cc/horizontal-bar sagas :saga-name past-7-days 0.001]]
@@ -238,5 +239,5 @@
          [bars-by-saga indexed-20 local chart-h 0.0035 put-fn]
          [bars-by-ts indexed-20 local 443.5 0.0044 put-fn]
          [:div.times-by-day
-          [:time (:date-string day-stats)]
+          [:time fmt-date]
           [time-by-stories-list day-stats]]]))))
