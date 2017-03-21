@@ -110,14 +110,14 @@
   [:svg
    {:viewBox (str "0 0 600 " chart-h)}
    [:g
-    [cc/chart-title "by story"]
     [:g
      (for [[idx v] indexed]
        (let [h (* y-scale (:total-time v))
              mouse-enter-fn (cc/mouse-enter-fn local v)
              mouse-leave-fn (cc/mouse-leave-fn local v)]
          ^{:key (str idx)}
-         [day-bars v local idx chart-h y-scale put-fn]))]]])
+         [day-bars v local idx chart-h y-scale put-fn]))]
+    [cc/chart-title "by story"]]])
 
 ;; TODO: either DRY up or rethink
 (defn day-bars-by-saga

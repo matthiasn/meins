@@ -40,23 +40,24 @@
   [query-id put-fn]
   (let [query-cfg (subscribe [:query-cfg])
         cfg (subscribe [:cfg])
-        options (subscribe [:options])]
+        options (subscribe [:options])
+        mentions (reaction (map (fn [m] {:name m}) (:mentions @options)))
+        hashtags (reaction
+                   (let [show-pvt? (:show-pvt @cfg)
+                         hashtags (:hashtags @options)
+                         pvt-hashtags (:pvt-hashtags @options)
+                         hashtags (if show-pvt?
+                                    (concat hashtags pvt-hashtags)
+                                    hashtags)]
+                     (map (fn [h] {:name h}) hashtags)))]
     (fn [query-id put-fn]
       (let [query (query-id (:queries @query-cfg))
-            show-pvt? (:show-pvt @cfg)
-            hashtags (:hashtags @options)
-            pvt-hashtags (:pvt-hashtags @options)
-            hashtags (if show-pvt? (concat hashtags pvt-hashtags) hashtags)
-            mentions-list (map (fn [m] {:name m}) (:mentions @options))
-            hashtags-list (map (fn [h] {:name h}) hashtags)
-
             search-send (fn [text editor-state]
                           (let [query (query-id (:queries @query-cfg))
                                 s (merge query
                                          (p/parse-search text)
                                          {:editor-state editor-state})]
                             (put-fn [:search/update s])))
-
             story-select-handler
             (fn [ev]
               (let [v (-> ev .-nativeEvent .-target .-value)
@@ -65,15 +66,14 @@
                 (put-fn [:search/update q])))]
         [:div.search
          [tags-view query]
-         (when (seq mentions-list)
-           ^{:key query-id}
-           [:div.search-row
-            [draft/draft-search-field
-             (editor-state query) search-send mentions-list hashtags-list]
-            [:select {:value     (or (:story query) "")
-                      :on-change story-select-handler}
-             [:option {:value ""} "no story selected"]
-             (for [[id story] (:sorted-stories @options)]
-               (let [story-name (:story-name story)]
-                 ^{:key (str query-id id story-name)}
-                 [:option {:value id} story-name]))]])]))))
+         ^{:key query-id}
+         [:div.search-row
+          [draft/draft-search-field
+           (editor-state query) search-send @mentions @hashtags]
+          [:select {:value     (or (:story query) "")
+                    :on-change story-select-handler}
+           [:option {:value ""} "no story selected"]
+           (for [[id story] (:sorted-stories @options)]
+             (let [story-name (:story-name story)]
+               ^{:key (str query-id id story-name)}
+               [:option {:value id} story-name]))]]]))))

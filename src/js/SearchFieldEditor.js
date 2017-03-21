@@ -9,14 +9,16 @@ export default class SearchFieldEditor extends Component {
     state = {};
 
     onSearchChange = ({value}) => {
+        let mentions = fromJS(this.props.mentions);
         this.setState({
-            mentionSuggestions: defaultSuggestionsFilter(value, this.state.mentions),
+            mentionSuggestions: defaultSuggestionsFilter(value, mentions),
         });
     };
 
     onSearchChange2 = ({value}) => {
+        let hashtags = fromJS(this.props.hashtags);
         this.setState({
-            hashtagSuggestions: defaultSuggestionsFilter(value, this.state.hashtags),
+            hashtagSuggestions: defaultSuggestionsFilter(value, hashtags),
         });
     };
 
