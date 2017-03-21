@@ -44,6 +44,7 @@
     (try (edn/read-string (slurp conf-path))
          (catch Exception ex
            (do (log/warn "No config found -> copying from default.")
+               (fs/mkdirs f/data-path)
                (spit conf-path (with-out-str (pp/pprint default)))
                default)))))
 
