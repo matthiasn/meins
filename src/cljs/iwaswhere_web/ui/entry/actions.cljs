@@ -96,11 +96,6 @@
               {:on-click #(do (toggle-visible) (new-loc entry))}
               [:span.fa.fa-plus-square] "add location"])])))))
 
-(defn upvote-fn [entry op put-fn]
-  "Create click function for like. Can handle both upvotes and downvotes."
-  (fn [_ev]
-    (put-fn [:entry/update (update-in @entry [:upvotes] op)])))
-
 (defn entry-actions
   "Entry-related action buttons. Hidden by default, become visible when mouse
    hovers over element, stays visible for a little while after mose leaves."
@@ -127,20 +122,14 @@
                        (put-fn [:entry/remove-local {:timestamp ts}])
                        (put-fn [:entry/trash @entry]))
         open-external (up/add-search ts tab-group put-fn)
-        upvote (upvote-fn @entry inc put-fn)
         mouse-enter #(reset! visible true)]
     (fn entry-actions-render [ts put-fn edit-mode? toggle-edit local-cfg]
       (let [map? (:latitude @entry)
-            upvotes (:upvotes @entry)
             prev-saved? (or (:last-saved @entry) (< ts 1479563777132))
             comment? (:comment-for @entry)]
         [:div {:on-mouse-enter mouse-enter
                :on-mouse-leave hide-fn
                :style          {:opacity (if (or edit-mode? @visible) 1 0)}}
-         (when prev-saved?
-           [:span.fa.toggle
-            {:on-click upvote
-             :class    (if (pos? upvotes) "fa-thumbs-up" "fa-thumbs-o-up")}])
          (when map? [:span.fa.fa-map-o.toggle {:on-click toggle-map}])
          (when prev-saved? [edit-icon toggle-edit edit-mode? @entry])
          (when-not comment? [:span.fa.fa-clock-o.toggle {:on-click new-pomodoro}])

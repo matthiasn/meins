@@ -15,7 +15,6 @@
    :timestamp   nil
    :n           40
    :query-id    :query-1
-   :sort-by-upvotes nil
    :sort-asc nil})
 
 (def open-tasks-query
@@ -27,7 +26,6 @@
    :timestamp   nil
    :n           40
    :query-id    :query-1
-   :sort-by-upvotes nil
    :sort-asc nil})
 
 (def test-entry

@@ -25,11 +25,6 @@
       "query is set locally"
       (is (= st/empty-query (-> new-state :query-cfg :queries :query-1))))
     (testing
-      "query is sent, with additional :sort-by-upvotes key"
-      (is (= (merge st/empty-query {:sort-by-upvotes nil
-                                    :sort-asc        nil})
-             (-> handler-res :emit-msg second :queries :query-1))))
-    (testing
       "active entry not set"
       (is (not (:active new-state))))
     (testing
@@ -43,34 +38,6 @@
     (testing
       "active entry not set after updating query"
       (is (not (:active new-state2))))))
-
-(deftest update-query-upvotes-test
-  "Test that new query is sent properly, with :sort-by-upvotes set"
-  (let [current-state @(:state (store/initial-state-fn (fn [_put-fn])))
-        handler-res (search/update-query-fn {:current-state current-state
-                                             :msg-payload   st/open-tasks-query})
-        new-state (:new-state handler-res)
-        new-state1 (:new-state (c/toggle-key-fn
-                                 {:current-state new-state
-                                  :msg-payload   {:path [:sort-by-upvotes]}}))
-        handler-res1 (search/update-query-fn
-                       {:current-state new-state1
-                        :msg-payload   st/open-tasks-query})]
-    (testing
-      "query is set locally"
-      (is (= st/open-tasks-query
-             (-> new-state :query-cfg :queries :query-1))))
-    (testing
-      "query is sent, with additional but false :sort-by-upvotes key"
-      (is (= (merge st/open-tasks-query {:sort-by-upvotes nil
-                                         :sort-asc        nil})
-             (-> handler-res :emit-msg second :queries :query-1))))
-    (testing
-      "query is sent after upvotes-toggle, with additional :sort-by-upvotes key
-       being true"
-      (is (= (merge st/open-tasks-query {:sort-by-upvotes true
-                                         :sort-asc        nil})
-             (-> handler-res1 :emit-msg second :queries :query-1))))))
 
 (deftest show-more-test
   "Ensure that query is properly updated when more results are desired."
@@ -89,8 +56,7 @@
 
 (deftest find-existing-test
   "Tests finding existing queries in tab."
-  (let [query-cfg {:queries    {:0f94cca4-160d-4220-8071-b794856b8f9c {:sort-by-upvotes nil
-                                                                       :mentions        #{}
+  (let [query-cfg {:queries    {:0f94cca4-160d-4220-8071-b794856b8f9c {:mentions        #{}
                                                                        :tags            #{"#briefing"}
                                                                        :date-string     nil
                                                                        :n               20
@@ -101,8 +67,7 @@
                                                                        :not-tags        #{}
                                                                        :search-text     "#briefing "
                                                                        :sort-asc        nil}
-                                :a760ca9a-7171-411b-9c55-7f5c66c7e3c3 {:sort-by-upvotes nil
-                                                                       :mentions        #{}
+                                :a760ca9a-7171-411b-9c55-7f5c66c7e3c3 {:mentions        #{}
                                                                        :tags            #{}
                                                                        :date-string     nil
                                                                        :n               20
@@ -113,8 +78,7 @@
                                                                        :not-tags        #{}
                                                                        :search-text     "1487900192603"
                                                                        :sort-asc        nil}
-                                :e77973b3-59da-4f6f-ad0b-82d24ed1d82d {:sort-by-upvotes nil
-                                                                       :mentions        #{}
+                                :e77973b3-59da-4f6f-ad0b-82d24ed1d82d {:mentions        #{}
                                                                        :tags            #{}
                                                                        :date-string     nil
                                                                        :n               20
@@ -125,8 +89,7 @@
                                                                        :not-tags        #{}
                                                                        :search-text     "1488339624152"
                                                                        :sort-asc        nil}
-                                :56439d98-3f98-412a-a213-82137a1f8247 {:sort-by-upvotes nil
-                                                                       :mentions        #{}
+                                :56439d98-3f98-412a-a213-82137a1f8247 {:mentions        #{}
                                                                        :tags            #{}
                                                                        :date-string     nil
                                                                        :n               20
@@ -153,7 +116,6 @@
               :query-id        :a760ca9a-7171-411b-9c55-7f5c66c7e3c3
               :search-text     "1487900192603"
               :sort-asc        nil
-              :sort-by-upvotes nil
               :tags            #{}
               :timestamp       "1487900192603"}
              (search/find-existing query-cfg :right {:search-text "1487900192603"}))))

@@ -122,18 +122,6 @@
                       opts-match?)]
       match?)))
 
-(defn compare-w-upvotes
-  "Sort comparator which considers upvotes first, and, if those are equal, the
-   timestamp second."
-  [x y]
-  (let [upvotes-x (get x :upvotes 0)
-        upvotes-y (get y :upvotes 0)]
-    (if-not (= upvotes-x upvotes-y)
-      (clojure.lang.Util/compare upvotes-y upvotes-x)
-      (if (pos? upvotes-x)                                  ; when entries have upvotes, sort oldest on top
-        (clojure.lang.Util/compare (:timestamp x) (:timestamp y))
-        (clojure.lang.Util/compare (:timestamp y) (:timestamp x))))))
-
 (defn get-comments
   "Extract all comments for entry."
   [entry g ts]
@@ -187,13 +175,9 @@
 (defn get-linked-entries
   "Extract all linked entries for entry, including their comments."
   [entry g n sort-by-upvotes?]
-  (let [sort-fn (fn [ids]
-                  (if sort-by-upvotes?
-                    (sort compare-w-upvotes ids)
-                    (sort ids)))
-        linked (->> (flatten (uc/find-edges g {:src n :relationship :LINKED}))
+  (let [linked (->> (flatten (uc/find-edges g {:src n :relationship :LINKED}))
                     (map :dest)
-                    (sort-fn))]
+                    (sort))]
     (merge entry {:linked-entries-list (vec linked)})))
 
 (defn extract-sorted-entries
@@ -202,14 +186,13 @@
    node.
    Warns when node not in graph. (debugging, should never happen)"
   [state query]
-  (let [sort-by-upvotes? (:sort-by-upvotes query)
-        g (:graph state)
+  (let [g (:graph state)
         n (:n query)
         mapper-fn (fn [n]
                     (if (uc/has-node? g n)
                       (-> (uc/attrs g n)
                           (get-comments g n)
-                          (get-linked-entries g n sort-by-upvotes?))
+                          (get-linked-entries g n false))
                       (log/warn "extract-sorted-entries can't find node: " n)))
         sort-fn #(into (sorted-set-by (if (:sort-asc query) < >)) %)
         matched-ids (cond
@@ -262,11 +245,8 @@
                       :else (:sorted-entries state))
         matched-entries (map mapper-fn (sort-fn matched-ids))
         parent-ids (filter identity (map :comment-for matched-entries))
-        parents (map mapper-fn parent-ids)
-        entries (flatten [matched-entries parents])]
-    (if sort-by-upvotes?
-      (sort compare-w-upvotes entries)
-      entries)))
+        parents (map mapper-fn parent-ids)]
+    (flatten [matched-entries parents])))
 
 (defn extract-entries-by-ts
   "Find all entries for given timestamps set."

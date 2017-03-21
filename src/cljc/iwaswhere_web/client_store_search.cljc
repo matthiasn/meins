@@ -22,8 +22,7 @@
   (let [query-id (:query-id msg-payload)
         query-path [:query-cfg :queries query-id]
         query-msg (merge msg-payload
-                         {:sort-by-upvotes (:sort-by-upvotes current-state)
-                          :sort-asc        (:sort-asc (:cfg current-state))})
+                         {:sort-asc (:sort-asc (:cfg current-state))})
         new-state (assoc-in current-state query-path query-msg)]
     (swap! query-cfg assoc-in [:queries query-id] msg-payload)
     {:new-state new-state

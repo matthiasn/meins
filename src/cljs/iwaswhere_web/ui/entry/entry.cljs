@@ -132,14 +132,6 @@
          [task/habit-details @entry put-fn edit-mode?]
          [b/briefing-view @entry put-fn edit-mode? local-cfg]
          [:div.footer
-          [:div.likes (when-let [upvotes (:upvotes @entry)]
-                        (when (pos? upvotes)
-                          [:div
-                           [:span.fa.fa-thumbs-up
-                            {:on-click (a/upvote-fn @entry inc put-fn)}]
-                           [:span.upvotes upvotes]
-                           [:span.fa.fa-thumbs-down.toggle
-                            {:on-click (a/upvote-fn @entry dec put-fn)}]]))]
           [:div.word-count (u/count-words-formatted @entry)]]]))))
 
 (defn entry-with-comments
