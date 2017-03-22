@@ -8,7 +8,10 @@
   [{:keys []}]
   {:emit-msg [:cmd/keep-alive-res]})
 
-(def max-age 15000)
+; Probably not all that useful until there's a login status, and then
+; it should be configurable. For now: one week
+; TODO: rethink
+(def max-age (* 7 24 60 60 1000))
 
 ;; Client side
 (defn init-keepalive!

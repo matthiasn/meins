@@ -75,6 +75,9 @@ The **systems-toolbox** library supports **Figwheel**, and all components will b
 
     $ lein sass watch
 
+Building the JS bundle:
+    
+    $ webpack -d --watch
 
 ## Tests
 

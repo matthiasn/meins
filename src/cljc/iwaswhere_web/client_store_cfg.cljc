@@ -10,6 +10,7 @@
    :show-maps-for     #{}
    :show-comments-for {}
    :show-pvt          true
+   :mute              true
    :thumbnails        true
    :lines-shortened   10})
 

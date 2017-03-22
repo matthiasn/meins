@@ -146,6 +146,7 @@
     (with-redefs [cse/new-entries-ls (atom {})
                   cse/play-audio (fn [id] (swap! play-counter update-in [id] inc))]
       (let [current-state @(:state (store/initial-state-fn (fn [_put-fn])))
+            current-state (assoc-in current-state [:cfg :mute] false)
             new-state (:new-state (cse/update-local-fn
                                     {:current-state current-state
                                      :msg-payload test-entry}))
@@ -178,7 +179,8 @@
           (is (= (:new-entries new-state3) @cse/new-entries-ls)))
         (testing
           "tick was played twice"
-          (is (= (get-in @play-counter ["ticking-clock"]) 2)))))))
+          (is (= 2
+                 (get-in @play-counter ["ticking-clock"]))))))))
 
 (deftest pomodoro-start-test
   "Tests that the pomodoro-start handler properly sets the entry status to
