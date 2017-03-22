@@ -165,9 +165,19 @@ $activity-weekend: lighten($activity, 30);
   .story-time {
     background-color: white;
     font-size: 0.8em;
+    table {
+      border-spacing: 0;
+      th {
+        background-color: #e8ecef;
+      }
+      td:nth-of-type(2) {
+        min-width: 120px;
+      }
+    }
     .legend {
       padding-right: 12px;
       margin-right: 4px;
+      height: 1.2em;
     }
   }
 
@@ -214,8 +224,8 @@ $activity-weekend: lighten($activity, 30);
 .times-by-day {
   padding-left: 2px;
   background-color: white;
+  font-size: 0.8em;
   time {
-    font-size: 0.8em;
     font-weight: bold;
   }
 }
