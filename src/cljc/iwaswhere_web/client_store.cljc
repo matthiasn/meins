@@ -66,7 +66,6 @@
                              :new-entries     @cse/new-entries-ls
                              :query-cfg       @s/query-cfg
                              :pomodoro-stats  (sorted-map)
-                             :activity-stats  (sorted-map)
                              :task-stats      (sorted-map)
                              :wordcount-stats (sorted-map)
                              :options         {:pvt-hashtags #{"#pvt"}}
@@ -80,7 +79,6 @@
   [{:keys [current-state msg-payload]}]
   (let [k (case (:type msg-payload)
             :stats/pomodoro :pomodoro-stats
-            :stats/activity :activity-stats
             :stats/tasks :task-stats
             :stats/wordcount :wordcount-stats
             :stats/daily-summaries :daily-summary-stats

@@ -108,31 +108,6 @@
                      :closed-cnt  (count closed-nodes)}]
       [date-string day-stats])))
 
-(defn activities-mapper
-  "Create mapper function for activity stats"
-  [current-state]
-  (fn [d]
-    (let [g (:graph current-state)
-          date-string (:date-string d)
-          day-nodes (gq/get-nodes-for-day g {:date-string date-string})
-          day-nodes-attrs (map #(uber/attrs g %) day-nodes)
-          weight-nodes (sort-by #(-> % :measurements :weight :value)
-                                (filter #(:weight (:measurements %))
-                                        day-nodes-attrs))
-          activity-nodes (filter :activity day-nodes-attrs)
-          activities (map :activity activity-nodes)
-          weight (-> weight-nodes first :measurements :weight)
-          girth-vals (->> day-nodes-attrs
-                          (map #(:girth (:measurements %)))
-                          (filter identity)
-                          (map #(+ (* (:abdominal-cm %) 10) (:abdominal-mm %))))
-          girth (when (seq girth-vals) (apply min girth-vals))
-          day-stats {:date-string    date-string
-                     :weight         weight
-                     :girth          girth
-                     :total-exercise (apply + (map :duration-m activities))}]
-      [date-string day-stats])))
-
 (defn wordcount-mapper
   "Create mapper function for wordcount stats"
   [current-state]
@@ -246,7 +221,6 @@
   (let [stats-type (:type msg-payload)
         stats-mapper (case stats-type
                        :stats/pomodoro pomodoro-mapper
-                       :stats/activity activities-mapper
                        :stats/custom-fields custom-fields-mapper
                        :stats/tasks tasks-mapper
                        :stats/wordcount wordcount-mapper

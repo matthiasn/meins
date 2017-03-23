@@ -1,6 +1,5 @@
 (ns iwaswhere-web.ui.stats
-  (:require [iwaswhere-web.ui.charts.activity :as ca]
-            [iwaswhere-web.ui.charts.tasks :as ct]
+  (:require [iwaswhere-web.ui.charts.tasks :as ct]
             [iwaswhere-web.ui.charts.custom-fields :as cf]
             [iwaswhere-web.ui.charts.wordcount :as wc]
             [iwaswhere-web.ui.charts.durations :as cd]
@@ -50,7 +49,7 @@
   [put-fn]
   (let [chart-data (subscribe [:chart-data])]
     (fn stats-view-render [put-fn]
-      (let [{:keys [pomodoro-stats activity-stats task-stats wordcount-stats
+      (let [{:keys [pomodoro-stats task-stats wordcount-stats
                     daily-summary-stats media-stats]} @chart-data]
         [:div.stats
          [:div.charts
@@ -58,7 +57,6 @@
           [ct/tasks-chart task-stats 250 put-fn]
           [ds/daily-summaries-chart daily-summary-stats 200 put-fn]
           [wc/wordcount-chart wordcount-stats 150 put-fn 1000]
-          [ca/activity-weight-chart activity-stats 250 put-fn]
           [m/media-chart media-stats 150 put-fn]]]))))
 
 (defn get-stats
@@ -72,7 +70,6 @@
   "Request updated stats."
   [put-fn]
   (get-stats :stats/pomodoro put-fn 60)
-  (get-stats :stats/activity put-fn 60)
   (get-stats :stats/custom-fields put-fn 60)
   (get-stats :stats/tasks put-fn 60)
   (get-stats :stats/wordcount put-fn 60)

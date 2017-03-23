@@ -29,7 +29,6 @@
 (reg-sub :timing (fn [db _] (:timing db)))
 (reg-sub :chart-data (fn [db _]
                        (select-keys db [:pomodoro-stats
-                                        :activity-stats
                                         :task-stats
                                         :wordcount-stats
                                         :daily-summary-stats

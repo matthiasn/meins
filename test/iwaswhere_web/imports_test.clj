@@ -20,5 +20,4 @@
       (is (fn? (:import/photos handler-map)))
       (is (fn? (:import/geo handler-map)))
       (is (fn? (:import/movie handler-map)))
-      (is (fn? (:import/weight handler-map)))
       (is (fn? (:import/phone handler-map))))))

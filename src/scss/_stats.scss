@@ -19,9 +19,6 @@ $closed-weekend: lighten($closed, 30);
 $backlog: DarkOrange;
 $backlog-weekend: lighten($backlog, 30);
 
-$activity: steelblue;
-$activity-weekend: lighten($activity, 30);
-
 .stats {
   height: 100%;
   overflow: auto;
@@ -103,13 +100,6 @@ $activity-weekend: lighten($activity, 30);
     .backlog-weekend {
       fill: $backlog-weekend;
     }
-    .activity {
-      fill: $activity;
-    }
-    .activity-weekend {
-      fill: $activity-weekend;
-    }
-
     .line {
       polyline {
         stroke-width: 4;

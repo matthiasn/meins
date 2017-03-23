@@ -218,14 +218,6 @@
                    :pomo-stats/total-time]))
 (s/def :stats/pomodoro (s/map-of :iww.search/date-string :stats/pomo-day))
 
-(s/def :activity-stats/total-exercise int-not-neg?)
-
-(s/def :stats/activity-day
-  (s/keys :req-un [:iww.search/date-string
-                   :activity-stats/total-exercise]))
-(s/def :stats/activity
-  (s/map-of :iww.search/date-string :stats/activity-day))
-
 (s/def :task-stats/tasks-cnt int-not-neg?)
 (s/def :task-stats/done-cnt int-not-neg?)
 (s/def :task-stats/closed-cnt int-not-neg?)

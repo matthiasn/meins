@@ -329,8 +329,7 @@
                [:div
                 "Tasks: " [:strong tasks-cnt] " created, "
                 [:strong done-cnt] " done, "
-                [:strong closed-cnt] " closed, "
-                [:strong (:started-tasks-cnt @stats)] " started. "
+                [:strong closed-cnt] " closed. "
                 [:strong (or (:word-count word-stats) 0)] " words written."])
              [:div
               "Total planned: "

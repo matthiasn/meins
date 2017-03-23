@@ -27,7 +27,6 @@
         (when converted
           (spit filename (with-out-str (pp/pprint converted))))))))
 
-
 (defn migrate-to-uuids
   ; (migrate-to-uuids "./data/migration/daily-logs" "./data/daily-logs/2017-03-19.jrn")
   [path out-file]
@@ -85,3 +84,30 @@
               (catch Exception ex
                 (log/error "Exception" ex "when parsing line:\n" line)))))))
     (log/info (count @ts-uuid) "migrated")))
+
+(defn migrate-weight
+  ; (migrate-weight "./data/migration/weight" "./data/migration/2017-03-23.jrn")
+  [path out-file]
+  (let [files (file-seq (clojure.java.io/file path))
+        ts-uuids (atom {})
+        weight-entry-uuids (atom {})]
+    (doseq [f (f/filter-by-name files #"\d{4}-\d{2}-\d{2}a?.jrn")]
+      (with-open [reader (clojure.java.io/reader f)]
+        (prn f)
+        (let [lines (line-seq reader)]
+          (doseq [line lines]
+            (try
+              (let [parsed (clojure.edn/read-string line)
+                    p [:measurements :weight :value]
+                    ts (:timestamp parsed)
+                    entry (if-let [w (get-in parsed p)]
+                            (do
+                              (swap! weight-entry-uuids assoc-in [ts] parsed)
+                              (assoc-in parsed [:custom-fields "#weight" :weight] w))
+                            parsed)
+                    serialized (str (pr-str entry) "\n")]
+                (swap! ts-uuids assoc-in [ts] entry)
+                (spit out-file serialized :append true))
+              (catch Exception ex
+                (log/error "Exception" ex "when parsing line:\n" line)))))))
+    (log/info (count @weight-entry-uuids) "-" (count @ts-uuids) "migrated." )))
