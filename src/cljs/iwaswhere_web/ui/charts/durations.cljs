@@ -213,6 +213,13 @@
                   [:td [:strong story-name]]
                   [:td.time (u/duration-string v)]]))]]])))))
 
+(defn award-points
+  "Simple view for points awarded."
+  []
+  (let [stats (subscribe [:stats])]
+    (fn []
+      [:div "Award points: " [:strong (:award-points @stats)]])))
+
 (defn durations-bar-chart
   [stats chart-h title y-scale put-fn]
   (let [local (rc/atom {})
@@ -229,6 +236,7 @@
             fmt-date (.format (js/moment (:date-string day-stats)) "ddd YY-MM-DD")]
         [:div
          [:div.times-by-day
+          [award-points]
           [:div [cc/horizontal-bar sagas :saga-name past-7-days 0.001]]
           [:div
            "Past seven days: "

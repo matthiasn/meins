@@ -236,15 +236,29 @@
                                          :type  stats-type}] msg-meta))
       (l/warn "No mapper defined for" stats-type))))
 
+(defn award-points
+  "Counts awarded points."
+  [current-state]
+  (let [q {:tags #{"#habit"}}]
+    (->> (gq/get-filtered current-state (merge {:n Integer/MAX_VALUE} q))
+         :entries-map
+         vals
+         (map :habit)
+         (filter :done)
+         (map :points)
+         (filter identity)
+         (apply +))))
+
 (defn get-basic-stats
   "Generate some very basic stats about the graph size for display in UI."
   [state]
   (merge (task-summary-stats state)
-         {:entry-count (count (:sorted-entries state))
-          :node-count  (count (:node-map (:graph state)))
-          :edge-count  (count (uber/find-edges (:graph state) {}))
-          :import-cnt  (res-count state {:tags #{"#import"}})
-          :new-cnt     (res-count state {:tags #{"#new"}})}))
+         {:entry-count  (count (:sorted-entries state))
+          :award-points (award-points state)
+          :node-count   (count (:node-map (:graph state)))
+          :edge-count   (count (uber/find-edges (:graph state) {}))
+          :import-cnt   (res-count state {:tags #{"#import"}})
+          :new-cnt      (res-count state {:tags #{"#new"}})}))
 
 (def started-tasks
   {:tags     #{"#task"}

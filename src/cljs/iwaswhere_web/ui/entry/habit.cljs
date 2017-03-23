@@ -53,15 +53,25 @@
             (if-not (-> entry :habit :next-entry)
               ;; check off and create next habit entry
               (let [next-entry (next-habit-entry entry)
+                    completion-ts (.format (js/moment))
+                    next-ts (:timestamp next-entry)
                     updated (-> entry
-                                (update-in [:habit :done] not)
-                                (assoc-in [:habit :next-entry] (:timestamp next-entry)))]
+                                (assoc-in [:habit :next-entry] next-ts)
+                                (assoc-in [:habit :completion-ts] completion-ts)
+                                (update-in [:habit :done] not))]
                 (put-fn [:entry/update next-entry])
                 (h/send-w-geolocation next-entry put-fn)
                 (put-fn [:entry/update updated]))
               ;; otherwise just toggle - follow-up is scheduled already
               (let [updated (update-in entry [:habit :done] not)]
                 (put-fn [:entry/update updated])))))
+        set-points (fn [entry]
+                     (fn [ev]
+                       (let [v (.. ev -target -value)
+                             parsed (when (seq v) (js/parseFloat v))
+                             updated (assoc-in entry [:habit :points] parsed)]
+                         (when parsed
+                           (put-fn [:entry/update-local updated])))))
         priority-select
         (fn [entry]
           (fn [ev]
@@ -98,6 +108,12 @@
                     :read-only (not edit-mode?)
                     :on-input  (active-from entry)
                     :value     (get-in entry [:habit :active-from])}]]
+          [:div
+           [:label "Reward points: "]
+           [:input {:type      :number
+                    :read-only (not edit-mode?)
+                    :on-input  (set-points entry)
+                    :value     (get-in entry [:habit :points] 0)}]]
           [:div
            [:label "Done? "]
            [:input {:type      :checkbox

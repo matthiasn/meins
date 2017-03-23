@@ -380,3 +380,14 @@
 u {
   text-decoration-skip: ink;
 }
+
+.habits {
+  .award-points {
+    padding: 0 8px 0 4px;
+    font-weight: 700;
+    text-align:right
+  }
+  .habit {
+    font-weight: 400;
+  }
+}

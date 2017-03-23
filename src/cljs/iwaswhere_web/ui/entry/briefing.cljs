@@ -94,7 +94,10 @@
           [:div
            [:table.habits
             [:tbody
-             [:tr [:th ""] [:th "waiting habits"]]
+             [:tr
+              [:th [:span.fa.fa-exclamation-triangle]]
+              [:th [:span.fa.fa-diamond]]
+              [:th "waiting habit"]]
              (for [entry entries-list]
                (let [ts (:timestamp entry)]
                  ^{:key ts}
@@ -102,14 +105,17 @@
                   [:td
                    (when-let [prio (-> entry :habit :priority)]
                      [:span.prio {:class prio} prio])]
-                  [:td
-                   [:strong (some-> entry
-                                    :md
-                                    (s/replace "#task" "")
-                                    (s/replace "#habit" "")
-                                    (s/replace "##" "")
-                                    s/split-lines
-                                    first)]]]))]]])))))
+                  [:td.award-points
+                   (when-let [points (-> entry :habit :points)]
+                     points)]
+                  [:td.habit
+                   (some-> entry
+                           :md
+                           (s/replace "#task" "")
+                           (s/replace "#habit" "")
+                           (s/replace "##" "")
+                           s/split-lines
+                           first)]]))]]])))))
 
 (defn started-tasks-list
   "Renders table with open entries, such as started tasks and open habits."
