@@ -276,6 +276,53 @@
                        :width  12
                        :height h}]))]])))
 
+(defn time-by-sagas-list
+  [entry day-stats local edit-mode? put-fn]
+  (let [options (subscribe [:options])
+        sagas (reaction (:sagas @options))
+        time-alloc-input-fn
+        (fn [entry saga]
+          (fn [ev]
+            (let [m (js/parseInt (-> ev .-nativeEvent .-target .-value))
+                  s (* m 60)
+                  updated (assoc-in entry [:briefing :time-allocation saga] s)]
+              (put-fn [:entry/update-local updated]))))]
+    (fn [entry day-stats local edit-mode? put-fn]
+      (let [actual-times (:time-by-saga day-stats)
+            sagas @sagas]
+        [:div
+         [:table
+          [:tbody
+           [:tr
+            [:th [:span.fa.fa-filter]]
+            [:th "saga"]
+            [:th "planned"]
+            [:th "actual"]
+            [:th "remaining"]]
+           (for [[k v] (sort-by #(-> % second :saga-name) sagas)]
+             (let [allocation (get-in entry [:briefing :time-allocation k] 0)
+                   actual (get-in (:time-by-saga day-stats) [k] 0)
+                   remaining (- allocation actual)
+                   color (cc/item-color (:saga-name v))
+                   click
+                   (fn [_]
+                     (when-not edit-mode?
+                       (swap! local update-in [:selected] #(if (= k %) nil k))))]
+               (when (or (pos? allocation) (get actual-times k) edit-mode?)
+                 ^{:key (str :time-allocation k)}
+                 [:tr {:on-click click
+                       :class    (when (= k (:selected @local)) "selected")}
+                  [:td [:div.legend {:style {:background-color color}}]]
+                  [:td [:strong (:saga-name v)]]
+                  [:td.time
+                   (if edit-mode?
+                     [:input {:on-input (time-alloc-input-fn entry k)
+                              :value    (when allocation (/ allocation 60))
+                              :type     :number}]
+                     [:span (u/duration-string allocation)])]
+                  [:td.time (u/duration-string actual)]
+                  [:td.time [:strong (u/duration-string remaining)]]])))]]]))))
+
 (defn briefing-view
   [entry put-fn edit-mode? local-cfg]
   (let [chart-data (subscribe [:chart-data])
@@ -345,33 +392,7 @@
               (when (seq dur)
                 [:span
                  " Logged: " [:strong dur] " in " (:total day-stats) " entries."])]
-             [:div.linked-tasks
-              [:table
-               [:tbody
-                [:tr [:th ""] [:th "saga"] [:th "planned"] [:th "actual"] [:th "remaining"]]
-                (for [[k v] (sort-by #(-> % second :saga-name) sagas)]
-                  (let [allocation (get-in entry [:briefing :time-allocation k] 0)
-                        actual (get-in (:time-by-saga day-stats) [k] 0)
-                        remaining (- allocation actual)
-                        color (cc/item-color (:saga-name v))
-                        click
-                        (fn [_]
-                          (when-not edit-mode?
-                            (swap! local update-in [:selected] #(if (= k %) nil k))))]
-                    (when (or (pos? allocation) (get actual-times k) edit-mode?)
-                      ^{:key (str :time-allocation k)}
-                      [:tr {:on-click click
-                            :class    (when (= k (:selected @local)) "selected")}
-                       [:td [:div.legend {:style {:background-color color}}]]
-                       [:td [:strong (:saga-name v)]]
-                       [:td.time
-                        (if edit-mode?
-                          [:input {:on-input (time-alloc-input-fn entry k)
-                                   :value    (when allocation (/ allocation 60))
-                                   :type     :number}]
-                          [:span (u/duration-string allocation)])]
-                       [:td.time (u/duration-string actual)]
-                       [:td.time [:strong (u/duration-string remaining)]]])))]]]
+             [time-by-sagas-list entry day-stats local edit-mode? put-fn]
              [started-tasks-list tab-group local put-fn]
              [open-linked-tasks-list ts local local-cfg put-fn]
              [waiting-habits-list tab-group entry put-fn]

@@ -46,7 +46,7 @@
   :jvm-opts ["-XX:-OmitStackTraceInFastThrow"]
 
   :profiles {:uberjar {:aot :all}
-             :dev {:dependencies [[re-frisk "0.4.4"]]}}
+             :dev     {:dependencies [[re-frisk "0.4.4"]]}}
 
   :plugins [[lein-cljsbuild "1.1.5"
              :exclusions [org.apache.commons/commons-compress]]
@@ -74,7 +74,7 @@
                      ["sass" "once"] "uberjar"]}
 
   :codox {:output-path "codox"
-          :source-uri "https://github.com/matthiasn/iWasWhere/blob/master/iwaswhere-web/{filepath}#L{line}"}
+          :source-uri  "https://github.com/matthiasn/iWasWhere/blob/master/iwaswhere-web/{filepath}#L{line}"}
 
   :cljsbuild
   {:builds
