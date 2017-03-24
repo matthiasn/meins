@@ -98,7 +98,8 @@
                                              :linked-story (:briefing-story @cfg)})
                                 new-entry-fn (h/new-entry-fn put-fn new-entry nil)]
                             (new-entry-fn)))
-                        (put-fn [:search/add {:tab-group :left :query q}])))]
+                        (put-fn [:search/add {:tab-group :left :query q}])
+                        (put-fn [:search/update q])))]
     (fn stats-view-render [put-fn]
       (let [briefings (mapv #(js/moment %) (keys @briefings))]
         [:div.calendar

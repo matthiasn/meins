@@ -64,16 +64,17 @@
                     story (js/parseInt v)
                     q (merge query {:story (when-not (js/isNaN story) story)})]
                 (put-fn [:search/update q])))]
-        [:div.search
-         [tags-view query]
-         ^{:key query-id}
-         [:div.search-row
-          [draft/draft-search-field
-           (editor-state query) search-send @mentions @hashtags]
-          [:select {:value     (or (:story query) "")
-                    :on-change story-select-handler}
-           [:option {:value ""} "no story selected"]
-           (for [[id story] (:sorted-stories @options)]
-             (let [story-name (:story-name story)]
-               ^{:key (str query-id id story-name)}
-               [:option {:value id} story-name]))]]]))))
+        (when-not (:briefing query)
+          [:div.search
+           [tags-view query]
+           ^{:key query-id}
+           [:div.search-row
+            [draft/draft-search-field
+             (editor-state query) search-send @mentions @hashtags]
+            [:select {:value     (or (:story query) "")
+                      :on-change story-select-handler}
+             [:option {:value ""} "no story selected"]
+             (for [[id story] (:sorted-stories @options)]
+               (let [story-name (:story-name story)]
+                 ^{:key (str query-id id story-name)}
+                 [:option {:value id} story-name]))]]])))))
