@@ -312,10 +312,8 @@
                   (fn [_]
                     (when-not edit-mode?
                       (swap! local update-in [:selected] #(if (= k %) nil k))))]
-              (when (or (pos? allocation)
-                        (get actual-times k) edit-mode?)
-                (when (or (not filtered?)
-                          (pos? remaining))
+              (when (or (pos? allocation) (get actual-times k) edit-mode?)
+                (when (or (not filtered?) (pos? remaining) edit-mode?)
                   ^{:key (str :time-allocation k)}
                   [:tr {:on-click click
                         :class    (when (= k (:selected @local)) "selected")}
