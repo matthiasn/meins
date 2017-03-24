@@ -1,7 +1,10 @@
 (ns iwaswhere-web.ui.menu
   (:require [iwaswhere-web.helpers :as h]
             [re-frame.core :refer [subscribe]]
-            [matthiasn.systems-toolbox.component :as stc]))
+            [matthiasn.systems-toolbox.component :as stc]
+            [reagent.core :as r]
+            [iwaswhere-web.utils.parse :as up]
+            [iwaswhere-web.utils.parse :as p]))
 
 (defn toggle-option-view
   "Render button for toggle option."
@@ -77,11 +80,37 @@
       (when (:qr-code @cfg)
         [:img {:src (str "/upload-address/" (stc/make-uuid) "/qrcode.png")}]))))
 
+(defn calendar-view
+  "Renders calendar component."
+  [put-fn]
+  (let [calendar (r/adapt-react-class (aget js/window "deps" "Calendar" "default"))
+        briefings (subscribe [:briefings])
+        cfg (subscribe [:cfg])
+        select-date (fn [dt]
+                      (let [fmt (.format dt "YYYY-MM-DD")
+                            q (up/parse-search (str "b:" fmt))]
+                        (when-not (get @briefings fmt)
+                          (let [weekday (.format dt "dddd")
+                                md (str "## " weekday "'s #briefing")
+                                new-entry (merge
+                                            (p/parse-entry md)
+                                            {:briefing     {:day fmt}
+                                             :linked-story (:briefing-story @cfg)})
+                                new-entry-fn (h/new-entry-fn put-fn new-entry nil)]
+                            (new-entry-fn)))
+                        (put-fn [:search/add {:tab-group :left :query q}])))]
+    (fn stats-view-render [put-fn]
+      (let [briefings (mapv #(js/moment %) (keys @briefings))]
+        [:div.calendar
+         [calendar {:select-date select-date
+                    :briefings   briefings}]]))))
+
 (defn menu-view
   "Renders component for rendering new and import buttons."
   [put-fn]
   [:div.menu-header
    [new-import-view put-fn]
+   [calendar-view put-fn]
    [:h1 "iWasWhere?"]
    [cfg-view put-fn]
    [upload-view]])

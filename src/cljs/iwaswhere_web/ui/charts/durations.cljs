@@ -213,13 +213,6 @@
                   [:td [:strong story-name]]
                   [:td.time (u/duration-string v)]]))]]])))))
 
-(defn award-points
-  "Simple view for points awarded."
-  []
-  (let [stats (subscribe [:stats])]
-    (fn []
-      [:div "Award points: " [:strong (:award-points @stats)]])))
-
 (defn durations-bar-chart
   [stats chart-h title y-scale put-fn]
   (let [local (rc/atom {})
@@ -242,7 +235,6 @@
            [:div.content.white
             [:div {:on-click #(swap! local update-in [:expanded] not)}
              [:span.fa {:class (if expanded? "fa-compress" "fa-expand")}]]
-            [award-points]
             [:div
              "Past seven days: "
              [:strong (u/duration-string (apply + (map second past-7-days)))]]

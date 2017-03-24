@@ -251,3 +251,15 @@ $backlog-weekend: lighten($backlog, 30);
 .white {
   background-color: white;
 }
+
+.award {
+  background-color: white;
+  padding: 5px;
+  text-align: center;
+
+  .points {
+    font-size: 2.4em;
+    font-weight: bold;
+
+  }
+}

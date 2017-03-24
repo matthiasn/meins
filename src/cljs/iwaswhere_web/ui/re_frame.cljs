@@ -7,7 +7,7 @@
             [iwaswhere-web.ui.new-entries :as n]
             [iwaswhere-web.ui.stats :as stats]
             [re-frame.db :as rdb]
-            [iwaswhere-web.ui.calendar :as cal]
+            [iwaswhere-web.ui.award :as aw]
             [iwaswhere-web.ui.charts.custom-fields :as cf2]))
 
 ;; Subscription Handlers
@@ -42,8 +42,7 @@
     [:div.wrapper
      [:div.menu
       [menu/menu-view put-fn]]
-     [:div.cal
-      [cal/calendar-view put-fn]]
+     [aw/award-points put-fn]
      [:div.custom
       [cf2/custom-fields-chart put-fn]]
      [:div.stats
