@@ -19,13 +19,6 @@
                             (let [dt (-> ev .-nativeEvent .-target .-value)
                                   updated (assoc-in entry [:task :active-from] dt)]
                               (put-fn [:entry/update-local updated]))))
-        follow-up-select
-        (fn [entry]
-          (fn [ev]
-            (let [sel (js/parseInt (-> ev .-nativeEvent .-target .-value))
-                  follow-up-hrs (when-not (js/isNaN sel) sel)
-                  updated (assoc-in entry [:task :follow-up-hrs] follow-up-hrs)]
-              (put-fn [:entry/update-local updated]))))
         prio-select (fn [entry]
                       (fn [ev]
                         (let [sel (keyword (-> ev .-nativeEvent .-target .-value))
@@ -75,23 +68,4 @@
                [:input {:type      :datetime-local
                         :read-only (not edit-mode?)
                         :on-input  (set-active-from entry)
-                        :value     (or active-from "")}]]))
-          (if-let [follow-up-scheduled (:follow-up-scheduled (:task entry))]
-            [:div "Follow-up in " follow-up-scheduled]
-            (when edit-mode?
-              [:div
-               [:span "Follow-up after "]
-               [:select {:value     (get-in entry [:task :follow-up-hrs] "")
-                         :on-change (follow-up-select entry)
-                         :disabled  (not edit-mode?)}
-                [:option ""]
-                [:option {:value 1} "1 hour"]
-                [:option {:value 3} "3 hours"]
-                [:option {:value 6} "6 hours"]
-                [:option {:value 12} "12 hours"]
-                [:option {:value 18} "18 hours"]
-                [:option {:value 24} "24 hours"]
-                [:option {:value 48} "48 hours"]
-                [:option {:value 72} "3 days"]
-                [:option {:value 96} "4 days"]
-                [:option {:value 168} "1 week"]]]))]]))))
+                        :value     (or active-from "")}]]))]]))))

@@ -60,28 +60,6 @@
   (let [ts (:timestamp msg-payload)
         curr-local (get-in current-state [:new-entries ts])
         parent-ts (:comment-for msg-payload)
-        follow-up
-        (when (and parent-ts
-                   (contains? (:tags msg-payload) "#done"))
-          (let [prev (get-in current-state [:entries-map parent-ts])
-                follow-up-hrs (:follow-up-hrs (:task prev))]
-            (when (and follow-up-hrs
-                       (not (:follow-up-scheduled (:task prev))))
-              (let [reused (select-keys prev [:md :tags :mentions :linked-story])
-                    now (st/now)
-                    d (* 24 60 60 1000)
-                    h (* 60 60 1000)
-                    new-start (+ now (* follow-up-hrs h))
-                    new (-> reused
-                            (merge {:timestamp now})
-                            (assoc-in [:task :start] new-start)
-                            (assoc-in [:task :due] (+ new-start d))
-                            (assoc-in [:task :follow-up-hrs] follow-up-hrs))
-                    updated (-> prev
-                                (assoc-in [:task :follow-up-scheduled] now)
-                                (update-in [:linked-entries] #(set (conj % now))))]
-                [[:entry/update new]
-                 [:entry/update (u/clean-entry updated)]]))))
         new-state
         (if (= (:md curr-local) (:md msg-payload))
           (-> current-state
@@ -90,7 +68,6 @@
           current-state)]
     (update-local-storage new-state)
     {:new-state    new-state
-     :emit-msg     follow-up
      :send-to-self [:search/refresh]}))
 
 (defn play-audio
