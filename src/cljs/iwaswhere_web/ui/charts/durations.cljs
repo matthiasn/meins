@@ -47,7 +47,7 @@
   "Renders chart with daily recorded times, split up by story."
   [indexed local chart-h y-scale put-fn]
   [:svg
-   {:viewBox (str "0 0 600 " chart-h)}
+   {:viewBox (str "0 0 420 " chart-h)}
    [:g
     [cc/chart-title "24h"]
     (for [h (range 28)]
@@ -222,7 +222,7 @@
     (fn [stats chart-h title y-scale put-fn]
       (let [sagas @sagas
             indexed (map-indexed idx-fn stats)
-            indexed-20 (map-indexed idx-fn (take-last 20 stats))
+            indexed-20 (map-indexed idx-fn (take-last 14 stats))
             day-stats (or (:mouse-over @local) (second (last stats)))
             past-7-days (cd/past-7-days stats :time-by-saga)
             dur (u/duration-string (:total-time day-stats))
