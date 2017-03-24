@@ -233,30 +233,38 @@
             day-stats (or (:mouse-over @local) (second (last stats)))
             past-7-days (cd/past-7-days stats :time-by-saga)
             dur (u/duration-string (:total-time day-stats))
-            fmt-date (.format (js/moment (:date-string day-stats)) "ddd YY-MM-DD")]
+            fmt-date (.format (js/moment (:date-string day-stats)) "ddd YY-MM-DD")
+            expanded? (:expanded @local)]
         [:div
          [:div.times-by-day
-          [award-points]
-          [:div [cc/horizontal-bar sagas :saga-name past-7-days 0.001]]
-          [:div
-           "Past seven days: "
-           [:strong (u/duration-string (apply + (map second past-7-days)))]]
           [:div.story-time
-           [:table
-            [:tbody
-             [:tr [:th ""] [:th "saga"] [:th "total"]]
-             (for [[saga v] past-7-days]
-               (let [saga-name (or (:saga-name (get sagas saga)) "none")
-                     color (cc/item-color saga-name)]
-                 ^{:key saga}
-                 [:tr
-                  [:td [:div.legend {:style {:background-color color}}]]
-                  [:td [:strong saga-name]]
-                  [:td.time (u/duration-string v)]]))]]]]
-         [bars-by-story indexed-20 local chart-h 0.0035 put-fn]
-         [bars-by-saga indexed-20 local chart-h 0.0035 put-fn]
-         [bars-by-ts indexed-20 local 443.5 0.0044 put-fn]
-         [:div.times-by-day
-          [:div [:time fmt-date]
-           " - " [:strong dur] " in " (:total day-stats) " entries."]
-          [time-by-stories-list day-stats]]]))))
+           {:class (when expanded? "expanded")}
+           [:div.content.white
+            [:div {:on-click #(swap! local update-in [:expanded] not)}
+             [:span.fa {:class (if expanded? "fa-compress" "fa-expand")}]]
+            [award-points]
+            [:div
+             "Past seven days: "
+             [:strong (u/duration-string (apply + (map second past-7-days)))]]
+            [:div [cc/horizontal-bar sagas :saga-name past-7-days 0.001]]
+            [:table
+             [:tbody
+              [:tr [:th ""] [:th "saga"] [:th "total"]]
+              (for [[saga v] past-7-days]
+                (let [saga-name (or (:saga-name (get sagas saga)) "none")
+                      color (cc/item-color saga-name)]
+                  ^{:key saga}
+                  [:tr
+                   [:td [:div.legend {:style {:background-color color}}]]
+                   [:td [:strong saga-name]]
+                   [:td.time (u/duration-string v)]]))]]
+            [bars-by-ts indexed-20 local 443.5 0.0044 put-fn]
+            (when expanded?
+              [bars-by-saga indexed-20 local chart-h 0.0035 put-fn])
+            (when expanded?
+              [bars-by-story indexed-20 local chart-h 0.0035 put-fn])
+            (when expanded?
+              [:div.times-by-day
+               [:div [:time fmt-date]
+                " - " [:strong dur] " in " (:total day-stats) " entries."]
+               [time-by-stories-list day-stats]])]]]]))))

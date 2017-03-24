@@ -153,7 +153,6 @@ $backlog-weekend: lighten($backlog, 30);
   }
 
   .story-time {
-    background-color: white;
     font-size: 0.8em;
     table {
       border-spacing: 0;
@@ -168,6 +167,13 @@ $backlog-weekend: lighten($backlog, 30);
       padding-right: 12px;
       margin-right: 4px;
       height: 1.2em;
+    }
+    .fa {
+      position: absolute;
+      font-size: 1.3em;
+      padding-top: 3px;
+      //top: 3px;
+      right: 5px;
     }
   }
 
@@ -192,7 +198,7 @@ $backlog-weekend: lighten($backlog, 30);
 
 .story-time {
   padding-top: 4px;
-  background-color: white;
+  //background-color: white;
   font-size: 0.8em;
   .legend {
     padding-right: 12px;
@@ -213,9 +219,35 @@ $backlog-weekend: lighten($backlog, 30);
 
 .times-by-day {
   padding-left: 2px;
-  background-color: white;
+  //background-color: white;
   font-size: 0.8em;
   time {
     font-weight: bold;
   }
+}
+
+.expanded {
+  z-index: 1000;
+  background-color: rgba(0,0,0,0.5);
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+
+  .content {
+    padding: 1vh;
+    position: fixed;
+    top: 80px;
+    left: 25vw;
+    right: 25vw;
+    width: auto;
+    height: 80vh;
+    overflow-y: auto;
+  }
+}
+
+.white {
+  background-color: white;
 }
