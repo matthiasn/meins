@@ -286,42 +286,49 @@
             (let [m (js/parseInt (-> ev .-nativeEvent .-target .-value))
                   s (* m 60)
                   updated (assoc-in entry [:briefing :time-allocation saga] s)]
-              (put-fn [:entry/update-local updated]))))]
+              (put-fn [:entry/update-local updated]))))
+        filter-click #(swap! local update-in [:outstanding-time-filter] not)]
     (fn [entry day-stats local edit-mode? put-fn]
       (let [actual-times (:time-by-saga day-stats)
-            sagas @sagas]
-        [:div
-         [:table
-          [:tbody
-           [:tr
-            [:th [:span.fa.fa-filter]]
-            [:th "saga"]
-            [:th "planned"]
-            [:th "actual"]
-            [:th "remaining"]]
-           (for [[k v] (sort-by #(-> % second :saga-name) sagas)]
-             (let [allocation (get-in entry [:briefing :time-allocation k] 0)
-                   actual (get-in (:time-by-saga day-stats) [k] 0)
-                   remaining (- allocation actual)
-                   color (cc/item-color (:saga-name v))
-                   click
-                   (fn [_]
-                     (when-not edit-mode?
-                       (swap! local update-in [:selected] #(if (= k %) nil k))))]
-               (when (or (pos? allocation) (get actual-times k) edit-mode?)
-                 ^{:key (str :time-allocation k)}
-                 [:tr {:on-click click
-                       :class    (when (= k (:selected @local)) "selected")}
-                  [:td [:div.legend {:style {:background-color color}}]]
-                  [:td [:strong (:saga-name v)]]
-                  [:td.time
-                   (if edit-mode?
-                     [:input {:on-input (time-alloc-input-fn entry k)
-                              :value    (when allocation (/ allocation 60))
-                              :type     :number}]
-                     [:span (u/duration-string allocation)])]
-                  [:td.time (u/duration-string actual)]
-                  [:td.time [:strong (u/duration-string remaining)]]])))]]]))))
+            filtered? (:outstanding-time-filter @local)
+            filter-cls (when-not filtered? "inactive")
+            sagas (sort-by #(-> % second :saga-name) @sagas)]
+        [:table
+         [:tbody
+          [:tr
+           [:th [:span.fa.fa-filter
+                 {:on-click filter-click
+                  :class filter-cls}]]
+           [:th "saga"]
+           [:th "planned"]
+           [:th "actual"]
+           [:th "remaining"]]
+          (for [[k v] sagas]
+            (let [allocation (get-in entry [:briefing :time-allocation k] 0)
+                  actual (get-in actual-times [k] 0)
+                  remaining (- allocation actual)
+                  color (cc/item-color (:saga-name v))
+                  click
+                  (fn [_]
+                    (when-not edit-mode?
+                      (swap! local update-in [:selected] #(if (= k %) nil k))))]
+              (when (or (pos? allocation)
+                        (get actual-times k) edit-mode?)
+                (when (or (not filtered?)
+                          (pos? remaining))
+                  ^{:key (str :time-allocation k)}
+                  [:tr {:on-click click
+                        :class    (when (= k (:selected @local)) "selected")}
+                   [:td [:div.legend {:style {:background-color color}}]]
+                   [:td [:strong (:saga-name v)]]
+                   [:td.time
+                    (if edit-mode?
+                      [:input {:on-input (time-alloc-input-fn entry k)
+                               :value    (when allocation (/ allocation 60))
+                               :type     :number}]
+                      [:span (u/duration-string allocation)])]
+                   [:td.time (u/duration-string actual)]
+                   [:td.time [:strong (u/duration-string remaining)]]]))))]]))))
 
 (defn briefing-view
   [entry put-fn edit-mode? local-cfg]
@@ -330,6 +337,7 @@
         today (.format (js/moment.) "YYYY-MM-DD")
         filter-btn (if (= day today) :active :open)
         local (r/atom {:filter  filter-btn
+                       :outstanding-time-filter true
                        :on-hold false})
         stats (subscribe [:stats])
         options (subscribe [:options])
