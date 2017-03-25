@@ -13,7 +13,7 @@
 
 (defn past-7-days
   "Sums logged times for the last week, not including current day."
-  [stats tk]
+  [tk stats]
   (->> stats
        (map (fn [[k v]] [k (tk v)]))
        (sort-by first)

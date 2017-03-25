@@ -2,7 +2,7 @@
   (:require [iwaswhere-web.ui.charts.tasks :as ct]
             [iwaswhere-web.ui.charts.custom-fields :as cf]
             [iwaswhere-web.ui.charts.wordcount :as wc]
-            [iwaswhere-web.ui.charts.durations :as cd]
+            [iwaswhere-web.ui.charts.time.durations :as cd]
             [iwaswhere-web.ui.charts.media :as m]
             [iwaswhere-web.ui.charts.daily-summaries :as ds]
             [cljsjs.moment]

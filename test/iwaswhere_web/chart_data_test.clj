@@ -58,13 +58,13 @@
             1485898032295 7025
             1486080918727 9785
             1486080959114 14385}
-           (cd/past-7-days stats :time-by-book))))
+           (cd/past-7-days :time-by-book stats))))
   (testing "calling with empty map yields nil"
     (is (= nil
-           (cd/past-7-days {} :time-by-book))))
+           (cd/past-7-days :time-by-book {}))))
   (testing "calling with nil yields nil"
     (is (= nil
-           (cd/past-7-days nil :time-by-book)))))
+           (cd/past-7-days :time-by-book nil)))))
 
 (deftest time-by-entity-stacked-test
   (testing "works with actual data"

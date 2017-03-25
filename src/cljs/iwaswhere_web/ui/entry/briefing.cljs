@@ -1,6 +1,5 @@
 (ns iwaswhere-web.ui.entry.briefing
   (:require [matthiasn.systems-toolbox.component :as st]
-            [iwaswhere-web.ui.charts.durations :as p]
             [reagent.ratom :refer-macros [reaction]]
             [re-frame.core :refer [subscribe]]
             [iwaswhere-web.charts.data :as cd]
@@ -375,7 +374,7 @@
               allocation (-> entry :briefing :time-allocation)
               actual-times (:time-by-saga day-stats)
               remaining (cd/remaining-times actual-times allocation)
-              past-7-days (cd/past-7-days pomodoro-stats :time-by-saga)
+              past-7-days (cd/past-7-days :time-by-saga pomodoro-stats)
               tab-group (:tab-group local-cfg)]
           [:div.briefing
            [:form.briefing-details

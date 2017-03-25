@@ -33,6 +33,7 @@
   "Calculate time spent per story, plus total time."
   [g nodes date-string]
   (let [stories (gq/find-all-stories {:graph g})
+        sagas (gq/find-all-sagas {:graph g})
         story-reducer (fn [acc entry]
                         (let [comment-for (:comment-for entry)
                               parent (when comment-for (uc/attrs g comment-for))
@@ -49,17 +50,22 @@
         by-ts-reducer (fn [acc entry]
                         (let [comment-for (:comment-for entry)
                               parent (when comment-for (uc/attrs g comment-for))
-                              story (or (:linked-story parent)
+                              story-id (or (:linked-story parent)
                                         (:linked-story entry)
                                         :no-story)
-                              acc-time (get acc story 0)
-                              story-name (:story-name (get-in stories [story]))
+                              story (get-in stories [story-id])
+                              acc-time (get acc story-id 0)
                               ts (:timestamp entry)
+                              saga-id (:linked-saga story)
+                              saga (get-in sagas [saga-id])
                               completed (get entry :completed-time 0)
                               manual (manually-logged entry date-string)
                               summed (+ acc-time completed manual)]
                           (if (pos? summed)
-                            (assoc-in acc [ts] {:story-name story-name
+                            (assoc-in acc [ts] {:story-name (:story-name story)
+                                                :story      story-id
+                                                :saga       saga-id
+                                                :saga-name  (:saga-name saga)
                                                 :summed     summed
                                                 :completed  completed
                                                 :manual     manual})
