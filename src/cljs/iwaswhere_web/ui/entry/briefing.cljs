@@ -56,16 +56,13 @@
                  [:td [:strong story]]
                  [:td.time (u/duration-string v)]]))]])))))
 
-(defn entry-compare
-  "Compare by prio first, then by active-from."
-  [k]
-  (fn [x y]
-    (let [prio-x (get-in x [k :priority] :X)
-          prio-y (get-in y [k :priority] :X)
-          c (compare prio-x prio-y)
-          active-x (get-in x [k :active-from])
-          active-y (get-in y [k :active-from])]
-      (if (not= c 0) c (compare active-x active-y)))))
+(defn habit-sorter
+  "Sorts tasks."
+  [x y]
+  (let [c (compare (get-in x [:habit :priority] :X)
+                   (get-in y [:habit :priority] :X))]
+    (if (not= c 0) c (compare (get-in y [:habit :points])
+                              (get-in x [:habit :points])))))
 
 (defn waiting-habits-list
   "Renders table with open entries, such as started tasks and open habits."
@@ -77,11 +74,10 @@
         entries-list
         (reaction
           (let [entries-map @entries-map
-                sorter (entry-compare :habit)
                 find-missing (u/find-missing-entry entries-map put-fn)
                 entries (->> @waiting-habits
                              (map (fn [ts] (find-missing ts)))
-                             (sort sorter))
+                             (sort habit-sorter))
                 conf (merge @cfg @options)]
             (if (:show-pvt @cfg)
               entries
@@ -117,6 +113,14 @@
                            s/split-lines
                            first)]]))]]])))))
 
+(defn task-sorter
+  "Sorts tasks."
+  [x y]
+  (let [c (compare (get-in x [:task :priority] :X)
+                   (get-in y [:task :priority] :X))]
+    (if (not= c 0) c (compare (get-in x [:task :active-from])
+                              (get-in y [:task :active-from])))))
+
 (defn started-tasks-list
   "Renders table with open entries, such as started tasks and open habits."
   [tab-group local put-fn]
@@ -143,13 +147,12 @@
                       (name fk)])
         entries-list (reaction
                        (let [entries-map @entries-map
-                             sorter (entry-compare :task)
                              find-missing (u/find-missing-entry entries-map put-fn)
                              entries (->> @started-tasks
                                           (map (fn [ts] (find-missing ts)))
                                           (filter on-hold-filter)
                                           (filter saga-filter)
-                                          (sort sorter))
+                                          (sort task-sorter))
                              conf (merge @cfg @options)]
                          (if (:show-pvt @cfg)
                            entries
