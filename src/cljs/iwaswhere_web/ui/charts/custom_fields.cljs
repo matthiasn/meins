@@ -72,12 +72,12 @@
 (defn barchart-row
   "Renders bars."
   [indexed local put-fn cfg k]
-  (let [{:keys [path chart-h y-start threshold threshold-type]} cfg]
+  (let [{:keys [path chart-h y-start threshold threshold-type]} cfg
+        max-val (or (:max cfg)
+                    (apply max (map (fn [[_idx v]] (get-in v path)) indexed)))]
     [:g
      (for [[idx day] indexed]
        (let [y-end (+ chart-h y-start)
-             max-val (or (:max cfg)
-                         (apply max (map (fn [[_idx v]] (get-in v path)) indexed)))
              y-scale (/ chart-h (or max-val 1))
              v (get-in day path)
              h (if (pos? v) (* y-scale v) 5)
