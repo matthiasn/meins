@@ -21,7 +21,7 @@
   (sb/send-mult-cmd
     switchboard
     [[:cmd/send {:to  :client/scheduler-cmp
-                 :msg [:cmd/schedule-new {:timeout 5000
+                 :msg [:cmd/schedule-new {:timeout 1000
                                           :message [:cmd/keep-alive]
                                           :repeat true
                                           :initial false}]}]]))
@@ -30,7 +30,13 @@
   "Sets :last-alive key whenever a keepalive response message was received from
    the backend."
   [{:keys [current-state]}]
-  {:new-state (assoc-in current-state [:last-alive] (st/now))})
+  (let [now (st/now)
+        busy? (when-let [last-busy (:last-busy current-state)]
+                (< (- now last-busy) 1000))
+        new-state (-> current-state
+                      (assoc-in [:last-alive] now)
+                      (assoc-in [:busy] busy?))]
+    {:new-state new-state}))
 
 (defn reset-fn
   "Reset local state when last message from backend was seen more than 10

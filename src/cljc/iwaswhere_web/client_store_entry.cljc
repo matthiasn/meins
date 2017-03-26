@@ -83,7 +83,10 @@
         new-state (update-in current-state [:new-entries ts :completed-time] inc)]
     (when (get-in current-state [:new-entries ts])
       (let [new-entry (get-in new-state [:new-entries ts])
-            done? (= (:planned-dur new-entry) (:completed-time new-entry))]
+            done? (= (:planned-dur new-entry) (:completed-time new-entry))
+            new-state (-> new-state
+                          (assoc-in [:busy] true)
+                          (assoc-in [:last-busy] (st/now)))]
         (if (:pomodoro-running new-entry)
           (do (when-not (:mute (:cfg current-state))
                 (if done? (play-audio "ringer")
@@ -102,7 +105,9 @@
    entry and schedule an initial increment message."
   [{:keys [current-state msg-payload]}]
   (let [ts (:timestamp msg-payload)
-        new-state (update-in current-state [:new-entries ts :pomodoro-running] not)]
+        new-state (-> current-state
+                      (update-in [:new-entries ts :pomodoro-running] not)
+                      (assoc-in [:busy] false))]
     (when (get-in current-state [:new-entries ts])
       (update-local-storage new-state)
       {:new-state    new-state

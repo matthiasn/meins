@@ -30,7 +30,7 @@
 (defn new-import-view
   "Renders new and import buttons."
   [put-fn]
-  [:div
+  [:div.new-import
    [:button.menu-new {:on-click (h/new-entry-fn put-fn {} nil)}
     [:span.fa.fa-plus-square] " new"]
    [:button.menu-new
@@ -106,10 +106,18 @@
          [calendar {:select-date select-date
                     :briefings   briefings}]]))))
 
+(defn busy-status
+  "Renders busy status indicator."
+  []
+  (let [busy (subscribe [:busy])]
+    (fn busy-status-render []
+      [:div.busy-status {:class (if @busy "red" "green")}])))
+
 (defn menu-view
   "Renders component for rendering new and import buttons."
   [put-fn]
   [:div.menu-header
+   [busy-status]
    [new-import-view put-fn]
    [calendar-view put-fn]
    [:h1 "iWasWhere?"]

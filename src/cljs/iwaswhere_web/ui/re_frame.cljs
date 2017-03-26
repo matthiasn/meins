@@ -15,6 +15,7 @@
 (reg-sub :options (fn [db _] (:options db)))
 (reg-sub :stories (fn [db _] (:stories (:options db))))
 (reg-sub :sagas (fn [db _] (:sagas (:options db))))
+(reg-sub :busy (fn [db _] (:busy db)))
 (reg-sub :query-cfg (fn [db _] (:query-cfg db)))
 (reg-sub :widgets (fn [db _] (:widgets (:cfg db))))
 (reg-sub :entries-map (fn [db _] (:entries-map db)))
