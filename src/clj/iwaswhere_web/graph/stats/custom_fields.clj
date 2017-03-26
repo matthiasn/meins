@@ -1,0 +1,51 @@
+(ns iwaswhere-web.graph.stats.custom-fields
+  "Get stats from graph."
+  (:require [ubergraph.core :as uber]
+            [iwaswhere-web.graph.query :as gq]
+            [clj-time.core :as t]
+            [iwaswhere-web.graph.stats.awards :as aw]
+            [iwaswhere-web.graph.stats.time :as t-s]
+            [iwaswhere-web.utils.misc :as u]
+            [clj-time.format :as ctf]
+            [matthiasn.systems-toolbox.log :as l]
+            [clojure.tools.logging :as log]
+            [ubergraph.core :as uc]))
+
+(defn custom-fields-mapper
+  "Creates mapper function for custom field stats. Takes current state. Returns
+   function that takes date string, such as '2016-10-10', and returns map with
+   results for the defined custom fields, plus the date string. Performs
+   operation specified for field, such as sum, min, max."
+  [current-state]
+  (fn [d]
+    (let [g (:graph current-state)
+          custom-fields (:custom-fields (:cfg current-state))
+          custom-field-stats-def (into {} (map (fn [[k v]] [k (:fields v)])
+                                               custom-fields))
+          date-string (:date-string d)
+          day-nodes (gq/get-nodes-for-day g {:date-string date-string})
+          day-nodes-attrs (map #(uber/attrs g %) day-nodes)
+          nodes (filter :custom-fields day-nodes-attrs)
+
+          stats-mapper
+          (fn [[k fields]]
+            (let [sum-mapper
+                  (fn [[field v]]
+                    (let [path [:custom-fields k field]
+                          val-mapper #(get-in % path)
+                          op (if (= :number (:type (:cfg v)))
+                               (case (:agg v)
+                                 :min #(when (seq %) (apply min %))
+                                 :max #(when (seq %) (apply max %))
+                                 :mean #(when (seq %) (/ (apply + %) (count %)))
+                                 :none nil
+                                 #(apply + %))
+                               nil)
+                          res (mapv val-mapper nodes)]
+                      [field (when op
+                               (try (op (filter identity res))
+                                    (catch Exception e (log/error e res))))]))]
+              [k (into {} (mapv sum-mapper fields))]))
+          day-stats (into {:date-string date-string}
+                          (mapv stats-mapper custom-field-stats-def))]
+      [date-string day-stats])))

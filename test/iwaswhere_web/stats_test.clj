@@ -4,6 +4,7 @@
             [iwaswhere-web.files :as f]
             [iwaswhere-web.store-test :as st]
             [iwaswhere-web.graph.stats :as gs]
+            [iwaswhere-web.graph.stats.time :as gst]
             [iwaswhere-web.files :as f]
             [iwaswhere-web.store-test-common :as stc]
             [clojure.pprint :as pp]
@@ -110,7 +111,7 @@
                               stats-test-entries)]
         (testing
           "task summary stats are correct"
-          (let [mapper (gs/pomodoro-mapper new-state)
+          (let [mapper (gst/time-mapper new-state)
                 stats (mapper {:date-string "2015-12-24"})]
             (is (= ["2015-12-24"
                     {:completed     0
