@@ -29,15 +29,15 @@
           (count (:hashtags @options)) " hashtags, "
           (count (:mentions @options)) " people, "
           (:open-tasks-cnt @stats) " open tasks, "
-          (:started-tasks-cnt @stats) " started tasks, "
-          (:due-tasks-cnt @stats) " due tasks, "
-          (:backlog-cnt @stats) " in backlog, "
+          (:started-tasks-cnt @stats) " started, "
+          (:due-tasks-cnt @stats) " due, "
+          (:backlog-cnt @stats) " backlog, "
           (:completed-cnt @stats) " completed, "
           (:closed-cnt @stats) " closed, "
-          (:open-habits-cnt @stats) " habits - "
+          (:open-habits-cnt @stats) " habits, "
           (:waiting-habits-cnt @stats) " waiting, "
           (:import-cnt @stats) " tagged #import, "
-          (:new-cnt @stats) " tagged #new."])
+          (:new-cnt @stats) " #new."])
        (when-let [ms (:query @timing)]
          [:div
           (str "Query with " (:count @timing)
