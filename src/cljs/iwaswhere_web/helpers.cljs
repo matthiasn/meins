@@ -63,6 +63,8 @@
 
 (defn prevent-default [ev] (.preventDefault ev))
 
+(defn add [x y] (+ (or x 0) (or y 0)))
+
 (defn print-duration
   "Helper for inspecting where time is spent."
   [msg-meta]

@@ -10,32 +10,33 @@
             [ubergraph.core :as uc]
             [clojure.pprint :as pp]))
 
-(defn award-point-stats
+(defn award-points-by
   "Counts awarded points."
-  [entries]
-  (let [by-day-mapper (fn [acc entry]
-                        (let [habit (:habit entry)
-                              completion (:completion-ts habit)
-                              completion-day (subs completion 0 10)
-                              points (:points habit)]
-                          (if (and (pos? points) (:done habit))
-                            (update-in acc [completion-day] #(+ (or % 0) points))
-                            acc)))
-        by-day (reduce by-day-mapper {} entries)
+  [k initial entries]
+  (let [entries (filter #(and (-> % k :done) (-> % k :points)) entries)
+        by-day-fn (fn [acc entry]
+                    (let [entitity (k entry)
+                          completion (:completion-ts entitity)
+                          points (:points entitity)]
+                      (if (and (pos? points) (seq completion) (:done entitity))
+                        (let [completion-day (subs completion 0 10)]
+                          (update-in acc [:by-day completion-day k] #(+ (or % 0) points)))
+                        acc)))
+        by-day (reduce by-day-fn initial entries)
         total (->> entries
-                   (map :habit)
+                   (map k)
                    (filter :done)
                    (map :points)
                    (filter identity)
                    (apply +))]
-    {:total  total
-     :by-day by-day}))
+    (update-in by-day [:total] #(+ (or % 0) total))))
 
 (defn award-points
   "Counts awarded points."
   [current-state]
-  (let [q {:tags #{"#habit"}
-           :n    Integer/MAX_VALUE}
-        entries (->> (gq/get-filtered current-state q) :entries-map vals)]
-    (award-point-stats (filter #(and (-> % :habit :done)
-                                     (-> % :habit :points)) entries))))
+  (let [q {:tags #{"#habit"} :n Integer/MAX_VALUE}
+        entries (->> (gq/get-filtered current-state q) :entries-map vals)
+        by-habit (award-points-by :habit {:total 0} entries)
+        q2 {:tags #{"#task" "#done"} :n Integer/MAX_VALUE}
+        entries2 (->> (gq/get-filtered current-state q2) :entries-map vals)]
+    (award-points-by :task by-habit entries2)))
