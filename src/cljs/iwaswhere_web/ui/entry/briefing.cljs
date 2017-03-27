@@ -164,6 +164,7 @@
             [:tbody
              [:tr
               [:th ""]
+              [:th [:span.fa.fa-diamond]]
               [:th
                [:div
                 "started tasks: "
@@ -175,6 +176,9 @@
                   [:td
                    (when-let [prio (-> entry :task :priority)]
                      [:span.prio {:class prio} prio])]
+                  [:td.award-points
+                   (when-let [points (-> entry :task :points)]
+                     points)]
                   [:td
                    [:strong (some-> entry
                                     :md
@@ -231,9 +235,11 @@
                                 (filter active-filter)
                                 (sort-by #(or (-> % :task :priority) :X)))]
         [:div.linked-tasks
-         [:table
+         [:table.habits
           [:tbody
-           [:tr [:th ""]
+           [:tr
+            [:th ""]
+            [:th [:span.fa.fa-diamond]]
             [:th [:div
                   [:strong "tasks:"]
                   [filter-btn :active]
@@ -252,6 +258,9 @@
                                 :draggable     true
                                 :on-drag-start on-drag-start}
                     prio]])
+                [:td.award-points
+                 (when-let [points (-> linked :task :points)]
+                   points)]
                 [:td.left [:strong (some-> linked
                                            :md
                                            (s/replace "#task" "")
