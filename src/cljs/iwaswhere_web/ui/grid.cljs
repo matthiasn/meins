@@ -6,6 +6,10 @@
             [iwaswhere-web.ui.search :as search]
             [re-frame.core :refer [subscribe]]))
 
+(defn fmt-ts [q]
+  (let [ts (:timestamp q)]
+    (.format (js/moment (js/parseInt ts)) "YY-MM-DD HH:mm")))
+
 (defn tabs-header-view
   [tab-group put-fn]
   (let [query-cfg (subscribe [:query-cfg])]
@@ -22,8 +26,13 @@
                            :on-drag-over  h/prevent-default
                            :on-drag-enter h/prevent-default}
          (for [q queries]
-           (let [search-text (s/trim (str (get-in query-config [:queries q :search-text])))
-                 search-text (if (empty? search-text) "empty" search-text)
+           (let [query (get-in query-config [:queries q])
+                 search-text (s/trim (str (:search-text query)))
+                 ;search-text (if (empty? search-text) "empty" search-text)
+                 search-text (cond
+                               (empty? search-text) "empty"
+                               (:timestamp query) (fmt-ts query)
+                               :else search-text)
                  query-coord {:query-id q :tab-group tab-group}
                  on-drag-start #(put-fn [:search/set-dragged query-coord])]
              ^{:key (str "tab-header" q)}

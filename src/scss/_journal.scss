@@ -9,6 +9,7 @@
 
 .tabs-header {
   display: flex;
+  overflow-y: auto;
   flex: 0 0 auto;
   background-color: $body-background-color;
 
@@ -21,6 +22,7 @@
     font-size: 0.8em;
     font-family: $header-font-family;
     font-weight: 300;
+    white-space: nowrap;
 
     .fa {
       margin-left: 3px;
