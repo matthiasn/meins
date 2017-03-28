@@ -7,7 +7,8 @@
             [iwaswhere-web.files :as f]
             [image-resizer.util :refer :all]
             [clojure.string :as s]
-            [clojure.tools.logging :as log]))
+            [clojure.tools.logging :as log]
+            [iwaswhere-web.file-utils :as fu]))
 
 (def upload-port (Integer/parseInt (get (System/getenv) "UPLOAD_PORT" "3001")))
 
@@ -27,7 +28,7 @@
             "OK"))
         binary-post-fn
         (fn [dir filename req]
-          (let [filename (str f/data-path "/" dir "/" filename)
+          (let [filename (str fu/data-path "/" dir "/" filename)
                 file (java.io.File. filename)]
             (io/make-parents file)
             (log/info :server/upload-cmp req)

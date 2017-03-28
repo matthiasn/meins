@@ -8,11 +8,12 @@
             [image-resizer.scale-methods :refer :all]
             [image-resizer.rotate :refer :all]
             [iwaswhere-web.imports :as i]
-            [clojure.string :as s]))
+            [clojure.string :as s]
+            [iwaswhere-web.file-utils :as fu]))
 
 (def img-resized-route
   (GET "/photos2/:filename" [filename :as r]
-    (let [filename (str f/data-path "/images/" filename)
+    (let [filename (str fu/data-path "/images/" filename)
           file (io/file filename)
           exif (i/extract-exif file)
           orientation (get exif "Orientation" "")

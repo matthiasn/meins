@@ -8,13 +8,14 @@
             [iwaswhere-web.graph.query :as gq]
             [iwaswhere-web.store-test-common :as stc]
             [iwaswhere-web.files :as f]
-            [clojure.pprint :as pp]))
+            [clojure.pprint :as pp]
+            [iwaswhere-web.file-utils :as fu]))
 
 (deftest query-test
   "Test that different queries return the expected results."
   (let [test-ts (System/currentTimeMillis)
         {:keys [current-state logs-path]} (st/mk-test-state test-ts)]
-    (with-redefs [f/daily-logs-path logs-path]
+    (with-redefs [fu/daily-logs-path logs-path]
       (let [simple-query-uid (comp/make-uuid)
             simple-query2-uid (comp/make-uuid)
             no-results-query-uid (comp/make-uuid)
@@ -89,7 +90,7 @@
   "Test that different queries return the expected results."
   (let [test-ts (System/currentTimeMillis)
         {:keys [current-state logs-path]} (st/mk-test-state test-ts)]
-    (with-redefs [f/daily-logs-path logs-path
+    (with-redefs [fu/daily-logs-path logs-path
                   comp/now (fn [] 1485107134358)]
       (let [new-state (reduce stc/persist-reducer current-state stc/test-entries)
             req-msg {:queries {"query1" stc/tasks-done-query

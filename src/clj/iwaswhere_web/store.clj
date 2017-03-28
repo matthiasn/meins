@@ -14,11 +14,12 @@
             [iwaswhere-web.fulltext-search :as ft]
             [clojure.pprint :as pp]
             [clojure.edn :as edn]
-            [clojure.java.io :as io]))
+            [clojure.java.io :as io]
+            [iwaswhere-web.file-utils :as fu]))
 
 (defn read-dir
-  [state entries-to-index cfg custom-path]
-  (let [path (:daily-logs-path (f/paths cfg custom-path))
+  [state entries-to-index cfg]
+  (let [path (:daily-logs-path (fu/paths))
         files (file-seq (clojure.java.io/file path))]
     (doseq [f (f/filter-by-name files #"\d{4}-\d{2}-\d{2}.jrn")]
       (with-open [reader (clojure.java.io/reader f)]
@@ -35,18 +36,20 @@
               (catch Exception ex
                 (log/error "Exception" ex "when parsing line:\n" line)))))))))
 
-(defn load-cfg
-  "Load config from file. When not exists, use default config and write the
-   default to data path."
-  []
-  (let [conf-path (str f/data-path "/conf.edn")
-        default (edn/read-string (slurp (io/resource "default-conf.edn")))]
-    (try (edn/read-string (slurp conf-path))
-         (catch Exception ex
-           (do (log/warn "No config found -> copying from default.")
-               (fs/mkdirs f/data-path)
-               (spit conf-path (with-out-str (pp/pprint default)))
-               default)))))
+(defn ft-index
+  [entries-to-index put-fn]
+  (let [path (:clucy-path (fu/paths))
+        files (file-seq (clojure.java.io/file path))
+        clucy-dir-empty? (empty? (filter #(.isFile %) files))]
+    (when clucy-dir-empty?
+      (future
+        (Thread/sleep 2000)
+        (log/info "Indexing started")
+        (let [t (with-out-str
+                  (time (doseq [entry (vals @entries-to-index)]
+                          (put-fn [:ft/add entry]))))]
+          (log/info "Indexed" (count @entries-to-index) "entries." t))
+        (reset! entries-to-index [])))))
 
 (defn state-fn
   "Initial state function, creates state atom and then parses all files in
@@ -55,35 +58,27 @@
    timestamp of an entry. A sort order by descending timestamp is maintained
    in a sorted set of the nodes."
   [put-fn]
-  (let [conf (load-cfg)
+  (let [conf (fu/load-cfg)
         entries-to-index (atom {})
         state (atom {:sorted-entries (sorted-set-by >)
                      :graph          (uber/graph)
                      :cfg            conf
-                     :lucene-index   ft/index
                      :client-queries {}
                      :hashtags       #{}
                      :mentions       #{}
                      :stats          {:entry-count     0
                                       :node-count      0
                                       :edge-count      0
-                                      :daily-summaries {}}})]
-    (read-dir state entries-to-index conf nil)
-
-    (future
-      (Thread/sleep 2000)
-      (log/info "Indexing started")
-      (let [t (with-out-str
-                (time (doseq [entry (vals @entries-to-index)]
-                        (put-fn [:ft/add entry]))))]
-        (log/info "Indexed" (count @entries-to-index) "entries." t))
-      (reset! entries-to-index []))
+                                      :daily-summaries {}}})
+        t (with-out-str (time (read-dir state entries-to-index conf)))]
+    (log/info "Read" (count @entries-to-index) "entries." t)
+    (ft-index entries-to-index put-fn)
     {:state state}))
 
 (defn refresh-cfg
   "Refresh configuration by reloading the config file."
   [{:keys [current-state]}]
-  {:new-state (assoc-in current-state [:cfg] (load-cfg))})
+  {:new-state (assoc-in current-state [:cfg] (fu/load-cfg))})
 
 (defn cmp-map
   "Generates component map for state-cmp."

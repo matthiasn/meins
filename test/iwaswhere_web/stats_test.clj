@@ -10,7 +10,8 @@
             [clojure.pprint :as pp]
             [iwaswhere-web.graph.add :as ga]
             [clj-time.core :as ct]
-            [clj-time.coerce :as ctc]))
+            [clj-time.coerce :as ctc]
+            [iwaswhere-web.file-utils :as fu]))
 
 (def stats-test-entries
   [{:mentions  #{}
@@ -82,7 +83,7 @@
   "test that daily summaries"
   (let [test-ts (System/currentTimeMillis)
         {:keys [current-state logs-path]} (st/mk-test-state test-ts)]
-    (with-redefs [f/daily-logs-path logs-path]
+    (with-redefs [fu/daily-logs-path logs-path]
       (let [new-state (reduce stc/persist-reducer
                               current-state
                               stats-test-entries)]
@@ -104,7 +105,7 @@
   "test that daily summaries"
   (let [test-ts (System/currentTimeMillis)
         {:keys [current-state logs-path]} (st/mk-test-state test-ts)]
-    (with-redefs [f/daily-logs-path logs-path
+    (with-redefs [fu/daily-logs-path logs-path
                   ga/local-dt (fn [entry] (ctc/from-long (:timestamp entry)))]
       (let [new-state (reduce stc/persist-reducer
                               current-state

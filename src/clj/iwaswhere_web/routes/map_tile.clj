@@ -6,12 +6,13 @@
             [clojure.java.io :as io]
             [clj-http.client :as client]
             [clojure.tools.logging :as log]
-            [me.raynes.fs :as fs]))
+            [me.raynes.fs :as fs]
+            [iwaswhere-web.file-utils :as fu]))
 
 (def map-tile-route
   (GET "/tiles/:z/:x/:y" [z x y :as r]
     (let [file-path (str z "/" x "/" y)
-          filename (str f/data-path "/tiles/" file-path)
+          filename (str fu/data-path "/tiles/" file-path)
           file (java.io.File. filename)]
       (io/make-parents file)
       (when-not (fs/exists? filename)

@@ -13,28 +13,10 @@
             [matthiasn.systems-toolbox.component :as st]
             [me.raynes.fs :as fs]
             [clojure.java.io :as io]
-            [clojure.tools.logging :as l]))
-
-(def data-path (or (System/getenv "DATA_PATH")
-                   (let [path (str (System/getenv "HOME") "/iWasWhere/data")]
-                     (when (fs/exists? path) path))
-                   "data"))
-(def daily-logs-path (str data-path "/daily-logs/"))
-
-(defn paths
-  [cfg custom-path-key]
-  (let [custom-path (get-in cfg [:custom-data-paths custom-path-key :path])
-        data-path (or (get-in cfg [:custom-data-paths custom-path :path])
-                      data-path)
-        daily-logs-path (if custom-path
-                          (str custom-path "/daily-logs/")
-                          daily-logs-path)
-        trash-path (str data-path "/trash/")]
-    (fs/mkdirs daily-logs-path)
-    (fs/mkdirs trash-path)
-    {:data-path       data-path
-     :daily-logs-path daily-logs-path
-     :trash-path      trash-path}))
+            [clojure.edn :as edn]
+            [clojure.tools.logging :as l]
+            [clojure.pprint :as pp]
+            [iwaswhere-web.file-utils :as fu]))
 
 (defn filter-by-name
   "Filter a sequence of files by their name, matched via regular expression."
@@ -44,7 +26,7 @@
 (defn append-daily-log
   "Appends journal entry to the current day's log file."
   [cfg entry]
-  (let [filename (str (:daily-logs-path (paths cfg (:custom-path entry)))
+  (let [filename (str (:daily-logs-path (fu/paths))
                       (tf/unparse (tf/formatters :year-month-day) (time/now))
                       ".jrn")
         serialized (str (pr-str entry) "\n")]
@@ -101,7 +83,7 @@
   "Moves attached media file to trash folder."
   [cfg entry dir k]
   (when-let [filename (k entry)]
-    (let [{:keys [data-path trash-path]} (paths cfg (:custom-path entry))]
+    (let [{:keys [data-path trash-path]} (fu/paths)]
       (fs/rename (str data-path "/" dir "/" filename)
                  (str trash-path filename))
       (l/info "Moved file to trash:" filename))))

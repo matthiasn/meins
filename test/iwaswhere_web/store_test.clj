@@ -8,7 +8,8 @@
             [iwaswhere-web.files :as f]
             [iwaswhere-web.utils.misc :as u]
             [clojure.set :as set]
-            [iwaswhere-web.graph.stats :as gs]))
+            [iwaswhere-web.graph.stats :as gs]
+            [iwaswhere-web.file-utils :as fu]))
 
 (def some-test-entry
   {:mentions   #{"@SantaClaus"}
@@ -48,8 +49,8 @@
   (let [test-daily-logs-path (str "./test-data/daily-logs/" test-ts "/")
         test-path (str "./test-data")]
     (fs/mkdirs test-daily-logs-path)
-    (with-redefs [f/data-path test-path
-                  f/daily-logs-path test-daily-logs-path]
+    (with-redefs [fu/data-path test-path
+                  fu/daily-logs-path test-daily-logs-path]
       {:current-state @(:state (s/state-fn (fn [_])))
        :logs-path     test-daily-logs-path
        :test-path     test-path})))
@@ -63,8 +64,8 @@
     (let [test-ts (System/currentTimeMillis)
           {:keys [current-state test-path logs-path]} (mk-test-state test-ts)
           test-entry (mk-test-entry test-ts)]
-      (with-redefs [f/data-path test-path
-                    f/daily-logs-path logs-path]
+      (with-redefs [fu/data-path test-path
+                    fu/daily-logs-path logs-path]
         (let [{:keys [new-state emit-msg]}
               (f/geo-entry-persist-fn {:current-state current-state
                                        :msg-payload   test-entry})
@@ -142,8 +143,8 @@
                                     {:tags     #{"#testing" "#new" "#entry"}
                                      :md       "Some #testing #entry @me #new"
                                      :mentions #{"@me"}})]
-      (with-redefs [f/data-path test-path
-                    f/daily-logs-path logs-path]
+      (with-redefs [fu/data-path test-path
+                    fu/daily-logs-path logs-path]
         (let [{:keys [new-state]} (f/geo-entry-persist-fn
                                     {:current-state current-state
                                      :msg-payload   test-entry})
@@ -208,8 +209,8 @@
           {:keys [current-state test-path logs-path]} (mk-test-state test-ts)
           test-entry (mk-test-entry test-ts)
           delete-msg {:timestamp (:timestamp test-entry) :deleted true}]
-      (with-redefs [f/data-path test-path
-                    f/daily-logs-path logs-path]
+      (with-redefs [fu/data-path test-path
+                    fu/daily-logs-path logs-path]
         (let [{:keys [new-state]} (f/geo-entry-persist-fn
                                     {:current-state current-state
                                      :msg-payload   some-test-entry})

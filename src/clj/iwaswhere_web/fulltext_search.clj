@@ -1,9 +1,10 @@
 (ns iwaswhere-web.fulltext-search
   "Lucene-based full-text index. In memory and reconstructed on application
    startup."
-  (:require [clucy.core :as clucy]))
+  (:require [clucy.core :as clucy]
+            [iwaswhere-web.file-utils :as fu]))
 
-(defonce index (clucy/memory-index))
+(defonce index (clucy/disk-index (:clucy-path (fu/paths))))
 
 (defn remove-from-index
   "Remove entry from index."

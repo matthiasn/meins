@@ -6,7 +6,8 @@
             [iwaswhere-web.graph.stats :as gs]
             [iwaswhere-web.files :as f]
             [iwaswhere-web.store-test-common :as stc]
-            [clojure.pprint :as pp]))
+            [clojure.pprint :as pp]
+            [iwaswhere-web.file-utils :as fu]))
 
 (def pvt-test-entries
   [{:mentions  #{}
@@ -35,7 +36,7 @@
    hashtags and mentions sets."
   (let [test-ts (System/currentTimeMillis)
         {:keys [current-state logs-path]} (st/mk-test-state test-ts)]
-    (with-redefs [f/daily-logs-path logs-path]
+    (with-redefs [fu/daily-logs-path logs-path]
       (let [new-state (reduce stc/persist-reducer current-state stc/test-entries)
             new-state2 (reduce stc/persist-reducer new-state pvt-test-entries)]
 

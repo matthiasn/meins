@@ -6,7 +6,8 @@
             [iwaswhere-web.routes.upload-qr :as qr]
             [iwaswhere-web.files :as f]
             [iwaswhere-web.routes.images :as ir]
-            [iwaswhere-web.routes.map-tile :as mt]))
+            [iwaswhere-web.routes.map-tile :as mt]
+            [iwaswhere-web.file-utils :as fu]))
 
 (defn index-page
   "Generates index page HTML with the specified page title."
@@ -46,9 +47,9 @@
    put-fn of the ws-cmp, which is not used here but can be useful in scenarios
    when requests are supposed to be handled by a another component."
   [_put-fn]
-  [(r/files "/photos" {:root (str f/data-path "/images/")})
-   (r/files "/audio" {:root (str f/data-path "/audio/")})
-   (r/files "/videos" {:root (str f/data-path "/videos/")})
+  [(r/files "/photos" {:root (str fu/data-path "/images/")})
+   (r/files "/audio" {:root (str fu/data-path "/audio/")})
+   (r/files "/videos" {:root (str fu/data-path "/videos/")})
    qr/address-qr-route
    ir/img-resized-route
    mt/map-tile-route])
