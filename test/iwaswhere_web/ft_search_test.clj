@@ -1,7 +1,9 @@
 (ns iwaswhere-web.ft-search-test
   "Here, we test the handler functions of the fulltext search component."
   (:require [clojure.test :refer [deftest testing is]]
-            [iwaswhere-web.fulltext-search :as fs]))
+            [iwaswhere-web.fulltext-search :as fs]
+            [iwaswhere-web.fulltext-search :as ft]
+            [clucy.core :as clucy]))
 
 (def some-test-entry
   {:mentions   #{"@SantaClaus"}
@@ -14,14 +16,15 @@
    :md         "Some test entry"})
 
 (deftest entry-index-test
-  (testing "entry is added"
-    (fs/add-to-index {:msg-payload some-test-entry})
-    (is (= [1450998000000]
-           (fs/search {:ft-search "test"}))))
-  (testing "entry is removed"
-    (fs/remove-from-index {:msg-payload {:timestamp 1450998000000}})
-    (is (= []
-           (fs/search {:ft-search "test"})))))
+  (with-redefs [ft/index (clucy/memory-index)]
+    (testing "entry is added"
+      (fs/add-to-index {:msg-payload some-test-entry})
+      (is (= [1450998000000]
+             (fs/search {:ft-search "test"}))))
+    (testing "entry is removed"
+      (fs/remove-from-index {:msg-payload {:timestamp 1450998000000}})
+      (is (= []
+             (fs/search {:ft-search "test"}))))))
 
 (deftest cmp-map-test
   (testing "cmp-map contains required keys"
