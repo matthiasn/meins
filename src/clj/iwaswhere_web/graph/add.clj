@@ -121,22 +121,6 @@
                                         {:relationship :DATE}]))))
       state)))
 
-(defn add-daily-summary
-  "Adds graph nodes for year, month and day of entry and connects those if they
-   don't exist."
-  [state entry startup?]
-  (let [g (:graph state)
-        dt (local-dt entry)
-        year (ct/year dt)
-        month (ct/month dt)
-        day-node {:type :timeline/day :year year :month month :day (ct/day dt)}
-        day-node-exists? (uc/has-node? g day-node)]
-    (if (and (not day-node-exists?) (>= (:year day-node) 2016))
-      (if startup?
-        (assoc-in state [:days-to-summarize day-node] state)
-        (gs/mk-daily-summary state state day-node))
-      state)))
-
 (defn add-parent-ref
   "Adds an edge to parent node when :comment-for key on the entry exists."
   [graph entry]
@@ -306,7 +290,6 @@
           (add-hashtags new-entry)
           (update-in [:graph] add-mentions new-entry)
           (update-in [:graph] add-linked new-entry)
-          (add-daily-summary new-entry startup?)
           (add-timeline-tree new-entry)
           (add-for-day new-entry)
           (update-in [:graph] add-linked-visit new-entry)

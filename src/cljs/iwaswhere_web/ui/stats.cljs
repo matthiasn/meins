@@ -4,7 +4,6 @@
             [iwaswhere-web.ui.charts.wordcount :as wc]
             [iwaswhere-web.ui.charts.time.durations :as cd]
             [iwaswhere-web.ui.charts.media :as m]
-            [iwaswhere-web.ui.charts.daily-summaries :as ds]
             [cljsjs.moment]
             [re-frame.core :refer [subscribe]]
             [cljs.pprint :as pp]))
@@ -55,7 +54,6 @@
          [:div.charts
           [cd/durations-bar-chart pomodoro-stats 200 "Pomodoros" 5 put-fn]
           [ct/tasks-chart task-stats 250 put-fn]
-          [ds/daily-summaries-chart daily-summary-stats 200 put-fn]
           [wc/wordcount-chart wordcount-stats 150 put-fn 1000]
           [m/media-chart media-stats 150 put-fn]]]))))
 
