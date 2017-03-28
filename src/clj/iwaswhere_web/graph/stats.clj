@@ -10,7 +10,8 @@
             [clj-time.format :as ctf]
             [matthiasn.systems-toolbox.log :as l]
             [clojure.tools.logging :as log]
-            [ubergraph.core :as uc]))
+            [ubergraph.core :as uc]
+            [clojure.set :as set]))
 
 (defn tasks-mapper
   "Create mapper function for task stats"
@@ -59,10 +60,17 @@
 (defn res-count
   "Count results for specified query."
   [current-state query]
-  (let [res (gq/get-filtered
-              current-state
-              (merge {:n Integer/MAX_VALUE} query))]
+  (let [res (gq/get-filtered current-state (merge {:n Integer/MAX_VALUE} query))]
     (count (set (:entries res)))))
+
+(defn completed-count
+  "Count completed tasks."
+  [current-state]
+  (let [q1 {:tags #{"#task" "#done"} :n Integer/MAX_VALUE}
+        q2 {:tags #{"#task"} :opts #{":done"} :n Integer/MAX_VALUE}
+        res1 (set (:entries (gq/get-filtered current-state q1)))
+        res2 (set (:entries (gq/get-filtered current-state q2)))]
+    (count (set/union res1 res2))))
 
 (defn task-summary-stats
   "Generate some very basic stats about the graph for display in UI."
@@ -82,7 +90,7 @@
                                          :opts     #{":waiting"}})
    :backlog-cnt        (res-count state {:tags     #{"#task" "#backlog"}
                                          :not-tags #{"#done" "#closed"}})
-   :completed-cnt      (res-count state {:tags #{"#task" "#done"}})
+   :completed-cnt      (completed-count state)
    :closed-cnt         (res-count state {:tags #{"#task" "#closed"}})})
 
 (defn daily-summaries-mapper

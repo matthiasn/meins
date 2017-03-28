@@ -140,6 +140,7 @@
                         (let [story (get @stories (:linked-story entry))]
                           (= selected (:linked-saga story)))
                         true))
+        open-filter (fn [entry] (not (-> entry :task :done)))
         filter-btn (fn [fk]
                      [:span.filter {:class    (when (:on-hold @local) "current")
                                     :on-click #(swap! local update-in [:on-hold] not)}
@@ -151,6 +152,7 @@
                                           (map (fn [ts] (find-missing ts)))
                                           (filter on-hold-filter)
                                           (filter saga-filter)
+                                          (filter open-filter)
                                           (sort task-sorter))
                              conf (merge @cfg @options)]
                          (if (:show-pvt @cfg)
@@ -209,14 +211,19 @@
     (fn open-linked-tasks-render [ts local local-cfg put-fn]
       (let [{:keys [tab-group query-id]} local-cfg
             linked-entries-set (into (sorted-set) (:linked-entries-list @entry))
-            linked-mapper (u/find-missing-entry @entries-map put-fn)
+            entries-w-done (into {} (map (fn [[k v]]
+                                           [k (if (-> v :task :done)
+                                                (update-in v [:tags] conj "#done")
+                                                v)])
+                                         @entries-map))
+            linked-mapper (u/find-missing-entry entries-w-done put-fn)
             linked-entries (mapv linked-mapper linked-entries-set)
             conf (merge @cfg @options)
             linked-entries (if (:show-pvt conf)
                              linked-entries
-                             (filter (u/pvt-filter conf @entries-map) linked-entries))
+                             (filter (u/pvt-filter conf entries-w-done) linked-entries))
             current-filter (get linked-filters (:filter @local))
-            filter-fn (u/linked-filter-fn @entries-map current-filter put-fn)
+            filter-fn (u/linked-filter-fn entries-w-done current-filter put-fn)
             saga-filter (fn [entry]
                           (if-let [selected (:selected @local)]
                             (let [story (get @stories (:linked-story entry))]

@@ -97,6 +97,10 @@
               (when due-ts
                 (> (st/now) due-ts)))
 
+            (contains? opts ":done")
+            (or (-> entry :task :done)
+                (-> entry :habit :done))
+
             (contains? opts ":no-start")
             (not (:start (:task entry)))
 
