@@ -65,6 +65,14 @@
 
 (defn add [x y] (+ (or x 0) (or y 0)))
 
+(defn update-numeric [entry path put-fn]
+  (fn [ev]
+    (let [v (.. ev -target -value)
+          parsed (when (seq v) (js/parseFloat v))
+          updated (assoc-in entry path parsed)]
+      (when parsed
+        (put-fn [:entry/update-local updated])))))
+
 (defn print-duration
   "Helper for inspecting where time is spent."
   [msg-meta]

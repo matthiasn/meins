@@ -24,13 +24,6 @@
                         (let [sel (keyword (-> ev .-nativeEvent .-target .-value))
                               updated (assoc-in entry [:task :priority] sel)]
                           (put-fn [:entry/update-local updated]))))
-        set-points (fn [entry]
-                     (fn [ev]
-                       (let [v (.. ev -target -value)
-                             parsed (when (seq v) (js/parseFloat v))
-                             updated (assoc-in entry [:task :points] parsed)]
-                         (when parsed
-                           (put-fn [:entry/update-local updated])))))
         done (fn [entry]
                (fn [ev]
                  (let [completion-ts (.format (js/moment))
@@ -74,8 +67,14 @@
            [:label "Reward points: "]
            [:input {:type      :number
                     :read-only (not edit-mode?)
-                    :on-input  (set-points entry)
+                    :on-input  (h/update-numeric entry [:task :points] put-fn)
                     :value     (get-in entry [:task :points] 0)}]]
+          [:div
+           [:label "Estimated time in minutes: "]
+           [:input {:type      :number
+                    :read-only (not edit-mode?)
+                    :on-input  (h/update-numeric entry [:task :estimate-m] put-fn)
+                    :value     (get-in entry [:task :estimate-m] 0)}]]
           [:div
            [:label "On hold? "]
            [:input {:type      :checkbox
