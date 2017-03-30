@@ -162,11 +162,12 @@
       (let [entries-list @entries-list]
         (when (seq entries-list)
           [:div.linked-tasks
-           [:table.habits
+           [:table.tasks
             [:tbody
              [:tr
               [:th ""]
               [:th [:span.fa.fa-diamond]]
+              [:th [:span.fa.fa-clock-o]]
               [:th
                [:div
                 "started tasks: "
@@ -181,6 +182,9 @@
                   [:td.award-points
                    (when-let [points (-> entry :task :points)]
                      points)]
+                  [:td.estimate
+                   (when-let [estimate (-> entry :task :estimate-m)]
+                     estimate)]
                   [:td
                    [:strong (some-> entry
                                     :md
@@ -242,18 +246,18 @@
                                 (filter active-filter)
                                 (sort-by #(or (-> % :task :priority) :X)))]
         [:div.linked-tasks
-         [:table.habits
+         [filter-btn :active]
+         [filter-btn :open]
+         [filter-btn :done]
+         [filter-btn :closed]
+         [filter-btn :backlog]
+         [:table.tasks
           [:tbody
            [:tr
             [:th ""]
             [:th [:span.fa.fa-diamond]]
-            [:th [:div
-                  [:strong "tasks:"]
-                  [filter-btn :active]
-                  [filter-btn :open]
-                  [filter-btn :done]
-                  [filter-btn :closed]
-                  [filter-btn :backlog]]]]
+            [:th [:span.fa.fa-clock-o]]
+            [:th [:strong "tasks"]]]
            (for [linked linked-entries]
              (let [ts (:timestamp linked)
                    on-drag-start (a/drag-start-fn linked put-fn)]
@@ -268,6 +272,9 @@
                 [:td.award-points
                  (when-let [points (-> linked :task :points)]
                    points)]
+                [:td.estimate
+                 (when-let [estimate (-> linked :task :estimate-m)]
+                   estimate)]
                 [:td.left [:strong (some-> linked
                                            :md
                                            (s/replace "#task" "")

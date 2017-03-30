@@ -380,9 +380,9 @@ u {
   text-decoration-skip: ink;
 }
 
-.habits {
-  .award-points {
-    padding: 0 8px 0 4px;
+.habits, .tasks {
+  .award-points, .estimate {
+    padding: 0 6px 0 4px;
     font-weight: 700;
     text-align:right
   }
