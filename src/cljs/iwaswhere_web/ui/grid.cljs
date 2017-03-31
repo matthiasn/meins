@@ -46,7 +46,10 @@
                 {:on-click #(do (put-fn [:search/remove query-coord])
                                 (.stopPropagation %))}]]]))
          [:div.tab-item {:on-click #(put-fn [:search/add {:tab-group tab-group}])}
-          [:span "add"]]]))))
+          [:span "add"]]
+         (when (> (count queries) 2)
+           [:div.tab-item {:on-click #(put-fn [:search/close-all {:tab-group tab-group}])}
+            [:span "all" [:span.fa.fa-times]]])]))))
 
 (defn tabs-view
   [tab-group put-fn]

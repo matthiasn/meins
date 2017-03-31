@@ -19,7 +19,7 @@
   "Update query in client state, with resetting the active entry in the linked
    entries view."
   [{:keys [current-state msg-payload]}]
-  (let [query-id (:query-id msg-payload)
+  (let [query-id (or (:query-id msg-payload) (keyword (st/make-uuid)))
         query-path [:query-cfg :queries query-id]
         query-msg (merge msg-payload
                          {:sort-asc (:sort-asc (:cfg current-state))})
@@ -113,6 +113,22 @@
     (reset! query-cfg (:query-cfg new-state))
     {:new-state new-state}))
 
+(defn close-all
+  "Remove query inside tab group specified in msg."
+  [{:keys [current-state msg-payload]}]
+  (let [{:keys [tab-group]} msg-payload
+        all-path [:query-cfg :tab-groups tab-group :all]
+        queries-in-grp (get-in current-state all-path)
+        query-path [:query-cfg :queries]
+        new-state (-> current-state
+                      (assoc-in all-path #{})
+                      (assoc-in [:query-cfg :tab-groups tab-group :active] nil)
+                      (update-in query-path #(apply dissoc % queries-in-grp)))]
+    (prn :close-all queries-in-grp)
+    (prn :close-all (get-in new-state query-path))
+    (reset! query-cfg (:query-cfg new-state))
+    {:new-state new-state}))
+
 (defn set-dragged-fn
   "Set actively dragged tab so it's available when dropped onto another element."
   [{:keys [current-state msg-payload]}]
@@ -158,6 +174,7 @@
    :search/set-active  set-active-query
    :search/add         add-query
    :search/remove      remove-query
+   :search/close-all   close-all
    :search/refresh     search-refresh-fn
    :search/set-dragged set-dragged-fn
    :search/move-tab    move-tab-fn
