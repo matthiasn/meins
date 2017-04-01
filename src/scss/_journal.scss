@@ -9,9 +9,13 @@
 
 .tabs-header {
   display: flex;
-  overflow-y: auto;
   flex: 0 0 auto;
   background-color: $body-background-color;
+
+  .tab-items {
+    display: flex;
+    overflow-y: auto;
+  }
 
   .tab-item {
     display: flex;
@@ -23,6 +27,17 @@
     font-family: $header-font-family;
     font-weight: 300;
     white-space: nowrap;
+
+    &.add {
+      background-color: lighten($green, 30);
+      font-weight: bold;
+      font-family: monospace;
+    }
+    &.close-all {
+      background-color: lighten($red, 30);
+      font-weight: bold;
+      font-family: monospace;
+    }
 
     .fa {
       margin-left: 3px;

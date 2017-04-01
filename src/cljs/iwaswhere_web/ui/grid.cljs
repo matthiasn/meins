@@ -25,31 +25,34 @@
         [:div.tabs-header {:on-drop       on-drop
                            :on-drag-over  h/prevent-default
                            :on-drag-enter h/prevent-default}
-         (for [q queries]
-           (let [query (get-in query-config [:queries q])
-                 search-text (s/trim (str (:search-text query)))
-                 ;search-text (if (empty? search-text) "empty" search-text)
-                 search-text (cond
-                               (empty? search-text) "empty"
-                               (:timestamp query) (fmt-ts query)
-                               :else search-text)
-                 query-coord {:query-id q :tab-group tab-group}
-                 on-drag-start #(put-fn [:search/set-dragged query-coord])]
-             ^{:key (str "tab-header" q)}
-             [:div.tab-item
-              {:class         (when (= active-query q) "active")
-               :on-click      #(put-fn [:search/set-active query-coord])
-               :draggable     true
-               :on-drag-start on-drag-start}
-              [:span (str (or search-text q))
-               [:span.fa.fa-times
-                {:on-click #(do (put-fn [:search/remove query-coord])
-                                (.stopPropagation %))}]]]))
-         [:div.tab-item {:on-click #(put-fn [:search/add {:tab-group tab-group}])}
+         [:div.tab-item.add
+          {:on-click #(put-fn [:search/add {:tab-group tab-group}])}
           [:span "add"]]
          (when (> (count queries) 2)
-           [:div.tab-item {:on-click #(put-fn [:search/close-all {:tab-group tab-group}])}
-            [:span "all" [:span.fa.fa-times]]])]))))
+           [:div.tab-item.close-all
+            {:on-click #(put-fn [:search/close-all {:tab-group tab-group}])}
+            [:span (count queries) [:span.fa.fa-times]]])
+         [:div.tab-items
+          (for [q queries]
+            (let [query (get-in query-config [:queries q])
+                  search-text (s/trim (str (:search-text query)))
+                  ;search-text (if (empty? search-text) "empty" search-text)
+                  search-text (cond
+                                (empty? search-text) "empty"
+                                (:timestamp query) (fmt-ts query)
+                                :else search-text)
+                  query-coord {:query-id q :tab-group tab-group}
+                  on-drag-start #(put-fn [:search/set-dragged query-coord])]
+              ^{:key (str "tab-header" q)}
+              [:div.tab-item
+               {:class         (when (= active-query q) "active")
+                :on-click      #(put-fn [:search/set-active query-coord])
+                :draggable     true
+                :on-drag-start on-drag-start}
+               [:span (str (or search-text q))
+                [:span.fa.fa-times
+                 {:on-click #(do (put-fn [:search/remove query-coord])
+                                 (.stopPropagation %))}]]]))]]))))
 
 (defn tabs-view
   [tab-group put-fn]
