@@ -1,7 +1,8 @@
 (ns iwaswhere-web.ui.award
   (:require [cljsjs.moment]
             [re-frame.core :refer [subscribe]]
-            [iwaswhere-web.helpers :as h]))
+            [iwaswhere-web.helpers :as h]
+            [reagent.core :as r]))
 
 (defn points-by-day-chart
   "Renders bars."
@@ -38,7 +39,9 @@
 (defn award-points
   "Simple view for points awarded."
   [put-fn]
-  (let [stats (subscribe [:stats])]
+  (let [stats (subscribe [:stats])
+        last-update (subscribe [:last-update])
+        local (r/atom {:last-fetched 0})]
     (fn [put-fn]
       (let [award-points (:award-points @stats)
             by-day (sort-by first (:by-day award-points))]

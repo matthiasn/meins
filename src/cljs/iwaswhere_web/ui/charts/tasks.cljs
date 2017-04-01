@@ -1,6 +1,8 @@
 (ns iwaswhere-web.ui.charts.tasks
   (:require [reagent.core :as rc]
-            [iwaswhere-web.ui.charts.common :as cc]))
+            [re-frame.core :refer [subscribe]]
+            [iwaswhere-web.ui.charts.common :as cc]
+            [iwaswhere-web.helpers :as h]))
 
 (defn tasks-chart
   "Draws chart for opened and closed tasks, where the bars for the counts of
@@ -10,12 +12,14 @@
    On mouse-over on any of the bars, the date and the values for the date are
    shown in an info div next to the bars."
   [task-stats chart-h put-fn]
-  (let [local (rc/atom {})]
+  (let [local (rc/atom {:last-fetched 0})
+        last-update (subscribe [:last-update])]
     (fn [task-stats chart-h put-fn]
       (let [indexed (map-indexed (fn [idx [_k v]] [idx v]) task-stats)
             max-cnt (apply max (map (fn [[_idx v]]
                                       (max (:tasks-cnt v) (:done-cnt v)))
                                     indexed))]
+        (h/keep-updated :stats/tasks 60 local @last-update put-fn)
         [:div
          [:svg
           {:viewBox (str "0 0 600 " chart-h)}

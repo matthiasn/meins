@@ -1,6 +1,8 @@
 (ns iwaswhere-web.ui.charts.wordcount
   (:require [reagent.core :as rc]
-            [iwaswhere-web.ui.charts.common :as cc]))
+            [re-frame.core :refer [subscribe]]
+            [iwaswhere-web.ui.charts.common :as cc]
+            [iwaswhere-web.helpers :as h]))
 
 (defn wordcount-chart
   "Draws chart for wordcount per day. The size of the the bars scales
@@ -8,10 +10,12 @@
    On mouse-over on any of the bars, the date and the values for the date are
    shown in an info div next to the bars."
   [stats chart-h put-fn daily-target]
-  (let [local (rc/atom {})]
+  (let [local (rc/atom {:last-fetched 0})
+        last-update (subscribe [:last-update])]
     (fn [stats chart-h put-fn daily-target]
       (let [indexed (map-indexed (fn [idx [_k v]] [idx v]) stats)
             max-cnt (apply max (map (fn [[_idx v]] (:word-count v)) indexed))]
+        (h/keep-updated :stats/wordcount 60 local @last-update put-fn)
         [:div
          [:svg
           {:viewBox (str "0 0 600 " chart-h)}

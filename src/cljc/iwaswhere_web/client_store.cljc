@@ -52,7 +52,6 @@
             (assoc-in [:waiting-habits] (:waiting-habits msg-payload))
             (assoc-in [:cfg :briefing-story] (:briefing-story (:cfg msg-payload)))
             (assoc-in [:stats] (:stats msg-payload)))]
-    #?(:cljs (stats/update-stats put-fn))
     {:new-state new-state}))
 
 (defn initial-state-fn

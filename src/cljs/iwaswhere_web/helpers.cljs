@@ -73,6 +73,24 @@
       (when parsed
         (put-fn [:entry/update-local updated])))))
 
+(def ymd-format "YYYY-MM-DD")
+(defn n-days-ago [n] (.subtract (js/moment.) n "d"))
+(defn n-days-ago-fmt [n] (.format (n-days-ago n) ymd-format))
+
+(defn get-stats
+  "Retrieves stats for the last n days."
+  [stats-key put-fn n]
+  (let [days (map n-days-ago-fmt (reverse (range n)))]
+    (put-fn [:stats/get {:days (mapv (fn [d] {:date-string d}) days)
+                         :type stats-key}])))
+
+(defn keep-updated
+  [stats-key n local last-update put-fn]
+  (when (not= last-update (:last-fetched @local))
+    (get-stats stats-key put-fn n)
+    (prn :update stats-key)
+    (swap! local assoc-in [:last-fetched] last-update)))
+
 (defn print-duration
   "Helper for inspecting where time is spent."
   [msg-meta]

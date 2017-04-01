@@ -12,6 +12,7 @@
 
 ;; Subscription Handlers
 (reg-sub :custom-field-stats (fn [db _] (:custom-field-stats db)))
+(reg-sub :last-update (fn [db _] (:last-update (:query-cfg db))))
 (reg-sub :options (fn [db _] (:options db)))
 (reg-sub :stories (fn [db _] (:stories (:options db))))
 (reg-sub :sagas (fn [db _] (:sagas (:options db))))

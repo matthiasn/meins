@@ -4,13 +4,10 @@
             [iwaswhere-web.ui.charts.wordcount :as wc]
             [iwaswhere-web.ui.charts.time.durations :as cd]
             [iwaswhere-web.ui.charts.media :as m]
+            [iwaswhere-web.helpers :as h]
             [cljsjs.moment]
             [re-frame.core :refer [subscribe]]
             [cljs.pprint :as pp]))
-
-(def ymd-format "YYYY-MM-DD")
-(defn n-days-go [n] (.subtract (js/moment.) n "d"))
-(defn n-days-go-fmt [n] (.format (n-days-go n) ymd-format))
 
 (defn stats-text
   "Renders stats text component."
@@ -48,28 +45,11 @@
   [put-fn]
   (let [chart-data (subscribe [:chart-data])]
     (fn stats-view-render [put-fn]
-      (let [{:keys [pomodoro-stats task-stats wordcount-stats
-                    daily-summary-stats media-stats]} @chart-data]
+      (let [{:keys [pomodoro-stats task-stats
+                    wordcount-stats media-stats]} @chart-data]
         [:div.stats
          [:div.charts
-          [cd/durations-bar-chart pomodoro-stats 200 "Pomodoros" 5 put-fn]
+          [cd/durations-bar-chart pomodoro-stats 200 5 put-fn]
           [ct/tasks-chart task-stats 250 put-fn]
           [wc/wordcount-chart wordcount-stats 150 put-fn 1000]
           [m/media-chart media-stats 150 put-fn]]]))))
-
-(defn get-stats
-  "Retrieves pomodoro stats for the last n days."
-  [stats-key put-fn n]
-  (let [days (map n-days-go-fmt (reverse (range n)))]
-    (put-fn [:stats/get {:days (mapv (fn [d] {:date-string d}) days)
-                         :type stats-key}])))
-
-(defn update-stats
-  "Request updated stats."
-  [put-fn]
-  (get-stats :stats/pomodoro put-fn 60)
-  (get-stats :stats/custom-fields put-fn 60)
-  (get-stats :stats/tasks put-fn 60)
-  (get-stats :stats/wordcount put-fn 60)
-  (get-stats :stats/media put-fn 60)
-  (get-stats :stats/daily-summaries put-fn 60))

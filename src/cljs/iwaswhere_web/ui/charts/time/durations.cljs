@@ -6,7 +6,8 @@
             [re-frame.core :refer [subscribe]]
             [reagent.ratom :refer-macros [reaction]]
             [clojure.pprint :as pp]
-            [iwaswhere-web.charts.data :as cd]))
+            [iwaswhere-web.charts.data :as cd]
+            [iwaswhere-web.helpers :as h]))
 
 (defn day-bars
   "Renders group with rects for all stories of the particular day."
@@ -159,12 +160,13 @@
                   [:td.time (u/duration-string v)]]))]]])))))
 
 (defn durations-bar-chart
-  [stats chart-h title y-scale put-fn]
-  (let [local (rc/atom {})
+  [stats chart-h y-scale put-fn]
+  (let [local (rc/atom {:last-fetched 0})
+        last-update (subscribe [:last-update])
         idx-fn (fn [idx [k v]] [idx v])
         sagas (subscribe [:sagas])
         chart-data (subscribe [:chart-data])]
-    (fn [stats chart-h title y-scale put-fn]
+    (fn [stats chart-h y-scale put-fn]
       (let [sagas @sagas
             indexed (map-indexed idx-fn stats)
             indexed-20 (map-indexed idx-fn (take-last 14 stats))
@@ -175,6 +177,7 @@
                              (sort-by second >))
             dur (u/duration-string (:total-time day-stats))
             fmt-date (.format (js/moment (:date-string day-stats)) "ddd YY-MM-DD")]
+        (h/keep-updated :stats/pomodoro 60 local @last-update put-fn)
         [:div
          [:div.times-by-day
           [:div.story-time

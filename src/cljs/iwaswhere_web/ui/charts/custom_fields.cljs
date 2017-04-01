@@ -1,11 +1,13 @@
 (ns iwaswhere-web.ui.charts.custom-fields
   (:require [reagent.core :as rc]
             [iwaswhere-web.ui.charts.common :as cc]
+            [iwaswhere-web.helpers :as h]
             [iwaswhere-web.charts.custom-fields-cfg :as cf]
             [re-frame.core :refer [subscribe]]
             [goog.string :as gstring]
             [goog.string.format]
-            [clojure.pprint :as pp]))
+            [clojure.pprint :as pp]
+            [reagent.core :as r]))
 
 (defn mouse-leave-fn
   "Creates event handler that removes the keys required for the info div
@@ -102,9 +104,10 @@
   "Draws custom fields chart, with a row for each configured chart. The
    position of each chart is calculated in the cf namespace."
   [put-fn]
-  (let [local (rc/atom {})
+  (let [local (rc/atom {:last-fetched 0})
         stats (subscribe [:custom-field-stats])
-        options (subscribe [:options])]
+        options (subscribe [:options])
+        last-update (subscribe [:last-update])]
     (fn custom-fields-chart-render
       [put-fn]
       (let [charts-vec (:custom-field-charts @options)
@@ -115,6 +118,7 @@
             n (.floor js/Math (/ w 5))
             indexed (map-indexed (fn [idx [k v]] [idx v])
                                  (take-last n @stats))]
+        (h/keep-updated :stats/custom-fields n local @last-update put-fn)
         [:div.stats
          [:svg
           {:viewBox (str "0 0 " (* 2 w) " " charts-h)}

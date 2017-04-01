@@ -7,9 +7,10 @@
     [clojure.set :as set]))
 
 (def initial-query-cfg
-  {:queries    {}
-   :tab-groups {:left  {:active nil :all #{}}
-                :right {:active nil :all #{}}}})
+  {:queries     {}
+   :last-update 0
+   :tab-groups  {:left  {:active nil :all #{}}
+                 :right {:active nil :all #{}}}})
 
 #?(:clj  (defonce query-cfg (atom initial-query-cfg))
    :cljs (defonce query-cfg (sa/local-storage
@@ -164,10 +165,12 @@
   "Refreshes client-side state by sending all queries, plus, with a delay,
    the stats and tags."
   [{:keys [current-state]}]
-  (let [query-cfg (:query-cfg current-state)]
-    {:emit-msg [[:state/search query-cfg]
-                [:cmd/schedule-new {:timeout 200
-                                    :message [:state/stats-tags-get]}]]}))
+  (let [query-cfg (:query-cfg current-state)
+        new-state (assoc-in current-state [:query-cfg :last-update] (st/now))]
+    {:new-state new-state
+     :emit-msg  [[:state/search query-cfg]
+                 [:cmd/schedule-new {:timeout 200
+                                     :message [:state/stats-tags-get]}]]}))
 
 (def search-handler-map
   {:search/update      update-query-fn
