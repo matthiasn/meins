@@ -383,8 +383,10 @@ u {
 .habits, .tasks {
   .award-points, .estimate {
     padding: 0 6px 0 4px;
-    font-weight: 700;
     text-align:right
+  }
+  .award-points {
+    font-weight: 700;
   }
   .habit {
     font-weight: 400;

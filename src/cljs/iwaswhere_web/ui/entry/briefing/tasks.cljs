@@ -16,6 +16,14 @@
     (if (not= c 0) c (compare (get-in x [:task :active-from])
                               (get-in y [:task :active-from])))))
 
+(defn m-to-hhmm
+  [minutes]
+  (let [dur (.duration js/moment minutes "minutes")
+        ms (.asMilliseconds dur)
+        utc (.utc js/moment ms)
+        fmt (.format utc "HH:mm")]
+    fmt))
+
 (defn started-tasks
   "Renders table with open entries, such as started tasks and open habits."
   [tab-group local put-fn]
@@ -80,7 +88,7 @@
                      points)]
                   [:td.estimate
                    (when-let [estimate (-> entry :task :estimate-m)]
-                     estimate)]
+                     (m-to-hhmm estimate))]
                   [:td
                    [:strong (some-> entry
                                     :md
@@ -104,10 +112,10 @@
                         :done    (up/parse-search "#task #done")
                         :closed  (up/parse-search "#task #closed")
                         :backlog (up/parse-search "#task #backlog")}
-        filter-btn (fn [fk]
+        filter-btn (fn [fk text]
                      [:span.filter {:class    (when (= fk (:filter @local)) "current")
                                     :on-click #(swap! local assoc-in [:filter] fk)}
-                      (name fk)])]
+                      (name fk) text])]
     (fn open-linked-tasks-render [ts local local-cfg put-fn]
       (let [{:keys [tab-group query-id]} local-cfg
             linked-entries-set (into (sorted-set) (:linked-entries-list @entry))
@@ -136,14 +144,16 @@
                                 (let [from-now (.fromNow (js/moment active-from))]
                                   (s/includes? from-now "ago"))
                                 true)))
-            linked-entries (->> linked-entries
+            linked-tasks (->> linked-entries
                                 (filter filter-fn)
                                 (filter saga-filter)
                                 (filter active-filter)
-                                (sort-by #(or (-> % :task :priority) :X)))]
+                                (sort-by #(or (-> % :task :priority) :X)))
+            time-reducer (fn [acc t] (+ acc (get-in t [:task :estimate-m] 0)))
+            total-time (reduce time-reducer 0 linked-tasks)]
         [:div.linked-tasks
          [filter-btn :active]
-         [filter-btn :open]
+         [filter-btn :open (str " - " (m-to-hhmm total-time))]
          [filter-btn :done]
          [filter-btn :closed]
          [filter-btn :backlog]
@@ -154,24 +164,24 @@
             [:th [:span.fa.fa-diamond]]
             [:th [:span.fa.fa-clock-o]]
             [:th [:strong "tasks"]]]
-           (for [linked linked-entries]
-             (let [ts (:timestamp linked)
-                   on-drag-start (a/drag-start-fn linked put-fn)]
+           (for [task linked-tasks]
+             (let [ts (:timestamp task)
+                   on-drag-start (a/drag-start-fn task put-fn)]
                ^{:key ts}
                [:tr {:on-click (up/add-search ts tab-group put-fn)}
-                (let [prio (or (-> linked :task :priority) "-")]
+                (let [prio (or (-> task :task :priority) "-")]
                   [:td
                    [:span.prio {:class         prio
                                 :draggable     true
                                 :on-drag-start on-drag-start}
                     prio]])
                 [:td.award-points
-                 (when-let [points (-> linked :task :points)]
+                 (when-let [points (-> task :task :points)]
                    points)]
                 [:td.estimate
-                 (when-let [estimate (-> linked :task :estimate-m)]
-                   estimate)]
-                [:td.left [:strong (some-> linked
+                 (when-let [estimate (-> task :task :estimate-m)]
+                   (m-to-hhmm estimate))]
+                [:td.left [:strong (some-> task
                                            :md
                                            (s/replace "#task" "")
                                            (s/replace "##" "")
