@@ -115,7 +115,7 @@
         filter-btn (fn [fk text]
                      [:span.filter {:class    (when (= fk (:filter @local)) "current")
                                     :on-click #(swap! local assoc-in [:filter] fk)}
-                      (name fk) text])]
+                      (name fk) (when (= fk (:filter @local)) text)])]
     (fn open-linked-tasks-render [ts local local-cfg put-fn]
       (let [{:keys [tab-group query-id]} local-cfg
             linked-entries-set (into (sorted-set) (:linked-entries-list @entry))
@@ -152,7 +152,7 @@
             time-reducer (fn [acc t] (+ acc (get-in t [:task :estimate-m] 0)))
             total-time (reduce time-reducer 0 linked-tasks)]
         [:div.linked-tasks
-         [filter-btn :active]
+         [filter-btn :active (str " - " (m-to-hhmm total-time))]
          [filter-btn :open (str " - " (m-to-hhmm total-time))]
          [filter-btn :done]
          [filter-btn :closed]
