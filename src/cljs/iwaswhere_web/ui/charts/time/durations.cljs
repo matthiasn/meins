@@ -139,10 +139,11 @@
            [:table
             [:tbody
              [:tr [:th ""] [:th "saga"] [:th "total"]]
-             (for [[saga v] (:time-by-saga day-stats)]
-               (let [saga-name (or (:saga-name (get sagas saga)) "none")
+             (for [[saga-id v] (:time-by-saga day-stats)]
+               (let [saga (get sagas saga-id)
+                     saga-name (or (:saga-name saga) "none")
                      color (cc/item-color saga-name)]
-                 ^{:key saga}
+                 ^{:key saga-id}
                  [:tr
                   [:td [:div.legend {:style {:background-color color}}]]
                   [:td [:strong saga-name]]
@@ -163,6 +164,8 @@
   [stats chart-h y-scale put-fn]
   (let [local (rc/atom {:last-fetched 0})
         last-update (subscribe [:last-update])
+        cfg (subscribe [:cfg])
+        show-pvt? (reaction (:show-pvt @cfg))
         idx-fn (fn [idx [k v]] [idx v])
         sagas (subscribe [:sagas])
         chart-data (subscribe [:chart-data])]
@@ -192,14 +195,18 @@
             [:table
              [:tbody
               [:tr [:th ""] [:th "saga"] [:th "total"]]
-              (for [[saga v] (if expanded? past-7-days (take 10 past-7-days))]
-                (let [saga-name (or (:saga-name (get sagas saga)) "none")
+              (for [[saga-id v] (if expanded? past-7-days (take 10 past-7-days))]
+                (let [saga (get sagas saga-id)
+                      pvt-saga? (contains? (:tags saga) "#pvt")
+                      saga-name (or (:saga-name saga) "none")
                       color (cc/item-color saga-name)]
-                  ^{:key saga}
-                  [:tr
-                   [:td [:div.legend {:style {:background-color color}}]]
-                   [:td [:strong saga-name]]
-                   [:td.time (u/duration-string v)]]))]]
+                  (when pvt-saga? (prn saga))
+                  (when (or @show-pvt? (not pvt-saga?))
+                    ^{:key saga-id}
+                    [:tr
+                     [:td [:div.legend {:style {:background-color color}}]]
+                     [:td [:strong saga-name]]
+                     [:td.time (u/duration-string v)]])))]]
             [tfh/earlybird-nightowl indexed-20 local :saga-name 443.5 0.0044 put-fn]
             (when expanded?
               [tfh/earlybird-nightowl indexed-20 local :story-name 443.5 0.0044 put-fn])
