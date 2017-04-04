@@ -12,6 +12,7 @@
             [iwaswhere-web.ui.entry.capture :as c]
             [iwaswhere-web.ui.entry.task :as task]
             [iwaswhere-web.ui.entry.habit :as habit]
+            [iwaswhere-web.ui.entry.reward :as reward]
             [iwaswhere-web.ui.entry.briefing :as b]
             [iwaswhere-web.ui.entry.story :as es]
             [iwaswhere-web.ui.entry.utils :as eu]
@@ -131,6 +132,7 @@
          [m/imdb-view @entry put-fn]
          [task/task-details @entry put-fn edit-mode?]
          [habit/habit-details @entry put-fn edit-mode?]
+         [reward/reward-details @entry put-fn edit-mode?]
          [b/briefing-view @entry put-fn edit-mode? local-cfg]
          [:div.footer
           [:div.word-count (u/count-words-formatted @entry)]]]))))

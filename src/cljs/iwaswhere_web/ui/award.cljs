@@ -19,10 +19,10 @@
               h (if (pos? v) (* y-scale v) 0)]
           (when (pos? max-val)
             ^{:key (str day idx)}
-            [:rect {:x      (* 10 idx)
+            [:rect {:x      (* 8 idx)
                     :y      (- chart-h h)
                     :fill   "#7FE283"
-                    :width  9
+                    :width  7
                     :height h}])))
       (for [[idx [day v]] indexed]
         (let [v (:task v)
@@ -30,10 +30,10 @@
               h (if (pos? v) (* y-scale v) 0)]
           (when (pos? max-val)
             ^{:key (str day idx)}
-            [:rect {:x      (* 10 idx)
+            [:rect {:x      (* 8 idx)
                     :y      (- chart-h h)
                     :fill   "#42b8dd"
-                    :width  9
+                    :width  7
                     :height h}])))]]))
 
 (defn award-points
@@ -44,7 +44,13 @@
         local (r/atom {:last-fetched 0})]
     (fn [put-fn]
       (let [award-points (:award-points @stats)
-            by-day (sort-by first (:by-day award-points))]
+            by-day (sort-by first (:by-day award-points))
+            total (:total award-points 0)
+            claimed (:claimed award-points 0)
+            balance (- total claimed)]
         [:div.award
-         [:div.points [:span.fa.fa-diamond] (:total award-points)]
+         [:div.points [:span.fa.fa-diamond] balance]
+         [:div
+          [:span.total total]
+          [:span.claimed claimed]]
          [points-by-day-chart by-day]]))))

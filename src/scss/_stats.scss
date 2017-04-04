@@ -268,6 +268,17 @@ $backlog-weekend: lighten($backlog, 30);
       position: relative;
     }
   }
+
+  .total {
+    font-size: 1em;
+    color: $green;
+    margin-right: 0.6em;
+  }
+  .claimed {
+    font-size: 1em;
+    color: $red;
+  }
+
   svg {
     padding: 4px;
     height: 30px;
