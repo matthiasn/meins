@@ -82,6 +82,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 1111;
 
   .new-entries-list {
     flex-flow: column;
