@@ -12,23 +12,70 @@
             [clojure.string :as s]
             [reagent.core :as r]))
 
-(defn vertical-bar
+(defn planned-actual
   "Draws vertical stacked barchart."
-  [entities k time-by-entities y-scale]
-  (let [data (cd/time-by-entity-stacked time-by-entities)]
-    (when (seq time-by-entities)
-      [:svg.vertical-bar
-       ;{:viewBox (str "0 0 12 300")}
-       [:g (for [[entity {:keys [x v]}] data]
-             (let [h (* y-scale v)
-                   x (* y-scale x)
-                   entity-name (or (k (get entities entity)) "none")]
-               ^{:key (str entity)}
-               [:rect {:fill   (cc/item-color entity-name)
-                       :y      x
-                       :x      0
-                       :width  12
-                       :height h}]))]])))
+  [entry]
+  (let [stats (subscribe [:stats])
+        chart-data (subscribe [:chart-data])
+        options (subscribe [:options])
+        sagas (reaction (:sagas @options))
+        y-scale 0.0045]
+    (fn [entry]
+      (let [{:keys [pomodoro-stats]} @chart-data
+            day (-> entry :briefing :day)
+            day-stats (get pomodoro-stats day)
+            allocation (-> entry :briefing :time-allocation)
+            sagas @sagas
+            actual-times (:time-by-saga day-stats)
+            remaining (cd/remaining-times actual-times allocation)
+            rect (fn [entity x v y]
+                   (let [h (* y-scale v)
+                         x (inc (* y-scale x))
+                         entity-name (or (:saga-name (get sagas entity)) "none")]
+                     ^{:key (str entity)}
+                     [:rect {:fill   (cc/item-color entity-name)
+                             :y      y
+                             :x      x
+                             :width  h
+                             :height 9}]))
+            legend (fn [text x y]
+                     [:text {:x           x
+                             :y           y
+                             :stroke      "none"
+                             :fill        "#333"
+                             :text-anchor :left
+                             :style       {:font-size 7}}
+                      text])]
+        (when (seq allocation)
+          [:svg.planned-actual
+           {:shape-rendering "crispEdges"
+            :style {:height "41px"}}
+           [:g
+            [:line {:x1           1
+                    :x2           260
+                    :y1           38
+                    :y2           38
+                    :stroke-width 0.5
+                    :stroke       "#333"}]
+            (for [h (range 16)]
+              (let [x (inc (* y-scale h 60 60))
+                    stroke-w (if (zero? (mod h 3)) 1.5 0.5)]
+                ^{:key h}
+                [:line {:x1           x
+                        :x2           x
+                        :y1           36
+                        :y2           40.5
+                        :stroke-width stroke-w
+                        :stroke       "#333"}]))
+            (for [[entity {:keys [x v]}] (cd/time-by-entity-stacked allocation)]
+              (rect entity x v 3))
+            (for [[entity {:keys [x v]}] (cd/time-by-entity-stacked actual-times)]
+              (rect entity x v 14))
+            (for [[entity {:keys [x v]}] (cd/time-by-entity-stacked remaining)]
+              (rect entity x v 25))
+            [legend "allocation" 3 10]
+            [legend "actual" 3 21]
+            [legend "remaining" 3 32]]])))))
 
 (defn briefing-view
   [entry put-fn edit-mode? local-cfg]
@@ -36,23 +83,15 @@
         day (-> entry :briefing :day)
         today (.format (js/moment.) "YYYY-MM-DD")
         filter-btn (if (= day today) :active :open)
-        local (r/atom {:filter  filter-btn
+        local (r/atom {:filter                  filter-btn
                        :outstanding-time-filter true
-                       :on-hold false})
-        stats (subscribe [:stats])
-        options (subscribe [:options])
-        sagas (reaction (:sagas @options))
-        entries-map (subscribe [:entries-map])
-        results (subscribe [:results])
-        cfg (subscribe [:cfg])
-
+                       :on-hold                 false})
         input-fn
         (fn [entry]
           (fn [ev]
             (let [day (-> ev .-nativeEvent .-target .-value)
                   updated (assoc-in entry [:briefing :day] day)]
               (put-fn [:entry/update-local updated]))))
-
         time-alloc-input-fn
         (fn [entry saga]
           (fn [ev]
@@ -62,19 +101,13 @@
               (put-fn [:entry/update-local updated]))))]
     (fn briefing-render [entry put-fn edit-mode? local-cfg]
       (when (contains? (:tags entry) "#briefing")
-        (let [sagas @sagas
-              ts (:timestamp entry)
+        (let [ts (:timestamp entry)
               {:keys [pomodoro-stats task-stats wordcount-stats]} @chart-data
               day (-> entry :briefing :day)
               day-stats (get pomodoro-stats day)
               dur (u/duration-string (:total-time day-stats))
               word-stats (get wordcount-stats day)
               {:keys [tasks-cnt done-cnt closed-cnt]} (get task-stats day)
-              started (:started-tasks-cnt @stats)
-              allocation (-> entry :briefing :time-allocation)
-              actual-times (:time-by-saga day-stats)
-              remaining (cd/remaining-times actual-times allocation)
-              past-7-days (cd/past-7-days :time-by-saga pomodoro-stats)
               tab-group (:tab-group local-cfg)]
           [:div.briefing
            [:form.briefing-details
@@ -92,6 +125,7 @@
                 [:strong done-cnt] " done, "
                 [:strong closed-cnt] " closed. "
                 [:strong (or (:word-count word-stats) 0)] " words written."])
+             [planned-actual entry]
              [:div
               "Total planned: "
               [:strong
@@ -104,8 +138,4 @@
              [tasks/started-tasks tab-group local put-fn]
              [tasks/open-linked-tasks ts local local-cfg put-fn]
              [habits/waiting-habits tab-group entry put-fn]
-             (when day-stats [time/time-by-stories day-stats local put-fn])]]
-           [:div.stacked-bars
-            [:div [vertical-bar sagas :saga-name allocation 0.0045]]
-            [:div [vertical-bar sagas :saga-name actual-times 0.0045]]
-            [:div [vertical-bar sagas :saga-name remaining 0.0045]]]])))))
+             (when day-stats [time/time-by-stories day-stats local put-fn])]]])))))
