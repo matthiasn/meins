@@ -40,23 +40,43 @@
              ^{:key (str item-name hh)}
              [:rect {:fill           (cc/item-color item-name)
                      :on-mouse-enter #(prn item-name hh summed)
-                     :x              (* 30 idx)
+                     :x              (+ 20 (* 13 idx))
                      :y              y
-                     :width          26
+                     :width          11
                      :height         h}]))]))))
+
+(defn legend
+  [text x y]
+  [:text {:x           x
+          :y           y
+          :stroke      "none"
+          :fill        "#333"
+          :text-anchor :middle
+          :style       {:font-size 6}}
+   text])
 
 (defn earlybird-nightowl
   "Renders chart with daily recorded times, split up by story."
   [indexed local item-name-k chart-h y-scale put-fn]
-  [:svg
-   {:viewBox (str "0 0 420 " chart-h)}
+  [:svg.earlybird
+   {:shape-rendering "crispEdges"
+    :style {:height chart-h}}
    [:g
-    [cc/chart-title "24h" 210]
     (for [h (range 28)]
       (let [y (* chart-h (/ h 28))
-            stroke-w (if (zero? (mod (- h 2) 6)) 2 1)]
+            stroke-w (if (zero? (mod (- h 2) 6)) 1 0.5)]
         ^{:key h}
-        [:line {:x1 0 :x2 600 :y1 y :y2 y :stroke-width stroke-w :stroke "#999"}]))
+        [:line {:x1           17
+                :x2           202
+                :y1           y
+                :y2           y
+                :stroke-width stroke-w
+                :stroke       "#666"}]))
+    [legend "00:00" 8 18]
+    [legend "06:00" 8 66]
+    [legend "12:00" 8 113]
+    [legend "18:00" 8 160]
+    [legend "24:00" 8 208]
     [:g
      (for [[idx v] indexed]
        (let [h (* y-scale (:total-time v))

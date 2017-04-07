@@ -207,9 +207,9 @@
                      [:td [:div.legend {:style {:background-color color}}]]
                      [:td [:strong saga-name]]
                      [:td.time (u/duration-string v)]])))]]
-            [tfh/earlybird-nightowl indexed-20 local :saga-name 443.5 0.0044 put-fn]
+            [tfh/earlybird-nightowl indexed-20 local :saga-name 222 0.0022 put-fn]
             (when expanded?
-              [tfh/earlybird-nightowl indexed-20 local :story-name 443.5 0.0044 put-fn])
+              [tfh/earlybird-nightowl indexed-20 local :story-name 220 0.0022 put-fn])
             (when expanded?
               [bars-by-saga indexed-20 local chart-h 0.0035 put-fn])
             (when expanded?
