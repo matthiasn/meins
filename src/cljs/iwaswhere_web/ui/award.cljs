@@ -8,9 +8,10 @@
   "Renders bars."
   [stats]
   (let [chart-h 22
-        indexed (map-indexed (fn [idx [day v]] [idx [day v]]) stats)
-        daily-totals (map (fn [[_ [d v]]] (h/add (:task v) (:habit v))) indexed)
-        max-val (apply max daily-totals)]
+        daily-totals (map (fn [[d v]] (h/add (:task v) (:habit v))) stats)
+        max-val (apply max daily-totals)
+        indexed (map-indexed (fn [idx [day v]] [idx [day v]])
+                             (take-last 14 stats))]
     [:svg
      [:g
       (for [[idx [day v]] indexed]
