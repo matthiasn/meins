@@ -19,11 +19,9 @@
 
 (def toggle-options
   [{:option :show-pvt :cls "fa-user-secret"}
-   {:option :redacted :cls "fa-eye"}
    {:option :comments-standalone :cls "fa-comments"}
    {:option :mute :cls "fa-volume-off"}
    {:option :hide-hashtags :cls "fa-hashtag"}
-   {:option :thumbnails :cls "fa-photo"}
    {:option :sort-asc :cls " fa-sort-asc"}])
 
 (defn new-import-view
@@ -54,8 +52,7 @@
   [put-fn]
   (let [cfg (subscribe [:cfg])]
     (fn [put-fn]
-      (let [refresh-cfg #(put-fn [:cfg/refresh])
-            toggle-qr-code
+      (let [toggle-qr-code
             (fn [_ev]
               (let [msg {:path [:cfg :qr-code]}
                     reset-msg (merge msg {:reset-to false})]
@@ -66,7 +63,6 @@
          (for [option toggle-options]
            ^{:key (str "toggle" (:cls option))}
            [toggle-option-view option put-fn])
-         [:span.fa.fa-refresh.toggle {:on-click refresh-cfg}]
          [:span.fa.fa-qrcode.toggle
           {:on-click toggle-qr-code
            :class    (when-not (:qr-code @cfg) "inactive")}]]))))

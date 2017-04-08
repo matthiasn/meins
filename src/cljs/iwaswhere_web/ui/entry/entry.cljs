@@ -49,11 +49,9 @@
   "Horizontally renders list with hashtags and mentions."
   [ts tab-group put-fn]
   (let [cfg (subscribe [:cfg])
-        entry (:entry (eu/entry-reaction ts))
-        redacted (reaction (:redacted @cfg))]
+        entry (:entry (eu/entry-reaction ts))]
     (fn hashtags-mentions-render [ts tab-group put-fn]
       [:div.hashtags
-       (when @redacted {:class "redacted"})
        (for [mention (:mentions @entry)]
          ^{:key (str "tag-" mention)}
          [:span.mention {:on-click (up/add-search mention tab-group put-fn)}

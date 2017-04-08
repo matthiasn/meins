@@ -70,6 +70,7 @@
                              :options         {:pvt-hashtags #{"#pvt"}}
                              :cfg             @c/app-cfg})]
     (put-fn [:state/stats-tags-get])
+    (put-fn [:cfg/refresh])
     (put-fn [:state/search (:query-cfg @initial-state)])
     {:state initial-state}))
 

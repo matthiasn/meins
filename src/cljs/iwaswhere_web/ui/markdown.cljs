@@ -58,7 +58,6 @@
   (let [cfg (rfc/subscribe [:cfg])
         hide-hashtags (reaction (:hide-hashtags @cfg))
         lines-shortened (reaction (:lines-shortened @cfg))
-        redacted (reaction (:redacted @cfg))
         local (rc/atom {:show-shortened   true
                         :recently-clicked false})
         on-click-fn (fn [_ev]
@@ -82,8 +81,7 @@
                           md-string)
               tags-xform (mk-format-tags-xform entry show-hashtags?)
               html (md/md->html md-string :custom-transformers [tags-xform])]
-          [:div {:on-click on-click-fn
-                 :class    (when @redacted "redacted")}
+          [:div {:on-click on-click-fn}
            [:div {:dangerouslySetInnerHTML {:__html html}}]
            (when shortened?
              [:span.more
