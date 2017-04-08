@@ -23,7 +23,6 @@
    {:option :comments-standalone :cls "fa-comments"}
    {:option :mute :cls "fa-volume-off"}
    {:option :hide-hashtags :cls "fa-hashtag"}
-   {:option :show-all-maps :cls "fa-map-o"}
    {:option :thumbnails :cls "fa-photo"}
    {:option :sort-asc :cls " fa-sort-asc"}])
 

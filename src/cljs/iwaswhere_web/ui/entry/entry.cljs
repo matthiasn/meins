@@ -76,7 +76,6 @@
         linked-desc (reaction (get @entries-map (:linked-timestamp @entry)))
         show-map? (reaction (contains? (:show-maps-for @cfg) ts))
         active (reaction (:active @cfg))
-        show-all-maps? (reaction (:show-all-maps @cfg))
         q-date-string (.format (js/moment ts) "YYYY-MM-DD")
         formatted-time (.format (js/moment ts) "ddd YY-MM-DD HH:mm")
         tab-group (:tab-group local-cfg)
@@ -125,7 +124,7 @@
              [md/markdown-render @entry toggle-edit]))
          [c/custom-fields-div @entry put-fn edit-mode?]
          [m/audioplayer-view @entry put-fn]
-         [l/leaflet-map @entry (or @show-map? @show-all-maps?) local-cfg put-fn]
+         [l/leaflet-map @entry @show-map? local-cfg put-fn]
          [loc/location-details @entry put-fn edit-mode?]
          [m/image-view @entry]
          [m/videoplayer-view @entry]
