@@ -37,7 +37,9 @@
         sagas (gq/find-all-sagas {:graph g})
         story-reducer (fn [acc entry]
                         (let [comment-for (:comment-for entry)
-                              parent (when comment-for (uc/attrs g comment-for))
+                              parent (when (and comment-for
+                                                (uc/has-node? g comment-for))
+                                       (uc/attrs g comment-for))
                               story (or (:linked-story parent)
                                         (:linked-story entry)
                                         :no-story)
@@ -50,7 +52,9 @@
                             acc)))
         by-ts-reducer (fn [acc entry]
                         (let [comment-for (:comment-for entry)
-                              parent (when comment-for (uc/attrs g comment-for))
+                              parent (when (and comment-for
+                                                (uc/has-node? g comment-for))
+                                       (uc/attrs g comment-for))
                               story-id (or (:linked-story parent)
                                         (:linked-story entry)
                                         :no-story)
@@ -97,3 +101,41 @@
                             :started     (count started)}
                            (time-by-stories g day-nodes-attrs date-string))]
       [date-string day-stats])))
+
+
+(defn time-stats
+  "Create mapper function for time stats"
+  [current-state]
+  (fn [d]
+    (let [g (:graph current-state)
+          date-string (:date-string d)
+          day-nodes (gq/get-nodes-for-day g {:date-string date-string})
+          day-nodes-attrs (map #(uber/attrs g %) day-nodes)
+          pomo-nodes (filter #(= (:entry-type %) :pomodoro) day-nodes-attrs)
+          completed (filter #(= (:planned-dur %) (:completed-time %)) pomo-nodes)
+          started (filter #(and (pos? (:completed-time %))
+                                (< (:completed-time %) (:planned-dur %)))
+                          pomo-nodes)
+          day-stats (merge {:date-string date-string
+                            :total       (count pomo-nodes)
+                            :completed   (count completed)
+                            :started     (count started)}
+                           (time-by-stories g day-nodes-attrs date-string))]
+      [date-string day-stats])))
+
+(defn get-stats-fn
+  "Retrieves stats of specified type. Picks the appropriate mapper function
+   for the requested message type."
+  [{:keys [current-state msg-payload msg-meta put-fn]}]
+  (let [stats-type (:type msg-payload)
+        stats-mapper (case stats-type
+                       :stats/pomodoro time-mapper
+                       nil)
+        days (:days msg-payload)
+        stats (when stats-mapper
+                (into {} (mapv (stats-mapper current-state) days)))]
+    (log/info stats-type (count (str stats)))
+    (if stats
+      (put-fn (with-meta [:stats/result {:stats stats
+                                         :type  stats-type}] msg-meta))
+      (l/warn "No mapper defined for" stats-type))))
