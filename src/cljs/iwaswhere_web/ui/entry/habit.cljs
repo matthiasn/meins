@@ -80,6 +80,15 @@
               (put-fn [:entry/update-local updated]))))]
     (fn [entry put-fn edit-mode?]
       (when (contains? (:tags entry) "#habit")
+        (when (and edit-mode? (not (:habit entry)))
+          (let [active-from (h/format-time (st/now))
+                habit {:days        (zipmap (range 7) (repeat true))
+                       :priority    :B
+                       :points      10
+                       :active-from active-from
+                       :done        false}
+                updated (assoc-in entry [:habit] habit)]
+            (put-fn [:entry/update-local updated])))
         [:form.task-details
          [:fieldset
           [:legend "Habit details"]

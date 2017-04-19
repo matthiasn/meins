@@ -3,9 +3,6 @@
             [clojure.string :as s]
             [iwaswhere-web.helpers :as h]))
 
-(defn format-time2 [m]
-  (.format (js/moment m) "YYYY-MM-DDTHH:mm"))
-
 (defn task-details
   [entry put-fn edit-mode?]
   (let [format-time #(.format (js/moment %) "ddd MMM DD - HH:mm")
@@ -50,7 +47,7 @@
            (if edit-mode?
              [:input {:type     :datetime-local
                       :on-input (input-fn entry :due)
-                      :value    (format-time2 (-> entry :task :due))}]
+                      :value    (h/format-time (-> entry :task :due))}]
              [:time (format-time (-> entry :task :due))])]
           [:div
            [:span " Priority: "]
