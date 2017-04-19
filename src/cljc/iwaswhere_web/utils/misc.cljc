@@ -90,7 +90,7 @@
   "Naive implementation of a wordcount function."
   [entry]
   (if-let [text (:md entry)]
-    (count (s/split text #" "))
+    (count (filter seq (s/split text #"\s")))
     0))
 
 (defn count-words-formatted

@@ -140,3 +140,11 @@
            {:a 1}))
     (is (= (u/deep-merge {:a 1} nil nil)
            {:a 1}))))
+
+(deftest count-words-test
+  (testing "counts words properly"
+    (is (= 69
+           (u/count-words {:md "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum  "}))))
+  (testing "counts words properly when word at beginning of line"
+    (is (= 29
+           (u/count-words {:md "Alabama \nArizona\nCalifornia\nColorado\nConnecticut\nDelaware\nDistrictOfColumbia\nFlorida\nIllinois\nLouisiana\nMaine\nMaryland\nMassachussets\nMississippi \nNevada\nNew Hampshire\nNew Jersey\nNew York\nOregon\nPennsylvania\nRhode Island\nUtah\nVermont\nVirgina\nWashington\n\n"})))))
