@@ -49,7 +49,7 @@
         (when (seq allocation)
           [:svg.planned-actual
            {:shape-rendering "crispEdges"
-            :style {:height "41px"}}
+            :style           {:height "41px"}}
            [:g
             [:line {:x1           1
                     :x2           260
@@ -80,6 +80,7 @@
 (defn briefing-view
   [entry put-fn edit-mode? local-cfg]
   (let [chart-data (subscribe [:chart-data])
+        cfg (subscribe [:cfg])
         day (-> entry :briefing :day)
         today (.format (js/moment.) "YYYY-MM-DD")
         filter-btn (if (= day today) :active :open)
@@ -105,7 +106,13 @@
               {:keys [pomodoro-stats task-stats wordcount-stats]} @chart-data
               day (-> entry :briefing :day)
               day-stats (get pomodoro-stats day)
-              dur (u/duration-string (:total-time day-stats))
+              excluded (:excluded (:briefing @cfg))
+              logged-s (->> day-stats
+                            :time-by-saga
+                            (filter (fn [[s _]] (not (contains? excluded s))))
+                            (map second)
+                            (apply +))
+              dur (u/duration-string logged-s)
               word-stats (get wordcount-stats day)
               {:keys [tasks-cnt done-cnt closed-cnt]} (get task-stats day)
               tab-group (:tab-group local-cfg)]

@@ -50,7 +50,7 @@
             (assoc-in [:briefings] (:briefings msg-payload))
             (assoc-in [:started-tasks] (:started-tasks msg-payload))
             (assoc-in [:waiting-habits] (:waiting-habits msg-payload))
-            (assoc-in [:cfg :briefing-story] (:briefing-story (:cfg msg-payload)))
+            (assoc-in [:cfg :briefing] (-> msg-payload :cfg :briefing))
             (assoc-in [:stats] (:stats msg-payload)))]
     {:new-state new-state}))
 

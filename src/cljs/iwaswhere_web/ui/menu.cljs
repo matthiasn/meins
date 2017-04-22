@@ -90,7 +90,7 @@
                                 new-entry (merge
                                             (p/parse-entry md)
                                             {:briefing     {:day fmt}
-                                             :linked-story (:briefing-story @cfg)})
+                                             :linked-story (-> @cfg :briefing :story)})
                                 new-entry-fn (h/new-entry-fn put-fn new-entry nil)]
                             (new-entry-fn)))
                         (put-fn [:search/add {:tab-group :left :query q}])
