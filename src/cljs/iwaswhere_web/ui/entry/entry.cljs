@@ -148,6 +148,17 @@
         cfg (subscribe [:cfg])
         options (subscribe [:options])
         show-pvt? (reaction (:show-pvt @cfg))
+        entries-map (subscribe [:entries-map])
+        comments (reaction
+                   (let [comments (map (fn [ts]
+                                         (or (get @new-entries ts)
+                                             (get @entries-map ts)))
+                                       @all-comments-set)
+                         pvt-filter (u/pvt-filter @options @entries-map)
+                         comments (if @show-pvt?
+                                    comments
+                                    (filter pvt-filter comments))]
+                     (map :timestamp comments)))
         thumbnails? (reaction (:thumbnails @cfg))
         show-comments-for? (reaction (get-in @cfg [:show-comments-for ts]))
         query-id (:query-id local-cfg)
@@ -157,22 +168,22 @@
                                             query-id)}])]
     (fn entry-with-comments-render [ts put-fn local-cfg]
       (let [entry @entry
-            all-comments-set @all-comments-set]
+            comments @comments]
         [:div.entry-with-comments
          [journal-entry ts put-fn local-cfg]
-         (when (seq all-comments-set)
+         (when (seq comments)
            (if (= query-id @show-comments-for?)
              [:div.comments
-              (let [n (count all-comments-set)]
+              (let [n (count comments)]
                 [:div.show-comments
                  (when (pos? n)
                    [:span {:on-click toggle-comments}
                     (str "hide " n " comment" (when (> n 1) "s"))])])
-              (for [comment all-comments-set]
+              (for [comment comments]
                 ^{:key (str "c" comment)}
                 [journal-entry comment put-fn local-cfg])]
              [:div.show-comments
-              (let [n (count all-comments-set)]
+              (let [n (count comments)]
                 [:span {:on-click toggle-comments}
                  (str "show " n " comment" (when (> n 1) "s"))])]))
          (when @thumbnails? [t/thumbnails entry put-fn])]))))
