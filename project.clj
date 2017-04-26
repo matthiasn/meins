@@ -13,16 +13,16 @@
                  [clj-http "3.5.0"]
                  [me.raynes/fs "1.4.6"]
                  [markdown-clj "0.9.99"]
-                 [cheshire "5.7.0"]
+                 [cheshire "5.7.1"]
                  [cljsjs/moment "2.17.1-0"]
                  [com.drewnoakes/metadata-extractor "2.10.1"]
                  [ubergraph "0.3.1"]
                  [factual/geo "1.0.0"]
                  [camel-snake-kebab "0.4.0"]
-                 [matthiasn/systems-toolbox "0.6.7"]
+                 [matthiasn/systems-toolbox "0.6.8"]
+                 [matthiasn/systems-toolbox-sente "0.6.14"]
                  [reagent "0.6.1"]
                  [capacitor "0.6.0"]
-                 [matthiasn/systems-toolbox-sente "0.6.14"]
                  [re-frame "0.9.2"]
                  [clucy "0.4.0"]
                  [seesaw "1.4.5"]
@@ -46,7 +46,7 @@
   :jvm-opts ["-XX:-OmitStackTraceInFastThrow"]
 
   :profiles {:uberjar {:aot :all}
-             :dev     {:dependencies [[re-frisk "0.4.4"]]}}
+             :dev     {:dependencies [[re-frisk "0.4.5"]]}}
 
   :plugins [[lein-cljsbuild "1.1.5"
              :exclusions [org.apache.commons/commons-compress]]
@@ -54,7 +54,7 @@
             [lein-sassy "1.0.8"
              :exclusions [org.clojure/clojure org.codehaus.plexus/plexus-utils]]
             [com.jakemccrary/lein-test-refresh "0.19.0"]
-            [test2junit "1.2.5"]
+            [test2junit "1.2.6"]
             [lein-doo "0.1.7"]
             [lein-codox "0.10.3"]]
 
