@@ -69,11 +69,17 @@
                       input-type (:type input-cfg)
                       path [:custom-fields tag k]
                       value (get-in entry path)
+                      value (if (and value (= :time input-type))
+                              (let [t (js/moment (* value 60 1000))]
+                                (.format (.utc t) "HH:mm"))
+                              value)
                       on-change-fn
                       (fn [ev]
                         (let [v (.. ev -target -value)
-                              parsed (if (= :number input-type)
-                                       (when (seq v) (js/parseFloat v))
+                              parsed (case input-type
+                                       :number (when (seq v) (js/parseFloat v))
+                                       :time (when (seq v)
+                                               (.asMinutes (.duration js/moment v)))
                                        v)
                               updated (assoc-in entry path parsed)]
                           (put-fn [:entry/update-local updated])))]
@@ -83,6 +89,13 @@
                             last-n (last (re-seq #"[0-9]*\.?[0-9]+" p1))]
                         (when last-n
                           (let [updated (assoc-in entry path (js/parseFloat last-n))]
+                            (put-fn [:entry/update-local updated])))))
+                    (when (and (= input-type :time) edit-mode?)
+                      (let [p1 (-> (:md entry) (s/split tag) first)
+                            v (last (re-seq #"\d+:\d{2}" p1))]
+                        (when v
+                          (let [m (.asMinutes (.duration js/moment v))
+                                updated (assoc-in entry path m)]
                             (put-fn [:entry/update-local updated]))))))
                   ^{:key (str "cf" ts tag k)}
                   [:div
