@@ -1,4 +1,4 @@
-(defproject matthiasn/iwaswhere-web "0.1.40"
+(defproject matthiasn/iwaswhere-web "0.1.41"
   :description "Sample application built with systems-toolbox library"
   :url "https://github.com/matthiasn/systems-toolbox"
   :license {:name "GNU AFFERO GENERAL PUBLIC LICENSE"
@@ -48,12 +48,12 @@
   :profiles {:uberjar {:aot :all}
              :dev     {:dependencies [[re-frisk "0.4.5"]]}}
 
-  :plugins [[lein-cljsbuild "1.1.5"
+  :plugins [[lein-cljsbuild "1.1.6"
              :exclusions [org.apache.commons/commons-compress]]
             [lein-figwheel "0.5.10"]
             [lein-sassy "1.0.8"
              :exclusions [org.clojure/clojure org.codehaus.plexus/plexus-utils]]
-            [com.jakemccrary/lein-test-refresh "0.19.0"]
+            [com.jakemccrary/lein-test-refresh "0.20.0"]
             [test2junit "1.2.6"]
             [lein-doo "0.1.7"]
             [lein-codox "0.10.3"]]

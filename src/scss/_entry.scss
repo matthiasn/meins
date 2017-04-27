@@ -97,6 +97,22 @@
     font-weight: bold;
   }
 
+  .header-1 {
+    display: flex;
+    justify-content: space-between;
+
+    .geoname {
+      font-size: 0.6em;
+      vertical-align: top;
+    }
+    .flag {
+      padding-left: 3px;
+      position: relative;
+      top: -6px;
+      font-size: 1.5em;
+    }
+  }
+
   .header {
     line-height: 1.4em;
     overflow-wrap: normal;

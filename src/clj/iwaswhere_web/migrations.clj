@@ -3,7 +3,15 @@
   (:require [iwaswhere-web.files :as f]
             [clojure.pprint :as pp]
             [clojure.tools.logging :as log]
-            [clj-uuid :as uuid]))
+            [clj-uuid :as uuid]
+            [camel-snake-kebab.core :refer :all]
+            [cheshire.core :as cc]
+            [clojure.string :as s]
+            [clj-http.client :as hc]
+            [clj-time.coerce :as ctc]
+            [clj-time.format :as ctf]
+            [clj-time.core :as ct]
+            [me.raynes.fs :as fs]))
 
 (defn add-tags-mentions
   "Parses entry for hashtags and mentions."
@@ -110,4 +118,61 @@
                 (spit out-file serialized :append true))
               (catch Exception ex
                 (log/error "Exception" ex "when parsing line:\n" line)))))))
-    (log/info (count @weight-entry-uuids) "-" (count @ts-uuids) "migrated." )))
+    (log/info (count @weight-entry-uuids) "-" (count @ts-uuids) "migrated.")))
+
+(defn get-geoname [entry]
+  (let [lat (:latitude entry)
+        lon (:longitude entry)
+        parser (fn [res] (cc/parse-string (:body res) #(keyword (->kebab-case %))))]
+    (when (and lat lon)
+      (let [res (hc/get (str "http://localhost:3003/geocode?latitude=" lat "&longitude=" lon))
+            geoname (ffirst (parser res))]
+        geoname))))
+
+(defn add-geonames
+  "Lookup geolocation for entries with lat and lon."
+  ; (use 'iwaswhere-web.migrations)
+  ; (time (add-geonames "./data/migration/geonames" "./data/migration/2017-04-26.jrn"))
+  [path out-file]
+  (let [files (file-seq (clojure.java.io/file path))
+        state (atom {:countries {}})
+        geonames-path "./data/geonames/"
+        local-fmt (ctf/with-zone (ctf/formatters :year-month-day)
+                                 (ct/default-time-zone))]
+    (fs/mkdirs geonames-path)
+    (doseq [f (f/filter-by-name files #"\d{4}-\d{2}-\d{2}a?.jrn")]
+      (with-open [reader (clojure.java.io/reader f)]
+        (prn f)
+        (let [lines (line-seq reader)]
+          (doseq [line lines]
+            (try
+              (let [parsed (clojure.edn/read-string line)
+                    geoname (get-geoname parsed)
+                    entry (if (and geoname (not (:geoname parsed)))
+                            (let [country (:country-code geoname)
+                                  serialized-geoname (with-out-str (pp/pprint geoname))
+                                  relevant (-> geoname
+                                               (select-keys [:name :country-code :geo-name-id])
+                                               (assoc-in [:admin-1-name] (get-in geoname [:admin-1-code :name]))
+                                               (assoc-in [:admin-2-name] (get-in geoname [:admin-2-code :name]))
+                                               (assoc-in [:admin-3-name] (get-in geoname [:admin-3-code :name]))
+                                               (assoc-in [:admin-4-name] (get-in geoname [:admin-4-code :name])))
+                                  geo-name-id (:geo-name-id geoname)
+                                  filename (str geonames-path geo-name-id ".edn")
+                                  ts (:timestamp parsed)
+                                  day (ctf/unparse local-fmt (ctc/from-long ts))]
+                              (swap! state assoc-in [:locations geo-name-id] geoname)
+                              (swap! state update-in [:countries country] #(set (conj % day)))
+                              (spit filename serialized-geoname)
+                              (assoc-in parsed [:geoname] relevant))
+                            parsed)
+                    serialized (str (pr-str entry) "\n")]
+                (spit out-file serialized :append true))
+              (catch Exception ex
+                (log/error "Exception" ex "when parsing line:\n" line)))))))
+    (let [countries (:countries @state)
+          days-per-country (map (fn [[c days]] [c (count days)]) countries)]
+      (log/info (count (:locations @state)) "locations in"
+                (count countries) "countries found.")
+      (doseq [[c days] (reverse (sort-by second days-per-country))]
+        (println c days "days")))))

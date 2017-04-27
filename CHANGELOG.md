@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [0.1.41] - 2017-04-27
+### Changed
+- geonames location lookup 
+
 ## [0.1.40] - 2017-03-27
 ### Changed
 - award points for tasks

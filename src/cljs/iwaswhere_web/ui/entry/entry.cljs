@@ -91,8 +91,11 @@
         [:div.entry {:on-drop       drop-fn
                      :on-drag-over  h/prevent-default
                      :on-drag-enter h/prevent-default}
-         [es/story-select @entry put-fn edit-mode?]
-         [es/saga-select @entry put-fn edit-mode?]
+         [:div.header-1
+          [:div
+           [es/story-select @entry put-fn edit-mode?]
+           [es/saga-select @entry put-fn edit-mode?]]
+          [loc/geonames @entry put-fn edit-mode?]]
          [:div.header
           [:div
            [:a [:time {:on-click add-search} formatted-time]]

@@ -7,6 +7,7 @@ window.deps = {
     'editor' : require ('./editor'),
     'SearchFieldEditor' : require ('./SearchFieldEditor'),
     'Calendar' : require ('./calendar'),
+    'emojiFlags' : require('emoji-flags')
 };
 
 window.React = window.deps['react'];
