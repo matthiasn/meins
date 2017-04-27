@@ -122,20 +122,3 @@
                             :started     (count started)}
                            (time-by-stories g day-nodes-attrs date-string))]
       [date-string day-stats])))
-
-(defn get-stats-fn
-  "Retrieves stats of specified type. Picks the appropriate mapper function
-   for the requested message type."
-  [{:keys [current-state msg-payload msg-meta put-fn]}]
-  (let [stats-type (:type msg-payload)
-        stats-mapper (case stats-type
-                       :stats/pomodoro time-mapper
-                       nil)
-        days (:days msg-payload)
-        stats (when stats-mapper
-                (into {} (mapv (stats-mapper current-state) days)))]
-    (log/info stats-type (count (str stats)))
-    (if stats
-      (put-fn (with-meta [:stats/result {:stats stats
-                                         :type  stats-type}] msg-meta))
-      (l/warn "No mapper defined for" stats-type))))

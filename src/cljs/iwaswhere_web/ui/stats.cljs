@@ -2,6 +2,7 @@
   (:require [iwaswhere-web.ui.charts.tasks :as ct]
             [iwaswhere-web.ui.charts.custom-fields :as cf]
             [iwaswhere-web.ui.charts.wordcount :as wc]
+            [iwaswhere-web.ui.charts.location :as loc]
             [iwaswhere-web.ui.charts.time.durations :as cd]
             [iwaswhere-web.ui.charts.media :as m]
             [iwaswhere-web.helpers :as h]
@@ -52,4 +53,5 @@
           [cd/durations-bar-chart pomodoro-stats 200 5 put-fn]
           [ct/tasks-chart task-stats 250 put-fn]
           [wc/wordcount-chart wordcount-stats 150 put-fn 1000]
-          [m/media-chart media-stats 150 put-fn]]]))))
+          [m/media-chart media-stats 150 put-fn]
+          [loc/wordcount-chart]]]))))

@@ -5,6 +5,7 @@
             [clj-time.core :as t]
             [iwaswhere-web.graph.stats.awards :as aw]
             [iwaswhere-web.graph.stats.time :as t-s]
+            [iwaswhere-web.graph.stats.location :as sl]
             [iwaswhere-web.graph.stats.custom-fields :as cf]
             [iwaswhere-web.utils.misc :as u]
             [clj-time.format :as ctf]
@@ -132,6 +133,7 @@
   (merge (task-summary-stats state)
          {:entry-count  (count (:sorted-entries state))
           :award-points (aw/award-points state)
+          :locations    (sl/locations state)
           :node-count   (count (:node-map (:graph state)))
           :edge-count   (count (uber/find-edges (:graph state) {}))
           :import-cnt   (res-count state {:tags #{"#import"}})

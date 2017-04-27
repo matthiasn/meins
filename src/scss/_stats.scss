@@ -253,6 +253,20 @@ $backlog-weekend: lighten($backlog, 30);
   background-color: white;
 }
 
+.location-stats {
+  background-color: white;
+  font-size: 1.6em;
+  .flag {
+    padding-left: 4px;
+  }
+  .cnt {
+    padding-left: 5px;
+    position: relative;
+    top: -3px;
+    font-size: 0.7em;
+  }
+}
+
 .award {
   background-color: white;
   padding: 5px;
