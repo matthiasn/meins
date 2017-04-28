@@ -16,7 +16,8 @@
             [clojure.edn :as edn]
             [clojure.tools.logging :as l]
             [clojure.pprint :as pp]
-            [iwaswhere-web.file-utils :as fu]))
+            [iwaswhere-web.file-utils :as fu]
+            [iwaswhere-web.location :as loc]))
 
 (defn filter-by-name
   "Filter a sequence of files by their name, matched via regular expression."
@@ -67,6 +68,7 @@
   (let [ts (:timestamp msg-payload)
         id (or (:id msg-payload) (uuid/v1))
         entry (merge msg-payload {:last-saved (st/now) :id id})
+        entry (loc/enrich-geoname entry)
         new-state (ga/add-node current-state ts entry false)
         cfg (:cfg current-state)]
     (when (not= current-state new-state)

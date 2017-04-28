@@ -12,13 +12,16 @@
             [clj-time.core :as ct]))
 
 (defn get-geoname [entry]
-  (let [lat (:latitude entry)
-        lon (:longitude entry)
-        parser (fn [res] (cc/parse-string (:body res) #(keyword (->kebab-case %))))]
-    (when (and lat lon)
-      (let [res (hc/get (str "http://localhost:3003/geocode?latitude=" lat "&longitude=" lon))
-            geoname (ffirst (parser res))]
-        geoname))))
+  (try
+    (when-not (:geoname entry)
+      (let [lat (:latitude entry)
+            lon (:longitude entry)
+            parser (fn [res] (cc/parse-string (:body res) #(keyword (->kebab-case %))))]
+        (when (and lat lon)
+          (let [res (hc/get (str "http://localhost:3003/geocode?latitude=" lat "&longitude=" lon))
+                geoname (ffirst (parser res))]
+            geoname))))
+    (catch java.net.ConnectException e (log/error "could not connect to geonames service"))))
 
 (defn enrich-geoname [entry]
   (let [geoname (get-geoname entry)]
