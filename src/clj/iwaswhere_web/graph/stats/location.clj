@@ -12,7 +12,7 @@
             [clj-time.core :as ct]))
 
 (defn locations
-  "Counts claimed award points."
+  "Gathers information about places visited."
   [current-state]
   (time
     (let [q {:mentions    #{}
@@ -33,6 +33,7 @@
                       day (ctf/unparse local-fmt (ctc/from-long ts))]
                   (-> acc
                       (update-in [:country-days country] #(set (conj % day)))
+                      (update-in [:days-countries day] #(set (conj % country)))
                       (update-in [:country-entries country] #(inc (or % 0)))))
                 acc)))
           acc (reduce by-country-fn {} entries)

@@ -105,7 +105,8 @@ Inspecting the store component:
 
 ````
 (use 'iwaswhere-web.core)
-(restart! switchboard)
+(require '[iwaswhere-web.file-utils :as fu])
+(with-redefs [fu/data-path "data"] (restart! switchboard))
 (def store (:cmp-state (:server/store-cmp (:components @(:cmp-state switchboard)))))
 (def g (:graph @store))
 

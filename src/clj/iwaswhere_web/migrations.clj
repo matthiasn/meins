@@ -1,6 +1,7 @@
 (ns iwaswhere-web.migrations
   "This namespace is used for migrating entries to new versions."
   (:require [iwaswhere-web.files :as f]
+            [iwaswhere-web.location :as loc]
             [clojure.pprint :as pp]
             [clojure.tools.logging :as log]
             [clj-uuid :as uuid]
@@ -148,25 +149,18 @@
             (try
               (let [parsed (clojure.edn/read-string line)
                     geoname (get-geoname parsed)
-                    entry (if (and geoname (not (:geoname parsed)))
-                            (let [country (:country-code geoname)
-                                  serialized-geoname (with-out-str (pp/pprint geoname))
-                                  relevant (-> geoname
-                                               (select-keys [:name :country-code :geo-name-id])
-                                               (assoc-in [:admin-1-name] (get-in geoname [:admin-1-code :name]))
-                                               (assoc-in [:admin-2-name] (get-in geoname [:admin-2-code :name]))
-                                               (assoc-in [:admin-3-name] (get-in geoname [:admin-3-code :name]))
-                                               (assoc-in [:admin-4-name] (get-in geoname [:admin-4-code :name])))
-                                  geo-name-id (:geo-name-id geoname)
-                                  filename (str geonames-path geo-name-id ".edn")
-                                  ts (:timestamp parsed)
-                                  day (ctf/unparse local-fmt (ctc/from-long ts))]
-                              (swap! state assoc-in [:locations geo-name-id] geoname)
-                              (swap! state update-in [:countries country] #(set (conj % day)))
-                              (spit filename serialized-geoname)
-                              (assoc-in parsed [:geoname] relevant))
-                            parsed)
+                    entry (loc/enrich-geoname parsed)
                     serialized (str (pr-str entry) "\n")]
+                (when-not (= parsed entry)
+                  (let [country (:country-code geoname)
+                        serialized-geoname (with-out-str (pp/pprint geoname))
+                        geo-name-id (:geo-name-id geoname)
+                        filename (str geonames-path geo-name-id ".edn")
+                        ts (:timestamp parsed)
+                        day (ctf/unparse local-fmt (ctc/from-long ts))]
+                    (swap! state assoc-in [:locations geo-name-id] geoname)
+                    (swap! state update-in [:countries country] #(set (conj % day)))
+                    (spit filename serialized-geoname)))
                 (spit out-file serialized :append true))
               (catch Exception ex
                 (log/error "Exception" ex "when parsing line:\n" line)))))))
