@@ -254,16 +254,26 @@ $backlog-weekend: lighten($backlog, 30);
 }
 
 .location-stats {
-  background-color: white;
-  font-size: 1.6em;
-  .flag {
-    padding-left: 4px;
+  .expand {
+    .fa {
+      padding: 4px;
+      float: right;
+    }
   }
-  .cnt {
-    padding-left: 5px;
+  table {
+    padding: 0 3px;
+  }
+  .flag {
+    font-size: 1.6em;
+    padding: 0 3px;
     position: relative;
-    top: -3px;
-    font-size: 0.7em;
+    vertical-align: bottom;
+  }
+  .cnt, .rank {
+    text-align: center;
+    padding-right: 3px;
+  }
+  .country {
   }
 }
 

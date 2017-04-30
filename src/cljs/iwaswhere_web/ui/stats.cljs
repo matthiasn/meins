@@ -54,4 +54,4 @@
           [ct/tasks-chart task-stats 250 put-fn]
           [wc/wordcount-chart wordcount-stats 150 put-fn 1000]
           [m/media-chart media-stats 150 put-fn]
-          [loc/wordcount-chart]]]))))
+          [loc/location-chart]]]))))

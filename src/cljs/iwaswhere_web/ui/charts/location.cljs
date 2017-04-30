@@ -5,21 +5,42 @@
             [iwaswhere-web.helpers :as h]
             [cljs.pprint :as pp]))
 
-(defn wordcount-chart
-  "Draws chart for wordcount per day. The size of the the bars scales
-   automatically depending on the maximum count found in the data.
-   On mouse-over on any of the bars, the date and the values for the date are
-   shown in an info div next to the bars."
-  [chart-h put-fn]
-  (let [local (rc/atom {:last-fetched 0})
+(defn location-chart [chart-h put-fn]
+  (let [local (rc/atom {:last-fetched 0
+                        :expand       false})
         stats (subscribe [:stats])
         emoji-flags (aget js/window "deps" "emojiFlags")
         last-update (subscribe [:last-update])]
     (fn [chart-h put-fn]
       (let [loc-stats (:locations @stats)
-            days-per-country (sort-by second (:days-per-country loc-stats))]
+            expanded? (:expanded @local)
+            per-country (->> (:locations @stats)
+                             :days-per-country
+                             (sort-by second)
+                             reverse
+                             (map-indexed (fn [idx v] [idx v])))]
         [:div.location-stats
-         (for [[cc cnt] (reverse days-per-country)]
-           (let [flag (get (js->clj (.countryCode emoji-flags cc)) "emoji")]
-             ^{:key cc}
-             [:div [:span.flag flag] [:span.cnt cnt "d"]]))]))))
+         {:class (when expanded? "expanded")}
+         [:div.content.white
+          [:div.expand {:on-click #(swap! local update-in [:expanded] not)}
+           [:span.fa {:class (if expanded? "fa-compress" "fa-expand")}]]
+          [:table
+           [:tbody
+            (when expanded?
+              [:tr
+               [:th "Rank"]
+               [:th "Flag"]
+               [:th "Days"]
+               [:th "Country"]])
+            (for [[i [cc cnt]] (if expanded? per-country (take 5 per-country))]
+              (let [country (js->clj (.countryCode emoji-flags cc))
+                    flag (get country "emoji")
+                    cname (get country "name")]
+                ^{:key cc}
+                [:tr
+                 [:td.rank (inc i) "."]
+                 [:td.flag flag]
+                 [:td.country cname]
+                 [:td.cnt cnt]]))]]
+          (when expanded?
+            [:div#plotly])]]))))
