@@ -238,6 +238,9 @@ $backlog-weekend: lighten($backlog, 30);
   margin: 0;
 
   .content {
+    &.expanded {
+      display: flex;
+    }
     padding: 1vh;
     position: fixed;
     top: 80px;

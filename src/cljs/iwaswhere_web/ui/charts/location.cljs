@@ -5,6 +5,23 @@
             [iwaswhere-web.helpers :as h]
             [cljs.pprint :as pp]))
 
+(defn loc-table [expanded? per-location label]
+  (when (seq per-location)
+    [:table
+     [:tbody
+      (when expanded?
+        [:tr
+         [:th "Rank"]
+         [:th "Days"]
+         [:th label]])
+      (for [[i [loc cnt]] (if expanded? per-location (take 5 per-location))]
+        (let []
+          ^{:key loc}
+          [:tr
+           [:td.rank (inc i) "."]
+           [:td.country loc]
+           [:td.cnt cnt]]))]]))
+
 (defn location-chart [chart-h put-fn]
   (let [local (rc/atom {:last-fetched 0
                         :expand       false})
@@ -14,11 +31,20 @@
     (fn [chart-h put-fn]
       (let [loc-stats (:locations @stats)
             expanded? (:expanded @local)
-            per-country (->> (:locations @stats)
-                             :days-per-country
-                             (sort-by second)
-                             reverse
-                             (map-indexed (fn [idx v] [idx v])))]
+            per-entity (fn [k]
+                         (->> (:locations @stats)
+                              k
+                              (sort-by second)
+                              (filter #(identity (first %)))
+                              reverse
+                              (map-indexed (fn [idx v] [idx v]))))
+            per-country (per-entity :days-per-country)
+            per-location (per-entity :days-per-location)
+            per-admin-1 (per-entity :days-per-admin-1)
+            per-admin-2 (per-entity :days-per-admin-2)
+            per-admin-3 (per-entity :days-per-admin-3)
+            per-admin-4 (per-entity :days-per-admin-4)]
+        (prn per-admin-1 per-admin-2)
         [:div.location-stats
          {:class (when expanded? "expanded")}
          [:div.content.white
@@ -42,5 +68,10 @@
                  [:td.flag flag]
                  [:td.country cname]
                  [:td.cnt cnt]]))]]
+          [loc-table expanded? per-location "Location"]
+          [loc-table expanded? per-admin-1 "Admin1"]
+          [loc-table expanded? per-admin-2 "Admin2"]
+          [loc-table expanded? per-admin-3 "Admin3"]
+          [loc-table expanded? per-admin-4 "Admin4"]
           (when expanded?
             [:div#plotly])]]))))

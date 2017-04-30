@@ -28,20 +28,35 @@
           (fn [acc entry]
             (let []
               (if-let [geoname (:geoname entry)]
-                (let [country (:country-code geoname)
+                (let [gname (:name geoname)
+                      admin-1-name (:admin-1-name geoname)
+                      admin-2-name (:admin-2-name geoname)
+                      admin-3-name (:admin-3-name geoname)
+                      admin-4-name (:admin-4-name geoname)
+                      country (:country-code geoname)
                       ts (:timestamp entry)
                       day (ctf/unparse local-fmt (ctc/from-long ts))]
                   (-> acc
                       (update-in [:country-days country] #(set (conj % day)))
                       (update-in [:days-countries day] #(set (conj % country)))
-                      (update-in [:country-entries country] #(inc (or % 0)))))
+                      (update-in [:country-entries country] #(inc (or % 0)))
+                      (update-in [:location-days gname] #(set (conj % day)))
+                      (update-in [:admin-1-days admin-1-name] #(set (conj % day)))
+                      (update-in [:admin-2-days admin-2-name] #(set (conj % day)))
+                      (update-in [:admin-3-days admin-3-name] #(set (conj % day)))
+                      (update-in [:admin-4-days admin-4-name] #(set (conj % day)))))
                 acc)))
           acc (reduce by-country-fn {} entries)
-          days-per-country (into {} (map (fn [[c days]] [c (count days)])
-                                         (:country-days acc)))
-          locations-stats (merge acc {:days-per-country days-per-country})]
+          count-days (fn [[c days]] [c (count days)])
+          locations-stats
+          {:days-per-country  (into {} (map count-days (:country-days acc)))
+           :days-per-location (into {} (map count-days (:location-days acc)))
+           :days-per-admin-1  (into {} (map count-days (:admin-1-days acc)))
+           :days-per-admin-2  (into {} (map count-days (:admin-2-days acc)))
+           :days-per-admin-3  (into {} (map count-days (:admin-3-days acc)))
+           :days-per-admin-4  (into {} (map count-days (:admin-4-days acc)))}]
       (log/info (count entries))
-      (log/info days-per-country)
+      (log/info locations-stats)
       (log/info (:country-entries acc))
       locations-stats)))
 
