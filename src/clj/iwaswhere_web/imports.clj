@@ -108,6 +108,7 @@
      :latitude  (dms-to-dd exif "GPS Latitude" "GPS Latitude Ref")
      :longitude (dms-to-dd exif "GPS Longitude" "GPS Longitude Ref")
      :img-file  target-filename
+     :md        "some #photo"
      :tags      #{"#photo" "#import"}}))
 
 (defn import-video
@@ -121,6 +122,7 @@
     (fs/rename rel-path (str fu/data-path "/videos/" target-filename))
     {:timestamp  timestamp
      :video-file target-filename
+     :md        "some #video"
      :tags       #{"#video" "#import"}}))
 
 (defn import-audio
@@ -136,6 +138,7 @@
     (fs/rename rel-path (str fu/data-path "/audio/" target-filename))
     {:timestamp  (c/to-long (tf/parse f ts-str))
      :audio-file target-filename
+     :md        "some #audio"
      :tags       #{"#audio" "#import"}}))
 
 (defn import-media

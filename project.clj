@@ -54,7 +54,7 @@
             [lein-sassy "1.0.8"
              :exclusions [org.clojure/clojure org.codehaus.plexus/plexus-utils]]
             [com.jakemccrary/lein-test-refresh "0.20.0"]
-            [test2junit "1.2.6"]
+            [test2junit "1.3.0"]
             [lein-doo "0.1.7"]
             [lein-codox "0.10.3"]]
 
