@@ -7,6 +7,8 @@
             [clj-time.coerce :as c]
             [clj-time.core :as t]
             [cheshire.core :as cc]
+            [camel-snake-kebab.core :refer :all]
+            [clj-time.coerce :as c]
             [matthiasn.systems-toolbox.component :as st]
             [me.raynes.fs :as fs]
             [clj-http.client :as hc]
@@ -15,7 +17,8 @@
             [clojure.java.io :as io]
             [clojure.string :as s]
             [iwaswhere-web.utils.misc :as u]
-            [iwaswhere-web.file-utils :as fu])
+            [iwaswhere-web.file-utils :as fu]
+            [clj-time.format :as ctf])
   (:import [com.drew.imaging ImageMetadataReader]))
 
 (defn dms-to-dd
@@ -122,7 +125,7 @@
     (fs/rename rel-path (str fu/data-path "/videos/" target-filename))
     {:timestamp  timestamp
      :video-file target-filename
-     :md        "some #video"
+     :md         "some #video"
      :tags       #{"#video" "#import"}}))
 
 (defn import-audio
@@ -138,7 +141,7 @@
     (fs/rename rel-path (str fu/data-path "/audio/" target-filename))
     {:timestamp  (c/to-long (tf/parse f ts-str))
      :audio-file target-filename
-     :md        "some #audio"
+     :md         "some #audio"
      :tags       #{"#audio" "#import"}}))
 
 (defn import-media
@@ -253,11 +256,44 @@
       {:emit-msg [:entry/update (merge (:entry msg-payload)
                                        {:imdb (merge imdb series)})]})))
 
+(defn import-spotify-listened-to
+  "Import songs listened to on spotify."
+  [{:keys [put-fn]}]
+  (let [conf (fu/load-cfg)
+        refresh-token (:spotify-refresh-token conf)
+        url (str "http://localhost:8888/refresh_token?refresh_token=" refresh-token)
+        parser (fn [res] (cc/parse-string (:body res) #(keyword (->kebab-case %))))
+        access-token (:access-token (parser (hc/get url)))
+        url (str "https://api.spotify.com/v1/me/player/recently-played?access_token="
+                 access-token)
+        item-mapper (fn [item]
+                      (let [track (:track item)
+                            album (:album track)
+                            images (:images album)
+                            artists (map (fn [a] (select-keys a [:id :name]))
+                                         (:artists track))]
+                        {:name      (:name track)
+                         :id        (:id track)
+                         :artists   artists
+                         :image     (:url (first images))
+                         :played-at (:played-at item)}))
+        listened-to (map item-mapper (:items (parser (hc/get url))))
+        entry-mapper (fn [item]
+                       (let [ts (c/to-long (:played-at item))]
+                         {:timestamp ts
+                          :md        "listened on #spotify"
+                          :tags      #{"#spotify"}
+                          :spotify   item}))
+        new-entries (map entry-mapper listened-to)]
+    (doseq [entry new-entries]
+      (put-fn [:entry/update entry]))))
+
 (defn cmp-map
   "Generates component map for imports-cmp."
   [cmp-id]
   {:cmp-id      cmp-id
-   :handler-map {:import/photos import-media
-                 :import/geo    import-geo
-                 :import/movie  import-movie
-                 :import/phone  import-text-entries}})
+   :handler-map {:import/photos  import-media
+                 :import/geo     import-geo
+                 :import/movie   import-movie
+                 :import/spotify import-spotify-listened-to
+                 :import/phone   import-text-entries}})

@@ -38,6 +38,7 @@
   [{:keys [current-state msg-payload]}]
   (let [id (or (:id msg-payload) (uuid/v1))
         entry (merge msg-payload {:last-saved (st/now) :id id})
+        entry (loc/enrich-geoname entry)
         ts (:timestamp entry)
         graph (:graph current-state)
         exists? (uber/has-node? graph ts)

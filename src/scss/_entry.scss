@@ -411,3 +411,15 @@ u {
     font-weight: 400;
   }
 }
+
+.spotify {
+  padding: 4px;
+
+  .title {
+    font-weight: bold;
+    margin-right: 5px;
+  }
+  img {
+    padding-top: 5px;
+  }
+}

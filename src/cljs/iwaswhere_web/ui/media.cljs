@@ -1,6 +1,7 @@
 (ns iwaswhere-web.ui.media
   (:require [clojure.string :as s]
-            [reagent.core :as r]))
+            [reagent.core :as r]
+            [clojure.pprint :as pp]))
 
 (defn image-view
   "Renders image view. Used resized and properly rotated image endpoint
@@ -62,3 +63,15 @@
          [:img {:src (:poster imdb)}]]
         (put-fn [:import/movie {:entry   entry
                                 :imdb-id imdb-id}])))))
+
+(defn spotify-view
+  "Renders IMDb view."
+  [entry put-fn]
+  (when-let [spotify (get-in entry [:spotify])]
+    (prn spotify)
+    (let []
+      [:div.spotify
+       [:div.title (:name spotify)]
+       [:div.artist (:name (first (:artists spotify)))]
+       [:img {:src (:image spotify)}]
+])))

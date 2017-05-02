@@ -130,6 +130,7 @@
          [m/image-view @entry]
          [m/videoplayer-view @entry]
          [m/imdb-view @entry put-fn]
+         [m/spotify-view @entry put-fn]
          [task/task-details @entry put-fn edit-mode?]
          [habit/habit-details @entry put-fn edit-mode?]
          [reward/reward-details @entry put-fn edit-mode?]
