@@ -82,7 +82,7 @@
         set-active-fn #(put-fn [:cmd/toggle-active
                                 {:timestamp ts
                                  :query-id  (:query-id local-cfg)}])
-        drop-fn (a/drop-linked-fn @entry cfg put-fn)
+        drop-fn (a/drop-linked-fn @entry entries-map cfg put-fn)
         toggle-edit #(if @edit-mode (put-fn [:entry/remove-local @entry])
                                     (put-fn [:entry/update-local @entry]))]
     (fn journal-entry-render [ts put-fn local-cfg]

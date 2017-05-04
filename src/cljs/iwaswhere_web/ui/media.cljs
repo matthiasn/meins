@@ -21,7 +21,7 @@
   (when-let [audio-file (:audio-file entry)]
     [:audio {:id       audio-file
              :controls true
-             :preload "auto"}
+             :preload  "auto"}
      (let [elem (js->clj (.getElementById js/document audio-file))
            duration (when elem (.. elem -duration))
            path [:custom-fields "#audio" :duration]]
@@ -68,10 +68,7 @@
   "Renders IMDb view."
   [entry put-fn]
   (when-let [spotify (get-in entry [:spotify])]
-    (prn spotify)
-    (let []
-      [:div.spotify
-       [:div.title (:name spotify)]
-       [:div.artist (:name (first (:artists spotify)))]
-       [:img {:src (:image spotify)}]
-])))
+    [:div.spotify
+     [:div.title (:name spotify)]
+     [:div.artist (:name (first (:artists spotify)))]
+     [:img {:src (:image spotify)}]]))
