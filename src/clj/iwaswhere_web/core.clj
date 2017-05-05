@@ -55,12 +55,19 @@
      [:cmd/route {:from :server/scheduler-cmp
                   :to   #{:server/store-cmp
                           :server/blink-cmp
+                          :server/imports-cmp
                           :server/ws-cmp}}]
 
      [:cmd/route {:from #{:server/store-cmp
                           :server/blink-cmp
                           :server/imports-cmp}
-                  :to :server/scheduler-cmp}]]))
+                  :to   :server/scheduler-cmp}]
+
+     [:cmd/send {:to  :server/scheduler-cmp
+                 :msg [:cmd/schedule-new {:timeout (* 5 60 1000)
+                                          :message [:import/spotify]
+                                          :repeat  true
+                                          :initial true}]}]]))
 
 (defn -main
   "Starts the application from command line, saves and logs process ID. The
@@ -72,7 +79,6 @@
   (pid/delete-on-shutdown! "iwaswhere.pid")
   (log/info "Application started, PID" (pid/current))
   (restart! switchboard)
-  #_
-  (when (get (System/getenv) "PROBE")
-    (probe/start! switchboard))
+  #_(when (get (System/getenv) "PROBE")
+      (probe/start! switchboard))
   (Thread/sleep Long/MAX_VALUE))

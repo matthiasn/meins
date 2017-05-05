@@ -259,34 +259,39 @@
 (defn import-spotify-listened-to
   "Import songs listened to on spotify."
   [{:keys [put-fn]}]
-  (let [conf (fu/load-cfg)
-        refresh-token (:spotify-refresh-token conf)
-        url (str "http://localhost:8888/refresh_token?refresh_token=" refresh-token)
-        parser (fn [res] (cc/parse-string (:body res) #(keyword (->kebab-case %))))
-        access-token (:access-token (parser (hc/get url)))
-        url (str "https://api.spotify.com/v1/me/player/recently-played?access_token="
-                 access-token)
-        item-mapper (fn [item]
-                      (let [track (:track item)
-                            album (:album track)
-                            images (:images album)
-                            artists (map (fn [a] (select-keys a [:id :name]))
-                                         (:artists track))]
-                        {:name      (:name track)
-                         :id        (:id track)
-                         :artists   artists
-                         :image     (:url (first images))
-                         :played-at (:played-at item)}))
-        listened-to (map item-mapper (:items (parser (hc/get url))))
-        entry-mapper (fn [item]
-                       (let [ts (c/to-long (:played-at item))]
-                         {:timestamp ts
-                          :md        "listened on #spotify"
-                          :tags      #{"#spotify"}
-                          :spotify   item}))
-        new-entries (map entry-mapper listened-to)]
-    (doseq [entry new-entries]
-      (put-fn [:entry/update entry]))))
+  (log/info "Importing from Spotify.")
+  (try
+    (let [conf (fu/load-cfg)
+          refresh-token (:spotify-refresh-token conf)
+          url (str "http://localhost:8888/refresh_token?refresh_token=" refresh-token)
+          parser (fn [res] (cc/parse-string (:body res) #(keyword (->kebab-case %))))
+          access-token (:access-token (parser (hc/get url)))
+          url (str "https://api.spotify.com/v1/me/player/recently-played?access_token="
+                   access-token)
+          item-mapper (fn [item]
+                        (let [track (:track item)
+                              album (:album track)
+                              images (:images album)
+                              artists (map (fn [a] (select-keys a [:id :name]))
+                                           (:artists track))]
+                          {:name      (:name track)
+                           :id        (:id track)
+                           :artists   artists
+                           :image     (:url (first images))
+                           :played-at (:played-at item)}))
+          listened-to (map item-mapper (:items (parser (hc/get url))))
+          entry-mapper (fn [item]
+                         (let [ts (c/to-long (:played-at item))]
+                           {:timestamp ts
+                            :md        "listened on #spotify"
+                            :tags      #{"#spotify"}
+                            :spotify   item}))
+          new-entries (map entry-mapper listened-to)]
+      (doseq [entry new-entries]
+        (put-fn [:entry/update entry])))
+    (catch Exception ex (log/error
+                          "Exception when importing from Spotify" (.getMessage ex)))))
+
 
 (defn cmp-map
   "Generates component map for imports-cmp."

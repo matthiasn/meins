@@ -47,16 +47,11 @@
                       (update-in [:admin-4-days admin-4-name] #(set (conj % day)))))
                 acc)))
           acc (reduce by-country-fn {} entries)
-          count-days (fn [[c days]] [c (count days)])
-          locations-stats
-          {:days-per-country  (into {} (map count-days (:country-days acc)))
-           :days-per-location (into {} (map count-days (:location-days acc)))
-           :days-per-admin-1  (into {} (map count-days (:admin-1-days acc)))
-           :days-per-admin-2  (into {} (map count-days (:admin-2-days acc)))
-           :days-per-admin-3  (into {} (map count-days (:admin-3-days acc)))
-           :days-per-admin-4  (into {} (map count-days (:admin-4-days acc)))}]
-      (log/info (count entries))
-      (log/info locations-stats)
-      (log/info (:country-entries acc))
-      locations-stats)))
+          count-days (fn [[c days]] [c (count days)])]
+      {:days-per-country  (into {} (map count-days (:country-days acc)))
+       :days-per-location (into {} (map count-days (:location-days acc)))
+       :days-per-admin-1  (into {} (map count-days (:admin-1-days acc)))
+       :days-per-admin-2  (into {} (map count-days (:admin-2-days acc)))
+       :days-per-admin-3  (into {} (map count-days (:admin-3-days acc)))
+       :days-per-admin-4  (into {} (map count-days (:admin-4-days acc)))})))
 
