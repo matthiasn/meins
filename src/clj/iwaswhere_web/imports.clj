@@ -4,8 +4,10 @@
             [iwaswhere-web.files :as f]
             [iwaswhere-web.migrations :as m]
             [iwaswhere-web.specs :as specs]
+            [iwaswhere-web.flight :as fl]
             [clj-time.coerce :as c]
             [clj-time.core :as t]
+            [net.cgrand.enlive-html :as eh]
             [cheshire.core :as cc]
             [camel-snake-kebab.core :refer :all]
             [clj-time.coerce :as c]
@@ -18,7 +20,8 @@
             [clojure.string :as s]
             [iwaswhere-web.utils.misc :as u]
             [iwaswhere-web.file-utils :as fu]
-            [clj-time.format :as ctf])
+            [clj-time.format :as ctf]
+            [clojure.string :as str])
   (:import [com.drew.imaging ImageMetadataReader]))
 
 (defn dms-to-dd
@@ -306,4 +309,5 @@
                  :import/geo     import-geo
                  :import/movie   import-movie
                  :import/spotify import-spotify
+                 :import/flight  fl/import-flight
                  :import/phone   import-text-entries}})

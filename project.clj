@@ -11,6 +11,7 @@
                  [clj-pid "0.1.2"]
                  [clj-time "0.13.0"]
                  [clj-http "3.5.0"]
+                 [enlive "1.1.6"]
                  [me.raynes/fs "1.4.6"]
                  [markdown-clj "0.9.99"]
                  [cheshire "5.7.1"]

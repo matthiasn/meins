@@ -18,11 +18,23 @@
     (fn flight-render [entry put-fn edit-mode? local-cfg]
       (when (contains? (:tags entry) "#flight")
         (let [ts (:timestamp entry)]
+          (when-not (-> entry :flight :duration)
+            (put-fn [:import/flight entry]))
           [:div.flight
            [:form
             [:fieldset
-             [:legend " FlightAware URL: "]
+             [:legend " FlightAware: "]
              [:div
+              [:label "Duration"]
+              [:span (-> entry :flight :duration)]]
+             [:div
+              [:label "Arrival"]
+              [:span (-> entry :flight :arrival)]]
+             [:div
+              [:label "Miles"]
+              [:span (-> entry :flight :miles)]]
+             [:div
+              [:label "URL"]
               [:input.url {:type     :text
                            :on-input (input-fn entry)
                            :value    url}]]
