@@ -17,7 +17,8 @@
             [clojure.tools.logging :as l]
             [clojure.pprint :as pp]
             [iwaswhere-web.file-utils :as fu]
-            [iwaswhere-web.location :as loc]))
+            [iwaswhere-web.location :as loc]
+            [ubergraph.core :as uc]))
 
 (defn filter-by-name
   "Filter a sequence of files by their name, matched via regular expression."
@@ -71,8 +72,11 @@
         entry (merge msg-payload {:last-saved (st/now) :id id})
         entry (loc/enrich-geoname entry)
         new-state (ga/add-node current-state ts entry false)
-        cfg (:cfg current-state)]
-    (when (not= current-state new-state)
+        cfg (:cfg current-state)
+        g (:graph current-state)
+        prev (when (uc/has-node? g ts) (uc/attrs g ts))]
+    (when (not= (dissoc prev :last-saved)
+                (dissoc entry :last-saved))
       (append-daily-log cfg entry))
     {:new-state    new-state
      :send-to-self (when-let [comment-for (:comment-for msg-payload)]
