@@ -44,6 +44,9 @@
           q-timestamp (:timestamp q)
           q-ts-match? (= q-timestamp (str (:timestamp entry)))
 
+          q-country (:country q)
+          q-cc-match? (= q-country (-> entry :geoname :country-code))
+
           q-tags (set (map s/lower-case (:tags q)))
           q-not-tags (set (map s/lower-case (:not-tags q)))
           q-mentions (set (map s/lower-case (:mentions q)))
@@ -123,6 +126,7 @@
                       (or (empty? q-mentions)
                           (seq (set/intersection q-mentions mentions)))
                       (or day-match? (empty? q-day))
+                      (or q-cc-match? (empty? q-country))
                       (or q-ts-match? (empty? q-timestamp))
                       story-match?
                       opts-match?)]

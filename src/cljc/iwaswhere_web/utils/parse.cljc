@@ -7,7 +7,8 @@
 (def search-tag-regex (re-pattern (str "(?m)(?:^|[^~])(#" tag-char-cls "+)")))
 (def search-not-tags-regex (re-pattern (str "(?m)~#" tag-char-cls "+")))
 (def search-mention-regex (re-pattern (str "(?m)@" tag-char-cls "+")))
-(def search-opts-regex (re-pattern (str "(?m):[a-zA-Z]+")))
+(def search-opts-regex (re-pattern "(?m)(?:[^c])(:[a-zA-Z]+)"))
+(def cc-regex (re-pattern "(?m)(cc:)([a-zA-Z]{2})"))
 (def entry-tag-regex
   (re-pattern (str "(?m)(?!^) ?#" tag-char-cls "+(?!" tag-char-cls ")")))
 (def entry-mentions-regex
@@ -43,7 +44,8 @@
      :not-tags    (set (map #(s/replace % "~" "")
                             (re-seq search-not-tags-regex text)))
      :mentions    (set (re-seq search-mention-regex text))
-     :opts        (set (re-seq search-opts-regex text))
+     :country     (get (re-find cc-regex text) 2)
+     :opts        (set (map second (re-seq search-opts-regex text)))
      :briefing    (second (re-find briefing-date-regex text))
      :date-string (second (re-find date-regex text))
      :id          (re-find id-regex text)

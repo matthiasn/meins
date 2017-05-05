@@ -40,6 +40,7 @@
 (def empty-search
   {:search-text ""
    :ft-search   nil
+   :country     nil
    :tags        #{}
    :not-tags    #{}
    :mentions    #{}
@@ -53,6 +54,7 @@
 (def fulltext-search
   {:search-text "\"travel AND aircraft\""
    :ft-search   "travel AND aircraft"
+   :country     nil
    :tags        #{}
    :not-tags    #{}
    :mentions    #{}
@@ -66,6 +68,7 @@
 (def open-tasks-search
   {:search-text "#task ~#done ~#backlog ~#outdated"
    :ft-search   nil
+   :country     nil
    :tags        #{"#task"}
    :not-tags #{"#backlog" "#done" "#outdated"}
    :mentions    #{}
@@ -79,6 +82,7 @@
 (def started-tasks-search
   {:search-text "#task ~#done ~#backlog ~#outdated :started"
    :ft-search   nil
+   :country     nil
    :tags        #{"#task"}
    :not-tags #{"#backlog" "#done" "#outdated"}
    :mentions    #{}
@@ -92,6 +96,7 @@
 (def tasks-done-search
   {:search-text "#task #done @myself"
    :ft-search   nil
+   :country     nil
    :tags        #{"#task" "#done"}
    :not-tags    #{}
    :mentions    #{"@myself"}
@@ -105,6 +110,7 @@
 (def day-search
   {:search-text "2016-06-07 #task #done @myself"
    :ft-search   nil
+   :country     nil
    :tags        #{"#task" "#done"}
    :not-tags    #{}
    :mentions    #{"@myself"}
@@ -118,6 +124,7 @@
 (def briefing-search
   {:search-text "b:2016-06-07"
    :ft-search   nil
+   :country     nil
    :tags        #{}
    :not-tags    #{}
    :mentions    #{}
@@ -131,6 +138,7 @@
 (def timestamp-search
   {:search-text "1465325998053"
    :ft-search   nil
+   :country     nil
    :tags        #{}
    :not-tags    #{}
    :mentions    #{}
@@ -141,9 +149,24 @@
    :id          nil
    :n           20})
 
+(def country-search
+  {:search-text "cc:DE"
+   :ft-search   nil
+   :country     "DE"
+   :tags        #{}
+   :not-tags    #{}
+   :mentions    #{}
+   :opts        #{}
+   :date-string nil
+   :briefing    nil
+   :timestamp   nil
+   :id          nil
+   :n           20})
+
 (def id-search
   {:search-text "48cde500-0d4f-11e7-8d14-42a2f9d2d24d"
    :ft-search   nil
+   :country     nil
    :tags        #{}
    :not-tags    #{}
    :mentions    #{}
@@ -193,6 +216,10 @@
   (testing "timestamp query is parsed correctly"
     (is (= (p/parse-search (:search-text timestamp-search))
            timestamp-search)))
+
+  (testing "country query is parsed correctly"
+    (is (= country-search
+           (p/parse-search (:search-text country-search)))))
 
   (testing "id query is parsed correctly"
     (is (= (p/parse-search (:search-text id-search))
