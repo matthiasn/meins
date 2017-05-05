@@ -14,6 +14,7 @@
             [iwaswhere-web.ui.entry.habit :as habit]
             [iwaswhere-web.ui.entry.reward :as reward]
             [iwaswhere-web.ui.entry.briefing :as b]
+            [iwaswhere-web.ui.entry.flight :as f]
             [iwaswhere-web.ui.entry.story :as es]
             [iwaswhere-web.ui.entry.utils :as eu]
             [iwaswhere-web.ui.entry.thumbnails :as t]
@@ -135,6 +136,7 @@
          [habit/habit-details @entry put-fn edit-mode?]
          [reward/reward-details @entry put-fn edit-mode?]
          [b/briefing-view @entry put-fn edit-mode? local-cfg]
+         [f/flight-view @entry put-fn edit-mode? local-cfg]
          [:div.footer
           [:div.word-count (u/count-words-formatted @entry)]]]))))
 

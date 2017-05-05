@@ -352,6 +352,10 @@
     }
     input[type="text"] {
       width: 120px;
+      &.url {
+        width: 330px;
+        font-size: 0.8em;
+      }
     }
     input[type="checkbox"] {
       width: 15px;
@@ -421,5 +425,20 @@ u {
   }
   img {
     padding-top: 5px;
+  }
+}
+
+.flight {
+  input[type="text"] {
+    width: 120px;
+    &.url {
+      width: 330px;
+      font-size: 0.8em;
+    }
+  }
+
+  iframe {
+    height: 350px;
+    width: 100%;
   }
 }
