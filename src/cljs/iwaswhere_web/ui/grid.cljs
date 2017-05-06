@@ -2,9 +2,11 @@
   (:require [reagent.core :as rc]
             [iwaswhere-web.ui.journal :as j]
             [clojure.string :as s]
+            [reagent.ratom :refer-macros [reaction]]
             [iwaswhere-web.helpers :as h]
             [iwaswhere-web.ui.search :as search]
-            [re-frame.core :refer [subscribe]]))
+            [re-frame.core :refer [subscribe]]
+            [iwaswhere-web.ui.entry.entry :as e]))
 
 (defn fmt-ts [q]
   (let [ts (:timestamp q)]
@@ -56,13 +58,16 @@
 
 (defn tabs-view
   [tab-group put-fn]
-  (let [query-cfg (subscribe [:query-cfg])]
+  (let [query-cfg (subscribe [:query-cfg])
+        query-id (reaction (get-in @query-cfg [:tab-groups tab-group :active]))
+        story (reaction (get-in @query-cfg [:queries @query-id :story]))
+        local-cfg (reaction {:query-id  @query-id
+                             :tab-group tab-group
+                             :story     @story})]
     (fn tabs-render [tab-group put-fn]
-      (let [query-id (-> @query-cfg :tab-groups tab-group :active)
-            local-cfg {:query-id query-id :tab-group tab-group}]
-        [:div.tile-tabs
-         [tabs-header-view tab-group put-fn]
-         (when query-id
-           [search/search-field-view query-id put-fn])
-         (when query-id
-           [j/journal-view local-cfg put-fn])]))))
+      [:div.tile-tabs
+       [tabs-header-view tab-group put-fn]
+       (when @query-id
+         [search/search-field-view @query-id put-fn])
+       (when @query-id
+         [j/journal-view @local-cfg put-fn])])))

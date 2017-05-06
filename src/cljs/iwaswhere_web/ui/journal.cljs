@@ -78,9 +78,14 @@
                                                      (not (:comment-for entry)))
                                                 (not comments-w-entries?))
                                             (or (:new-entry entry) show-context?)))
-            linked-entries-set (into (sorted-set) (:linked-entries-list active-entry))]
+            linked-entries-set (into (sorted-set) (:linked-entries-list active-entry))
+            find-missing (u/find-missing-entry @entries-map put-fn)]
         [:div.journal
          [:div.journal-entries
+          (when-let [story (:story local-cfg)]
+            (find-missing story)
+            ^{:key story}
+            [e/entry-with-comments story put-fn local-cfg])
           (for [entry (filter #(not (contains? linked-entries-set (:timestamp %)))
                               filtered-entries)]
             (when (with-comments? entry)

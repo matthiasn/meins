@@ -240,8 +240,6 @@
                                  :duration dur
                                  :miles    dist}
                         entry (update-in msg-payload [:flight] merge details)]
-                    (prn :res entry)
-                    (put-fn [:entry/update entry])
-                    ))]
+                    (put-fn [:entry/update entry])))]
     (get url handler))
   {})

@@ -44,7 +44,6 @@
             per-admin-2 (per-entity :days-per-admin-2)
             per-admin-3 (per-entity :days-per-admin-3)
             per-admin-4 (per-entity :days-per-admin-4)]
-        (prn per-admin-1 per-admin-2)
         [:div.location-stats
          {:class (when expanded? "expanded")}
          [:div.content.white
