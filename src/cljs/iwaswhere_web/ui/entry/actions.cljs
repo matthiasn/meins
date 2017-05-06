@@ -49,18 +49,18 @@
    dropped."
   [entry entries-map cfg put-fn]
   (fn [_ev]
-    (if (= :story (:entry-type entry))
+    (if (= :story (:entry-type @entry))
       ; assign story
       (let [ts (:currently-dragged @cfg)
             dropped (get @entries-map ts)
-            story (:timestamp entry)
+            story (:timestamp @entry)
             updated (merge (assoc-in dropped [:linked-story] story)
                            (up/parse-entry (:md dropped)))]
         (when (and ts (not= ts story))
           (put-fn [:entry/update updated])))
       ; link two entries
       (let [ts (:currently-dragged @cfg)
-            updated (update-in entry [:linked-entries] #(set (conj % ts)))]
+            updated (update-in @entry [:linked-entries] #(set (conj % ts)))]
         (when (and ts (not= ts (:timestamp updated)))
           (put-fn [:entry/update (u/clean-entry updated)]))))))
 
