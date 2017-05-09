@@ -17,8 +17,29 @@
   font-size: 0.6em;
   color: #5d7186;
 
+  .name {
+    padding-right: 1em;
+  }
+
   label {
     font-weight: bold;
     padding: 4px 0;
   }
+
+  .stories {
+    margin-bottom: 0.5em;
+    line-height: 1.4em;
+    font-size: 2em;
+    position: relative;
+  }
+
+  .story-list {
+    position: absolute;
+    background-color: white;
+    z-index: 1002;
+    padding: 2px 4px 4px 4px;
+    white-space: nowrap;
+    border: #BBB 1px solid;
+  }
 }
+

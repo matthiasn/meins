@@ -107,7 +107,7 @@
                                          (get exif "GPS Time-Stamp")) filename)
                     (extract-ts (str (get exif "Date/Time")) filename)
                     (extract-ts (str (get exif "Date/Time Original")) filename)
-                    (st/now))
+                    (.lastModified file))
         target-filename (str timestamp "-" filename)]
     (fs/rename rel-path (str fu/data-path "/images/" target-filename))
     {:timestamp timestamp
@@ -290,8 +290,10 @@
         ex-handler (fn [ex] (log/error (.getMessage ex)))
         get (fn [url handler] (hc/get url {:async? true} handler ex-handler))
         rp-handler (fn [res]
-                     (let [recently-played (map item-mapper (:items (parser res)))
+                     (let [parsed (parser res)
+                           recently-played (map item-mapper (:items parsed))
                            new-entries (map entry-mapper recently-played)]
+                       (log/info "obtained response from spotify")
                        (doseq [entry new-entries]
                          (put-fn [:entry/update entry]))))
         refresh-handler (fn [res]

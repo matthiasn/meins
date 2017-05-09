@@ -2,7 +2,9 @@
   (:require [iwaswhere-web.helpers :as h]
             [iwaswhere-web.ui.entry.capture :as c]
             [re-frame.core :refer [subscribe]]
-            [reagent.ratom :refer-macros [reaction]]))
+            [reagent.ratom :refer-macros [reaction]]
+            [reagent.core :as r]
+            [clojure.string :as s]))
 
 (defn editable-field
   [on-input-fn on-keydown-fn text]
@@ -20,7 +22,7 @@
           updated (assoc-in entry [k] text)
           key-code (.. ev -keyCode)
           meta-key (.. ev -metaKey)]
-      (when (and meta-key (= key-code 83)) ; CMD-s pressed
+      (when (and meta-key (= key-code 83))                  ; CMD-s pressed
         (put-fn [:entry/update updated])
         (.preventDefault ev)))))
 
@@ -61,7 +63,11 @@
   "In edit mode, allow editing of story, otherwise show story name."
   [entry put-fn edit-mode?]
   (let [options (subscribe [:options])
+        local (r/atom {:search ""})
         stories (reaction (:stories @options))
+        story-filter (fn [[id story]]
+                       (s/includes? (s/lower-case (:story-name story))
+                                    (s/lower-case (:search @local))))
         sorted-stories (reaction (:sorted-stories @options))
         ts (:timestamp entry)
         new-entries (subscribe [:new-entries])
@@ -70,21 +76,38 @@
           (let [selected (js/parseInt (-> ev .-nativeEvent .-target .-value))
                 updated (-> (get-in @new-entries [ts])
                             (assoc-in [:linked-story] selected))]
-            (put-fn [:entry/update-local updated])))]
+            (put-fn [:entry/update-local updated])))
+        story-input (fn [story-id]
+                      (fn [_]
+                        (let [updated (-> (get-in @new-entries [ts])
+                                          (assoc-in [:linked-story] story-id))]
+                          (swap! local assoc-in [:search] "")
+                          (put-fn [:entry/update-local updated]))))
+        search-change (fn [ev]
+                        (let [text (aget ev "target" "value")]
+                          (swap! local assoc-in [:search] text)))]
     (fn story-select-render [entry put-fn edit-mode?]
       (let [linked-story (:linked-story entry)]
         (if edit-mode?
           (when-not (or (contains? #{:saga :story} (:entry-type entry))
                         (:comment-for entry))
             [:div.story
-             [:label "Story:"]
-             [:select {:value     (or linked-story "")
-                       :on-change select-handler}
-              [:option {:value ""} "no story selected"]
-              (for [[id story] @sorted-stories]
-                (let [story-name (:story-name story)]
-                  ^{:key (str ts story-name)}
-                  [:option {:value id} story-name]))]])
+             [:div.name (get-in @stories [linked-story :story-name])]
+             [:div
+              [:input {:type      :text
+                       :on-change search-change
+                       :value     (:search @local)}]
+              (when (pos? (count (:search @local)))
+                (let [stories (->> @sorted-stories
+                                   (filter story-filter)
+                                   (take 10))]
+                  [:div.stories
+                   [:div.story-list
+                    (for [[id story] stories]
+                      (let [story-name (:story-name story)]
+                        ^{:key (str ts story-name)}
+                        [:div {:on-click (story-input id)}
+                         story-name]))]]))]])
           (when linked-story
             [:div.story (:story-name (get @stories linked-story))]))))))
 

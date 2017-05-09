@@ -17,7 +17,7 @@
   (time
     (let [q {:mentions    #{}
              :tags        #{}
-             :n           30000
+             :n           36000
              :not-tags    #{}
              :search-text ""}
           res (gq/get-filtered current-state q)
