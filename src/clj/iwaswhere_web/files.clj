@@ -58,11 +58,7 @@
     (when-not (= existing node-to-add)
       (append-daily-log cfg node-to-add))
     {:new-state (ga/add-node current-state ts node-to-add false)
-     :emit-msg  [[:ft/add entry]
-                 [:cmd/schedule-new
-                  {:timeout 5000
-                   :message (with-meta [:search/refresh]
-                                       {:sente-uid :broadcast})}]]}))
+     :emit-msg  [[:ft/add entry]]}))
 
 (defn geo-entry-persist-fn
   "Handler function for persisting journal entry."

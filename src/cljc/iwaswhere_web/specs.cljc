@@ -38,7 +38,7 @@
 (s/def :iww.entry/planned-dur integer?)
 (s/def :iww.entry/interruptions (s/and integer? #(<= 0 %)))
 
-(def media-file-regex #"[ A-Za-z0-9_]+.(jpg|JPG|PNG|png|m4v|m4a)")
+(def media-file-regex #"[ A-Za-z0-9_\-]+.(jpg|JPG|PNG|png|m4v|m4a)")
 (def valid-filename? #(re-find media-file-regex %))
 (s/def :iww.entry/audio-file valid-filename?)
 (s/def :iww.entry/img-file valid-filename?)

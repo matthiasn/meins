@@ -73,7 +73,7 @@
                 stats (:stats res)]
             (is (= 107
                    (:entry-count stats)))
-            (is (= 235
+            (is (= 239
                    (:node-count stats)))))
 
         (testing

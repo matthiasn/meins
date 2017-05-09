@@ -6,21 +6,24 @@
             [cljs.pprint :as pp]))
 
 (defn loc-table [expanded? per-location label]
-  (when (seq per-location)
-    [:table
-     [:tbody
-      (when expanded?
+  (let [emoji-flags (aget js/window "deps" "emojiFlags")]
+    (when (and expanded? (seq per-location))
+      [:table
+       [:tbody
         [:tr
          [:th "Rank"]
-         [:th "Days"]
-         [:th label]])
-      (for [[i [loc cnt]] (if expanded? per-location (take 5 per-location))]
-        (let []
-          ^{:key loc}
-          [:tr
-           [:td.rank (inc i) "."]
-           [:td.country loc]
-           [:td.cnt cnt]]))]]))
+         [:th "Flag"]
+         [:th label]
+         [:th "Days"]]
+        (for [[i [loc cnt]] per-location]
+          (let [country (js->clj (.countryCode emoji-flags (:country loc)))
+                flag (get country "emoji")]
+            ^{:key loc}
+            [:tr
+             [:td.rank (inc i) "."]
+             [:td.flag flag]
+             [:td.country (:name loc)]
+             [:td.cnt cnt]]))]])))
 
 (defn location-chart [chart-h put-fn]
   (let [local (rc/atom {:last-fetched 0
@@ -55,9 +58,9 @@
               [:tr
                [:th "Rank"]
                [:th "Flag"]
-               [:th "Days"]
-               [:th "Country"]])
-            (for [[i [cc cnt]] (if expanded? per-country (take 5 per-country))]
+               [:th "Country"]
+               [:th "Days"]])
+            (for [[i [cc cnt]] (if expanded? per-country (take 10 per-country))]
               (let [country (js->clj (.countryCode emoji-flags cc))
                     flag (get country "emoji")
                     cname (get country "name")]
