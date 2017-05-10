@@ -10,7 +10,8 @@
             [clojure.set :as set]
             [iwaswhere-web.graph.stats :as gs]
             [iwaswhere-web.file-utils :as fu]
-            [iwaswhere-web.location :as loc]))
+            [iwaswhere-web.location :as loc]
+            [iwaswhere-web.store-test-common :as stc]))
 
 (def some-test-entry
   {:mentions   #{"@SantaClaus"}
@@ -43,14 +44,6 @@
    :timestamp   nil
    :n           40})
 
-(defn enrich-geoname-mock [entry]
-  (assoc-in entry [:geoname] {:admin-1-name "Lower Saxony"
-                              :admin-2-name nil
-                              :admin-3-name "Landkreis Heidekreis"
-                              :admin-4-name "Bispingen"
-                              :country-code "DE"
-                              :geo-name-id  "2948222"
-                              :name         "Bispingen"}))
 
 (defn mk-test-state
   "Create test state by calling the component's state function and returning
@@ -73,10 +66,10 @@
      storing the hashtags and mentions in graph."
     (let [test-ts (System/currentTimeMillis)
           {:keys [current-state test-path logs-path]} (mk-test-state test-ts)
-          test-entry (enrich-geoname-mock (mk-test-entry test-ts))]
+          test-entry (stc/enrich-geoname-mock (mk-test-entry test-ts))]
       (with-redefs [fu/data-path test-path
                     fu/daily-logs-path logs-path
-                    loc/enrich-geoname enrich-geoname-mock]
+                    loc/enrich-geoname stc/enrich-geoname-mock]
         (let [{:keys [new-state emit-msg]}
               (f/geo-entry-persist-fn {:current-state current-state
                                        :msg-payload   test-entry})
@@ -154,10 +147,10 @@
                                     {:tags     #{"#testing" "#new" "#entry"}
                                      :md       "Some #testing #entry @me #new"
                                      :mentions #{"@me"}})
-          updated-test-entry (enrich-geoname-mock updated-test-entry)]
+          updated-test-entry (stc/enrich-geoname-mock updated-test-entry)]
       (with-redefs [fu/data-path test-path
                     fu/daily-logs-path logs-path
-                    loc/enrich-geoname enrich-geoname-mock]
+                    loc/enrich-geoname stc/enrich-geoname-mock]
         (let [{:keys [new-state]} (f/geo-entry-persist-fn
                                     {:current-state current-state
                                      :msg-payload   test-entry})
