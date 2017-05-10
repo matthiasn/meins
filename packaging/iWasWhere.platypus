@@ -13,7 +13,7 @@
 	<key>BundledFiles</key>
 	<array>
 		<string>/Users/mn/github/iWasWhere/bin/blink1-tool</string>
-		<string>/Users/mn/github/iWasWhere/target/iwaswhere-web-0.1.42-standalone.jar</string>
+		<string>/Users/mn/github/iWasWhere/target/iwaswhere-web-0.1.43-standalone.jar</string>
 	</array>
 	<key>Creator</key>
 	<string>Platypus-5.1</string>
@@ -260,6 +260,6 @@
 	<key>UseXMLPlistFormat</key>
 	<false/>
 	<key>Version</key>
-	<string>0.1.42</string>
+	<string>0.1.43</string>
 </dict>
 </plist>

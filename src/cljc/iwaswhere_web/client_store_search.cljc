@@ -85,6 +85,30 @@
         (reset! query-cfg (:query-cfg new-state))
         {:new-state new-state}))))
 
+(defn update-query
+  "Adds query inside tab group specified in msg if none exists already with the
+   same search-text. Otherwise opens the existing one."
+  [{:keys [current-state msg-payload]}]
+  (let [{:keys [tab-group query]} msg-payload
+        query-id (keyword (st/make-uuid))
+        active-path [:query-cfg :tab-groups tab-group :active]
+        all-path [:query-cfg :tab-groups tab-group :all]]
+    (if-let [existing (find-existing (:query-cfg current-state) tab-group query)]
+      (let [query-id (:query-id existing)
+            new-state (assoc-in current-state active-path query-id)]
+        (reset! query-cfg (:query-cfg new-state))
+        {:new-state new-state})
+      (let [new-query (merge {:query-id query-id} (p/parse-search "") query)
+            new-state (-> current-state
+                          (assoc-in active-path query-id)
+                          (assoc-in [:query-cfg :queries query-id] new-query)
+                          (update-in all-path conj query-id)
+                          (update-in [:query-cfg :tab-groups tab-group :history]
+                                     #(conj (take 20 %1) %2)
+                                     query-id))]
+        (reset! query-cfg (:query-cfg new-state))
+        {:new-state new-state}))))
+
 (defn previously-active
   "Sets active query for the tab group to the previously active query."
   [state query-id tab-group]

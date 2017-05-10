@@ -80,6 +80,7 @@
 (defn briefing-view
   [entry put-fn edit-mode? local-cfg]
   (let [chart-data (subscribe [:chart-data])
+        query-cfg (subscribe [:query-cfg])
         cfg (subscribe [:cfg])
         day (-> entry :briefing :day)
         today (.format (js/moment.) "YYYY-MM-DD")
@@ -115,7 +116,13 @@
               dur (u/duration-string logged-s)
               word-stats (get wordcount-stats day)
               {:keys [tasks-cnt done-cnt closed-cnt]} (get task-stats day)
-              tab-group (:tab-group local-cfg)]
+              tab-group (:tab-group local-cfg)
+              query (reaction (get-in @query-cfg [:queries (:query-id local-cfg)]))
+              linked (:linked @query)
+              close (fn [_ev]
+                      (let [query-id (:query-id local-cfg)
+                            q (get-in @query-cfg [:queries query-id])]
+                        (put-fn [:search/update (assoc-in q [:linked] nil)])))]
           [:div.briefing
            [:form.briefing-details
             [:fieldset
@@ -142,7 +149,13 @@
                 [:span
                  " Logged: " [:strong dur] " in " (:total day-stats) " entries."])]
              [time/time-by-sagas entry day-stats local edit-mode? put-fn]
-             [tasks/started-tasks tab-group local put-fn]
-             [tasks/open-linked-tasks ts local local-cfg put-fn]
-             [habits/waiting-habits tab-group entry put-fn]
-             (when day-stats [time/time-by-stories day-stats local put-fn])]]])))))
+             (if linked
+               [:div
+                [:span.btn.delete-warn
+                 [:span.fa.fa-close] [:span {:on-click close} "close"]]]
+               [:div
+                [tasks/started-tasks tab-group local local-cfg put-fn]
+                [tasks/open-linked-tasks ts local local-cfg put-fn]
+                [habits/waiting-habits tab-group entry local-cfg put-fn]
+                (when day-stats
+                  [time/time-by-stories day-stats local put-fn])])]]])))))

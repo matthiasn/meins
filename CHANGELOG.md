@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [0.1.43] - 2017-05-10
+### Changed
+- focus view in briefing
+
 ## [0.1.42] - 2017-05-03
 ### Changed
 - spotify integration 

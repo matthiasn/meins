@@ -56,6 +56,7 @@
    entry."
   [local-cfg put-fn]
   (let [cfg (subscribe [:cfg])
+        query-cfg (subscribe [:query-cfg])
         options (subscribe [:options])
         entries-map (subscribe [:entries-map])
         results (subscribe [:results])
@@ -63,6 +64,7 @@
     (fn journal-view-render [local-cfg put-fn]
       (let [conf (merge @cfg @options)
             query-id (:query-id local-cfg)
+            query (reaction (get-in @query-cfg [:queries (:query-id local-cfg)]))
             active-id (query-id @active)
             active-entry (get @entries-map active-id)
             entries (query-id @results)
@@ -91,7 +93,10 @@
             (when (with-comments? entry)
               ^{:key (:timestamp entry)}
               [e/entry-with-comments (:timestamp entry) put-fn local-cfg]))
-          (when (seq entries)
+          (when-let [linked (:linked @query)]
+            ^{:key linked}
+            [e/entry-with-comments linked put-fn local-cfg])
+          (when (> (count entries) 1)
             (let [show-more #(put-fn [:show/more {:query-id query-id}])]
               [:div.show-more {:on-click show-more :on-mouse-over show-more}
                [:span.show-more-btn [:span.fa.fa-plus-square] " show more"]]))]

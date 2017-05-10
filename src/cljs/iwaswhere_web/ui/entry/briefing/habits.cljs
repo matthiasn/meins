@@ -16,8 +16,9 @@
 
 (defn waiting-habits
   "Renders table with open entries, such as started tasks and open habits."
-  [tab-group entry put-fn]
+  [tab-group entry local-cfg put-fn]
   (let [cfg (subscribe [:cfg])
+        query-cfg (subscribe [:query-cfg])
         waiting-habits (subscribe [:waiting-habits])
         options (subscribe [:options])
         entries-map (subscribe [:entries-map])
@@ -31,8 +32,14 @@
                 conf (merge @cfg @options)]
             (if (:show-pvt @cfg)
               entries
-              (filter (u/pvt-filter conf entries-map) entries))))]
-    (fn waiting-habits-list-render [tab-group entry put-fn]
+              (filter (u/pvt-filter conf entries-map) entries))))
+        update-search (fn [ts]
+                        (fn [_ev]
+                          (let [query-id (:query-id local-cfg)
+                                q (get-in @query-cfg [:queries query-id])]
+                            (put-fn [:search/update
+                                     (update-in q [:linked] #(when-not (= % ts) ts))]))))]
+    (fn waiting-habits-list-render [tab-group entry local-cfg put-fn]
       (let [entries-list @entries-list
             today (.format (js/moment.) "YYYY-MM-DD")
             briefing-day (-> entry :briefing :day)]
@@ -47,7 +54,7 @@
              (for [entry entries-list]
                (let [ts (:timestamp entry)]
                  ^{:key ts}
-                 [:tr {:on-click (up/add-search ts tab-group put-fn)}
+                 [:tr {:on-click (update-search ts)}
                   [:td
                    (when-let [prio (-> entry :habit :priority)]
                      [:span.prio {:class prio} prio])]
