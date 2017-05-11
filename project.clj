@@ -25,6 +25,11 @@
                  [reagent "0.6.1"]
                  [capacitor "0.6.0"]
                  [re-frame "0.9.2"]
+
+                 [io.zipkin.brave/brave "4.3.0"]
+                 [io.zipkin.reporter/zipkin-reporter "0.9.0"]
+                 [io.zipkin.reporter/zipkin-sender-okhttp3 "0.9.0"]
+
                  [clucy "0.4.0"]
                  [seesaw "1.4.5"]
                  [clj.qrgen "0.4.0"]

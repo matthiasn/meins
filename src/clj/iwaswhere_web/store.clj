@@ -7,6 +7,7 @@
             [iwaswhere-web.graph.stats :as gs]
             [iwaswhere-web.graph.add :as ga]
             [iwaswhere-web.specs]
+            [iwaswhere-web.zipkin :as z]
             [ubergraph.core :as uber]
             [iwaswhere-web.keepalive :as ka]
             [clojure.tools.logging :as log]
@@ -92,6 +93,6 @@
                    :entry/find     gq/find-entry
                    :entry/update   f/geo-entry-persist-fn
                    :entry/trash    f/trash-entry-fn
-                   :state/search   gq/query-fn
+                   :state/search   (z/traced gq/query-fn :state/search)
                    :cfg/refresh    refresh-cfg
                    :cmd/keep-alive ka/keepalive-fn})})

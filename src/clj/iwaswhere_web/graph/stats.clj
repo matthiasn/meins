@@ -12,7 +12,8 @@
             [matthiasn.systems-toolbox.log :as l]
             [clojure.tools.logging :as log]
             [ubergraph.core :as uc]
-            [clojure.set :as set]))
+            [clojure.set :as set]
+            [iwaswhere-web.zipkin :as z]))
 
 (defn tasks-mapper
   "Create mapper function for task stats"
@@ -108,7 +109,7 @@
 (defn get-stats-fn
   "Retrieves stats of specified type. Picks the appropriate mapper function
    for the requested message type."
-  [{:keys [current-state msg-payload msg-meta put-fn]}]
+  [{:keys [current-state msg-payload msg-meta put-fn span]}]
   (let [stats-type (:type msg-payload)
         stats-mapper (case stats-type
                        :stats/pomodoro t-s/time-mapper
@@ -120,8 +121,24 @@
                        nil)
         days (:days msg-payload)
         stats (when stats-mapper
-                (into {} (mapv (stats-mapper current-state) days)))]
+                (let [child-span (z/child-span span "stats-mapper")
+                      res (mapv (stats-mapper current-state) days)]
+                  (.finish child-span)
+                  (into {} res)))]
     (log/info stats-type (count (str stats)))
+
+    (Thread/sleep 11)
+    (let [child-span (z/child-span span "wait-1")]
+      (Thread/sleep 33)
+      (.finish child-span))
+
+    (Thread/sleep 5)
+    (let [child-span (z/child-span span "wait-2")]
+      (Thread/sleep 22)
+      (.finish child-span))
+
+    (.tag span "meta" (str msg-meta))
+    (.tag span "tag" (:tag msg-meta))
     (if stats
       (put-fn (with-meta [:stats/result {:stats stats
                                          :type  stats-type}] msg-meta))
@@ -175,5 +192,5 @@
   {})
 
 (def stats-handler-map
-  {:stats/get            get-stats-fn
-   :state/stats-tags-get stats-tags-fn})
+  {:stats/get            (z/traced get-stats-fn :stats/get)
+   :state/stats-tags-get (z/traced get-stats-fn :state/stats-tags-get)})
