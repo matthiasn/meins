@@ -53,9 +53,7 @@
       {:new-state new-state})))
 
 (defn entry-saved-fn
-  "Remove new entry from local when saving is confirmed by backend.
-   TODO: allow specifying sequence of handler functions in systems-toolbox,
-         then take this function apart, it's too large."
+  "Remove new entry from local when saving is confirmed by backend."
   [{:keys [current-state msg-payload]}]
   (let [ts (:timestamp msg-payload)
         curr-local (get-in current-state [:new-entries ts])
