@@ -82,14 +82,6 @@
    :started-tasks-cnt  (res-count state {:tags     #{"#task"}
                                          :not-tags #{"#done" "#backlog" "#closed"}
                                          :opts     #{":started"}})
-   :due-tasks-cnt      (res-count state {:tags     #{"#task"}
-                                         :not-tags #{"#done" "#backlog" "#closed"}
-                                         :opts     #{":due"}})
-   :open-habits-cnt    (res-count state {:tags     #{"#habit"}
-                                         :not-tags #{"#done"}})
-   :waiting-habits-cnt (res-count state {:tags     #{"#habit"}
-                                         :not-tags #{"#done"}
-                                         :opts     #{":waiting"}})
    :backlog-cnt        (res-count state {:tags     #{"#task" "#backlog"}
                                          :not-tags #{"#done" "#closed"}})
    :completed-cnt      (completed-count state)
@@ -110,47 +102,50 @@
   "Retrieves stats of specified type. Picks the appropriate mapper function
    for the requested message type."
   [{:keys [current-state msg-payload msg-meta put-fn span]}]
-  (let [stats-type (:type msg-payload)
-        stats-mapper (case stats-type
-                       :stats/pomodoro t-s/time-mapper
-                       :stats/custom-fields cf/custom-fields-mapper
-                       :stats/tasks tasks-mapper
-                       :stats/wordcount wordcount-mapper
-                       :stats/media media-mapper
-                       :stats/daily-summaries daily-summaries-mapper
-                       nil)
-        days (:days msg-payload)
-        stats (when stats-mapper
-                (let [child-span (z/child-span span "stats-mapper")
-                      res (mapv (stats-mapper current-state) days)]
-                  (.finish child-span)
-                  (into {} res)))]
-    (log/info stats-type (count (str stats)))
-
-    (Thread/sleep 11)
-    (let [child-span (z/child-span span "wait-1")]
-      (Thread/sleep 33)
-      (.finish child-span))
-
-    (Thread/sleep 5)
-    (let [child-span (z/child-span span "wait-2")]
-      (Thread/sleep 22)
-      (.finish child-span))
-
-    (.tag span "meta" (str msg-meta))
-    (.tag span "tag" (:tag msg-meta))
-    (if stats
-      (put-fn (with-meta [:stats/result {:stats stats
-                                         :type  stats-type}] msg-meta))
-      (l/warn "No mapper defined for" stats-type))))
+  (future
+    (let [stats-type (:type msg-payload)
+          stats-mapper (case stats-type
+                         :stats/pomodoro t-s/time-mapper
+                         :stats/custom-fields cf/custom-fields-mapper
+                         :stats/tasks tasks-mapper
+                         :stats/wordcount wordcount-mapper
+                         :stats/media media-mapper
+                         :stats/daily-summaries daily-summaries-mapper
+                         nil)
+          days (:days msg-payload)
+          stats (when stats-mapper
+                  (let [child-span (z/child-span span (str stats-type))
+                        res (mapv (stats-mapper current-state) days)]
+                    (.finish child-span)
+                    (into {} res)))
+          extracted-trace (if-let [t (:trace msg-meta)]
+                            (z/extract-trace t)
+                            span)]
+      (log/info stats-type (count (str stats)))
+      (.tag span "meta" (str msg-meta))
+      (.tag span "tag" (:tag msg-meta))
+      (if stats
+        (put-fn (with-meta [:stats/result {:stats stats
+                                           :type  stats-type}] msg-meta))
+        (l/warn "No mapper defined for" stats-type))))
+  {})
 
 (defn get-basic-stats
   "Generate some very basic stats about the graph size for display in UI."
-  [state]
-  (merge (task-summary-stats state)
+  [state span]
+  (merge (let [child-span (z/child-span span "task-summary-stats")
+               s (task-summary-stats state)]
+           (.finish child-span)
+           s)
+         (let [child-span (z/child-span span "award-points")
+               s {:award-points (aw/award-points state)}]
+           (.finish child-span)
+           s)
+         (let [child-span (z/child-span span "locations")
+               s {:locations    (sl/locations state)}]
+           (.finish child-span)
+           s)
          {:entry-count  (count (:sorted-entries state))
-          :award-points (aw/award-points state)
-          :locations    (sl/locations state)
           :node-count   (count (:node-map (:graph state)))
           :edge-count   (count (uber/find-edges (:graph state) {}))
           :import-cnt   (res-count state {:tags #{"#import"}})
@@ -167,8 +162,11 @@
 
 (defn make-stats-tags
   "Generate stats and tags from current-state."
-  [state]
-  {:stats          (get-basic-stats state)
+  [state span]
+  {:stats          (let [child-span (z/child-span span "stats")
+                         s (get-basic-stats state child-span)]
+                     (.finish child-span)
+                     s)
    :hashtags       (gq/find-all-hashtags state)
    :pvt-hashtags   (gq/find-all-pvt-hashtags state)
    :started-tasks  (:entries (gq/get-filtered state started-tasks))
@@ -176,7 +174,10 @@
    :pvt-displayed  (:pvt-displayed (:cfg state))
    :mentions       (gq/find-all-mentions state)
    :stories        (gq/find-all-stories state)
-   :locations      (gq/find-all-locations state)
+   :locations      (let [child-span (z/child-span span "locations")
+                         s (gq/find-all-locations state)]
+                     (.finish child-span)
+                     s)
    :briefings      (gq/find-all-briefings state)
    :sagas          (gq/find-all-sagas state)
    :cfg            (:cfg state)})
@@ -184,13 +185,15 @@
 (defn stats-tags-fn
   "Generates stats and tags (they only change on insert anyway) and initiates
    publication thereof to all connected clients."
-  [{:keys [current-state put-fn msg-meta]}]
+  [{:keys [current-state put-fn msg-meta span]}]
   (future
-    (let [stats-tags (make-stats-tags current-state)
+    (let [child-span (z/child-span span "stats-tags-fn")
+          stats-tags (make-stats-tags current-state child-span)
           uid (:sente-uid msg-meta)]
+      (.finish child-span)
       (put-fn (with-meta [:state/stats-tags stats-tags] {:sente-uid uid}))))
   {})
 
 (def stats-handler-map
   {:stats/get            (z/traced get-stats-fn :stats/get)
-   :state/stats-tags-get (z/traced get-stats-fn :state/stats-tags-get)})
+   :state/stats-tags-get (z/traced stats-tags-fn :state/stats-tags-get)})

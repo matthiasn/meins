@@ -13,7 +13,8 @@
             [immutant.web.undertow :as undertow]
             [taoensso.sente :as sente]
             [taoensso.sente.packers.transit :as sente-transit]
-            [taoensso.sente.server-adapters.immutant :as ia]))
+            [taoensso.sente.server-adapters.immutant :as ia]
+            [iwaswhere-web.zipkin :as z]))
 
 (def default-ring-defaults-config
   (assoc-in rmd/site-defaults [:security :anti-forgery]
@@ -35,7 +36,17 @@
   [_ put-fn]
   (fn [{:keys [event]}]
     (log/debug "Received over WebSockets:" event)
-    (put-fn (u/deserialize-meta event))))
+    (let [msg (u/deserialize-meta event)
+          msg-meta (meta msg)
+          msg-type (first msg)
+          trace (z/new-trace-ws (str "ws-recv" (first msg)))
+          serialized-trace (z/serialized-trace trace)
+          msg-meta (if (:trace msg-meta)
+                     msg-meta
+                     (assoc-in msg-meta [:trace] serialized-trace))]
+      (prn :received (first msg) serialized-trace)
+      (put-fn (with-meta msg msg-meta))
+      (.finish trace))))
 
 (def env-host (get (System/getenv) "HOST"))
 (def env-port (get (System/getenv) "PORT"))
@@ -126,12 +137,19 @@
         chsk-send! (:send-fn ws)
         connected-uids (:any @(:connected-uids ws))
         dest-uid (:sente-uid msg-meta)
-        msg-w-ser-meta [msg-type {:msg msg-payload :msg-meta msg-meta}]]
+        msg-w-ser-meta [msg-type {:msg msg-payload :msg-meta msg-meta}]
+        span (when-let [t (:trace msg-meta)]
+               (let [child-span (z/child-span-ws (z/extract-trace t) "chsk-send!")]
+                 ;                 (.tag child-span (str msg-type))
+                 child-span))]
+    (prn :all-msgs-handler (:trace msg-meta))
     (when (contains? connected-uids dest-uid)
       (chsk-send! dest-uid msg-w-ser-meta))
     (when (= :broadcast dest-uid)
       (doseq [uid connected-uids]
-        (chsk-send! uid msg-w-ser-meta)))))
+        (chsk-send! uid msg-w-ser-meta)))
+    (when span (.finish span))
+    {}))
 
 (defn cmp-map
   "Returns map for creating server-side WebSockets communication component.

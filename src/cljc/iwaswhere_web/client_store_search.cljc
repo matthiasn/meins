@@ -188,13 +188,17 @@
 (defn search-refresh-fn
   "Refreshes client-side state by sending all queries, plus, with a delay,
    the stats and tags."
-  [{:keys [current-state]}]
+  [{:keys [current-state msg-meta]}]
   (let [query-cfg (:query-cfg current-state)
-        new-state (assoc-in current-state [:query-cfg :last-update] (st/now))]
+        new-state (-> current-state
+                      (assoc-in [:query-cfg :last-update] {:last-update (st/now)
+                                                           :meta msg-meta})
+                      (assoc-in [:query-cfg :last-update-meta] msg-meta))
+        ]
     {:new-state new-state
-     :emit-msg  [[:state/search query-cfg]
+     :emit-msg  [(with-meta [:state/search query-cfg] msg-meta)
                  [:cmd/schedule-new {:timeout 200
-                                     :message [:state/stats-tags-get]}]]}))
+                                     :message (with-meta [:state/stats-tags-get] msg-meta)}]]}))
 
 (def search-handler-map
   {:search/update      update-query-fn

@@ -54,7 +54,7 @@
 
 (defn entry-saved-fn
   "Remove new entry from local when saving is confirmed by backend."
-  [{:keys [current-state msg-payload]}]
+  [{:keys [current-state msg-payload msg-meta]}]
   (let [ts (:timestamp msg-payload)
         curr-local (get-in current-state [:new-entries ts])
         parent-ts (:comment-for msg-payload)
@@ -65,8 +65,9 @@
               (assoc-in [:entries-map ts] msg-payload))
           current-state)]
     (update-local-storage new-state)
+    (prn :entry-saved-fn msg-meta)
     {:new-state    new-state
-     :send-to-self [:search/refresh]}))
+     :send-to-self (with-meta [:search/refresh] msg-meta)}))
 
 (defn play-audio
   "Start playing audio element with provided DOM id."

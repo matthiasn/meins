@@ -90,8 +90,8 @@
    :handler-map (merge
                   gs/stats-handler-map
                   {:entry/import   f/entry-import-fn
-                   :entry/find     gq/find-entry
-                   :entry/update   f/geo-entry-persist-fn
+                   :entry/find     (z/traced gq/find-entry :entry/find)
+                   :entry/update   (z/traced f/geo-entry-persist-fn :entry/update)
                    :entry/trash    f/trash-entry-fn
                    :state/search   (z/traced gq/query-fn :state/search)
                    :cfg/refresh    refresh-cfg

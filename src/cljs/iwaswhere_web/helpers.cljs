@@ -80,17 +80,19 @@
 
 (defn get-stats
   "Retrieves stats for the last n days."
-  [stats-key put-fn n]
+  [stats-key n m put-fn]
   (let [days (map n-days-ago-fmt (reverse (range n)))]
-    (put-fn [:stats/get {:days (mapv (fn [d] {:date-string d}) days)
-                         :type stats-key}])))
+    (put-fn (with-meta
+              [:stats/get {:days (mapv (fn [d] {:date-string d}) days)
+                           :type stats-key}]
+              m))))
 
 (defn keep-updated
   [stats-key n local last-update put-fn]
-  (when (not= last-update (:last-fetched @local))
-    (get-stats stats-key put-fn n)
-    (prn :update stats-key)
-    (swap! local assoc-in [:last-fetched] last-update)))
+  (when (not= (:last-update last-update) (:last-fetched @local))
+    (swap! local assoc-in [:last-fetched] (:last-update last-update))
+    (get-stats stats-key n (:meta last-update {}) put-fn)
+    (prn :update stats-key)))
 
 (defn print-duration
   "Helper for inspecting where time is spent."
