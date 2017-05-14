@@ -21,18 +21,13 @@
        (when stats
          [:div
           (:entry-count @stats) " entries, "
-          (:node-count @stats) " nodes, "
-          (:edge-count @stats) " edges, "
           (count (:hashtags @options)) " hashtags, "
           (count (:mentions @options)) " people, "
           (:open-tasks-cnt @stats) " open tasks, "
           (:started-tasks-cnt @stats) " started, "
-          (:due-tasks-cnt @stats) " due, "
           (:backlog-cnt @stats) " backlog, "
           (:completed-cnt @stats) " completed, "
           (:closed-cnt @stats) " closed, "
-          (:open-habits-cnt @stats) " habits, "
-          (:waiting-habits-cnt @stats) " waiting, "
           (:import-cnt @stats) " tagged #import, "
           (:new-cnt @stats) " #new."])
        (when-let [ms (:query @timing)]

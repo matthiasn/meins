@@ -58,14 +58,12 @@
   (let [ts (:timestamp msg-payload)
         curr-local (get-in current-state [:new-entries ts])
         parent-ts (:comment-for msg-payload)
-        new-state
-        (if (= (:md curr-local) (:md msg-payload))
-          (-> current-state
-              (update-in [:new-entries] dissoc ts)
-              (assoc-in [:entries-map ts] msg-payload))
-          current-state)]
+        new-state (if (= (:md curr-local) (:md msg-payload))
+                    (-> current-state
+                        (update-in [:new-entries] dissoc ts)
+                        (assoc-in [:entries-map ts] msg-payload))
+                    current-state)]
     (update-local-storage new-state)
-    (prn :entry-saved-fn msg-meta)
     {:new-state    new-state
      :send-to-self (with-meta [:search/refresh] msg-meta)}))
 

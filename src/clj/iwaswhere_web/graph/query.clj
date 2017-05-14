@@ -51,16 +51,14 @@
           q-not-tags (set (map s/lower-case (:not-tags q)))
           q-mentions (set (map s/lower-case (:mentions q)))
 
-          entry-tags (set (map s/lower-case (:tags entry)))
+          tags (set (map s/lower-case (:tags entry)))
           entry-comments (map #(uc/attrs g %) (:comments entry))
           entry-comments-tags (apply set/union (map :tags entry-comments))
-          tags (set (map s/lower-case (set/union entry-tags entry-comments-tags)))
+          tags (set (map s/lower-case (set/union tags entry-comments-tags)))
 
-          entry-mentions (set (map s/lower-case (:mentions entry)))
-          entry-comments-mentions (apply set/union (map :mentions
-                                                        (:comments entry)))
-          mentions (set (map s/lower-case
-                             (set/union entry-mentions entry-comments-mentions)))
+          mentions (set (map s/lower-case (:mentions entry)))
+          entry-comments-mentions (apply set/union (map :mentions entry-comments))
+          mentions (set (map s/lower-case (set/union mentions entry-comments-mentions)))
 
           story-match? (if-let [story (:story q)]
                          (or (= story (:linked-story entry))
@@ -71,7 +69,7 @@
           opts-match?
           (cond
             (contains? opts ":started")
-            (when (contains? entry-tags "#task")
+            (when (contains? tags "#task")
               (let [nodes (into [entry] entry-comments)
                     filter-fn (fn [n]
                                 (let [completed (:completed-time n)]
@@ -81,7 +79,7 @@
                 (seq started)))
 
             (contains? opts ":waiting")
-            (when (contains? entry-tags "#habit")
+            (when (contains? tags "#habit")
               (when-let [active-from (get-in entry [:habit :active-from])]
                 (let [active-from (get-in entry [:habit :active-from])
                       dtz (ct/default-time-zone)
@@ -145,15 +143,16 @@
 (defn get-tags-mentions-matches
   "Extract matching timestamps for query."
   [g query]
-  (let [mapper (fn [tag-type]
-                 (fn [tag]
-                   (let [q {:src {tag-type tag} :relationship :CONTAINS}
-                         edges (uc/find-edges g q)]
-                     (set (map :dest edges)))))
-        t-matched (map (mapper :tag) (map s/lower-case (:tags query)))
-        pt-matched (map (mapper :ptag) (map s/lower-case (:tags query)))
-        m-matched (map (mapper :mention) (map s/lower-case (:mentions query)))]
-    (apply set/union (concat t-matched pt-matched m-matched))))
+  (time
+    (let [mapper (fn [tag-type]
+                   (fn [tag]
+                     (let [q {:src {tag-type tag} :relationship :CONTAINS}
+                           edges (uc/find-edges g q)]
+                       (set (map :dest edges)))))
+          t-matched (map (mapper :tag) (map s/lower-case (:tags query)))
+          pt-matched (map (mapper :ptag) (map s/lower-case (:tags query)))
+          m-matched (map (mapper :mention) (map s/lower-case (:mentions query)))]
+      (apply set/union (concat t-matched pt-matched m-matched)))))
 
 (defn get-nodes-for-day
   "Extract matching timestamps for query."
@@ -359,8 +358,7 @@
           (get-linked-entries graph ts sort-by-upvotes?)))))
 
 (defn get-filtered
-  "Retrieve items to show in UI, also deliver all hashtags for autocomplete and
-   some basic stats."
+  "Retrieve entries."
   [current-state query]
   (let [n (or (:n query) Integer/MAX_VALUE)
         g (:graph current-state)

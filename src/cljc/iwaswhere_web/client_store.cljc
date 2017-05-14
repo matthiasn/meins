@@ -87,7 +87,6 @@
             :stats/pomodoro :pomodoro-stats
             :stats/tasks :task-stats
             :stats/wordcount :wordcount-stats
-            :stats/daily-summaries :daily-summary-stats
             :stats/custom-fields :custom-field-stats
             :stats/media :media-stats
             nil)

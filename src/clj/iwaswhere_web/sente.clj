@@ -139,8 +139,7 @@
         dest-uid (:sente-uid msg-meta)
         msg-w-ser-meta [msg-type {:msg msg-payload :msg-meta msg-meta}]
         span (when-let [t (:trace msg-meta)]
-               (let [child-span (z/child-span-ws (z/extract-trace t) "chsk-send!")]
-                 ;                 (.tag child-span (str msg-type))
+               (let [child-span (z/child-span-ws (z/extract-trace t) (str "chsk-send!-" msg-type))]
                  child-span))]
     (prn :all-msgs-handler (:trace msg-meta))
     (when (contains? connected-uids dest-uid)

@@ -22,8 +22,7 @@
 (def prop-setter
   (reify brave.propagation.Propagation$Setter
     (put [this c k v]
-      (assoc! c k v)
-      (prn :setter c k v))))
+      (assoc! c k v))))
 
 (def injector
   (-> tracing
@@ -33,7 +32,6 @@
 (def prop-getter
   (reify brave.propagation.Propagation$Getter
     (get [this c k]
-      (prn :getter k (get-in c [k]))
       (get-in c [k]))))
 
 (def extractor
@@ -99,7 +97,5 @@
           _ (.inject injector (.context span) c)
           pc (persistent! c)
           extracted (extract-trace pc)]
-      (prn :carrier pc)
-      (prn :extracted extracted)
       (.finish span)
       res)))
