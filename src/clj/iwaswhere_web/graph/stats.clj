@@ -59,19 +59,37 @@
                      :video-cnt   (count (filter :video-file day-nodes-attrs))}]
       [date-string day-stats])))
 
+#_(defn res-count
+    "Count results for specified query."
+    [current-state query]
+    (let [res (gq/get-filtered current-state (merge {:n Integer/MAX_VALUE} query))]
+      (count (set (:entries res)))))
+
 (defn res-count
   "Count results for specified query."
   [current-state query]
-  (let [res (gq/get-filtered current-state (merge {:n Integer/MAX_VALUE} query))]
-    (count (set (:entries res)))))
+  (let [res (gq/extract-sorted-entries2 current-state (merge {:n Integer/MAX_VALUE}
+                                                             query))]
+    (when (= (:tags query) #{"#new"})
+      (prn :res-count query res))
+    (count (set res))))
+
+#_(defn completed-count
+    "Count completed tasks."
+    [current-state]
+    (let [q1 {:tags #{"#task" "#done"} :n Integer/MAX_VALUE}
+          q2 {:tags #{"#task"} :opts #{":done"} :n Integer/MAX_VALUE}
+          res1 (set (:entries (gq/get-filtered current-state q1)))
+          res2 (set (:entries (gq/get-filtered current-state q2)))]
+      (count (set/union res1 res2))))
 
 (defn completed-count
   "Count completed tasks."
   [current-state]
   (let [q1 {:tags #{"#task" "#done"} :n Integer/MAX_VALUE}
         q2 {:tags #{"#task"} :opts #{":done"} :n Integer/MAX_VALUE}
-        res1 (set (:entries (gq/get-filtered current-state q1)))
-        res2 (set (:entries (gq/get-filtered current-state q2)))]
+        res1 (set (gq/extract-sorted-entries2 current-state q1))
+        res2 (set (gq/extract-sorted-entries2 current-state q2))]
     (count (set/union res1 res2))))
 
 (defn get-stats-fn
@@ -132,10 +150,7 @@
    :pvt-displayed  (:pvt-displayed (:cfg state))
    :mentions       (gq/find-all-mentions state)
    :stories        (gq/find-all-stories state)
-   :locations      (let [child-span (z/child-span span "locations")
-                         s (gq/find-all-locations state)]
-                     (.finish child-span)
-                     s)
+   :locations      (gq/find-all-locations state)
    :briefings      (gq/find-all-briefings state)
    :sagas          (gq/find-all-sagas state)
    :cfg            (:cfg state)})

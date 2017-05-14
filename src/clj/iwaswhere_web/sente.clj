@@ -44,7 +44,6 @@
           msg-meta (if (:trace msg-meta)
                      msg-meta
                      (assoc-in msg-meta [:trace] serialized-trace))]
-      (prn :received (first msg) serialized-trace)
       (put-fn (with-meta msg msg-meta))
       (.finish trace))))
 
@@ -141,7 +140,6 @@
         span (when-let [t (:trace msg-meta)]
                (let [child-span (z/child-span-ws (z/extract-trace t) (str "chsk-send!-" msg-type))]
                  child-span))]
-    (prn :all-msgs-handler (:trace msg-meta))
     (when (contains? connected-uids dest-uid)
       (chsk-send! dest-uid msg-w-ser-meta))
     (when (= :broadcast dest-uid)

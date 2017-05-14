@@ -35,6 +35,7 @@
         tags (set (:tags entry))
         pvt-tags (set/union (:pvt-displayed cfg) (:pvt-tags cfg))
         pvt-entry? (seq (set/intersection tags pvt-tags))
+        comment-for (:comment-for entry)
         tag-add-fn
         (fn [g tag]
           (let [ltag (s/lower-case tag)
@@ -48,6 +49,8 @@
                 (uc/add-nodes-with-attrs [{tag-type ltag} {:val tag}])
                 (uc/add-edges
                   [{tag-type ltag} (:timestamp entry) {:relationship :CONTAINS}]
+                  (when comment-for
+                    [{tag-type ltag} comment-for {:relationship :CONTAINS}])
                   [ht-parent {tag-type ltag} {:relationship :IS}]))))]
     (assoc-in current-state [:graph] (reduce tag-add-fn graph tags))))
 
@@ -259,6 +262,15 @@
         (uc/add-edges [:sagas (:timestamp entry)]))
     graph))
 
+(defn add-done
+  "When entry is a task that's done, add edge to :done node for faster lookup."
+  [graph entry]
+  (if (get-in entry [:task :done])
+    (-> graph
+        (uc/add-nodes :done)
+        (uc/add-edges [:done (:timestamp entry)]))
+    graph))
+
 (defn add-story-set
   "When entry is linked to a story, add that entry timestamp to the set with
    the entry ids on that timeline."
@@ -287,8 +299,7 @@
   (let [graph (:graph current-state)
         old-entry (when (uc/has-node? graph ts) (uc/attrs graph ts))
         merged (merge old-entry entry)
-        geo-only? (= (set (keys merged))
-                     #{:timestamp :latitude :longitude :last-saved})
+        geo-only? (= (set (keys merged)) #{:timestamp :latitude :longitude :last-saved})
         old-tags (:tags old-entry)
         old-mentions (:mentions old-entry)
         remove-tag-edges (fn [g tags k]
@@ -317,6 +328,7 @@
           (update-in [:graph] add-parent-ref new-entry)
           (update-in [:graph] add-story new-entry)
           (update-in [:graph] add-saga new-entry)
+          (update-in [:graph] add-done new-entry)
           (update-in [:graph] add-location new-entry)
           (update-in [:graph] add-briefing new-entry)
           (add-story-set new-entry)

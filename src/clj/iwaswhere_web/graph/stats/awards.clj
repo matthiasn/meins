@@ -50,10 +50,8 @@
   (let [q {:tags #{"#habit"} :n Integer/MAX_VALUE}
         entries (->> (gq/get-filtered current-state q) :entries-map vals)
         by-habit (award-points-by :habit {:total 0} entries)
-        q2 {:tags #{"#task" "#done"} :n Integer/MAX_VALUE}
-        q3 {:tags #{"#task"} :opts #{":done"} :n Integer/MAX_VALUE}
-        by-task (vals (merge (:entries-map (gq/get-filtered current-state q2))
-                             (:entries-map (gq/get-filtered current-state q3))))
+        q2 {:tags #{"#task"} :opts #{":done"} :n Integer/MAX_VALUE}
+        by-task (vals (:entries-map (gq/get-filtered current-state q2)))
         by-habit-and-task (award-points-by :task by-habit by-task)
         claimed (claimed-points current-state)]
     (merge by-habit-and-task

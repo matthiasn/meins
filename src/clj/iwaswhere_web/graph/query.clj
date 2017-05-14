@@ -154,6 +154,24 @@
           m-matched (map (mapper :mention) (map s/lower-case (:mentions query)))]
       (apply set/union (concat t-matched pt-matched m-matched)))))
 
+(defn get-tags-mentions-matches
+  "Extract matching timestamps for query."
+  [g query]
+  (let [mapper (fn [tag-type]
+                 (fn [tag]
+                   (let [q {:src {tag-type tag} :relationship :CONTAINS}
+                         edges (uc/find-edges g q)]
+                     (set (map :dest edges)))))
+        t-matched (map (mapper :tag) (map s/lower-case (:tags query)))
+        nt-matched (map (mapper :tag) (map s/lower-case (:not-tags query)))
+        ntp-matched (map (mapper :ptag) (map s/lower-case (:not-tags query)))
+        pt-matched (map (mapper :ptag) (map s/lower-case (:tags query)))
+        m-matched (map (mapper :mention) (map s/lower-case (:mentions query)))
+        match-sets (filter seq (concat t-matched pt-matched m-matched))
+        matched (if (seq match-sets) (apply set/intersection match-sets) #{})
+        not-matched (apply set/union (filter seq (concat nt-matched ntp-matched)))]
+    (set/difference matched not-matched)))
+
 (defn get-nodes-for-day
   "Extract matching timestamps for query."
   [g query]
@@ -231,16 +249,12 @@
 
                       ; query is for tasks
                       (and (seq (:opts query))
-                           (contains? (:opts query) ":due"))
-                      (get-in state [:sorted-tasks])
+                           (contains? (:opts query) ":done"))
+                      (get-connected-nodes g :done)
 
                       (and (seq (:opts query))
                            (contains? (:opts query) ":story"))
                       (get-connected-nodes g :stories)
-
-                      (and (seq (:opts query))
-                           (contains? (:opts query) ":saga"))
-                      (get-connected-nodes g :sagas)
 
                       (and (seq (:opts query))
                            (contains? (:opts query) ":saga"))
@@ -256,6 +270,67 @@
         parent-ids (filter identity (map :comment-for matched-entries))
         parents (map mapper-fn parent-ids)]
     (flatten [matched-entries parents])))
+
+(defn extract-sorted-entries2
+  "Extracts nodes and their properties in descending timestamp order by looking
+   for node by mapping over the sorted set and extracting attributes for each
+   node.
+   Warns when node not in graph. (debugging, should never happen)"
+  [state query]
+  (let [g (:graph state)
+        n (:n query)
+        mapper-fn (fn [n]
+                    (if (uc/has-node? g n)
+                      (-> (uc/attrs g n)
+                          (get-comments g n)
+                          (get-linked-entries g n false))
+                      (log/warn "extract-sorted-entries can't find node: " n)))
+        sort-fn #(into (sorted-set-by (if (:sort-asc query) < >)) %)
+        matched-ids (cond
+                      ; full-text search
+                      (:ft-search query)
+                      (ft/search query)
+
+                      ; set with the one timestamp in query
+                      (:timestamp query)
+                      #{(Long/parseLong (:timestamp query))}
+
+                      ; set with the one id in query
+                      (:id query)
+                      #{(uuid/as-uuid (:id query))}
+
+                      ; set with timestamps matching the day
+                      (:date-string query)
+                      (get-nodes-for-day g query)
+
+                      ; set with timestamps matching the day
+                      (:briefing query)
+                      (get-briefing-for-day g query)
+
+                      ; query is for specific story
+                      (:story query)
+                      (get-in state [:sorted-story-entries (:story query)])
+
+                      ; query is for tasks
+                      (and (seq (:opts query))
+                           (contains? (:opts query) ":done"))
+                      (get-connected-nodes g :done)
+
+                      (and (seq (:opts query))
+                           (contains? (:opts query) ":story"))
+                      (get-connected-nodes g :stories)
+
+                      (and (seq (:opts query))
+                           (contains? (:opts query) ":saga"))
+                      (get-connected-nodes g :sagas)
+
+                      ; set with timestamps matching tags and mentions
+                      (or (seq (:tags query)) (seq (:mentions query)))
+                      (get-tags-mentions-matches g query)
+
+                      ; set with all timestamps
+                      :else (:sorted-entries state))]
+    matched-ids))
 
 (defn extract-entries-by-ts
   "Find all entries for given timestamps set."

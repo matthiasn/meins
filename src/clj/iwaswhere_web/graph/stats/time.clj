@@ -91,34 +91,6 @@
           day-nodes (gq/get-nodes-for-day g {:date-string date-string})
           day-nodes-attrs (map #(uber/attrs g %) day-nodes)
           pomo-nodes (filter #(= (:entry-type %) :pomodoro) day-nodes-attrs)
-          completed (filter #(= (:planned-dur %) (:completed-time %)) pomo-nodes)
-          started (filter #(and (pos? (:completed-time %))
-                                (< (:completed-time %) (:planned-dur %)))
-                          pomo-nodes)
-          day-stats (merge {:date-string date-string
-                            :total       (count pomo-nodes)
-                            :completed   (count completed)
-                            :started     (count started)}
-                           (time-by-stories g day-nodes-attrs date-string))]
-      [date-string day-stats])))
-
-
-(defn time-stats
-  "Create mapper function for time stats"
-  [current-state]
-  (fn [d]
-    (let [g (:graph current-state)
-          date-string (:date-string d)
-          day-nodes (gq/get-nodes-for-day g {:date-string date-string})
-          day-nodes-attrs (map #(uber/attrs g %) day-nodes)
-          pomo-nodes (filter #(= (:entry-type %) :pomodoro) day-nodes-attrs)
-          completed (filter #(= (:planned-dur %) (:completed-time %)) pomo-nodes)
-          started (filter #(and (pos? (:completed-time %))
-                                (< (:completed-time %) (:planned-dur %)))
-                          pomo-nodes)
-          day-stats (merge {:date-string date-string
-                            :total       (count pomo-nodes)
-                            :completed   (count completed)
-                            :started     (count started)}
+          day-stats (merge {:date-string date-string}
                            (time-by-stories g day-nodes-attrs date-string))]
       [date-string day-stats])))
