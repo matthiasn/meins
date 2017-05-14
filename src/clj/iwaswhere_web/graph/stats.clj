@@ -133,23 +133,12 @@
 (defn get-basic-stats
   "Generate some very basic stats about the graph size for display in UI."
   [state span]
-  (merge (let [child-span (z/child-span span "task-summary-stats")
-               s (task-summary-stats state)]
-           (.finish child-span)
-           s)
-         (let [child-span (z/child-span span "award-points")
-               s {:award-points (aw/award-points state)}]
-           (.finish child-span)
-           s)
-         (let [child-span (z/child-span span "locations")
-               s {:locations    (sl/locations state)}]
-           (.finish child-span)
-           s)
-         {:entry-count  (count (:sorted-entries state))
-          :node-count   (count (:node-map (:graph state)))
-          :edge-count   (count (uber/find-edges (:graph state) {}))
-          :import-cnt   (res-count state {:tags #{"#import"}})
-          :new-cnt      (res-count state {:tags #{"#new"}})}))
+  {:entry-count (count (:sorted-entries state))
+   :node-count  (count (:node-map (:graph state)))
+   :edge-count  (count (uber/find-edges (:graph state) {}))
+   :import-cnt  (res-count state {:tags #{"#import"}})
+   :new-cnt     (res-count state {:tags #{"#new"}})
+   :locations   (sl/locations state)})
 
 (def started-tasks
   {:tags     #{"#task"}
@@ -163,11 +152,7 @@
 (defn make-stats-tags
   "Generate stats and tags from current-state."
   [state span]
-  {:stats          (let [child-span (z/child-span span "stats")
-                         s (get-basic-stats state child-span)]
-                     (.finish child-span)
-                     s)
-   :hashtags       (gq/find-all-hashtags state)
+  {:hashtags       (gq/find-all-hashtags state)
    :pvt-hashtags   (gq/find-all-pvt-hashtags state)
    :started-tasks  (:entries (gq/get-filtered state started-tasks))
    :waiting-habits (:entries (gq/get-filtered state waiting-habits))
@@ -194,6 +179,49 @@
       (put-fn (with-meta [:state/stats-tags stats-tags] {:sente-uid uid}))))
   {})
 
+(defn task-summary-stats2
+  "Generate some very basic stats about the graph for display in UI."
+  [state k span msg-meta put-fn]
+  (future
+    (let [child-span (z/child-span span (str "task-summary-stats-" k))
+          uid (:sente-uid msg-meta)
+          res (case k
+                :open-tasks-cnt    (res-count state {:tags     #{"#task"}
+                                                     :not-tags #{"#done" "#backlog" "#closed"}})
+                :started-tasks-cnt (res-count state {:tags     #{"#task"}
+                                                     :not-tags #{"#done" "#backlog" "#closed"}
+                                                     :opts     #{":started"}})
+                :backlog-cnt       (res-count state {:tags     #{"#task" "#backlog"}
+                                                     :not-tags #{"#done" "#closed"}})
+                :completed-cnt     (completed-count state)
+                :closed-cnt        (res-count state {:tags #{"#task" "#closed"}}))]
+      (.finish child-span)
+      (put-fn (with-meta [:stats/result2 {k res}] {:sente-uid uid})))))
+
+(defn get-stats-fn2
+  "Generates stats and tags (they only change on insert anyway) and initiates
+   publication thereof to all connected clients."
+  [{:keys [current-state put-fn msg-meta span]}]
+  (future
+    (let [child-span (z/child-span span "get-stats-fn2")
+          stats (get-basic-stats current-state child-span)
+          uid (:sente-uid msg-meta)]
+      (.finish child-span)
+      (put-fn (with-meta [:stats/result2 stats] {:sente-uid uid}))))
+  (task-summary-stats2 current-state :open-tasks-cnt span msg-meta put-fn)
+  (task-summary-stats2 current-state :started-tasks-cnt span msg-meta put-fn)
+  (task-summary-stats2 current-state :backlog-cnt span msg-meta put-fn)
+  (task-summary-stats2 current-state :completed-cnt span msg-meta put-fn)
+  (task-summary-stats2 current-state :closed-cnt span msg-meta put-fn)
+  (future
+    (let [child-span (z/child-span span "award-points")
+          stats {:award-points (aw/award-points current-state)}
+          uid (:sente-uid msg-meta)]
+      (.finish child-span)
+      (put-fn (with-meta [:stats/result2 stats] {:sente-uid uid}))))
+  {})
+
 (def stats-handler-map
   {:stats/get            (z/traced get-stats-fn :stats/get)
+   :stats/get2            (z/traced get-stats-fn2 :stats/get)
    :state/stats-tags-get (z/traced stats-tags-fn :state/stats-tags-get)})

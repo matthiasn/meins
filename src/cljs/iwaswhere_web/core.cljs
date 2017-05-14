@@ -18,7 +18,7 @@
                                :import/spotify :import/flight
                                ;:cmd/keep-alive
                                :stats/pomo-day-get
-                               :stats/get :import/movie :blink/busy
+                               :stats/get :stats/get2 :import/movie :blink/busy
                                :state/stats-tags-get :import/weight
                                :state/search :cfg/refresh
                                :firehose/cmp-put

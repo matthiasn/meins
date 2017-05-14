@@ -60,4 +60,4 @@
    :routes-fn     routes-fn
    :port          8765
    :relay-types   #{:cmd/keep-alive-res :entry/saved :entry/found :state/new
-                    :stats/result :state/stats-tags :search/refresh}})
+                    :stats/result :stats/result2 :state/stats-tags :search/refresh}})

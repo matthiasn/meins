@@ -196,8 +196,7 @@
 
 (s/def :state/stats-tags
   (s/keys :req-un [:iww.search-result/hashtags
-                   :iww.search-result/mentions
-                   :iww.search-result/stats]))
+                   :iww.search-result/mentions]))
 
 (s/def :stats/day (s/keys :req-un [:iww.search/date-string]))
 (s/def :stats/days (s/coll-of :stats/day))
