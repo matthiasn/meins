@@ -47,10 +47,13 @@
             (assoc-in [:options :sagas] sagas)
             (assoc-in [:options :sorted-sagas] sorted-sagas)
             (assoc-in [:options :mentions] (:mentions msg-payload))
-            (assoc-in [:briefings] (:briefings msg-payload))
-            (assoc-in [:started-tasks] (:started-tasks msg-payload))
-            (assoc-in [:waiting-habits] (:waiting-habits msg-payload))
             (assoc-in [:cfg :briefing] (-> msg-payload :cfg :briefing)))]
+    {:new-state new-state}))
+
+(defn stats-tags-fn2
+  "Update client side state with stats and tags received from backend."
+  [{:keys [current-state msg-payload put-fn]}]
+  (let [new-state (merge current-state msg-payload)]
     {:new-state new-state}))
 
 (defn save-stats-fn2
@@ -108,6 +111,7 @@
                               :stats/result       save-stats-fn
                               :stats/result2      save-stats-fn2
                               :state/stats-tags   stats-tags-fn
+                              :state/stats-tags2  stats-tags-fn2
                               :cfg/save           c/save-cfg
                               :cmd/toggle-active  c/toggle-active-fn
                               :cmd/toggle         c/toggle-set-fn

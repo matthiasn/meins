@@ -32,10 +32,8 @@
 
 (defn time-by-stories
   "Calculate time spent per story, plus total time."
-  [g nodes date-string]
-  (let [stories (gq/find-all-stories {:graph g})
-        sagas (gq/find-all-sagas {:graph g})
-        story-reducer (fn [acc entry]
+  [g nodes stories sagas date-string]
+  (let [story-reducer (fn [acc entry]
                         (let [comment-for (:comment-for entry)
                               parent (when (and comment-for
                                                 (uc/has-node? g comment-for))
@@ -56,8 +54,8 @@
                                                 (uc/has-node? g comment-for))
                                        (uc/attrs g comment-for))
                               story-id (or (:linked-story parent)
-                                        (:linked-story entry)
-                                        :no-story)
+                                           (:linked-story entry)
+                                           :no-story)
                               story (get-in stories [story-id])
                               acc-time (get acc story-id 0)
                               ts (:timestamp entry)
@@ -77,7 +75,8 @@
                             acc)))
         by-story (reduce story-reducer {} nodes)
         by-ts (reduce by-ts-reducer {} nodes)]
-    {:total-time    (apply + (map second by-story))
+    {:date-string   date-string
+     :total-time    (apply + (map second by-story))
      :time-by-ts    by-ts
      :time-by-story by-story
      :time-by-saga  (time-by-sagas g by-story)}))
@@ -85,12 +84,12 @@
 (defn time-mapper
   "Create mapper function for time stats"
   [current-state]
-  (fn [d]
-    (let [g (:graph current-state)
-          date-string (:date-string d)
-          day-nodes (gq/get-nodes-for-day g {:date-string date-string})
-          day-nodes-attrs (map #(uber/attrs g %) day-nodes)
-          pomo-nodes (filter #(= (:entry-type %) :pomodoro) day-nodes-attrs)
-          day-stats (merge {:date-string date-string}
-                           (time-by-stories g day-nodes-attrs date-string))]
-      [date-string day-stats])))
+  (let [g (:graph current-state)
+        stories (gq/find-all-stories {:graph g})
+        sagas (gq/find-all-sagas {:graph g})]
+    (fn [d]
+      (let [date-string (:date-string d)
+            day-nodes (gq/get-nodes-for-day g {:date-string date-string})
+            day-nodes-attrs (map #(uber/attrs g %) day-nodes)
+            day-stats (time-by-stories g day-nodes-attrs stories sagas date-string)]
+        [date-string day-stats]))))

@@ -110,10 +110,7 @@
                   (let [child-span (z/child-span span (str stats-type))
                         res (mapv (stats-mapper current-state) days)]
                     (.finish child-span)
-                    (into {} res)))
-          extracted-trace (if-let [t (:trace msg-meta)]
-                            (z/extract-trace t)
-                            span)]
+                    (into {} res)))]
       (log/info stats-type (count (str stats)))
       (.tag span "meta" (str msg-meta))
       (.tag span "tag" (:tag msg-meta))
@@ -143,17 +140,21 @@
 (defn make-stats-tags
   "Generate stats and tags from current-state."
   [state span]
-  {:hashtags       (gq/find-all-hashtags state)
-   :pvt-hashtags   (gq/find-all-pvt-hashtags state)
-   :started-tasks  (:entries (gq/get-filtered state started-tasks))
+  {:hashtags      (gq/find-all-hashtags state)
+   :pvt-hashtags  (gq/find-all-pvt-hashtags state)
+   :pvt-displayed (:pvt-displayed (:cfg state))
+   :mentions      (gq/find-all-mentions state)
+   :stories       (gq/find-all-stories state)
+   :sagas         (gq/find-all-sagas state)
+   :locations     (gq/find-all-locations state)
+   :cfg           (:cfg state)})
+
+(defn make-stats-tags2
+  "Generate stats and tags from current-state."
+  [state span]
+  {:started-tasks  (:entries (gq/get-filtered state started-tasks))
    :waiting-habits (:entries (gq/get-filtered state waiting-habits))
-   :pvt-displayed  (:pvt-displayed (:cfg state))
-   :mentions       (gq/find-all-mentions state)
-   :stories        (gq/find-all-stories state)
-   :locations      (gq/find-all-locations state)
-   :briefings      (gq/find-all-briefings state)
-   :sagas          (gq/find-all-sagas state)
-   :cfg            (:cfg state)})
+   :briefings      (gq/find-all-briefings state)})
 
 (defn stats-tags-fn
   "Generates stats and tags (they only change on insert anyway) and initiates
@@ -165,6 +166,24 @@
           uid (:sente-uid msg-meta)]
       (.finish child-span)
       (put-fn (with-meta [:state/stats-tags stats-tags] {:sente-uid uid}))))
+  (future
+    (let [child-span (z/child-span span "stats-tags-:started-tasks")
+          stats {:started-tasks (:entries (gq/get-filtered current-state started-tasks))}
+          uid (:sente-uid msg-meta)]
+      (.finish child-span)
+      (put-fn (with-meta [:state/stats-tags2 stats] {:sente-uid uid}))))
+  (future
+    (let [child-span (z/child-span span "stats-tags-:waiting-habits")
+          stats {:waiting-habits (:entries (gq/get-filtered current-state waiting-habits))}
+          uid (:sente-uid msg-meta)]
+      (.finish child-span)
+      (put-fn (with-meta [:state/stats-tags2 stats] {:sente-uid uid}))))
+  (future
+    (let [child-span (z/child-span span "stats-tags-:briefings")
+          stats {:briefings (gq/find-all-briefings current-state)}
+          uid (:sente-uid msg-meta)]
+      (.finish child-span)
+      (put-fn (with-meta [:state/stats-tags2 stats] {:sente-uid uid}))))
   {})
 
 (defn task-summary-stats
