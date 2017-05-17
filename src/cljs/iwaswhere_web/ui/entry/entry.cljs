@@ -192,4 +192,4 @@
               (let [n (count comments)]
                 [:span {:on-click toggle-comments}
                  (str "show " n " comment" (when (> n 1) "s"))])]))
-         (when @thumbnails? [t/thumbnails entry put-fn])]))))
+         (when @thumbnails? [t/thumbnails entry local-cfg put-fn])]))))

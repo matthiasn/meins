@@ -9,7 +9,7 @@
   [entry query-params]
   (when-let [file (:img-file entry)]
     (let [path (str "/photos/" file)
-          resized (if (s/includes? path ".JPG")
+          resized (if (s/includes? (s/lower-case path) ".jpg")
                     (str "/photos2/" file query-params)
                     path)]
       [:a {:href path :target "_blank"}
