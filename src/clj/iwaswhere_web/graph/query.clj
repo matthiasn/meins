@@ -13,7 +13,8 @@
             [clojure.pprint :as pp]
             [matthiasn.systems-toolbox.component :as st]
             [clj-time.core :as t]
-            [clj-uuid :as uuid])
+            [clj-uuid :as uuid]
+            [iwaswhere-web.zipkin :as z])
   (:import (org.joda.time DateTimeZone)))
 
 ;; TODO: migrate existing audio entries to use a different keyword
@@ -458,22 +459,22 @@
       (log/warn "cannot find node: " ts))))
 
 (defn run-query
-  [current-state msg-meta]
+  [current-state msg-meta span]
   (fn [[query-id query]]
-    (let [start-ts (System/nanoTime)
-          res (get-filtered current-state query)
-          ms (/ (- (System/nanoTime) start-ts) 1000000)
-          dur {:duration-ms (pp/cl-format nil "~,3f ms" ms)}]
-      (log/info (str "Query \"" (:search-text query) "\" took " (:duration-ms dur)))
+    (let [child-span (when span
+                       (z/child-span span (str "query: "
+                                               (pr-str (:search-text query)))))
+          res (get-filtered current-state query)]
+      (when child-span (.finish child-span))
       [query-id res])))
 
 (defn query-fn
   "Runs all queries in request, sends back to client, with all entry maps
    for the individual queries merged into one."
-  [{:keys [current-state msg-payload msg-meta]}]
+  [{:keys [current-state msg-payload msg-meta span]}]
   (let [queries (:queries msg-payload)
         start-ts (System/nanoTime)
-        res-mapper (run-query current-state msg-meta)
+        res-mapper (run-query current-state msg-meta span)
         res (mapv res-mapper queries)
         res2 (reduce (fn [acc [k v]]
                        (-> acc
@@ -483,6 +484,5 @@
                      res)
         ms (/ (- (System/nanoTime) start-ts) 1000000)
         dur {:duration-ms (pp/cl-format nil "~,3f ms" ms)}]
-    (log/info "Queries took" (:duration-ms dur))
     (log/debug queries)
     {:emit-msg [:state/new (merge res2 dur)]}))

@@ -71,12 +71,9 @@
 
         (testing
           "stats show expected numbers"
-          (let [res (gs/make-stats-tags new-state)
-                stats (:stats res)]
+          (let [res (gs/get-basic-stats new-state)]
             (is (= 107
-                   (:entry-count stats)))
-            (is (= 239
-                   (:node-count stats)))))
+                   (:entry-count res)))))
 
         (testing
           "hashtags and mentions in result of stats-tags publish fn"

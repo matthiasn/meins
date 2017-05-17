@@ -1,4 +1,4 @@
-(defproject matthiasn/iwaswhere-web "0.1.43"
+(defproject matthiasn/iwaswhere-web "0.1.44"
   :description "Sample application built with systems-toolbox library"
   :url "https://github.com/matthiasn/systems-toolbox"
   :license {:name "GNU AFFERO GENERAL PUBLIC LICENSE"

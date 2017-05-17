@@ -87,19 +87,26 @@
       (let [new-state (reduce stc/persist-reducer
                               current-state
                               stats-test-entries)]
-
         (testing
           "task summary stats are correct"
-          (let [stats (gs/task-summary-stats new-state)]
-            (is (= {:backlog-cnt        1
-                    :closed-cnt         1
-                    :completed-cnt      2
-                    :due-tasks-cnt      0
-                    :open-habits-cnt    0
-                    :waiting-habits-cnt 0
-                    :open-tasks-cnt     1
-                    :started-tasks-cnt  0}
-                   stats))))))))
+          (let [stats (gs/task-summary-stats new-state :open-tasks-cnt)]
+            (is (= 1 stats))))
+        (testing
+          "task summary stats are correct"
+          (let [stats (gs/task-summary-stats new-state :started-tasks-cnt)]
+            (is (= 1 stats))))
+        (testing
+          "task summary stats are correct"
+          (let [stats (gs/task-summary-stats new-state :backlog-cnt)]
+            (is (= 1 stats))))
+        (testing
+          "task summary stats are correct"
+          (let [stats (gs/task-summary-stats new-state :completed-cnt)]
+            (is (= 2 stats))))
+        (testing
+          "task summary stats are correct"
+          (let [stats (gs/task-summary-stats new-state :closed-cnt)]
+            (is (= 1 stats))))))))
 
 (deftest pomodoro-stats-test
   "test that daily summaries"
@@ -115,9 +122,7 @@
           (let [mapper (gst/time-mapper new-state)
                 stats (mapper {:date-string "2015-12-24"})]
             (is (= ["2015-12-24"
-                    {:completed     0
-                     :date-string   "2015-12-24"
-                     :started       1
+                    {:date-string   "2015-12-24"
                      :time-by-saga  {:no-saga 1301}
                      :time-by-story {1484076392371 291
                                      1484076392372 899
@@ -150,6 +155,5 @@
                                                     :story      :no-story
                                                     :story-name nil
                                                     :summed     111}}
-                     :total         4
                      :total-time    1301}]
                    stats))))))))

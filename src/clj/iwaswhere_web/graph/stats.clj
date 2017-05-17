@@ -59,29 +59,12 @@
                      :video-cnt   (count (filter :video-file day-nodes-attrs))}]
       [date-string day-stats])))
 
-#_(defn res-count
-    "Count results for specified query."
-    [current-state query]
-    (let [res (gq/get-filtered current-state (merge {:n Integer/MAX_VALUE} query))]
-      (count (set (:entries res)))))
-
 (defn res-count
   "Count results for specified query."
   [current-state query]
   (let [res (gq/extract-sorted-entries2 current-state (merge {:n Integer/MAX_VALUE}
                                                              query))]
-    (when (= (:tags query) #{"#new"})
-      (prn :res-count query res))
     (count (set res))))
-
-#_(defn completed-count
-    "Count completed tasks."
-    [current-state]
-    (let [q1 {:tags #{"#task" "#done"} :n Integer/MAX_VALUE}
-          q2 {:tags #{"#task"} :opts #{":done"} :n Integer/MAX_VALUE}
-          res1 (set (:entries (gq/get-filtered current-state q1)))
-          res2 (set (:entries (gq/get-filtered current-state q2)))]
-      (count (set/union res1 res2))))
 
 (defn completed-count
   "Count completed tasks."
@@ -122,7 +105,7 @@
 
 (defn get-basic-stats
   "Generate some very basic stats about the graph size for display in UI."
-  [state span]
+  [state]
   {:entry-count (count (:sorted-entries state))
    :import-cnt  (res-count state {:tags #{"#import"}})
    :new-cnt     (res-count state {:tags #{"#new"}})
@@ -139,7 +122,7 @@
 
 (defn make-stats-tags
   "Generate stats and tags from current-state."
-  [state span]
+  [state]
   {:hashtags      (gq/find-all-hashtags state)
    :pvt-hashtags  (gq/find-all-pvt-hashtags state)
    :pvt-displayed (:pvt-displayed (:cfg state))
@@ -162,7 +145,7 @@
   [{:keys [current-state put-fn msg-meta span]}]
   (future
     (let [child-span (z/child-span span "stats-tags-fn")
-          stats-tags (make-stats-tags current-state child-span)
+          stats-tags (make-stats-tags current-state)
           uid (:sente-uid msg-meta)]
       (.finish child-span)
       (put-fn (with-meta [:state/stats-tags stats-tags] {:sente-uid uid}))))
@@ -188,19 +171,24 @@
 
 (defn task-summary-stats
   "Generate some very basic stats about the graph for display in UI."
+  [state k]
+  (case k
+    :open-tasks-cnt (res-count state {:tags     #{"#task"}
+                                      :not-tags #{"#done" "#backlog" "#closed"}})
+    :started-tasks-cnt (res-count state {:tags     #{"#task"}
+                                         :not-tags #{"#done" "#backlog" "#closed"}
+                                         :opts     #{":started"}})
+    :backlog-cnt (res-count state {:tags     #{"#task" "#backlog"}
+                                   :not-tags #{"#done" "#closed"}})
+    :completed-cnt (completed-count state)
+    :closed-cnt (res-count state {:tags #{"#task" "#closed"}})))
+
+(defn task-summary-stats-w
+  "Generate some very basic stats about the graph for display in UI."
   [state k span msg-meta put-fn]
   (future
     (let [child-span (z/child-span span (str "task-summary-stats-" k))
-          res (case k
-                :open-tasks-cnt (res-count state {:tags     #{"#task"}
-                                                  :not-tags #{"#done" "#backlog" "#closed"}})
-                :started-tasks-cnt (res-count state {:tags     #{"#task"}
-                                                     :not-tags #{"#done" "#backlog" "#closed"}
-                                                     :opts     #{":started"}})
-                :backlog-cnt (res-count state {:tags     #{"#task" "#backlog"}
-                                               :not-tags #{"#done" "#closed"}})
-                :completed-cnt (completed-count state)
-                :closed-cnt (res-count state {:tags #{"#task" "#closed"}}))]
+          res (task-summary-stats state k)]
       (.finish child-span)
       (put-fn (with-meta [:stats/result2 {k res}] msg-meta)))))
 
@@ -210,15 +198,15 @@
   [{:keys [current-state put-fn msg-meta span]}]
   (future
     (let [child-span (z/child-span span "get-basic-stats")
-          stats (get-basic-stats current-state child-span)
+          stats (get-basic-stats current-state)
           uid (:sente-uid msg-meta)]
       (.finish child-span)
       (put-fn (with-meta [:stats/result2 stats] {:sente-uid uid}))))
-  (task-summary-stats current-state :open-tasks-cnt span msg-meta put-fn)
-  (task-summary-stats current-state :started-tasks-cnt span msg-meta put-fn)
-  (task-summary-stats current-state :backlog-cnt span msg-meta put-fn)
-  (task-summary-stats current-state :completed-cnt span msg-meta put-fn)
-  (task-summary-stats current-state :closed-cnt span msg-meta put-fn)
+  (task-summary-stats-w current-state :open-tasks-cnt span msg-meta put-fn)
+  (task-summary-stats-w current-state :started-tasks-cnt span msg-meta put-fn)
+  (task-summary-stats-w current-state :backlog-cnt span msg-meta put-fn)
+  (task-summary-stats-w current-state :completed-cnt span msg-meta put-fn)
+  (task-summary-stats-w current-state :closed-cnt span msg-meta put-fn)
   (future
     (let [child-span (z/child-span span "award-points")
           stats {:award-points (aw/award-points current-state)}

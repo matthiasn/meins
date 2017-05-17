@@ -181,14 +181,13 @@
 
 (s/def :iww.search-result/entries-seq (s/* possible-timestamp?))
 (s/def :iww.search-result/entries
-  (s/map-of keyword? :iww.search-result/entries-seq) )
+  (s/map-of (s/nilable keyword?) :iww.search-result/entries-seq) )
 (s/def :iww.search-result/entries-map (s/map-of possible-timestamp? entry-spec))
 (s/def :iww.search-result/hashtags (s/* string?))
 (s/def :iww.search-result/mentions (s/* string?))
 (s/def :iww.search-result/stats search-stats-spec)
 (s/def :iww.search-result/duration-ms string?)
 
-#_
 (s/def :state/new
   (s/keys :req-un [:iww.search-result/entries
                    :iww.search-result/entries-map
@@ -197,6 +196,8 @@
 (s/def :state/stats-tags
   (s/keys :req-un [:iww.search-result/hashtags
                    :iww.search-result/mentions]))
+
+(s/def :state/stats-tags2 map?)
 
 (s/def :stats/day (s/keys :req-un [:iww.search/date-string]))
 (s/def :stats/days (s/coll-of :stats/day))
@@ -231,6 +232,7 @@
 (s/def :stats/result
   (s/keys :req-un [:stats/type
                    :stats/stats]))
+(s/def :stats/result2 map?)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Spec for :state/publish-current
