@@ -16,7 +16,7 @@
 (def sente-cfg {:relay-types #{:entry/update :entry/find :entry/trash
                                :import/geo :import/photos :import/phone
                                :import/spotify :import/flight
-                               ;:cmd/keep-alive
+                               :cmd/keep-alive
                                :stats/pomo-day-get
                                :stats/get :stats/get2 :import/movie :blink/busy
                                :state/stats-tags-get :import/weight
@@ -57,8 +57,7 @@
      [:cmd/route {:from :client/scheduler-cmp
                   :to   #{:client/store-cmp
                           :client/ws-cmp}}]])
-  ;(ka/init-keepalive! switchboard)
-  )
+  (ka/init-keepalive! switchboard))
 
 (init!)
 
