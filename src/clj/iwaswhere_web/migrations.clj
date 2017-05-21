@@ -143,7 +143,6 @@
     (fs/mkdirs geonames-path)
     (doseq [f (f/filter-by-name files #"\d{4}-\d{2}-\d{2}a?.jrn")]
       (with-open [reader (clojure.java.io/reader f)]
-        (prn f)
         (let [lines (line-seq reader)]
           (doseq [line lines]
             (try
@@ -170,3 +169,43 @@
                 (count countries) "countries found.")
       (doseq [[c days] (reverse (sort-by second days-per-country))]
         (println c days "days")))))
+
+(defn remove-deleted
+  "Lookup geolocation for entries with lat and lon."
+  ; (use 'iwaswhere-web.migrations)
+  ; (time (m/remove-deleted "./data/migration/remove-deleted" "./data/migration/out/"))
+  [path out-dir]
+  (let [files (file-seq (clojure.java.io/file path))
+        state (atom {:deleted #{}})
+        geonames-path "./data/geonames/"
+        local-fmt (ctf/with-zone (ctf/formatters :year-month-day)
+                                 (ct/default-time-zone))]
+    (fs/mkdirs out-dir)
+    (doseq [f (f/filter-by-name files #"\d{4}-\d{2}-\d{2}a?.jrn")]
+      (with-open [reader (clojure.java.io/reader f)]
+        (let [lines (line-seq reader)]
+          (doseq [line lines]
+            (try
+              (let [parsed (clojure.edn/read-string line)]
+                (when (:deleted parsed)
+                  (let [ts (:timestamp parsed)]
+                    (swap! state update-in [:deleted] #(set (conj % ts))))))
+              (catch Exception ex
+                (log/error "Exception" ex "when parsing line:\n" line)))))))
+    (doseq [f (f/filter-by-name files #"\d{4}-\d{2}-\d{2}a?.jrn")]
+      (with-open [reader (clojure.java.io/reader f)]
+        (let [lines (line-seq reader)
+              filename (.getName f)]
+          (log/info filename)
+          (doseq [line lines]
+            (try
+              (let [parsed (clojure.edn/read-string line)
+                    ts (:timestamp parsed)
+                    serialized (str (pr-str parsed) "\n")
+                    out-file (str out-dir filename)]
+                (when-not (contains? (:deleted @state) ts)
+                  (spit out-file serialized :append true)))
+              (catch Exception ex
+                (log/error "Exception" ex "when parsing line:\n" line)))))))
+    (let [deleted (:deleted @state)]
+      (log/info (count deleted) " deleted."))))
