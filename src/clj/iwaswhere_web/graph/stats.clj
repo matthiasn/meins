@@ -175,9 +175,6 @@
   (case k
     :open-tasks-cnt (res-count state {:tags     #{"#task"}
                                       :not-tags #{"#done" "#backlog" "#closed"}})
-    :started-tasks-cnt (res-count state {:tags     #{"#task"}
-                                         :not-tags #{"#done" "#backlog" "#closed"}
-                                         :opts     #{":started"}})
     :backlog-cnt (res-count state {:tags     #{"#task" "#backlog"}
                                    :not-tags #{"#done" "#closed"}})
     :completed-cnt (completed-count state)
@@ -203,7 +200,6 @@
       (.finish child-span)
       (put-fn (with-meta [:stats/result2 stats] {:sente-uid uid}))))
   (task-summary-stats-w current-state :open-tasks-cnt span msg-meta put-fn)
-  (task-summary-stats-w current-state :started-tasks-cnt span msg-meta put-fn)
   (task-summary-stats-w current-state :backlog-cnt span msg-meta put-fn)
   (task-summary-stats-w current-state :completed-cnt span msg-meta put-fn)
   (task-summary-stats-w current-state :closed-cnt span msg-meta put-fn)

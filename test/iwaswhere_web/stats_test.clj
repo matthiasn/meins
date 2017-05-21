@@ -93,10 +93,6 @@
             (is (= 1 stats))))
         (testing
           "task summary stats are correct"
-          (let [stats (gs/task-summary-stats new-state :started-tasks-cnt)]
-            (is (= 1 stats))))
-        (testing
-          "task summary stats are correct"
           (let [stats (gs/task-summary-stats new-state :backlog-cnt)]
             (is (= 1 stats))))
         (testing

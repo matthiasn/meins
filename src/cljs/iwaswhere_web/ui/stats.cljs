@@ -24,7 +24,6 @@
           (count (:hashtags @options)) " hashtags, "
           (count (:mentions @options)) " people, "
           (:open-tasks-cnt @stats) " open tasks, "
-          (:started-tasks-cnt @stats) " started, "
           (:backlog-cnt @stats) " backlog, "
           (:completed-cnt @stats) " completed, "
           (:closed-cnt @stats) " closed, "
