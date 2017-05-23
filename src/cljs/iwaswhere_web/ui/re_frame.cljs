@@ -49,6 +49,8 @@
       [cf2/custom-fields-chart put-fn]]
      [:div.stats
       [stats/stats-view put-fn]]
+     [:div.briefing
+      [g/tabs-view :briefing put-fn]]
      [:div.left
       [g/tabs-view :left put-fn]]
      [:div.right

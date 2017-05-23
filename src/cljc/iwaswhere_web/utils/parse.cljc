@@ -58,9 +58,10 @@
   [query-string tab-group put-fn]
   (fn [_ev]
     (put-fn [:search/add
-             {:tab-group (if (= tab-group :right)
-                           :left
-                           :right)
+             {:tab-group (case tab-group
+                           :briefing :left
+                           :left :right
+                           :left)
               :query     (parse-search query-string)}])))
 
 (defn autocomplete-tags

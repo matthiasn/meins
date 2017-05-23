@@ -32,13 +32,7 @@
                 conf (merge @cfg @options)]
             (if (:show-pvt @cfg)
               entries
-              (filter (u/pvt-filter conf entries-map) entries))))
-        update-search (fn [ts]
-                        (fn [_ev]
-                          (let [query-id (:query-id local-cfg)
-                                q (get-in @query-cfg [:queries query-id])]
-                            (put-fn [:search/update
-                                     (update-in q [:linked] #(when-not (= % ts) ts))]))))]
+              (filter (u/pvt-filter conf entries-map) entries))))]
     (fn waiting-habits-list-render [tab-group entry local-cfg put-fn]
       (let [entries-list @entries-list
             today (.format (js/moment.) "YYYY-MM-DD")
