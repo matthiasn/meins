@@ -54,7 +54,7 @@
              (for [entry entries-list]
                (let [ts (:timestamp entry)]
                  ^{:key ts}
-                 [:tr {:on-click (update-search ts)}
+                 [:tr {:on-click (up/add-search ts tab-group put-fn)}
                   [:td
                    (when-let [prio (-> entry :habit :priority)]
                      [:span.prio {:class prio} prio])]

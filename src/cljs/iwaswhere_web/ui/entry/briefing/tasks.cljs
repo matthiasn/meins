@@ -50,12 +50,6 @@
                      [:span.filter {:class    (when (:on-hold @local) "current")
                                     :on-click #(swap! local update-in [:on-hold] not)}
                       (name fk)])
-        update-search (fn [ts]
-                        (fn [_ev]
-                          (let [query-id (:query-id local-cfg)
-                                q (get-in @query-cfg [:queries query-id])]
-                            (put-fn [:search/update
-                                     (update-in q [:linked] #(when-not (= % ts) ts))]))))
         entries-list (reaction
                        (let [entries-map @entries-map
                              find-missing (u/find-missing-entry entries-map put-fn)
@@ -86,7 +80,7 @@
              (for [entry entries-list]
                (let [ts (:timestamp entry)]
                  ^{:key ts}
-                 [:tr {:on-click (update-search ts)}
+                 [:tr {:on-click (up/add-search ts tab-group put-fn)}
                   [:td
                    (when-let [prio (-> entry :task :priority)]
                      [:span.prio {:class prio} prio])]
@@ -182,7 +176,7 @@
              (let [ts (:timestamp task)
                    on-drag-start (a/drag-start-fn task put-fn)]
                ^{:key ts}
-               [:tr {:on-click (update-search ts)}
+               [:tr {:on-click (up/add-search ts tab-group put-fn)}
                 (let [prio (or (-> task :task :priority) "-")]
                   [:td
                    [:span.prio {:class         prio

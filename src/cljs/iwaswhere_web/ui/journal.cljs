@@ -93,11 +93,6 @@
             (when (with-comments? entry)
               ^{:key (:timestamp entry)}
               [e/entry-with-comments (:timestamp entry) put-fn local-cfg]))
-          (when-let [linked (:linked @query)]
-            (find-missing linked)
-            (put-fn [:entry/find {:timestamp linked}])
-            ;^{:key linked}
-            [e/entry-with-comments linked put-fn local-cfg])
           (when (> (count entries) 1)
             (let [show-more #(put-fn [:show/more {:query-id query-id}])]
               [:div.show-more {:on-click show-more :on-mouse-over show-more}
