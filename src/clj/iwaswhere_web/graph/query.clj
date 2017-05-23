@@ -89,8 +89,10 @@
                       now (ct/now)
                       today-at (t/from-time-zone
                                  (ct/today-at (ct/hour from) (ct/minute from))
-                                 dtz)]
-                  (and (not (:done (:habit entry)))
+                                 dtz)
+                      habit (:habit entry)]
+                  (and (not (:done habit))
+                       (not (:skipped habit))
                        (t/after? now from)
                        (t/after? now today-at)))))
 

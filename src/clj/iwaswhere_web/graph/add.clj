@@ -103,23 +103,24 @@
 (defn add-geoname
   "Add geoname info"
   [state entry]
-  (if-let [geoname (:geoname entry)]
-    (let [g (:graph state)
-          dt (local-dt entry)
-          year (ct/year dt)
-          month (ct/month dt)
-          country {:type :geoname/cc :country-code (:country-code geoname)}
-          geoname {:type :geoname/geoname :geoname geoname}
-          day-node {:type :timeline/day :year year :month month :day (ct/day dt)}]
-      (assoc-in state [:graph] (-> g
-                                   (uc/add-nodes :countries country day-node)
-                                   (uc/add-nodes :geonames geoname day-node)
-                                   (uc/add-edges
-                                     [:countries country]
-                                     [:geonames geoname]
-                                     [day-node country {:relationship :VISITED}]
-                                     [day-node geoname {:relationship :VISITED}]))))
-    state))
+  (let [geoname (:geoname entry)]
+    (if (and geoname (:latitude entry))
+      (let [g (:graph state)
+            dt (local-dt entry)
+            year (ct/year dt)
+            month (ct/month dt)
+            country {:type :geoname/cc :country-code (:country-code geoname)}
+            geoname {:type :geoname/geoname :geoname geoname}
+            day-node {:type :timeline/day :year year :month month :day (ct/day dt)}]
+        (assoc-in state [:graph] (-> g
+                                     (uc/add-nodes :countries country day-node)
+                                     (uc/add-nodes :geonames geoname day-node)
+                                     (uc/add-edges
+                                       [:countries country]
+                                       [:geonames geoname]
+                                       [day-node country {:relationship :VISITED}]
+                                       [day-node geoname {:relationship :VISITED}]))))
+      state)))
 
 (defn add-for-day
   "Adds links to timeline nodes when when entry is for another day and time.

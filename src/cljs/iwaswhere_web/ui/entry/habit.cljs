@@ -28,6 +28,7 @@
         (assoc-in [:habit :done] false)
         (dissoc :linked-entries-list)
         (dissoc :last-saved)
+        (dissoc :geoname)
         (dissoc :latitude)
         (dissoc :longitude))))
 
@@ -64,6 +65,22 @@
                 (put-fn [:entry/update updated]))
               ;; otherwise just toggle - follow-up is scheduled already
               (let [updated (update-in entry [:habit :done] not)]
+                (put-fn [:entry/update updated])))))
+        skipped
+        (fn [entry]
+          (fn [ev]
+            (if-not (-> entry :habit :next-entry)
+              ;; check off and create next habit entry
+              (let [next-entry (next-habit-entry entry)
+                    next-ts (:timestamp next-entry)
+                    updated (-> entry
+                                (assoc-in [:habit :next-entry] next-ts)
+                                (update-in [:habit :skipped] not))]
+                (put-fn [:entry/update next-entry])
+                (h/send-w-geolocation next-entry put-fn)
+                (put-fn [:entry/update updated]))
+              ;; otherwise just toggle - follow-up is scheduled already
+              (let [updated (update-in entry [:habit :skipped] not)]
                 (put-fn [:entry/update updated])))))
         set-points (fn [entry]
                      (fn [ev]
@@ -127,4 +144,9 @@
            [:label "Done? "]
            [:input {:type      :checkbox
                     :checked   (get-in entry [:habit :done])
-                    :on-change (done entry)}]]]]))))
+                    :on-change (done entry)}]]
+          [:div
+           [:label "Skipped? "]
+           [:input {:type      :checkbox
+                    :checked   (get-in entry [:habit :skipped])
+                    :on-change (skipped entry)}]]]]))))
