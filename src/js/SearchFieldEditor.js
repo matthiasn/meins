@@ -69,7 +69,6 @@ export default class SearchFieldEditor extends Component {
                  onClick={this.focus}>
                 <Editor
                     editorState={this.state.editorState}
-                    //editorState={this.props.editorState}
                     onChange={this.onChange}
                     plugins={this.plugins}
                     ref={(element) => {

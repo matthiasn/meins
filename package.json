@@ -13,9 +13,9 @@
   "license": "AGPL-1.0",
   "dependencies": {
     "draft-js": "^0.10.0",
-    "draft-js-hashtag-plugin": "^2.0.0-beta9",
-    "draft-js-mention-plugin": "^2.0.0-beta9",
-    "draft-js-plugins-editor": "^2.0.0-beta9",
+    "draft-js-hashtag-plugin": "^2.0.0-rc1",
+    "draft-js-mention-plugin": "^2.0.0-rc1",
+    "draft-js-plugins-editor": "^2.0.0-rc1",
     "emoji-flags": "^1.2.0",
     "extract-text-webpack-plugin": "^2.0.0",
     "moment": "^2.18.1",

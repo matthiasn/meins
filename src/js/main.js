@@ -6,6 +6,7 @@ window.deps = {
     'react-responsive-carousel' : require('react-responsive-carousel').Carousel,
     'editor' : require ('./editor'),
     'SearchFieldEditor' : require ('./SearchFieldEditor'),
+    'StoryFieldEditor' : require ('./StoryFieldEditor'),
     'Calendar' : require ('./calendar'),
     'emojiFlags' : require('emoji-flags')
 };
@@ -15,4 +16,3 @@ window.ReactDOM = window.deps['react-dom'];
 window.Draft = window.deps['draft-js'];
 window.ReactPerf = window.deps['react-addons-perf'];
 window.MyEditor = window.deps['editor'];
-window.SearchFieldEditor = window.deps['SearchFieldEditor'];

@@ -29,3 +29,12 @@
                :mentions    mentions
                :hashtags    hashtags
                :onChange    on-change}])))
+
+(defn story-search-field
+  [editor-state select-story _stories]
+  (let [editor (r/adapt-react-class
+                 (aget js/window "deps" "StoryFieldEditor" "default"))]
+    (fn [editor-state select-story stories]
+      [editor {:editorState editor-state
+               :stories     stories
+               :selectStory select-story}])))

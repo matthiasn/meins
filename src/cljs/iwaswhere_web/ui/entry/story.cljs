@@ -1,6 +1,7 @@
 (ns iwaswhere-web.ui.entry.story
   (:require [iwaswhere-web.helpers :as h]
             [iwaswhere-web.ui.entry.capture :as c]
+            [iwaswhere-web.ui.draft :as d]
             [re-frame.core :refer [subscribe]]
             [reagent.ratom :refer-macros [reaction]]
             [reagent.core :as r]
@@ -83,31 +84,26 @@
                                           (assoc-in [:linked-story] story-id))]
                           (swap! local assoc-in [:search] "")
                           (put-fn [:entry/update-local updated]))))
+        select-story (fn [story-id]
+                       (let [updated (-> (get-in @new-entries [ts])
+                                         (assoc-in [:linked-story] story-id))]
+                         (put-fn [:entry/update-local updated])))
         search-change (fn [ev]
                         (let [text (aget ev "target" "value")]
-                          (swap! local assoc-in [:search] text)))]
+                          (swap! local assoc-in [:search] text)))
+        story-mapper (fn [[ts story]]
+                       {:name (:story-name story)
+                        :id ts})]
     (fn story-select-render [entry put-fn edit-mode?]
-      (let [linked-story (:linked-story entry)]
+      (let [linked-story (:linked-story entry)
+            story-name (get-in @stories [linked-story :story-name] "")
+            editor-state (d/editor-state-from-text story-name)
+            stories-list (map story-mapper @sorted-stories)]
         (if edit-mode?
           (when-not (or (contains? #{:saga :story} (:entry-type entry))
                         (:comment-for entry))
             [:div.story
-             [:div.name (get-in @stories [linked-story :story-name])]
-             [:div
-              [:input {:type      :text
-                       :on-change search-change
-                       :value     (:search @local)}]
-              (when (pos? (count (:search @local)))
-                (let [stories (->> @sorted-stories
-                                   (filter story-filter)
-                                   (take 10))]
-                  [:div.stories
-                   [:div.story-list
-                    (for [[id story] stories]
-                      (let [story-name (:story-name story)]
-                        ^{:key (str ts story-name)}
-                        [:div {:on-click (story-input id)}
-                         story-name]))]]))]])
+             [d/story-search-field editor-state select-story stories-list]])
           (when linked-story
             [:div.story (:story-name (get @stories linked-story))]))))))
 
