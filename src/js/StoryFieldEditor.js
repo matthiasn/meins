@@ -48,6 +48,7 @@ export default class SearchFieldEditor extends Component {
         this.state.storySuggestions = fromJS(props.stories);
 
         this.onChange = (editorState) => {
+            props.onChange(editorState);
             this.setState({editorState});
         };
     }
@@ -55,7 +56,8 @@ export default class SearchFieldEditor extends Component {
     render() {
         const StorySuggestions = this.StorySuggestions;
         return (
-            <div onClick={this.focus}>
+            <div className="search-field"
+                 onClick={this.focus}>
                 <Editor
                     editorState={this.state.editorState}
                     onChange={this.onChange}

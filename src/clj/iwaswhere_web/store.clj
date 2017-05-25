@@ -45,7 +45,7 @@
     (when clucy-dir-empty?
       (future
         (Thread/sleep 2000)
-        (log/info "Indexing started")
+        (log/info "Fulltext-Indexing started")
         (let [t (with-out-str
                   (time (doseq [entry (vals @entries-to-index)]
                           (put-fn [:ft/add entry]))))]

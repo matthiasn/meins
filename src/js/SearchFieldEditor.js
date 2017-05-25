@@ -4,6 +4,17 @@ import createMentionPlugin, {defaultSuggestionsFilter} from 'draft-js-mention-pl
 import {fromJS} from 'immutable';
 import editorStyles from './editorStyles.css';
 
+const suggestionsFilter = (searchValue, suggestions) => {
+    const value = searchValue.toLowerCase();
+    const filteredSuggestions = suggestions.filter((suggestion) => {
+        const name = suggestion.get("name").toLowerCase();
+        const match = name.indexOf(value);
+        return match > -1;
+    });
+    const size = filteredSuggestions.size < 15 ? filteredSuggestions.size : 15;
+    return filteredSuggestions.setSize(size);
+};
+
 export default class SearchFieldEditor extends Component {
 
     state = {};
@@ -22,6 +33,12 @@ export default class SearchFieldEditor extends Component {
         });
     };
 
+    onSearchChangeStories = ({value}) => {
+        this.setState({
+            storySuggestions: suggestionsFilter(value, this.state.stories),
+        });
+    };
+
     focus = () => {
         this.editor.focus();
     };
@@ -30,30 +47,40 @@ export default class SearchFieldEditor extends Component {
         // get the mention object selected
     };
 
+    onAddStory = (story) => {
+        this.selectStory(story.get("id"));
+    };
+
     constructor(props) {
         super(props);
         console.log(props);
 
         this.state.editorState = props.editorState;
+        this.selectStory = props.selectStory;
 
         const hashtagPlugin = createMentionPlugin({
             mentionTrigger: "#",
         });
 
         const mentionPlugin = createMentionPlugin({
-            //mentionPrefix: "@",
             mentionTrigger: "@",
         });
 
-        this.plugins = [hashtagPlugin, mentionPlugin];
+        const storyPlugin = createMentionPlugin({
+            mentionTrigger: "$",
+        });
+
+        this.plugins = [hashtagPlugin, mentionPlugin, storyPlugin];
         this.HashtagSuggestions = hashtagPlugin.MentionSuggestions;
         this.MentionSuggestions = mentionPlugin.MentionSuggestions;
+        this.StorySuggestions = storyPlugin.MentionSuggestions;
 
         this.state.mentions = fromJS(props.mentions);
-        this.state.hashtags = fromJS(props.hashtags);
-
         this.state.mentionSuggestions = fromJS(props.mentions);
+        this.state.hashtags = fromJS(props.hashtags);
         this.state.hashtagSuggestions = fromJS(props.hashtags);
+        this.state.stories = fromJS(props.stories);
+        this.state.storySuggestions = fromJS(props.stories);
 
         this.onChange = (editorState) => {
             props.onChange(editorState);
@@ -64,6 +91,7 @@ export default class SearchFieldEditor extends Component {
     render() {
         const HashtagSuggestions = this.HashtagSuggestions;
         const MentionSuggestions = this.MentionSuggestions;
+        const StorySuggestions = this.StorySuggestions;
         return (
             <div className="search-field"
                  onClick={this.focus}>
@@ -84,6 +112,11 @@ export default class SearchFieldEditor extends Component {
                     onSearchChange={this.onSearchChange2}
                     suggestions={this.state.hashtagSuggestions}
                     onAddMention={this.onAddMention}
+                />
+                <StorySuggestions
+                    onSearchChange={this.onSearchChangeStories}
+                    suggestions={this.state.storySuggestions}
+                    onAddMention={this.onAddStory}
                 />
             </div>
         );

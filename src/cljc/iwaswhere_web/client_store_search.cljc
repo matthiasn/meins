@@ -192,7 +192,7 @@
   (let [query-cfg (:query-cfg current-state)
         new-state (-> current-state
                       (assoc-in [:query-cfg :last-update] {:last-update (st/now)
-                                                           :meta msg-meta})
+                                                           :meta        msg-meta})
                       (assoc-in [:query-cfg :last-update-meta] msg-meta))]
     {:new-state new-state
      :emit-msg  [[:state/search query-cfg]

@@ -66,10 +66,6 @@
   (let [options (subscribe [:options])
         local (r/atom {:search ""})
         stories (reaction (:stories @options))
-        story-filter (fn [[id story]]
-                       (s/includes? (s/lower-case (:story-name story))
-                                    (s/lower-case (:search @local))))
-        sorted-stories (reaction (:sorted-stories @options))
         ts (:timestamp entry)
         new-entries (subscribe [:new-entries])
         select-handler
@@ -78,32 +74,19 @@
                 updated (-> (get-in @new-entries [ts])
                             (assoc-in [:linked-story] selected))]
             (put-fn [:entry/update-local updated])))
-        story-input (fn [story-id]
-                      (fn [_]
-                        (let [updated (-> (get-in @new-entries [ts])
-                                          (assoc-in [:linked-story] story-id))]
-                          (swap! local assoc-in [:search] "")
-                          (put-fn [:entry/update-local updated]))))
         select-story (fn [story-id]
                        (let [updated (-> (get-in @new-entries [ts])
                                          (assoc-in [:linked-story] story-id))]
-                         (put-fn [:entry/update-local updated])))
-        search-change (fn [ev]
-                        (let [text (aget ev "target" "value")]
-                          (swap! local assoc-in [:search] text)))
-        story-mapper (fn [[ts story]]
-                       {:name (:story-name story)
-                        :id ts})]
+                         (put-fn [:entry/update-local updated])))]
     (fn story-select-render [entry put-fn edit-mode?]
       (let [linked-story (:linked-story entry)
             story-name (get-in @stories [linked-story :story-name] "")
-            editor-state (d/editor-state-from-text story-name)
-            stories-list (map story-mapper @sorted-stories)]
+            editor-state (d/editor-state-from-text story-name)]
         (if edit-mode?
           (when-not (or (contains? #{:saga :story} (:entry-type entry))
                         (:comment-for entry))
             [:div.story
-             [d/story-search-field editor-state select-story stories-list]])
+             [d/story-search-field editor-state select-story]])
           (when linked-story
             [:div.story (:story-name (get @stories linked-story))]))))))
 
