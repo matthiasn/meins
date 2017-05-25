@@ -38,20 +38,11 @@
 (defn search-field-view
   "Renders search field for current tab."
   [query-id put-fn]
-  (let [query-cfg (subscribe [:query-cfg])
-        cfg (subscribe [:cfg])
-        options (subscribe [:options])
-        stories (reaction (:stories @options))]
+  (let [query-cfg (subscribe [:query-cfg])]
     (fn [query-id put-fn]
       (let [query (query-id (:queries @query-cfg))
-            editor-state2 (d/editor-state-from-text "")
-            story-name (get-in @stories [:story-name] "test: story")
-            editor-state2 (d/editor-state-from-text story-name)
             search-send (fn [text editor-state]
                           (let [query (query-id (:queries @query-cfg))
-                                path [:entityMap :0 :data :mention :id]
-                                story (get-in editor-state path)
-                                story (when story (js/parseInt story))
                                 story (->> editor-state
                                            :entityMap
                                            vals
@@ -61,25 +52,15 @@
                                            :mention
                                            :id)
                                 story (when story (js/parseInt story))
-                                _ (prn story editor-state)
                                 s (merge query
                                          (p/parse-search text)
                                          {:story        story
                                           :editor-state editor-state})]
                             (put-fn [:search/update s])))
-            story-select-cb (fn [text editor-state]
-                              (prn editor-state)
-                              (let [path [:entityMap :0 :data :mention :id]
-                                    story (get-in editor-state path)
-                                    story (when story (js/parseInt story))
-                                    q (merge query {:story story})]
-                                (prn q)
-                                (put-fn [:search/update q])))
             select-story (fn [_story])]
         (when-not (:briefing query)
           [:div.search
            [tags-view query]
            ^{:key query-id}
            [:div.search-row
-            [d/draft-search-field (editor-state query) search-send select-story]
-            [d/story-search-field editor-state2 story-select-cb select-story]]])))))
+            [d/draft-search-field (editor-state query) search-send select-story]]])))))

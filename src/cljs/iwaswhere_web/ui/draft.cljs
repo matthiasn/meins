@@ -60,14 +60,12 @@
                :onChange    on-change}])))
 
 (defn story-search-field
-  [editor-state story-select-cb select-story]
+  [editor-state select-story]
   (let [options (subscribe [:options])
         sorted-stories (reaction (:sorted-stories @options))
-        editor (adapt-react-class "StoryFieldEditor")
-        on-change (on-editor-change story-select-cb)]
+        editor (adapt-react-class "StoryFieldEditor")]
     (fn [editor-state select-story]
       (let [stories-list (map story-mapper @sorted-stories)]
         [editor {:editorState editor-state
                  :stories     stories-list
-                 :selectStory select-story
-                 :onChange    on-change}]))))
+                 :selectStory select-story}]))))
