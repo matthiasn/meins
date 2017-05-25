@@ -68,12 +68,6 @@
         stories (reaction (:stories @options))
         ts (:timestamp entry)
         new-entries (subscribe [:new-entries])
-        select-handler
-        (fn [ev]
-          (let [selected (js/parseInt (-> ev .-nativeEvent .-target .-value))
-                updated (-> (get-in @new-entries [ts])
-                            (assoc-in [:linked-story] selected))]
-            (put-fn [:entry/update-local updated])))
         select-story (fn [story-id]
                        (let [updated (-> (get-in @new-entries [ts])
                                          (assoc-in [:linked-story] story-id))]
