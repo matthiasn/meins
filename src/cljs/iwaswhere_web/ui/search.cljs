@@ -56,11 +56,10 @@
                                          (p/parse-search text)
                                          {:story        story
                                           :editor-state editor-state})]
-                            (put-fn [:search/update s])))
-            select-story (fn [_story])]
+                            (put-fn [:search/update s])))]
         (when-not (:briefing query)
           [:div.search
            [tags-view query]
            ^{:key query-id}
            [:div.search-row
-            [d/draft-search-field (editor-state query) search-send select-story]]])))))
+            [d/draft-search-field (editor-state query) search-send]]])))))

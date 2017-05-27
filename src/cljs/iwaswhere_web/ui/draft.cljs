@@ -34,7 +34,7 @@
   (r/adapt-react-class (aget js/window "deps" cls "default")))
 
 (defn draft-search-field
-  [editor-state update-cb select-story]
+  [editor-state update-cb]
   (let [editor (adapt-react-class "SearchFieldEditor")
         options (subscribe [:options])
         sorted-stories (reaction (:sorted-stories @options))
@@ -50,13 +50,12 @@
                                     hashtags)]
                      (map (fn [h] {:name h}) hashtags)))
         on-change (on-editor-change update-cb)]
-    (fn [editor-state send-fn select-story]
+    (fn [editor-state send-fn]
       [editor {:editorState editor-state
                :spellCheck  true
                :mentions    @mentions
                :hashtags    @hashtags
                :stories     @stories-list
-               :selectStory select-story
                :onChange    on-change}])))
 
 (defn story-search-field

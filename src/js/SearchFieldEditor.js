@@ -34,8 +34,9 @@ export default class SearchFieldEditor extends Component {
     };
 
     onSearchChangeStories = ({value}) => {
+        let stories = fromJS(this.props.stories);
         this.setState({
-            storySuggestions: suggestionsFilter(value, this.state.stories),
+            storySuggestions: suggestionsFilter(value, stories),
         });
     };
 
@@ -48,7 +49,6 @@ export default class SearchFieldEditor extends Component {
     };
 
     onAddStory = (story) => {
-        this.selectStory(story.get("id"));
     };
 
     constructor(props) {
@@ -56,7 +56,6 @@ export default class SearchFieldEditor extends Component {
         console.log(props);
 
         this.state.editorState = props.editorState;
-        this.selectStory = props.selectStory;
 
         const hashtagPlugin = createMentionPlugin({
             mentionTrigger: "#",
@@ -75,11 +74,8 @@ export default class SearchFieldEditor extends Component {
         this.MentionSuggestions = mentionPlugin.MentionSuggestions;
         this.StorySuggestions = storyPlugin.MentionSuggestions;
 
-        this.state.mentions = fromJS(props.mentions);
         this.state.mentionSuggestions = fromJS(props.mentions);
-        this.state.hashtags = fromJS(props.hashtags);
         this.state.hashtagSuggestions = fromJS(props.hashtags);
-        this.state.stories = fromJS(props.stories);
         this.state.storySuggestions = fromJS(props.stories);
 
         this.onChange = (editorState) => {
