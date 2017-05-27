@@ -119,8 +119,8 @@
      :tags      #{"#photo" "#import"}}))
 
 (defn import-video
-  "Takes an video file (as a java.io.InputStream or java.io.File) creates entry
-   from it."
+  "Takes a video file (as a java.io.InputStream or java.io.File) and creates
+   entry from it."
   [file]
   (let [filename (.getName file)
         rel-path (.getPath file)

@@ -49,6 +49,7 @@
    :briefing    nil
    :timestamp   nil
    :id          nil
+   :linked      nil
    :n           20})
 
 (def fulltext-search
@@ -63,6 +64,7 @@
    :briefing    nil
    :timestamp   nil
    :id          nil
+   :linked      nil
    :n           20})
 
 (def open-tasks-search
@@ -77,6 +79,7 @@
    :briefing    nil
    :timestamp   nil
    :id          nil
+   :linked      nil
    :n           20})
 
 (def started-tasks-search
@@ -91,6 +94,7 @@
    :briefing    nil
    :timestamp   nil
    :id          nil
+   :linked      nil
    :n           20})
 
 (def tasks-done-search
@@ -105,6 +109,7 @@
    :briefing    nil
    :timestamp   nil
    :id          nil
+   :linked      nil
    :n           20})
 
 (def day-search
@@ -119,6 +124,7 @@
    :briefing    nil
    :timestamp   nil
    :id          nil
+   :linked      nil
    :n           20})
 
 (def briefing-search
@@ -133,6 +139,7 @@
    :briefing    "2016-06-07"
    :timestamp   nil
    :id          nil
+   :linked      nil
    :n           20})
 
 (def timestamp-search
@@ -146,6 +153,22 @@
    :date-string nil
    :briefing    nil
    :timestamp   "1465325998053"
+   :linked      nil
+   :id          nil
+   :n           20})
+
+(def linked-search
+  {:search-text "l:1465325998053"
+   :ft-search   nil
+   :country     nil
+   :tags        #{}
+   :not-tags    #{}
+   :mentions    #{}
+   :opts        #{}
+   :date-string nil
+   :briefing    nil
+   :timestamp   nil
+   :linked      "1465325998053"
    :id          nil
    :n           20})
 
@@ -160,6 +183,7 @@
    :date-string nil
    :briefing    nil
    :timestamp   nil
+   :linked      nil
    :id          nil
    :n           20})
 
@@ -174,6 +198,7 @@
    :date-string nil
    :briefing    nil
    :timestamp   nil
+   :linked      nil
    :id          "48cde500-0d4f-11e7-8d14-42a2f9d2d24d"
    :n           20})
 
@@ -216,6 +241,10 @@
   (testing "timestamp query is parsed correctly"
     (is (= (p/parse-search (:search-text timestamp-search))
            timestamp-search)))
+
+  (testing "linked query is parsed correctly"
+    (is (= (p/parse-search (:search-text linked-search))
+           linked-search)))
 
   (testing "country query is parsed correctly"
     (is (= country-search

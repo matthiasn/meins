@@ -185,6 +185,15 @@
                                                      :day   (ct/day dt)}
                                       :relationship :DATE})))))
 
+(defn get-linked-nodes
+  "Find all linked nodes for entry."
+  [g query]
+  (let [for-entry (Long/parseLong (:linked query))
+        linked (->> (flatten (uc/find-edges g {:src for-entry :relationship :LINKED}))
+                    (map :dest)
+                    (sort))]
+    (set linked)))
+
 (defn get-briefing-for-day
   "Extract matching timestamps for query."
   [g query]
@@ -229,6 +238,10 @@
                       ; full-text search
                       (:ft-search query)
                       (ft/search query)
+
+                      ; set with linked timestamps
+                      (:linked query)
+                      (get-linked-nodes g query)
 
                       ; set with the one timestamp in query
                       (:timestamp query)
