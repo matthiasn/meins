@@ -105,6 +105,7 @@
         timestamp (or
                     (extract-gps-ts (str (get exif "GPS Date Stamp") " "
                                          (get exif "GPS Time-Stamp")) filename)
+                    (extract-ts (str (get exif "Date/Time Digitized")) filename)
                     (extract-ts (str (get exif "Date/Time")) filename)
                     (extract-ts (str (get exif "Date/Time Original")) filename)
                     (.lastModified file))
