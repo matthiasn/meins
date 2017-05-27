@@ -42,17 +42,6 @@
         new-state (assoc-in current-state [:cfg :currently-dragged] ts)]
     {:new-state new-state}))
 
-(defn toggle-active-fn
-  "Sets entry in payload as the active entry for which to show linked entries."
-  [{:keys [current-state msg-payload]}]
-  (let [{:keys [timestamp query-id]} msg-payload
-        currently-active (get-in current-state [:cfg :active query-id])
-        new-state (assoc-in current-state [:cfg :active query-id]
-                            (when-not (= currently-active timestamp)
-                              timestamp))]
-    {:new-state    new-state
-     :send-to-self [:cfg/save]}))
-
 (defn toggle-set-fn
   "Toggles for example the visibility of a map or the edit mode for an individual
   journal entry. Requires the key to exist on the application state as a set."

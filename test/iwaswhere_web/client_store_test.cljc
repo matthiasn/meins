@@ -121,18 +121,6 @@
       "stats are on new state"
       (is (= (:stats new-state) (:stats stats-tags-from-backend))))))
 
-(deftest set-active-test
-  "Test that active entry is updated properly in store component state"
-  (let [current-state @(:state (store/initial-state-fn (fn [_put-fn])))
-        ts (:timestamp test-entry)
-        new-state (:new-state (c/toggle-active-fn
-                                {:current-state current-state
-                                 :msg-payload   {:timestamp ts
-                                                 :query-id  :query-1}}))]
-    (testing
-      "active entry is set"
-      (is (= ts (:query-1 (:active (:cfg new-state))))))))
-
 (deftest toggle-key-test
   "toggle key messages flip boolean value"
   (let [current-state @(:state (store/initial-state-fn (fn [_put-fn])))
@@ -184,7 +172,6 @@
       (is (fn? (:stats/result handler-map)))
       (is (fn? (:state/stats-tags  handler-map)))
       (is (fn? (:cfg/save    handler-map)))
-      (is (fn? (:cmd/toggle-active handler-map)))
       (is (fn? (:cmd/toggle handler-map)))
       (is (fn? (:cmd/toggle-key handler-map)))
       (is (fn? (:cmd/set-opt handler-map)))

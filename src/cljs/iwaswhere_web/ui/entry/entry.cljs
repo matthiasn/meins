@@ -80,9 +80,7 @@
         tab-group (:tab-group local-cfg)
         add-search (up/add-search q-date-string tab-group put-fn)
         pomo-start #(put-fn [:cmd/pomodoro-start @entry])
-        set-active-fn #(put-fn [:cmd/toggle-active
-                                {:timestamp ts
-                                 :query-id  (:query-id local-cfg)}])
+        open-linked (up/add-search (str "l:" ts) tab-group put-fn)
         drop-fn (a/drop-linked-fn entry entries-map cfg put-fn)
         toggle-edit #(if @edit-mode (put-fn [:entry/remove-local @entry])
                                     (put-fn [:entry/update-local @entry]))]
@@ -109,7 +107,7 @@
              (let [ts (:timestamp @entry)
                    entry-active? (when-let [query-id (:query-id local-cfg)]
                                    (= (query-id @active) ts))]
-               [:span.link-btn {:on-click set-active-fn
+               [:span.link-btn {:on-click open-linked
                                 :class    (when entry-active? "active")}
                 (str " linked: " (count (:linked-entries-list @entry)))]))]
           [a/entry-actions ts put-fn edit-mode? toggle-edit local-cfg]]

@@ -113,7 +113,6 @@
                               :state/stats-tags   stats-tags-fn
                               :state/stats-tags2  stats-tags-fn2
                               :cfg/save           c/save-cfg
-                              :cmd/toggle-active  c/toggle-active-fn
                               :cmd/toggle         c/toggle-set-fn
                               :cmd/set-opt        c/set-conj-fn
                               :cmd/set-dragged    c/set-currently-dragged

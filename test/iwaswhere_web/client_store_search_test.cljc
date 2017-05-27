@@ -15,11 +15,8 @@
                                              :msg-payload   st/empty-query})
         new-state (:new-state handler-res)
         toggle-msg {:timestamp (:timestamp st/test-entry) :query-id :query-1}
-        new-state1 (:new-state (c/toggle-active-fn
-                                 {:current-state new-state
-                                  :msg-payload   toggle-msg}))
         new-state2 (:new-state (search/update-query-fn
-                                 {:current-state new-state1
+                                 {:current-state new-state
                                   :msg-payload   st/open-tasks-query}))]
     (testing
       "query is set locally"
@@ -27,10 +24,6 @@
     (testing
       "active entry not set"
       (is (not (:active new-state))))
-    (testing
-      "active entry is set in base state for subseqent test"
-      (is (= (:timestamp st/test-entry)
-             (:query-1 (:active (:cfg new-state1))))))
     (testing
       "query is updated"
       (is (= st/open-tasks-query
