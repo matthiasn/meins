@@ -127,8 +127,7 @@
             [:option {:value :B} "B"]
             [:option {:value :C} "C"]
             [:option {:value :D} "D"]
-            [:option {:value :E} "E"]]]
-          [:div
+            [:option {:value :E} "E"]]
            [:label "Active from: "]
            [:input {:type      :datetime-local
                     :read-only (not edit-mode?)
@@ -144,8 +143,7 @@
            [:label "Done? "]
            [:input {:type      :checkbox
                     :checked   (get-in entry [:habit :done])
-                    :on-change (done entry)}]]
-          [:div
+                    :on-change (done entry)}]
            [:label "Skipped? "]
            [:input {:type      :checkbox
                     :checked   (get-in entry [:habit :skipped])

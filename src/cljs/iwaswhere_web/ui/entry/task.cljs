@@ -43,13 +43,6 @@
          [:fieldset
           [:legend "Task details"]
           [:div
-           [:span " Due: "]
-           (if edit-mode?
-             [:input {:type     :datetime-local
-                      :on-input (input-fn entry :due)
-                      :value    (h/format-time (-> entry :task :due))}]
-             [:time (format-time (-> entry :task :due))])]
-          [:div
            [:span " Priority: "]
            [:select {:value     (get-in entry [:task :priority] "")
                      :disabled  (not edit-mode?)
@@ -59,29 +52,33 @@
             [:option {:value :B} "B"]
             [:option {:value :C} "C"]
             [:option {:value :D} "D"]
-            [:option {:value :E} "E"]]]
+            [:option {:value :E} "E"]]
+           [:span " Due: "]
+           (if edit-mode?
+             [:input {:type     :datetime-local
+                      :on-input (input-fn entry :due)
+                      :value    (h/format-time (-> entry :task :due))}]
+             [:time (format-time (-> entry :task :due))])]
           [:div
            [:label "Reward points: "]
            [:input {:type      :number
                     :read-only (not edit-mode?)
                     :on-input  (h/update-numeric entry [:task :points] put-fn)
-                    :value     (get-in entry [:task :points] 0)}]]
-          [:div
-           [:label "Estimated time in minutes: "]
+                    :value     (get-in entry [:task :points] 0)}]
+           [:label "Estimated min: "]
            [:input {:type      :number
                     :read-only (not edit-mode?)
                     :on-input  (h/update-numeric entry [:task :estimate-m] put-fn)
                     :value     (get-in entry [:task :estimate-m] 0)}]]
           [:div
+           [:label "Done? "]
+           [:input {:type      :checkbox
+                    :checked   (get-in entry [:task :done])
+                    :on-change (done entry)}]
            [:label "On hold? "]
            [:input {:type      :checkbox
                     :checked   (get-in entry [:task :on-hold])
                     :on-change (hold entry)}]]
-          [:div
-           [:label "Done? "]
-           [:input {:type      :checkbox
-                    :checked   (get-in entry [:task :done])
-                    :on-change (done entry)}]]
           (let [active-from (get-in entry [:task :active-from])]
             (when (or edit-mode? active-from)
               [:div
