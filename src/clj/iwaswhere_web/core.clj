@@ -3,8 +3,7 @@
   together to form the backend system."
   (:gen-class)
   (:require [matthiasn.systems-toolbox.switchboard :as sb]
-    ;[matthiasn.systems-toolbox-sente.server :as sente]
-            [iwaswhere-web.sente :as sente]
+            [matthiasn.systems-toolbox-sente.server :as sente]
     ;[matthiasn.systems-toolbox-probe.probe :as probe]
             [iwaswhere-web.index :as idx]
             [iwaswhere-web.specs]

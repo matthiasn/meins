@@ -11,67 +11,24 @@
                  (.localServiceName "store")
                  (.reporter reporter)
                  (.build)))
-(def tracer (.tracer tracing))
-
-(def ws-tracing (-> (Tracing/newBuilder)
-                    (.localServiceName "ws")
-                    (.reporter reporter)
-                    (.build)))
-(def ws-tracer (.tracer ws-tracing))
 
 (def prop-setter
   (reify brave.propagation.Propagation$Setter
     (put [this c k v]
       (assoc! c k v))))
 
-(def injector
-  (-> tracing
-      (.propagation)
-      (.injector prop-setter)))
 
 (def prop-getter
   (reify brave.propagation.Propagation$Getter
     (get [this c k]
       (get-in c [k]))))
 
-(def extractor
-  (-> tracing
-      (.propagation)
-      (.extractor prop-getter)))
-
 ;tracing.close();
 ;reporter.close();
 
-(defn child-span-ws
-  [span child-name]
-  (-> ws-tracer
-      (.newChild (.context span))
-      (.name child-name)
-      (.annotate "cs")
-      (.start)))
 
-(defn new-trace-ws
-  [op-name]
-  (-> ws-tracer
-      (.newTrace)
-      (.name (str op-name))
-      (.annotate "cs")
-      (.start)))
-
-(defn serialized-trace
-  [span]
-  (let [c (transient {})
-        _ (.inject injector (.context span) c)
-        pc (persistent! c)]
-    pc))
-
-(defn extract-trace
-  [pc]
-  (.extract extractor pc))
-
-(defn trace-wrapper [f cmp-id]
-  (let [service-name (str cmp-id)
-        tracing (-> (Tracing/newBuilder)
+(defn trace-wrapper [f service-name]
+  (let [tracing (-> (Tracing/newBuilder)
                     (.localServiceName service-name)
                     (.reporter reporter)
                     (.build))
@@ -113,10 +70,56 @@
         (.finish span)
         res))))
 
+
 (defn trace-cmp
   [cmp-map]
-  (let [cmp-id (:cmp-id cmp-map)
+  (let [service-name (str (:cmp-id cmp-map))
+        tracing (-> (Tracing/newBuilder)
+                    (.localServiceName service-name)
+                    (.reporter reporter)
+                    (.build))
+        tracer (.tracer tracing)
+        injector (-> tracing
+                     (.propagation)
+                     (.injector prop-setter))
+        extractor (-> tracing
+                      (.propagation)
+                      (.extractor prop-getter))
+        extract-trace (fn [pc] (.extract extractor pc))
+        serialized-trace (fn [span]
+                           (let [c (transient {})
+                                 _ (.inject injector (.context span) c)
+                                 pc (persistent! c)]
+                             pc))
+        mk-child-span (fn [span child-name]
+                        ;(.annotate (.context span) "sr")
+                        (-> tracer
+                            (.newChild (.context span))
+                            (.name child-name)
+                            ;(.annotate "sr")
+                            (.start)))
+        state-fn (:state-fn cmp-map)
+        wrapped-state-fn
+        (fn [put-fn]
+          (let [wrapped-put-fn
+                (fn [m]
+                  (let [msg-meta (or (meta m) {})
+                        msg-meta (if (:trace msg-meta)
+                                   msg-meta
+                                   (let [msg-type (first m)
+                                         trace (-> tracer
+                                                   (.newTrace)
+                                                   (.name (str msg-type " put-fn"))
+                                                   (.annotate "cs")
+                                                   (.annotate "put-fn")
+                                                   (.start))
+                                         serialized-trace (serialized-trace trace)]
+                                     (.flush trace)
+                                     (assoc-in msg-meta [:trace] serialized-trace)))]
+                    (put-fn (with-meta m msg-meta))))]
+            (when state-fn (state-fn wrapped-put-fn))))
         handler-map (->> (:handler-map cmp-map)
-                         (map (fn [[k f]] [k (trace-wrapper f cmp-id)]))
+                         (map (fn [[k f]] [k (trace-wrapper f service-name)]))
                          (into {}))]
-    (merge cmp-map {:handler-map handler-map})))
+    (merge cmp-map {:handler-map handler-map
+                    :state-fn    wrapped-state-fn})))
