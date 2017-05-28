@@ -21,7 +21,8 @@
             [iwaswhere-web.utils.misc :as u]
             [iwaswhere-web.file-utils :as fu]
             [clj-time.format :as ctf]
-            [clojure.string :as str])
+            [clojure.string :as str]
+            [iwaswhere-web.zipkin :as z])
   (:import [com.drew.imaging ImageMetadataReader]))
 
 (defn dms-to-dd
@@ -308,7 +309,7 @@
   "Generates component map for imports-cmp."
   [cmp-id]
   {:cmp-id      cmp-id
-   :handler-map {:import/photos  import-media
+   :handler-map {:import/photos  (z/traced3 import-media :import/photos)
                  :import/geo     import-geo
                  :import/movie   import-movie
                  :import/spotify import-spotify

@@ -40,6 +40,7 @@
           msg-meta (meta msg)
           msg-type (first msg)
           trace (z/new-trace-ws (str "ws-recv" (first msg)))
+          _ (.annotate trace "cr")
           serialized-trace (z/serialized-trace trace)
           msg-meta (if (:trace msg-meta)
                      msg-meta

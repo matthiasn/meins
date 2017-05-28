@@ -15,7 +15,8 @@
             [iwaswhere-web.upload :as up]
             [iwaswhere-web.blink :as bl]
             [iwaswhere-web.imports :as i]
-            [matthiasn.systems-toolbox.scheduler :as sched]))
+            [matthiasn.systems-toolbox.scheduler :as sched]
+            [iwaswhere-web.zipkin :as z]))
 
 (defonce switchboard (sb/component :server/switchboard))
 
@@ -33,7 +34,7 @@
     [[:cmd/init-comp #{(sente/cmp-map :server/ws-cmp idx/sente-map)
                        (sched/cmp-map :server/scheduler-cmp)
                        (i/cmp-map :server/imports-cmp)
-                       (st/cmp-map :server/store-cmp)
+                       (z/trace-cmp (st/cmp-map :server/store-cmp))
                        (up/cmp-map :server/upload-cmp)
                        (bl/cmp-map :server/blink-cmp)
                        (ft/cmp-map :server/ft-cmp)}]

@@ -81,6 +81,22 @@
   [{:keys [current-state]}]
   {:new-state (assoc-in current-state [:cfg] (fu/load-cfg))})
 
+#_(defn cmp-map
+    "Generates component map for state-cmp."
+    [cmp-id]
+    {:cmp-id      cmp-id
+     :state-fn    state-fn
+     :opts        {:msgs-on-firehose true}
+     :handler-map (merge
+                    gs/stats-handler-map
+                    {:entry/import   f/entry-import-fn
+                     :entry/find     (z/traced gq/find-entry :entry/find)
+                     :entry/update   (z/trace-wrapper f/geo-entry-persist-fn "store")
+                     :entry/trash    f/trash-entry-fn
+                     :state/search   (z/traced gq/query-fn :state/search)
+                     :cfg/refresh    refresh-cfg
+                     :cmd/keep-alive ka/keepalive-fn})})
+
 (defn cmp-map
   "Generates component map for state-cmp."
   [cmp-id]
@@ -90,9 +106,9 @@
    :handler-map (merge
                   gs/stats-handler-map
                   {:entry/import   f/entry-import-fn
-                   :entry/find     (z/traced gq/find-entry :entry/find)
-                   :entry/update   (z/traced f/geo-entry-persist-fn :entry/update)
+                   :entry/find     gq/find-entry
+                   :entry/update   f/geo-entry-persist-fn
                    :entry/trash    f/trash-entry-fn
-                   :state/search   (z/traced gq/query-fn :state/search)
+                   :state/search   gq/query-fn
                    :cfg/refresh    refresh-cfg
                    :cmd/keep-alive ka/keepalive-fn})})

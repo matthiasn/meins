@@ -7,7 +7,8 @@
             [me.raynes.fs :as fs]
             [clj-time.core :as ct]
             [clj-time.local :as ctl]
-            [clojure.tools.logging :as log]))
+            [clojure.tools.logging :as log]
+            [iwaswhere-web.zipkin :as z]))
 
 (def red {:day "--hsb=265,255,255" :night "--hsb=265,255,100"})
 (def green {:day "--hsb=65,255,255" :night "--hsb=65,255,100"})
@@ -61,5 +62,5 @@
   [cmp-id]
   {:cmp-id      cmp-id
    :state-fn    state-fn
-   :handler-map {:blink/heartbeat blink-fn
-                 :blink/busy      blink-busy}})
+   :handler-map {:blink/heartbeat (z/traced2 blink-fn :blink/heartbeat)
+                 :blink/busy      (z/traced2 blink-busy :blink/heartbeat)}})
