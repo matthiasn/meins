@@ -137,16 +137,12 @@
         chsk-send! (:send-fn ws)
         connected-uids (:any @(:connected-uids ws))
         dest-uid (:sente-uid msg-meta)
-        msg-w-ser-meta [msg-type {:msg msg-payload :msg-meta msg-meta}]
-        span (when-let [t (:trace msg-meta)]
-               (let [child-span (z/child-span-ws (z/extract-trace t) (str "chsk-send!-" msg-type))]
-                 child-span))]
+        msg-w-ser-meta [msg-type {:msg msg-payload :msg-meta msg-meta}]]
     (when (contains? connected-uids dest-uid)
       (chsk-send! dest-uid msg-w-ser-meta))
     (when (= :broadcast dest-uid)
       (doseq [uid connected-uids]
         (chsk-send! uid msg-w-ser-meta)))
-    (when span (.finish span))
     {}))
 
 (defn cmp-map

@@ -62,5 +62,5 @@
   [cmp-id]
   {:cmp-id      cmp-id
    :state-fn    state-fn
-   :handler-map {:blink/heartbeat (z/traced2 blink-fn :blink/heartbeat)
-                 :blink/busy      (z/traced2 blink-busy :blink/heartbeat)}})
+   :handler-map {:blink/heartbeat blink-fn
+                 :blink/busy      blink-busy}})

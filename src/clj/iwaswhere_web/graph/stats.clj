@@ -78,7 +78,7 @@
 (defn get-stats-fn
   "Retrieves stats of specified type. Picks the appropriate mapper function
    for the requested message type."
-  [{:keys [current-state msg-payload msg-meta put-fn span]}]
+  [{:keys [current-state msg-payload msg-meta put-fn span mk-child-span]}]
   (future
     (let [stats-type (:type msg-payload)
           stats-mapper (case stats-type
@@ -90,7 +90,7 @@
                          nil)
           days (:days msg-payload)
           stats (when stats-mapper
-                  (let [child-span (z/child-span span (str stats-type))
+                  (let [child-span (mk-child-span span (str stats-type))
                         res (mapv (stats-mapper current-state) days)]
                     (.finish child-span)
                     (into {} res)))]
@@ -142,27 +142,27 @@
 (defn stats-tags-fn
   "Generates stats and tags (they only change on insert anyway) and initiates
    publication thereof to all connected clients."
-  [{:keys [current-state put-fn msg-meta span]}]
+  [{:keys [current-state put-fn msg-meta span mk-child-span]}]
   (future
-    (let [child-span (z/child-span span "stats-tags-fn")
+    (let [child-span (mk-child-span span "stats-tags-fn")
           stats-tags (make-stats-tags current-state)
           uid (:sente-uid msg-meta)]
       (.finish child-span)
       (put-fn (with-meta [:state/stats-tags stats-tags] {:sente-uid uid}))))
   (future
-    (let [child-span (z/child-span span "stats-tags-:started-tasks")
+    (let [child-span (mk-child-span span "stats-tags-:started-tasks")
           stats {:started-tasks (:entries (gq/get-filtered current-state started-tasks))}
           uid (:sente-uid msg-meta)]
       (.finish child-span)
       (put-fn (with-meta [:state/stats-tags2 stats] {:sente-uid uid}))))
   (future
-    (let [child-span (z/child-span span "stats-tags-:waiting-habits")
+    (let [child-span (mk-child-span span "stats-tags-:waiting-habits")
           stats {:waiting-habits (:entries (gq/get-filtered current-state waiting-habits))}
           uid (:sente-uid msg-meta)]
       (.finish child-span)
       (put-fn (with-meta [:state/stats-tags2 stats] {:sente-uid uid}))))
   (future
-    (let [child-span (z/child-span span "stats-tags-:briefings")
+    (let [child-span (mk-child-span span "stats-tags-:briefings")
           stats {:briefings (gq/find-all-briefings current-state)}
           uid (:sente-uid msg-meta)]
       (.finish child-span)
@@ -182,9 +182,9 @@
 
 (defn task-summary-stats-w
   "Generate some very basic stats about the graph for display in UI."
-  [state k span msg-meta put-fn]
+  [state k span mk-child-span msg-meta put-fn]
   (future
-    (let [child-span (z/child-span span (str "task-summary-stats-" k))
+    (let [child-span (mk-child-span span (str "task-summary-stats-" k))
           res (task-summary-stats state k)]
       (.finish child-span)
       (put-fn (with-meta [:stats/result2 {k res}] msg-meta)))))
@@ -192,19 +192,19 @@
 (defn get-stats-fn2
   "Generates stats and tags (they only change on insert anyway) and initiates
    publication thereof to all connected clients."
-  [{:keys [current-state put-fn msg-meta span]}]
+  [{:keys [current-state put-fn msg-meta span mk-child-span]}]
   (future
-    (let [child-span (z/child-span span "get-basic-stats")
+    (let [child-span (mk-child-span span "get-basic-stats")
           stats (get-basic-stats current-state)
           uid (:sente-uid msg-meta)]
       (.finish child-span)
       (put-fn (with-meta [:stats/result2 stats] {:sente-uid uid}))))
-  (task-summary-stats-w current-state :open-tasks-cnt span msg-meta put-fn)
-  (task-summary-stats-w current-state :backlog-cnt span msg-meta put-fn)
-  (task-summary-stats-w current-state :completed-cnt span msg-meta put-fn)
-  (task-summary-stats-w current-state :closed-cnt span msg-meta put-fn)
+  (task-summary-stats-w current-state :open-tasks-cnt span mk-child-span msg-meta put-fn)
+  (task-summary-stats-w current-state :backlog-cnt span mk-child-span msg-meta put-fn)
+  (task-summary-stats-w current-state :completed-cnt span mk-child-span msg-meta put-fn)
+  (task-summary-stats-w current-state :closed-cnt span mk-child-span msg-meta put-fn)
   (future
-    (let [child-span (z/child-span span "award-points")
+    (let [child-span (mk-child-span span "award-points")
           stats {:award-points (aw/award-points current-state)}
           uid (:sente-uid msg-meta)]
       (.finish child-span)
@@ -212,6 +212,6 @@
   {})
 
 (def stats-handler-map
-  {:stats/get            (z/traced get-stats-fn :stats/get)
-   :stats/get2           (z/traced get-stats-fn2 :stats/get)
-   :state/stats-tags-get (z/traced stats-tags-fn :state/stats-tags-get)})
+  {:stats/get            get-stats-fn
+   :stats/get2           get-stats-fn2
+   :state/stats-tags-get stats-tags-fn})

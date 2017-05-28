@@ -31,13 +31,13 @@
   [switchboard]
   (sb/send-mult-cmd
     switchboard
-    [[:cmd/init-comp #{(sente/cmp-map :server/ws-cmp idx/sente-map)
-                       (sched/cmp-map :server/scheduler-cmp)
-                       (i/cmp-map :server/imports-cmp)
+    [[:cmd/init-comp #{(z/trace-cmp (sente/cmp-map :server/ws-cmp idx/sente-map))
+                       (z/trace-cmp (sched/cmp-map :server/scheduler-cmp))
+                       (z/trace-cmp (i/cmp-map :server/imports-cmp))
                        (z/trace-cmp (st/cmp-map :server/store-cmp))
-                       (up/cmp-map :server/upload-cmp)
-                       (bl/cmp-map :server/blink-cmp)
-                       (ft/cmp-map :server/ft-cmp)}]
+                       (z/trace-cmp (up/cmp-map :server/upload-cmp))
+                       (z/trace-cmp (bl/cmp-map :server/blink-cmp))
+                       (z/trace-cmp (ft/cmp-map :server/ft-cmp))}]
 
      [:cmd/route {:from :server/ws-cmp
                   :to   #{:server/store-cmp

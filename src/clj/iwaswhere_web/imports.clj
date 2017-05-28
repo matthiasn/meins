@@ -309,7 +309,7 @@
   "Generates component map for imports-cmp."
   [cmp-id]
   {:cmp-id      cmp-id
-   :handler-map {:import/photos  (z/traced3 import-media :import/photos)
+   :handler-map {:import/photos  import-media
                  :import/geo     import-geo
                  :import/movie   import-movie
                  :import/spotify import-spotify
