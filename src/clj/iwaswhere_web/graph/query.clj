@@ -146,20 +146,6 @@
 (defn get-tags-mentions-matches
   "Extract matching timestamps for query."
   [g query]
-  (time
-    (let [mapper (fn [tag-type]
-                   (fn [tag]
-                     (let [q {:src {tag-type tag} :relationship :CONTAINS}
-                           edges (uc/find-edges g q)]
-                       (set (map :dest edges)))))
-          t-matched (map (mapper :tag) (map s/lower-case (:tags query)))
-          pt-matched (map (mapper :ptag) (map s/lower-case (:tags query)))
-          m-matched (map (mapper :mention) (map s/lower-case (:mentions query)))]
-      (apply set/union (concat t-matched pt-matched m-matched)))))
-
-(defn get-tags-mentions-matches
-  "Extract matching timestamps for query."
-  [g query]
   (let [mapper (fn [tag-type]
                  (fn [tag]
                    (let [q {:src {tag-type tag} :relationship :CONTAINS}
@@ -387,7 +373,7 @@
         g (:graph current-state)
         ltags (map #(-> % :dest :ptag) (uc/find-edges g {:src :pvt-hashtags}))
         tags (map #(:val (uc/attrs g {:ptag %})) ltags)]
-    (disj (set/union (set tags) (:pvt-tags cfg)) "#new")))
+    (disj (set/union (set tags) (:pvt-tags cfg)) "#new" "#import")))
 
 (defn find-all-mentions
   "Finds all hashtags used in entries by finding the edges that originate from

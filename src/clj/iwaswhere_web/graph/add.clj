@@ -197,7 +197,8 @@
   (reduce
     (fn [g tag]
       (let [ltag (s/lower-case tag)]
-        (if (empty? (uc/find-edges g {:src {k ltag} :relationship :CONTAINS}))
+        (if (and (empty? (uc/find-edges g {:src {k ltag} :relationship :CONTAINS}))
+                 (not (contains? #{"#new" "#import"} tag)))
           (uc/remove-nodes g {k ltag})
           g)))
     graph
