@@ -7,7 +7,6 @@
             [iwaswhere-web.graph.stats :as gs]
             [iwaswhere-web.graph.add :as ga]
             [iwaswhere-web.specs]
-            [iwaswhere-web.zipkin :as z]
             [ubergraph.core :as uber]
             [iwaswhere-web.keepalive :as ka]
             [clojure.tools.logging :as log]

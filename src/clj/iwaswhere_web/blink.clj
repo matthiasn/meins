@@ -7,8 +7,7 @@
             [me.raynes.fs :as fs]
             [clj-time.core :as ct]
             [clj-time.local :as ctl]
-            [clojure.tools.logging :as log]
-            [iwaswhere-web.zipkin :as z]))
+            [clojure.tools.logging :as log]))
 
 (def red {:day "--hsb=265,255,255" :night "--hsb=265,255,100"})
 (def green {:day "--hsb=65,255,255" :night "--hsb=65,255,100"})

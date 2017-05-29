@@ -21,8 +21,7 @@
             [iwaswhere-web.utils.misc :as u]
             [iwaswhere-web.file-utils :as fu]
             [clj-time.format :as ctf]
-            [clojure.string :as str]
-            [iwaswhere-web.zipkin :as z])
+            [clojure.string :as str])
   (:import [com.drew.imaging ImageMetadataReader]))
 
 (defn dms-to-dd

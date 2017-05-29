@@ -14,7 +14,7 @@
             [matthiasn.systems-toolbox.component :as st]
             [clj-time.core :as t]
             [clj-uuid :as uuid]
-            [iwaswhere-web.zipkin :as z])
+            [systems-toolbox-zipkin.core :as z])
   (:import (org.joda.time DateTimeZone)))
 
 ;; TODO: migrate existing audio entries to use a different keyword
@@ -430,9 +430,10 @@
   [graph sort-by-upvotes?]
   (fn [entry]
     (let [ts (:timestamp entry)]
-      (-> entry
-          (get-comments graph ts)
-          (get-linked-entries graph ts sort-by-upvotes?)))))
+      (when ts
+        (-> entry
+            (get-comments graph ts)
+            (get-linked-entries graph ts sort-by-upvotes?))))))
 
 (defn get-filtered
   "Retrieve entries."
@@ -456,7 +457,7 @@
     (if (uc/has-node? g ts)
       (let [comments-linked-mapper (comments-linked-for-entry g false)
             entry (comments-linked-mapper (uc/attrs g ts))]
-        {:emit-msg [:entry/found entry]})
+        {:emit-msg (when entry [:entry/found entry])})
       (log/warn "cannot find node: " ts))))
 
 (defn run-query

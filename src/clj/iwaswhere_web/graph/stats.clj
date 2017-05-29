@@ -13,7 +13,7 @@
             [clojure.tools.logging :as log]
             [ubergraph.core :as uc]
             [clojure.set :as set]
-            [iwaswhere-web.zipkin :as z]))
+            [systems-toolbox-zipkin.core :as z]))
 
 (defn tasks-mapper
   "Create mapper function for task stats"
