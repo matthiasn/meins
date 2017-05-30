@@ -26,6 +26,11 @@
           day-nodes (gq/get-nodes-for-day g {:date-string date-string})
           day-nodes-attrs (map #(uber/attrs g %) day-nodes)
           nodes (filter :custom-fields day-nodes-attrs)
+          for-day-filter (fn [entry]
+                           (let [for-day (:for-day entry)]
+                             (or (not for-day)
+                                 (= date-string (subs for-day 0 10)))))
+          nodes (filter for-day-filter nodes)
 
           stats-mapper
           (fn [[k fields]]

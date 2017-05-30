@@ -40,7 +40,9 @@
                                    (ct/default-time-zone))
           entry-day (ctf/unparse local-fmt (ctc/from-long (:timestamp entry)))
           q-day (:date-string q)
-          day-match? (= q-day entry-day)
+          day-match? (or (= q-day entry-day)
+                         (when-let [for-day (:for-day entry)]
+                           (= q-day (subs for-day 0 10))))
 
           q-timestamp (:timestamp q)
           q-ts-match? (= q-timestamp (str (:timestamp entry)))

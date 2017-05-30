@@ -2,5 +2,5 @@
   (:require [clj-time.core :as ct]
             [clj-time.format :as ctf]))
 
-(def datetime-local-fmt
+(def dt-local-fmt
   (ctf/formatter "yyyy-MM-dd'T'HH:mm" (ct/default-time-zone)))

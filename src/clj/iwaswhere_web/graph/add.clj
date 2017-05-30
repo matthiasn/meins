@@ -128,7 +128,7 @@
   [state entry]
   (let [g (:graph state)]
     (if-let [for-day (:for-day entry)]
-      (let [dt (ctf/parse dt/datetime-local-fmt for-day)
+      (let [dt (ctf/parse dt/dt-local-fmt for-day)
             year (ct/year dt)
             month (ct/month dt)
             year-node {:type :timeline/year :year year}

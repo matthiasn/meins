@@ -8,7 +8,9 @@
             [clj-time.format :as ctf]
             [matthiasn.systems-toolbox.log :as l]
             [clojure.tools.logging :as log]
-            [ubergraph.core :as uc]))
+            [ubergraph.core :as uc]
+            [iwaswhere-web.datetime :as dt]
+            [clj-time.coerce :as c]))
 
 (defn time-by-sagas
   "Calculate time spent per saga, plus time not assigned to any saga."
@@ -22,7 +24,7 @@
 (defn manually-logged
   "Calculates summed duration and returns it when entry is either not for a
    different day, or, if so, when date string from query is equal to the
-   referencenced day. Otherwise returns zero."
+   referenced day. Otherwise returns zero."
   [entry date-string]
   (let [manual (gq/summed-durations entry)]
     (if-let [for-day (:for-day entry)]
@@ -58,7 +60,10 @@
                                            :no-story)
                               story (get-in stories [story-id])
                               acc-time (get acc story-id 0)
-                              ts (:timestamp entry)
+                              for-ts (when-let [for-day (:for-day entry)]
+                                       (let [dt (ctf/parse dt/dt-local-fmt for-day)]
+                                         (c/to-long dt)))
+                              ts (or for-ts (:timestamp entry))
                               saga-id (:linked-saga story)
                               saga (get-in sagas [saga-id])
                               completed (get entry :completed-time 0)
