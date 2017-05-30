@@ -14,7 +14,7 @@
             [matthiasn.systems-toolbox.component :as st]
             [clj-time.core :as t]
             [clj-uuid :as uuid]
-            [systems-toolbox-zipkin.core :as z])
+            [matthiasn.systems-toolbox-zipkin.core :as z])
   (:import (org.joda.time DateTimeZone)))
 
 ;; TODO: migrate existing audio entries to use a different keyword

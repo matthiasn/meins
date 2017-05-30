@@ -1,7 +1,6 @@
 (ns iwaswhere-web.ui.entry.actions
   (:require [iwaswhere-web.ui.pomodoro :as p]
             [iwaswhere-web.utils.parse :as up]
-            [cljsjs.moment]
             [iwaswhere-web.helpers :as h]
             [reagent.core :as r]
             [iwaswhere-web.ui.entry.utils :as eu]

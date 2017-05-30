@@ -15,7 +15,7 @@
             [iwaswhere-web.blink :as bl]
             [iwaswhere-web.imports :as i]
             [matthiasn.systems-toolbox.scheduler :as sched]
-            [systems-toolbox-zipkin.core :as z]))
+            [matthiasn.systems-toolbox-zipkin.core :as z]))
 
 (defonce switchboard (sb/component :server/switchboard))
 
