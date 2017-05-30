@@ -108,6 +108,7 @@
         results (subscribe [:results])
         options (subscribe [:options])
         stories (reaction (:stories @options))
+        started-tasks (subscribe [:started-tasks])
         entries-map (subscribe [:entries-map])
         update-search (fn [ts]
                         (fn [_ev]
@@ -152,9 +153,11 @@
                                 (let [from-now (.fromNow (js/moment active-from))]
                                   (s/includes? from-now "ago"))
                                 true)))
+            started-tasks (set @started-tasks)
             linked-tasks (->> linked-entries
                               (filter filter-fn)
                               (filter saga-filter)
+                              (filter #(not (contains? started-tasks (:timestamp %))))
                               (filter active-filter)
                               (sort-by #(or (-> % :task :priority) :X)))
             time-reducer (fn [acc t] (+ acc (get-in t [:task :estimate-m] 0)))
