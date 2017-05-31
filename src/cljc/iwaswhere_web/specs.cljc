@@ -1,7 +1,7 @@
 (ns iwaswhere-web.specs
   (:require  [iwaswhere-web.utils.parse :as p]
-    #?(:clj  [clojure.spec :as s]
-       :cljs [cljs.spec :as s])))
+    #?(:clj  [clojure.spec.alpha :as s]
+       :cljs [cljs.spec.alpha :as s])))
 
 (defn number-in-range?
   "Return function that returns true if start <= val and val < end"
