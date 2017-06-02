@@ -3,6 +3,8 @@ import {mdToDraftjs, draftjsToMd} from 'draftjs-md-converter';
 import Draft, {RichUtils, EditorState, ContentState, convertToRaw, convertFromRaw} from 'draft-js';
 import Editor, {createEditorStateWithText} from 'draft-js-plugins-editor'; // eslint-disable-line import/no-unresolved
 import createMentionPlugin, {defaultSuggestionsFilter} from 'draft-js-mention-plugin'; // eslint-disable-line import/no-unresolved
+import createLinkifyPlugin from 'draft-js-linkify-plugin'; // eslint-disable-line import/no-unresolved
+import 'draft-js-linkify-plugin/lib/plugin.css'; // eslint-disable-line import/no-unresolved
 import {fromJS} from 'immutable';
 import editorStyles from './editorStyles.css';
 import StyleControls from './style-controls';
@@ -95,19 +97,20 @@ export default class EntryTextEditor extends Component {
         this.toggleInlineStyle = (style) => this._toggleInlineStyle(style);
         this.toggleBlockType = (type) => this._toggleBlockType(type);
 
-        const hashtagPlugin = createMentionPlugin({
-            mentionTrigger: "#",
+        const hashtagPlugin = createMentionPlugin({mentionTrigger: "#",});
+        const mentionPlugin = createMentionPlugin({mentionTrigger: "@",});
+        const storyPlugin   = createMentionPlugin({mentionTrigger: "$",});
+        const linkifyPlugin = createLinkifyPlugin({
+            target: "_blank",
+            component: (props) => (
+                // eslint-disable-next-line no-alert, jsx-a11y/anchor-has-content
+                <a {...props} onClick={() => {
+                    window.open(props.href, '_blank');
+                }} />
+            )
         });
 
-        const mentionPlugin = createMentionPlugin({
-            mentionTrigger: "@",
-        });
-
-        const storyPlugin = createMentionPlugin({
-            mentionTrigger: "$",
-        });
-
-        this.plugins = [hashtagPlugin, mentionPlugin, storyPlugin];
+        this.plugins = [hashtagPlugin, mentionPlugin, storyPlugin, linkifyPlugin];
         this.HashtagSuggestions = hashtagPlugin.MentionSuggestions;
         this.MentionSuggestions = mentionPlugin.MentionSuggestions;
         this.StorySuggestions = storyPlugin.MentionSuggestions;

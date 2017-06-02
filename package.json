@@ -14,6 +14,7 @@
   "dependencies": {
     "draft-js": "^0.10.1",
     "draft-js-hashtag-plugin": "^2.0.0-rc2",
+    "draft-js-linkify-plugin": "^2.0.0-rc2",
     "draft-js-mention-plugin": "^2.0.0-rc2",
     "draft-js-plugins-editor": "^2.0.0-rc2",
     "draftjs-md-converter": "^0.1.4",
