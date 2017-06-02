@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
-import Draft, {RichUtils, EditorState, ContentState} from 'draft-js';
+import {mdToDraftjs, draftjsToMd} from 'draftjs-md-converter';
+import Draft, {RichUtils, EditorState, ContentState, convertToRaw, convertFromRaw} from 'draft-js';
 import Editor, {createEditorStateWithText} from 'draft-js-plugins-editor'; // eslint-disable-line import/no-unresolved
 import createMentionPlugin, {defaultSuggestionsFilter} from 'draft-js-mention-plugin'; // eslint-disable-line import/no-unresolved
 import {fromJS} from 'immutable';
 import editorStyles from './editorStyles.css';
 import StyleControls from './style-controls';
-
 
 const suggestionsFilter = (searchValue, suggestions) => {
     const value = searchValue.toLowerCase();
@@ -16,6 +16,12 @@ const suggestionsFilter = (searchValue, suggestions) => {
     });
     const size = filteredSuggestions.size < 15 ? filteredSuggestions.size : 15;
     return filteredSuggestions.setSize(size);
+};
+
+const myMdDict = {
+    BOLD: '**',
+    STRIKETHROUGH: '~~',
+    CODE: '`'
 };
 
 export default class EntryTextEditor extends Component {
@@ -112,6 +118,9 @@ export default class EntryTextEditor extends Component {
 
         this.onChange = (newState) => {
             props.onChange(newState);
+            const content = newState.getCurrentContent();
+            const md = draftjsToMd(convertToRaw(content), myMdDict);
+            console.log("md", md);
             this.setState({editorState: newState});
         };
     }
