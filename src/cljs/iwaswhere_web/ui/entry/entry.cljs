@@ -21,7 +21,8 @@
             [cljsjs.moment]
             [iwaswhere-web.utils.misc :as u]
             [iwaswhere-web.helpers :as h]
-            [clojure.set :as set]))
+            [clojure.set :as set]
+            [iwaswhere-web.ui.draft :as d]))
 
 (defn all-comments-set
   "Finds all comments for a particular entry."
@@ -83,7 +84,14 @@
         open-linked (up/add-search (str "l:" ts) tab-group put-fn)
         drop-fn (a/drop-linked-fn entry entries-map cfg put-fn)
         toggle-edit #(if @edit-mode (put-fn [:entry/remove-local @entry])
-                                    (put-fn [:entry/update-local @entry]))]
+                                    (put-fn [:entry/update-local @entry]))
+        editor-state (d/editor-state-from-text "")
+        editor-cb (fn [text editor-state]
+                    (let []
+                      (prn :editor-cb text)
+                      (prn :editor-cb editor-state)
+                      ;(put-fn [:search/update s])
+                      ))]
     (fn journal-entry-render [ts put-fn local-cfg]
       (let [edit-mode? @edit-mode
             linked-desc @linked-desc]
@@ -122,6 +130,9 @@
                          #(str % " <span class=\"fa fa-link\"></span>"))
               h/prevent-default]
              [md/markdown-render @entry toggle-edit]))
+
+         [d/draft-text-editor editor-state editor-cb]
+
          [c/custom-fields-div @entry put-fn edit-mode?]
          [m/audioplayer-view @entry put-fn]
          [l/leaflet-map @entry @show-map? local-cfg put-fn]

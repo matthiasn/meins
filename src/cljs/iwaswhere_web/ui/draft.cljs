@@ -58,6 +58,31 @@
                :stories     @stories-list
                :onChange    on-change}])))
 
+(defn draft-text-editor
+  [editor-state update-cb]
+  (let [editor (adapt-react-class "EntryTextEditor")
+        options (subscribe [:options])
+        sorted-stories (reaction (:sorted-stories @options))
+        stories-list (reaction (map story-mapper @sorted-stories))
+        cfg (subscribe [:cfg])
+        mentions (reaction (map (fn [m] {:name m}) (:mentions @options)))
+        hashtags (reaction
+                   (let [show-pvt? (:show-pvt @cfg)
+                         hashtags (:hashtags @options)
+                         pvt-hashtags (:pvt-hashtags @options)
+                         hashtags (if show-pvt?
+                                    (concat hashtags pvt-hashtags)
+                                    hashtags)]
+                     (map (fn [h] {:name h}) hashtags)))
+        on-change (on-editor-change update-cb)]
+    (fn [editor-state send-fn]
+      [editor {:editorState editor-state
+               :spellCheck  true
+               :mentions    @mentions
+               :hashtags    @hashtags
+               :stories     @stories-list
+               :onChange    on-change}])))
+
 (defn story-search-field
   [editor-state select-story]
   (let [options (subscribe [:options])

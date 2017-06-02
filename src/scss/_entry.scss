@@ -442,3 +442,40 @@ u {
     width: 100%;
   }
 }
+
+
+.edit-menu {
+  background-color: #DDD;
+  padding: 0 4px;
+
+  .fa-inactive {
+    color: #BBB;
+  }
+
+  .header-2 {
+    font-size: 0.9em;
+  }
+  .header-3 {
+    font-size: 0.8em;
+  }
+  .header-4 {
+    font-size: 0.7em;
+  }
+
+  .spacer {
+    padding: 5px;
+  }
+
+  .spacer-sm {
+    padding: 5px;
+  }
+
+  .fa {
+    padding: 5px 3px;
+    cursor: pointer;
+  }
+
+  .fa-wide {
+    padding: 5px;
+  }
+}
