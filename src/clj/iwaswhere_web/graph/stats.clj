@@ -132,12 +132,13 @@
    :locations     (gq/find-all-locations state)
    :cfg           (:cfg state)})
 
-(defn make-stats-tags2
-  "Generate stats and tags from current-state."
-  [state span]
-  {:started-tasks  (:entries (gq/get-filtered state started-tasks))
-   :waiting-habits (:entries (gq/get-filtered state waiting-habits))
-   :briefings      (gq/find-all-briefings state)})
+(defn count-words
+  "Count total number of words."
+  [current-state]
+  (let [g (:graph current-state)
+        entries (map #(uber/attrs g %) (:sorted-entries current-state))
+        counts (map (fn [entry] (u/count-words entry)) entries)]
+    (apply + counts)))
 
 (defn stats-tags-fn
   "Generates stats and tags (they only change on insert anyway) and initiates
@@ -161,6 +162,12 @@
           uid (:sente-uid msg-meta)]
       (.finish child-span)
       (put-fn (with-meta [:state/stats-tags2 stats] {:sente-uid uid}))))
+  (future
+    (let [child-span (mk-child-span span "stats-tags-:word-count")
+          stats {:word-count (count-words current-state)}
+          uid (:sente-uid msg-meta)]
+      (.finish child-span)
+      (put-fn (with-meta [:stats/result2 stats] {:sente-uid uid}))))
   (future
     (let [child-span (mk-child-span span "stats-tags-:briefings")
           stats {:briefings (gq/find-all-briefings current-state)}
