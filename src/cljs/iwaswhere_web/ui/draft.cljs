@@ -88,9 +88,8 @@
 
 (defn entry-editor
   [entry put-fn]
-  (let [editor-state (if-let [editor-state (:editor-state @entry)]
-                       (editor-state-from-raw (clj->js editor-state))
-                       (editor-state-from-text (:md @entry)))
+  (let [editor-state (when-let [editor-state (:editor-state @entry)]
+                       (editor-state-from-raw (clj->js editor-state)))
         local (r/atom {:editor-state (:editor-state @entry)})
         editor-cb (fn [md plain editor-state]
                     (let [new-state (js->clj editor-state :keywordize-keys true)
@@ -99,7 +98,6 @@
                                     (p/parse-entry md)
                                     {:editor-state new-state
                                      :text         plain})]
-                      (prn updated)
                       (put-fn [:entry/update-local updated])))]
     (fn [entry put-fn]
       (let [latest-entry (dissoc @entry :comments)
@@ -108,9 +106,10 @@
                         [:entry/update
                          (if (and (:new-entry entry) (not (:comment-for entry)))
                            (update-in (u/clean-entry latest-entry) [:tags] conj "#new")
-                           (u/clean-entry latest-entry))]))]
+                           (u/clean-entry latest-entry))]))
+            md (or (:md @entry) "")]
         [:div
-         [draft-text-editor editor-state (:md @entry) editor-cb]
+         [draft-text-editor editor-state md editor-cb]
          [:div.save
           (when
             (not= (:editor-state @local)

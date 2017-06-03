@@ -93,8 +93,9 @@ export default class EntryTextEditor extends Component {
 
     constructor(props) {
         super(props);
-        console.log(props);
-        this.state.editorState = props.editorState;
+        const stateFromMd = convertFromRaw(mdToDraftjs(props.md));
+        const stateFromMd2 = EditorState.createWithContent(stateFromMd);
+        this.state.editorState = props.editorState ? props.editorState : stateFromMd2;
         this.toggleInlineStyle = (style) => this._toggleInlineStyle(style);
         this.toggleBlockType = (type) => this._toggleBlockType(type);
 

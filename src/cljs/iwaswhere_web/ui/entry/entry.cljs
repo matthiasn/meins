@@ -116,6 +116,7 @@
          [hashtags-mentions-list ts tab-group put-fn]
          [es/story-name-field @entry edit-mode? put-fn]
          [es/saga-name-field @entry edit-mode? put-fn]
+         #_
          (when-not (:editor-state @entry)
            (if edit-mode?
              [e/editable-md-render @entry put-fn]
