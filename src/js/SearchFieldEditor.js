@@ -53,8 +53,6 @@ export default class SearchFieldEditor extends Component {
 
     constructor(props) {
         super(props);
-        console.log(props);
-
         this.state.editorState = props.editorState;
 
         const hashtagPlugin = createMentionPlugin({

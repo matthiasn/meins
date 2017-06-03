@@ -1,7 +1,6 @@
 (ns iwaswhere-web.ui.entry.entry
   (:require [iwaswhere-web.ui.leaflet :as l]
             [iwaswhere-web.ui.markdown :as md]
-            [iwaswhere-web.ui.edit :as e]
             [iwaswhere-web.ui.media :as m]
             [iwaswhere-web.ui.pomodoro :as pomo]
             [re-frame.core :refer [subscribe]]
@@ -116,16 +115,6 @@
          [hashtags-mentions-list ts tab-group put-fn]
          [es/story-name-field @entry edit-mode? put-fn]
          [es/saga-name-field @entry edit-mode? put-fn]
-         #_
-         (when-not (:editor-state @entry)
-           (if edit-mode?
-             [e/editable-md-render @entry put-fn]
-             (if (and (empty? (:md @entry)) linked-desc)
-               [md/markdown-render
-                (update-in linked-desc [:md]
-                           #(str % " <span class=\"fa fa-link\"></span>"))
-                h/prevent-default]
-               [md/markdown-render @entry toggle-edit])))
          [d/entry-editor entry put-fn]
          [c/custom-fields-div @entry put-fn edit-mode?]
          [m/audioplayer-view @entry put-fn]

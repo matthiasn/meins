@@ -13,7 +13,6 @@
 
 (defn editor-state-from-raw
   [editor-state]
-  (prn editor-state)
   (let [content-from-raw (.convertFromRaw js/Draft editor-state)]
     (.createWithContent js/Draft.EditorState content-from-raw)))
 
