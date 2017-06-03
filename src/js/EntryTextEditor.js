@@ -23,7 +23,8 @@ const suggestionsFilter = (searchValue, suggestions) => {
 const myMdDict = {
     BOLD: '**',
     STRIKETHROUGH: '~~',
-    CODE: '`'
+    CODE: '`',
+    UNDERLINE: "__"
 };
 
 export default class EntryTextEditor extends Component {
@@ -120,10 +121,12 @@ export default class EntryTextEditor extends Component {
         this.state.storySuggestions = fromJS(props.stories);
 
         this.onChange = (newState) => {
-            props.onChange(newState);
             const content = newState.getCurrentContent();
-            const md = draftjsToMd(convertToRaw(content), myMdDict);
-            console.log("md", md);
+            const plain = content.getPlainText();
+            const rawContent = convertToRaw(content);
+            const rawContent2 = JSON.parse(JSON.stringify(rawContent));
+            const md = draftjsToMd(rawContent, myMdDict);
+            props.onChange(md, plain, rawContent2);
             this.setState({editorState: newState});
         };
     }

@@ -3,7 +3,7 @@
             [iwaswhere-web.ui.markdown :as md]
             [iwaswhere-web.ui.edit :as e]
             [iwaswhere-web.ui.media :as m]
-            [iwaswhere-web.ui.pomodoro :as p]
+            [iwaswhere-web.ui.pomodoro :as pomo]
             [re-frame.core :refer [subscribe]]
             [reagent.ratom :refer-macros [reaction]]
             [iwaswhere-web.utils.parse :as up]
@@ -22,7 +22,8 @@
             [iwaswhere-web.utils.misc :as u]
             [iwaswhere-web.helpers :as h]
             [clojure.set :as set]
-            [iwaswhere-web.ui.draft :as d]))
+            [iwaswhere-web.ui.draft :as d]
+            [iwaswhere-web.utils.parse :as p]))
 
 (defn all-comments-set
   "Finds all comments for a particular entry."
@@ -84,14 +85,7 @@
         open-linked (up/add-search (str "l:" ts) tab-group put-fn)
         drop-fn (a/drop-linked-fn entry entries-map cfg put-fn)
         toggle-edit #(if @edit-mode (put-fn [:entry/remove-local @entry])
-                                    (put-fn [:entry/update-local @entry]))
-        editor-state (d/editor-state-from-text "")
-        editor-cb (fn [text editor-state]
-                    (let []
-                      (prn :editor-cb text)
-                      (prn :editor-cb editor-state)
-                      ;(put-fn [:search/update s])
-                      ))]
+                                    (put-fn [:entry/update-local @entry]))]
     (fn journal-entry-render [ts put-fn local-cfg]
       (let [edit-mode? @edit-mode
             linked-desc @linked-desc]
@@ -108,7 +102,7 @@
            [:a [:time {:on-click add-search} formatted-time]]
            [:time (u/visit-duration @entry)]]
           (if (= :pomodoro (:entry-type @entry))
-            [p/pomodoro-header @entry pomo-start edit-mode?]
+            [pomo/pomodoro-header @entry pomo-start edit-mode?]
             [:div (when-not (:comment-for @entry) [total-time-logged ts])])
           [:div
            (when (seq (:linked-entries-list @entry))
@@ -122,17 +116,16 @@
          [hashtags-mentions-list ts tab-group put-fn]
          [es/story-name-field @entry edit-mode? put-fn]
          [es/saga-name-field @entry edit-mode? put-fn]
-         (if edit-mode?
-           [e/editable-md-render @entry put-fn]
-           (if (and (empty? (:md @entry)) linked-desc)
-             [md/markdown-render
-              (update-in linked-desc [:md]
-                         #(str % " <span class=\"fa fa-link\"></span>"))
-              h/prevent-default]
-             [md/markdown-render @entry toggle-edit]))
-
-         [d/draft-text-editor editor-state editor-cb]
-
+         (when-not (:editor-state @entry)
+           (if edit-mode?
+             [e/editable-md-render @entry put-fn]
+             (if (and (empty? (:md @entry)) linked-desc)
+               [md/markdown-render
+                (update-in linked-desc [:md]
+                           #(str % " <span class=\"fa fa-link\"></span>"))
+                h/prevent-default]
+               [md/markdown-render @entry toggle-edit])))
+         [d/entry-editor entry put-fn]
          [c/custom-fields-div @entry put-fn edit-mode?]
          [m/audioplayer-view @entry put-fn]
          [l/leaflet-map @entry @show-map? local-cfg put-fn]

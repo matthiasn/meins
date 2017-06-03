@@ -110,9 +110,10 @@
       {:new-state    new-state
        :send-to-self [:cmd/pomodoro-inc {:timestamp ts}]})))
 
-(defn update-local-fn
+(defn update-local-fn2
   "Update locally stored new entry with changes from edit element."
   [{:keys [current-state msg-payload]}]
+  (prn :update-local-fn msg-payload)
   (let [ts (:timestamp msg-payload)
         entry (u/deep-merge (get-in current-state [:entries-map ts])
                             (get-in current-state [:new-entries ts])
@@ -129,6 +130,22 @@
         new-state (assoc-in current-state [:new-entries ts] updated)]
     (update-local-storage new-state)
     {:new-state new-state}))
+
+(defn update-local-fn
+  "Update locally stored new entry with changes from edit element."
+  [{:keys [current-state msg-payload]}]
+  (let [ts (:timestamp msg-payload)
+        saved (get-in current-state [:entries-map ts])]
+    (if (not= (:md saved) (:md msg-payload))
+      (let [entry (u/deep-merge saved
+                                (get-in current-state [:new-entries ts])
+                                msg-payload)
+            parsed (p/parse-entry (:md entry))
+            updated (merge entry parsed)
+            new-state (assoc-in current-state [:new-entries ts] updated)]
+        (update-local-storage new-state)
+        {:new-state new-state})
+      {})))
 
 (defn remove-local-fn
   "Remove new entry from local when saving is confirmed by backend."

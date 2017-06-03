@@ -2,7 +2,9 @@
   (:require [matthiasn.systems-toolbox.component :as st]
             [re-frame.core :refer [subscribe]]
             [reagent.ratom :refer-macros [reaction]]
-            [reagent.core :as r]))
+            [reagent.core :as r]
+            [iwaswhere-web.utils.parse :as p]
+            [iwaswhere-web.utils.misc :as u]))
 
 (defn editor-state-from-text
   [text]
@@ -11,6 +13,7 @@
 
 (defn editor-state-from-raw
   [editor-state]
+  (prn editor-state)
   (let [content-from-raw (.convertFromRaw js/Draft editor-state)]
     (.createWithContent js/Draft.EditorState content-from-raw)))
 
@@ -59,7 +62,7 @@
                :onChange    on-change}])))
 
 (defn draft-text-editor
-  [editor-state update-cb]
+  [editor-state md update-cb]
   (let [editor (adapt-react-class "EntryTextEditor")
         options (subscribe [:options])
         sorted-stories (reaction (:sorted-stories @options))
@@ -73,15 +76,47 @@
                          hashtags (if show-pvt?
                                     (concat hashtags pvt-hashtags)
                                     hashtags)]
-                     (map (fn [h] {:name h}) hashtags)))
-        on-change (on-editor-change update-cb)]
-    (fn [editor-state send-fn]
+                     (map (fn [h] {:name h}) hashtags)))]
+    (fn [editor-state md send-fn]
       [editor {:editorState editor-state
+               :md          md
                :spellCheck  true
                :mentions    @mentions
                :hashtags    @hashtags
                :stories     @stories-list
-               :onChange    on-change}])))
+               :onChange    update-cb}])))
+
+(defn entry-editor
+  [entry put-fn]
+  (let [editor-state (if-let [editor-state (:editor-state @entry)]
+                       (editor-state-from-raw (clj->js editor-state))
+                       (editor-state-from-text (:md @entry)))
+        local (r/atom {:editor-state (:editor-state @entry)})
+        editor-cb (fn [md plain editor-state]
+                    (let [new-state (js->clj editor-state :keywordize-keys true)
+                          updated (merge
+                                    @entry
+                                    (p/parse-entry md)
+                                    {:editor-state new-state
+                                     :text         plain})]
+                      (prn updated)
+                      (put-fn [:entry/update-local updated])))]
+    (fn [entry put-fn]
+      (let [latest-entry (dissoc @entry :comments)
+            save-fn (fn [_ev]
+                      (put-fn
+                        [:entry/update
+                         (if (and (:new-entry entry) (not (:comment-for entry)))
+                           (update-in (u/clean-entry latest-entry) [:tags] conj "#new")
+                           (u/clean-entry latest-entry))]))]
+        [:div
+         [draft-text-editor editor-state (:md @entry) editor-cb]
+         [:div.save
+          (when
+            (not= (:editor-state @local)
+                  (:editor-state @entry))
+            [:span.not-saved {:on-click save-fn}
+             [:span.fa.fa-floppy-o] "  click to save"])]]))))
 
 (defn story-search-field
   [editor-state select-story]
