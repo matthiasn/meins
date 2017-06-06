@@ -4,7 +4,8 @@
             [reagent.ratom :refer-macros [reaction]]
             [reagent.core :as r]
             [iwaswhere-web.utils.parse :as p]
-            [iwaswhere-web.utils.misc :as u]))
+            [iwaswhere-web.utils.misc :as u]
+            [iwaswhere-web.ui.entry.utils :as eu]))
 
 (defn editor-state-from-text
   [text]
@@ -61,7 +62,7 @@
                :onChange    on-change}])))
 
 (defn draft-text-editor
-  [editor-state md update-cb]
+  [editor-state md update-cb save-fn]
   (let [editor (adapt-react-class "EntryTextEditor")
         options (subscribe [:options])
         sorted-stories (reaction (:sorted-stories @options))
@@ -76,18 +77,21 @@
                                     (concat hashtags pvt-hashtags)
                                     hashtags)]
                      (map (fn [h] {:name h}) hashtags)))]
-    (fn [editor-state md send-fn]
+    (fn [editor-state md update-cb save-fn]
       [editor {:editorState editor-state
                :md          md
                :spellCheck  true
                :mentions    @mentions
                :hashtags    @hashtags
                :stories     @stories-list
+               :saveFn      save-fn
                :onChange    update-cb}])))
 
 (defn entry-editor
   [entry put-fn]
-  (let [editor-state (when-let [editor-state (:editor-state @entry)]
+  (let [ts (:timestamp @entry)
+        {:keys [entry edit-mode entries-map new-entries unsaved]} (eu/entry-reaction ts)
+        editor-state (when-let [editor-state (:editor-state @entry)]
                        (editor-state-from-raw (clj->js editor-state)))
         local (r/atom {:editor-state (:editor-state @entry)})
         editor-cb (fn [md plain editor-state]
@@ -101,18 +105,17 @@
     (fn [entry put-fn]
       (let [latest-entry (dissoc @entry :comments)
             save-fn (fn [_ev]
-                      (put-fn
-                        [:entry/update
-                         (if (and (:new-entry entry) (not (:comment-for entry)))
-                           (update-in (u/clean-entry latest-entry) [:tags] conj "#new")
-                           (u/clean-entry latest-entry))]))
+                      (let [cleaned (u/clean-entry latest-entry)
+                            entry (if (and (:new-entry entry)
+                                           (not (:comment-for entry)))
+                                    (update-in cleaned [:tags] conj "#new")
+                                    cleaned)]
+                        (put-fn [:entry/update entry])))
             md (or (:md @entry) "")]
         [:div
-         [draft-text-editor editor-state md editor-cb]
+         [draft-text-editor editor-state md editor-cb save-fn]
          [:div.save
-          (when
-            (not= (:editor-state @local)
-                  (:editor-state @entry))
+          (when @unsaved
             [:span.not-saved {:on-click save-fn}
              [:span.fa.fa-floppy-o] "  click to save"])]]))))
 

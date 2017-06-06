@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {mdToDraftjs, draftjsToMd} from 'draftjs-md-converter';
-import Draft, {RichUtils, EditorState, ContentState, convertToRaw, convertFromRaw} from 'draft-js';
+import {RichUtils, EditorState, ContentState, convertToRaw, convertFromRaw} from 'draft-js';
+import {getDefaultKeyBinding, KeyBindingUtil} from 'draft-js';
 import Editor, {createEditorStateWithText} from 'draft-js-plugins-editor'; // eslint-disable-line import/no-unresolved
 import createMentionPlugin, {defaultSuggestionsFilter} from 'draft-js-mention-plugin'; // eslint-disable-line import/no-unresolved
 import createLinkifyPlugin from 'draft-js-linkify-plugin'; // eslint-disable-line import/no-unresolved
@@ -8,6 +9,15 @@ import 'draft-js-linkify-plugin/lib/plugin.css'; // eslint-disable-line import/n
 import {fromJS} from 'immutable';
 import editorStyles from './editorStyles.css';
 import StyleControls from './style-controls';
+
+const {hasCommandModifier} = KeyBindingUtil;
+
+function myKeyBindingFn(e) {
+    if (e.keyCode === 83 /* `S` key */ && hasCommandModifier(e)) {
+        return 'myeditor-save';
+    }
+    return getDefaultKeyBinding(e);
+}
 
 const suggestionsFilter = (searchValue, suggestions) => {
     const value = searchValue.toLowerCase();
@@ -33,6 +43,12 @@ export default class EntryTextEditor extends Component {
     handleKeyCommand = (command) => {
         const {editorState} = this.state;
         console.log("handleKeyCommand", command);
+
+        if (command === 'myeditor-save') {
+            this.props.saveFn();
+            return 'handled';
+        }
+
         const newState = RichUtils.handleKeyCommand(editorState, command);
         if (newState) {
             this.onChange(newState);
@@ -93,6 +109,7 @@ export default class EntryTextEditor extends Component {
 
     constructor(props) {
         super(props);
+        this.handleKeyCommand = this.handleKeyCommand.bind(this);
         const stateFromMd = convertFromRaw(mdToDraftjs(props.md));
         const stateFromMd2 = EditorState.createWithContent(stateFromMd);
         this.state.editorState = props.editorState ? props.editorState : stateFromMd2;
@@ -153,6 +170,7 @@ export default class EntryTextEditor extends Component {
                     onChange={this.onChange}
                     plugins={this.plugins}
                     handleKeyCommand={this.handleKeyCommand}
+                    keyBindingFn={myKeyBindingFn}
                     ref={(element) => {
                         this.editor = element;
                     }}

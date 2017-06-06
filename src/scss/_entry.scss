@@ -447,6 +447,7 @@ u {
 .edit-menu {
   background-color: #DDD;
   padding: 0 4px;
+  margin: 0 -10px 3px -10px;
 
   .fa-inactive {
     color: #BBB;
@@ -463,19 +464,19 @@ u {
   }
 
   .spacer {
-    padding: 5px;
+    padding: 3px 5px;
   }
 
   .spacer-sm {
-    padding: 5px;
+    padding: 3px 5px;
   }
 
   .fa {
-    padding: 5px 3px;
+    padding: 3px;
     cursor: pointer;
   }
 
   .fa-wide {
-    padding: 5px;
+    padding: 3px 5px;
   }
 }
