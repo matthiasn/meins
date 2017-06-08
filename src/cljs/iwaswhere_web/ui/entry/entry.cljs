@@ -1,6 +1,5 @@
 (ns iwaswhere-web.ui.entry.entry
   (:require [iwaswhere-web.ui.leaflet :as l]
-            [iwaswhere-web.ui.markdown :as md]
             [iwaswhere-web.ui.media :as m]
             [iwaswhere-web.ui.pomodoro :as pomo]
             [re-frame.core :refer [subscribe]]

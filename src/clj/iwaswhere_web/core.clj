@@ -4,7 +4,6 @@
   (:gen-class)
   (:require [matthiasn.systems-toolbox.switchboard :as sb]
             [matthiasn.systems-toolbox-sente.server :as sente]
-    ;[matthiasn.systems-toolbox-probe.probe :as probe]
             [iwaswhere-web.index :as idx]
             [iwaswhere-web.specs]
             [clojure.tools.logging :as log]
@@ -80,6 +79,4 @@
   (pid/delete-on-shutdown! "iwaswhere.pid")
   (log/info "Application started, PID" (pid/current))
   (restart! switchboard)
-  #_(when (get (System/getenv) "PROBE")
-      (probe/start! switchboard))
   (Thread/sleep Long/MAX_VALUE))

@@ -42,7 +42,6 @@ export default class EntryTextEditor extends Component {
 
     handleKeyCommand = (command) => {
         const {editorState} = this.state;
-        console.log("handleKeyCommand", command);
 
         if (command === 'myeditor-save') {
             this.props.saveFn();
@@ -105,6 +104,17 @@ export default class EntryTextEditor extends Component {
     };
 
     onAddStory = (story) => {
+    };
+
+    componentWillReceiveProps = (nextProps) => {
+        const nextPropsContent = nextProps.editorState.getCurrentContent();
+        const currentContent = this.state.editorState.getCurrentContent();
+        const nextPropsPlain = nextPropsContent.getPlainText();
+        const statePlain = currentContent.getPlainText();
+        const changedOutside = (nextPropsPlain !== statePlain);
+        if (changedOutside) {
+            this.setState({editorState: nextProps.editorState});
+        }
     };
 
     constructor(props) {

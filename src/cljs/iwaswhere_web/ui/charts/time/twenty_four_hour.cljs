@@ -70,8 +70,7 @@
                           :width          11
                           :height         h}]))]))]))))
 
-(defn legend
-  [text x y]
+(defn legend [text x y]
   [:text {:x           x
           :y           y
           :stroke      "none"

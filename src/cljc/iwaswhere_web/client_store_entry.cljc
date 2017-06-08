@@ -110,27 +110,6 @@
       {:new-state    new-state
        :send-to-self [:cmd/pomodoro-inc {:timestamp ts}]})))
 
-(defn update-local-fn2
-  "Update locally stored new entry with changes from edit element."
-  [{:keys [current-state msg-payload]}]
-  (prn :update-local-fn msg-payload)
-  (let [ts (:timestamp msg-payload)
-        entry (u/deep-merge (get-in current-state [:entries-map ts])
-                            (get-in current-state [:new-entries ts])
-                            msg-payload)
-        parsed (p/parse-entry (:md entry))
-        updated (merge entry parsed)
-        now (st/now)
-        h (* 60 60 1000)
-        updated (if (and (:completed-time entry)
-                         (= (:completed-time entry) (:planned-dur entry))
-                         (< (- now ts) h))
-                  (update-in updated [:tags] conj "#mood-map")
-                  updated)
-        new-state (assoc-in current-state [:new-entries ts] updated)]
-    (update-local-storage new-state)
-    {:new-state new-state}))
-
 (defn update-local-fn
   "Update locally stored new entry with changes from edit element."
   [{:keys [current-state msg-payload]}]

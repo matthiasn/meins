@@ -24,6 +24,10 @@
 .entry {
   padding: 0.5em 0.8em 0.2em 0.8em;
 
+  .entry-text {
+    padding-bottom: 0.3em;
+  }
+
   .active {
     border: 1px solid red;
   }
@@ -445,7 +449,7 @@ u {
 
 
 .edit-menu {
-  background-color: #DDD;
+  background-color: #EEE;
   padding: 0 4px;
   margin: 0 -10px 3px -10px;
 

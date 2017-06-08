@@ -45,8 +45,6 @@
                           :client/ui-cmp}
                   :to   :client/store-cmp}]
 
-     ;[:cmd/attach-to-firehose :client/ws-cmp]
-
      [:cmd/route {:from #{:client/store-cmp
                           :client/ui-cmp}
                   :to   :client/scheduler-cmp}]

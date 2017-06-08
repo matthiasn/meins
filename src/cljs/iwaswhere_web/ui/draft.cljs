@@ -91,8 +91,6 @@
   [entry put-fn]
   (let [ts (:timestamp @entry)
         {:keys [entry edit-mode entries-map new-entries unsaved]} (eu/entry-reaction ts)
-        editor-state (when-let [editor-state (:editor-state @entry)]
-                       (editor-state-from-raw (clj->js editor-state)))
         local (r/atom {:editor-state (:editor-state @entry)})
         editor-cb (fn [md plain editor-state]
                     (let [new-state (js->clj editor-state :keywordize-keys true)
@@ -104,6 +102,8 @@
                       (put-fn [:entry/update-local updated])))]
     (fn [entry put-fn]
       (let [latest-entry (dissoc @entry :comments)
+            editor-state (when-let [editor-state (:editor-state latest-entry)]
+                           (editor-state-from-raw (clj->js editor-state)))
             save-fn (fn [_ev]
                       (let [cleaned (u/clean-entry latest-entry)
                             entry (if (and (:new-entry entry)
