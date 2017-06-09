@@ -36,6 +36,15 @@
   [cls]
   (r/adapt-react-class (aget js/window "deps" cls "default")))
 
+(defn entry-stories [editor-state]
+  (->> editor-state
+       :entityMap
+       vals
+       (filter #(= (:type %) "$mention"))
+       (map #(-> % :data :mention :id))
+       (map #(when % (js/parseInt %)))
+       (set)))
+
 (defn draft-search-field
   [editor-state update-cb]
   (let [editor (adapt-react-class "SearchFieldEditor")
@@ -94,9 +103,11 @@
         local (r/atom {:editor-state (:editor-state @entry)})
         editor-cb (fn [md plain editor-state]
                     (let [new-state (js->clj editor-state :keywordize-keys true)
+                          story (first (entry-stories new-state))
                           updated (merge
                                     @entry
                                     (p/parse-entry md)
+                                    (when story {:linked-story story})
                                     {:editor-state new-state
                                      :text         plain})]
                       (put-fn [:entry/update-local updated])))]
@@ -118,14 +129,3 @@
           (when @unsaved
             [:span.not-saved {:on-click save-fn}
              [:span.fa.fa-floppy-o] "  click to save"])]]))))
-
-(defn story-search-field
-  [editor-state select-story]
-  (let [options (subscribe [:options])
-        sorted-stories (reaction (:sorted-stories @options))
-        editor (adapt-react-class "StoryFieldEditor")]
-    (fn [editor-state select-story]
-      (let [stories-list (map story-mapper @sorted-stories)]
-        [editor {:editorState editor-state
-                 :stories     stories-list
-                 :selectStory select-story}]))))

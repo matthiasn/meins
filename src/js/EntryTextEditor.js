@@ -99,12 +99,8 @@ export default class EntryTextEditor extends Component {
         this.editor.focus();
     };
 
-    onAddMention = () => {
-        // get the mention object selected
-    };
-
-    onAddStory = (story) => {
-    };
+    onAddMention = () => {};
+    onAddStory = (story) => {};
 
     componentWillReceiveProps = (nextProps) => {
         const nextEditorState = nextProps.editorState;

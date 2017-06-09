@@ -43,15 +43,7 @@
       (let [query (query-id (:queries @query-cfg))
             search-send (fn [text editor-state]
                           (let [query (query-id (:queries @query-cfg))
-                                story (->> editor-state
-                                           :entityMap
-                                           vals
-                                           (filter #(= (:type %) "$mention"))
-                                           first
-                                           :data
-                                           :mention
-                                           :id)
-                                story (when story (js/parseInt story))
+                                story (first (d/entry-stories editor-state))
                                 s (merge query
                                          (p/parse-search text)
                                          {:story        story

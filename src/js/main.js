@@ -6,7 +6,6 @@ window.deps = {
     'react-responsive-carousel' : require('react-responsive-carousel').Carousel,
     'editor' : require ('./editor'),
     'SearchFieldEditor' : require ('./SearchFieldEditor'),
-    'StoryFieldEditor' : require ('./StoryFieldEditor'),
     'EntryTextEditor' : require ('./EntryTextEditor'),
     'Calendar' : require ('./calendar'),
     'emojiFlags' : require('emoji-flags')

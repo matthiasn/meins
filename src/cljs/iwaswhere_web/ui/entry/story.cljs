@@ -5,7 +5,8 @@
             [re-frame.core :refer [subscribe]]
             [reagent.ratom :refer-macros [reaction]]
             [reagent.core :as r]
-            [clojure.string :as s]))
+            [clojure.string :as s]
+            [iwaswhere-web.utils.parse :as up]))
 
 (defn editable-field
   [on-input-fn on-keydown-fn text]
@@ -60,29 +61,16 @@
          [editable-field on-input-fn on-keydown-fn (:saga-name entry)]]
         [:h2 "Saga: " (:saga-name entry)]))))
 
-(defn story-select
-  "In edit mode, allow editing of story, otherwise show story name."
-  [entry put-fn edit-mode?]
+(defn story-div
+  "Shows story name."
+  [entry tab-group put-fn]
   (let [options (subscribe [:options])
-        local (r/atom {:search ""})
-        stories (reaction (:stories @options))
-        ts (:timestamp entry)
-        new-entries (subscribe [:new-entries])
-        select-story (fn [story-id]
-                       (let [updated (-> (get-in @new-entries [ts])
-                                         (assoc-in [:linked-story] story-id))]
-                         (put-fn [:entry/update-local updated])))]
-    (fn story-select-render [entry put-fn edit-mode?]
-      (let [linked-story (:linked-story entry)
-            story-name (get-in @stories [linked-story :story-name] "")
-            editor-state (d/editor-state-from-text story-name)]
-        (if edit-mode?
-          (when-not (or (contains? #{:saga :story} (:entry-type entry))
-                        (:comment-for entry))
-            [:div.story
-             [d/story-search-field editor-state select-story]])
-          (when linked-story
-            [:div.story (:story-name (get @stories linked-story))]))))))
+        stories (reaction (:stories @options))]
+    (fn story-select-render [entry put-fn]
+      (let [linked-story (:linked-story entry)]
+        (when linked-story
+          [:div.story
+           (:story-name (get @stories linked-story))])))))
 
 (defn saga-select
   "In edit mode, allow editing of story, otherwise show story name."

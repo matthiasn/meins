@@ -25,6 +25,7 @@
     (some-> entry
             (text)
             (s/replace "#task" "")
+            (s/replace "#habit" "")
             (s/replace "##" "")
             s/trim
             s/split-lines
