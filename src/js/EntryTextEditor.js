@@ -75,21 +75,21 @@ export default class EntryTextEditor extends Component {
     }
 
     onSearchChange = ({value}) => {
-        let mentions = fromJS(this.props.mentions);
+        let mentions = fromJS(this.state.mentions);
         this.setState({
             mentionSuggestions: defaultSuggestionsFilter(value, mentions),
         });
     };
 
     onSearchChange2 = ({value}) => {
-        let hashtags = fromJS(this.props.hashtags);
+        let hashtags = fromJS(this.state.hashtags);
         this.setState({
             hashtagSuggestions: defaultSuggestionsFilter(value, hashtags),
         });
     };
 
     onSearchChangeStories = ({value}) => {
-        let stories = fromJS(this.props.stories);
+        let stories = fromJS(this.state.stories);
         this.setState({
             storySuggestions: suggestionsFilter(value, stories),
         });
@@ -110,6 +110,10 @@ export default class EntryTextEditor extends Component {
         const nextEditorState = nextProps.editorState;
         const currentEditorState = this.state.editorState;
 
+        this.state.mentions  = fromJS(nextProps.mentions);
+        this.state.hashtags = fromJS(nextProps.hashtags);
+        this.state.stories = fromJS(nextProps.stories);
+        
         if (nextEditorState && currentEditorState) {
             const nextPropsContent = nextEditorState.getCurrentContent();
             const currentContent = currentEditorState.getCurrentContent();
@@ -148,6 +152,10 @@ export default class EntryTextEditor extends Component {
         this.HashtagSuggestions = hashtagPlugin.MentionSuggestions;
         this.MentionSuggestions = mentionPlugin.MentionSuggestions;
         this.StorySuggestions = storyPlugin.MentionSuggestions;
+
+        this.state.mentions  = fromJS(props.mentions);
+        this.state.hashtags = fromJS(props.hashtags);
+        this.state.stories = fromJS(props.stories);
 
         this.state.mentionSuggestions = fromJS(props.mentions);
         this.state.hashtagSuggestions = fromJS(props.hashtags);

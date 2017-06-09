@@ -149,8 +149,6 @@
                       (assoc-in all-path #{})
                       (assoc-in [:query-cfg :tab-groups tab-group :active] nil)
                       (update-in query-path #(apply dissoc % queries-in-grp)))]
-    (prn :close-all queries-in-grp)
-    (prn :close-all (get-in new-state query-path))
     (reset! query-cfg (:query-cfg new-state))
     {:new-state new-state}))
 
