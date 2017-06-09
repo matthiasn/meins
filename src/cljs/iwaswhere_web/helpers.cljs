@@ -68,5 +68,4 @@
   [stats-key n local last-update put-fn]
   (when (not= (:last-update last-update) (:last-fetched @local))
     (swap! local assoc-in [:last-fetched] (:last-update last-update))
-    (get-stats stats-key n (:meta last-update {}) put-fn)
-    (prn :update stats-key)))
+    (get-stats stats-key n (:meta last-update {}) put-fn)))

@@ -107,13 +107,18 @@ export default class EntryTextEditor extends Component {
     };
 
     componentWillReceiveProps = (nextProps) => {
-        const nextPropsContent = nextProps.editorState.getCurrentContent();
-        const currentContent = this.state.editorState.getCurrentContent();
-        const nextPropsPlain = nextPropsContent.getPlainText();
-        const statePlain = currentContent.getPlainText();
-        const changedOutside = (nextPropsPlain !== statePlain);
-        if (changedOutside) {
-            this.setState({editorState: nextProps.editorState});
+        const nextEditorState = nextProps.editorState;
+        const currentEditorState = this.state.editorState;
+
+        if (nextEditorState && currentEditorState) {
+            const nextPropsContent = nextEditorState.getCurrentContent();
+            const currentContent = currentEditorState.getCurrentContent();
+            const nextPropsPlain = nextPropsContent.getPlainText();
+            const statePlain = currentContent.getPlainText();
+            const changedOutside = (nextPropsPlain !== statePlain);
+            if (changedOutside) {
+                this.setState({editorState: nextProps.editorState});
+            }
         }
     };
 
