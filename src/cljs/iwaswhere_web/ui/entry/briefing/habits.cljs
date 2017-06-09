@@ -4,7 +4,8 @@
             [re-frame.core :refer [subscribe]]
             [iwaswhere-web.utils.misc :as u]
             [iwaswhere-web.utils.parse :as up]
-            [clojure.string :as s]))
+            [clojure.string :as s]
+            [iwaswhere-web.ui.entry.utils :as eu]))
 
 (defn habit-sorter
   "Sorts tasks."
@@ -46,7 +47,8 @@
               [:th [:span.fa.fa-diamond]]
               [:th "waiting habit"]]
              (for [entry entries-list]
-               (let [ts (:timestamp entry)]
+               (let [ts (:timestamp entry)
+                     text (eu/first-line entry)]
                  ^{:key ts}
                  [:tr {:on-click (up/add-search ts tab-group put-fn)}
                   [:td
@@ -55,11 +57,4 @@
                   [:td.award-points
                    (when-let [points (-> entry :habit :points)]
                      points)]
-                  [:td.habit
-                   (some-> entry
-                           :md
-                           (s/replace "#task" "")
-                           (s/replace "#habit" "")
-                           (s/replace "##" "")
-                           s/split-lines
-                           first)]]))]]])))))
+                  [:td.habit text]]))]]])))))

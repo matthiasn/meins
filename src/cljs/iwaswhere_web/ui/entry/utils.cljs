@@ -1,6 +1,7 @@
 (ns iwaswhere-web.ui.entry.utils
   (:require [re-frame.core :refer [subscribe]]
-            [reagent.ratom :refer-macros [reaction]]))
+            [reagent.ratom :refer-macros [reaction]]
+            [clojure.string :as s]))
 
 (defn entry-reaction
   [ts]
@@ -12,9 +13,19 @@
         unsaved (reaction (and @edit-mode
                                (not= (get-in @new-entries [ts])
                                      (get-in @entries-map [ts]))))]
-    {:entry       entry
-     :entries-map entries-map
+    {:entry            entry
+     :entries-map      entries-map
      :combined-entries combined-entries
-     :new-entries new-entries
-     :unsaved     unsaved
-     :edit-mode   edit-mode}))
+     :new-entries      new-entries
+     :unsaved          unsaved
+     :edit-mode        edit-mode}))
+
+(defn first-line [entry]
+  (let [text #(or (:text %) (:md %))]
+    (some-> entry
+            (text)
+            (s/replace "#task" "")
+            (s/replace "##" "")
+            s/trim
+            s/split-lines
+            first)))

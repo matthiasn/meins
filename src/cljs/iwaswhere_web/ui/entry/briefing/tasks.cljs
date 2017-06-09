@@ -78,7 +78,8 @@
                 "started tasks: "
                 [filter-btn :on-hold]]]]
              (for [entry entries-list]
-               (let [ts (:timestamp entry)]
+               (let [ts (:timestamp entry)
+                     text (eu/first-line entry)]
                  ^{:key ts}
                  [:tr {:on-click (up/add-search ts tab-group put-fn)}
                   [:td
@@ -90,14 +91,7 @@
                   [:td.estimate
                    (when-let [estimate (-> entry :task :estimate-m)]
                      (m-to-hhmm estimate))]
-                  [:td
-                   [:strong (some-> entry
-                                    :md
-                                    (s/replace "#task" "")
-                                    (s/replace "#habit" "")
-                                    (s/replace "##" "")
-                                    s/split-lines
-                                    first)]]]))]]])))))
+                  [:td [:strong text]]]))]]])))))
 
 (defn open-linked-tasks
   "Show open tasks that are also linked with the briefing entry."
@@ -177,7 +171,8 @@
             [:th [:strong "tasks"]]]
            (for [task linked-tasks]
              (let [ts (:timestamp task)
-                   on-drag-start (a/drag-start-fn task put-fn)]
+                   on-drag-start (a/drag-start-fn task put-fn)
+                   text (eu/first-line task)]
                ^{:key ts}
                [:tr {:on-click (up/add-search ts tab-group put-fn)}
                 (let [prio (or (-> task :task :priority) "-")]
@@ -192,10 +187,4 @@
                 [:td.estimate
                  (when-let [estimate (-> task :task :estimate-m)]
                    (m-to-hhmm estimate))]
-                [:td.left [:strong (some-> task
-                                           :md
-                                           (s/replace "#task" "")
-                                           (s/replace "##" "")
-                                           s/trim
-                                           s/split-lines
-                                           first)]]]))]]]))))
+                [:td.left [:strong text]]]))]]]))))

@@ -113,7 +113,7 @@ export default class EntryTextEditor extends Component {
         this.state.mentions  = fromJS(nextProps.mentions);
         this.state.hashtags = fromJS(nextProps.hashtags);
         this.state.stories = fromJS(nextProps.stories);
-        
+
         if (nextEditorState && currentEditorState) {
             const nextPropsContent = nextEditorState.getCurrentContent();
             const currentContent = currentEditorState.getCurrentContent();
