@@ -1,6 +1,12 @@
 import React, {Component} from 'react';
 import {mdToDraftjs, draftjsToMd} from 'draftjs-md-converter';
-import {RichUtils, EditorState, ContentState, convertToRaw, convertFromRaw} from 'draft-js';
+import {
+    RichUtils,
+    EditorState,
+    ContentState,
+    convertToRaw,
+    convertFromRaw
+} from 'draft-js';
 import {getDefaultKeyBinding, KeyBindingUtil} from 'draft-js';
 import Editor, {createEditorStateWithText} from 'draft-js-plugins-editor'; // eslint-disable-line import/no-unresolved
 import createMentionPlugin, {defaultSuggestionsFilter} from 'draft-js-mention-plugin'; // eslint-disable-line import/no-unresolved
@@ -99,18 +105,21 @@ export default class EntryTextEditor extends Component {
         this.editor.focus();
     };
 
-    onAddMention = () => {};
-    onAddStory = (story) => {};
+    onAddMention = () => {
+    };
+    onAddStory = (story) => {
+    };
 
     componentWillReceiveProps = (nextProps) => {
         const nextEditorState = nextProps.editorState;
         const currentEditorState = this.state.editorState;
+        const sinceUpdate = Date.now() - this.state.lastUpdated;
 
-        this.state.mentions  = fromJS(nextProps.mentions);
+        this.state.mentions = fromJS(nextProps.mentions);
         this.state.hashtags = fromJS(nextProps.hashtags);
         this.state.stories = fromJS(nextProps.stories);
 
-        if (nextEditorState && currentEditorState) {
+        if (nextEditorState && currentEditorState && (sinceUpdate > 1000)) {
             const nextPropsContent = nextEditorState.getCurrentContent();
             const currentContent = currentEditorState.getCurrentContent();
             const nextPropsPlain = nextPropsContent.getPlainText();
@@ -133,14 +142,14 @@ export default class EntryTextEditor extends Component {
 
         const hashtagPlugin = createMentionPlugin({mentionTrigger: "#",});
         const mentionPlugin = createMentionPlugin({mentionTrigger: "@",});
-        const storyPlugin   = createMentionPlugin({mentionTrigger: "$",});
+        const storyPlugin = createMentionPlugin({mentionTrigger: "$",});
         const linkifyPlugin = createLinkifyPlugin({
             target: "_blank",
             component: (props) => (
                 // eslint-disable-next-line no-alert, jsx-a11y/anchor-has-content
                 <a {...props} onClick={() => {
                     window.open(props.href, '_blank');
-                }} />
+                }}/>
             )
         });
 
@@ -149,7 +158,7 @@ export default class EntryTextEditor extends Component {
         this.MentionSuggestions = mentionPlugin.MentionSuggestions;
         this.StorySuggestions = storyPlugin.MentionSuggestions;
 
-        this.state.mentions  = fromJS(props.mentions);
+        this.state.mentions = fromJS(props.mentions);
         this.state.hashtags = fromJS(props.hashtags);
         this.state.stories = fromJS(props.stories);
 
@@ -163,8 +172,12 @@ export default class EntryTextEditor extends Component {
             const rawContent = convertToRaw(content);
             const rawContent2 = JSON.parse(JSON.stringify(rawContent));
             const md = draftjsToMd(rawContent, myMdDict);
+            const now = Date.now();
             props.onChange(md, plain, rawContent2);
-            this.setState({editorState: newState});
+            this.setState({
+                editorState: newState,
+                lastUpdated: now
+            });
         };
     }
 

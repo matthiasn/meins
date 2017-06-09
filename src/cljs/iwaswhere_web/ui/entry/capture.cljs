@@ -105,3 +105,49 @@
                              {:read-only (not edit-mode?)
                               :on-change on-change-fn
                               :value     value})]]))])])))))
+
+(defn questionnaire-div
+  "In edit mode, allow editing of questionnaire, otherwise show a summary."
+  [entry put-fn edit-mode?]
+  (let [options (subscribe [:options])
+        questionnaires (reaction (:questionnaires @options))]
+    (fn questionnaire-render [entry put-fn edit-mode?]
+      (when-let [questionnaires @questionnaires]
+        (let [ts (:timestamp entry)
+              questionnaire-tags (:mapping questionnaires)
+              q-tags (select-keys questionnaire-tags (:tags entry))
+              questionnaires (map (fn [[t k]] [k (get-in questionnaires [:items k])]) q-tags)]
+          [:div
+           (for [[k conf] questionnaires]
+             (let [q-path [:questionnaires k]]
+               ^{:key (str "cf" ts k)}
+               [:form.questionnaire
+                [:h3 (:header conf)]
+                [:p (:desc conf)]
+                [:ol
+                 (for [{:keys [type path label]} (:fields conf)]
+                   (let [path (concat q-path path)
+                         value (get-in entry path)]
+                     ^{:key (str "q" ts k path)}
+                     [:li
+                      [:label {:class (when-not value "missing")} label]
+                      [:span.range
+                       (for [n (range 1 6)]
+                         (let [click (fn [_ev]
+                                       (let [new-val (when-not (= value n) n)
+                                             updated (assoc-in entry path new-val)]
+                                         (put-fn [:entry/update-local updated])))]
+                           ^{:key (str "q" ts k path n)}
+                           [:span.opt {:on-click click
+                                       :class    (when (= value n) "sel")} n]))]]))]
+                [:div.agg
+                 (for [[k cfg] (:aggregations conf)]
+                   (let [items (filter identity
+                                       (vals (select-keys (get-in entry q-path)
+                                                          (:items cfg))))
+                         complete? (= (count items) (count (:items cfg)))
+                         res (apply + items)]
+                     (when complete?
+                       ^{:key k}
+                       [:span [:span (:label cfg)] [:span.res res]])))]
+                [:cite (:reference conf)]]))])))))

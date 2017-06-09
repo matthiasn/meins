@@ -116,6 +116,7 @@
          [es/saga-name-field @entry edit-mode? put-fn]
          [d/entry-editor entry put-fn]
          [c/custom-fields-div @entry put-fn edit-mode?]
+         [c/questionnaire-div @entry put-fn edit-mode?]
          [m/audioplayer-view @entry put-fn]
          [l/leaflet-map @entry @show-map? local-cfg put-fn]
          [loc/location-details @entry put-fn edit-mode?]

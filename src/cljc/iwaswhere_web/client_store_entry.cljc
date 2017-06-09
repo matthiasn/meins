@@ -115,16 +115,13 @@
   [{:keys [current-state msg-payload]}]
   (let [ts (:timestamp msg-payload)
         saved (get-in current-state [:entries-map ts])]
-    (if (not= (:md saved) (:md msg-payload))
-      (let [entry (u/deep-merge saved
-                                (get-in current-state [:new-entries ts])
-                                msg-payload)
-            parsed (p/parse-entry (:md entry))
-            updated (merge entry parsed)
-            new-state (assoc-in current-state [:new-entries ts] updated)]
-        (update-local-storage new-state)
-        {:new-state new-state})
-      {})))
+    (let [new-entry (get-in current-state [:new-entries ts])
+          entry (u/deep-merge saved new-entry msg-payload)
+          parsed (p/parse-entry (:md entry))
+          updated (merge entry parsed)
+          new-state (assoc-in current-state [:new-entries ts] updated)]
+      (update-local-storage new-state)
+      {:new-state new-state})))
 
 (defn remove-local-fn
   "Remove new entry from local when saving is confirmed by backend."

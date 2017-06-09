@@ -1,0 +1,36 @@
+{:mapping {"#PANAS" :panas}
+ :types   {:likert {:type  :range
+                    :items [{:value 1 :desc "Very Slightly or Not at All"}
+                            {:value 2 :desc "A Little"}
+                            {:value 3 :desc "Moderately"}
+                            {:value 4 :desc "Quite a Bit"}
+                            {:value 5 :desc "Extremely"}]}}
+ :items   {:panas {:header       "The Positive and Negative Affect Schedule (PANAS; Watson et al., 1988)"
+                   :desc         "Indicate to what extent you feel this way right now, that is, at the present moment."
+                   :reference    "Watson, D., Clark, L. A., & Tellegan, A. (1988). Development and validation of brief measures of positive and negative affect: The PANAS scales. Journal of Personality and Social Psychology, 54(6), 1063–1070."
+                   :fields       [{:type :likert :path [1] :label "Interested"}
+                                  {:type :likert :path [2] :label "Distressed"}
+                                  {:type :likert :path [3] :label "Excited"}
+                                  {:type :likert :path [4] :label "Upset"}
+                                  {:type :likert :path [5] :label "Strong"}
+                                  {:type :likert :path [6] :label "Guilty"}
+                                  {:type :likert :path [7] :label "Scared"}
+                                  {:type :likert :path [8] :label "Hostile"}
+                                  {:type :likert :path [9] :label "Enthusiastic"}
+                                  {:type :likert :path [10] :label "Proud"}
+                                  {:type :likert :path [11] :label "Irritable"}
+                                  {:type :likert :path [12] :label "Alert"}
+                                  {:type :likert :path [13] :label "Ashamed"}
+                                  {:type :likert :path [14] :label "Inspired"}
+                                  {:type :likert :path [15] :label "Nervous"}
+                                  {:type :likert :path [16] :label "Determined"}
+                                  {:type :likert :path [17] :label "Attentive"}
+                                  {:type :likert :path [18] :label "Jittery"}
+                                  {:type :likert :path [19] :label "Active"}
+                                  {:type :likert :path [20] :label "Afraid"}]
+                   :aggregations {:pos {:type  :sum
+                                        :label "Positive Affect Score:"
+                                        :items #{1 3 5 9 10 12 14 16 17 19}}
+                                  :neg {:type  :sum
+                                        :label "Negative Affect Score:"
+                                        :items #{2 4 6 7 8 11 13 15 18 20}}}}}}
