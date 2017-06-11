@@ -114,14 +114,18 @@
   "Update locally stored new entry with changes from edit element."
   [{:keys [current-state msg-payload]}]
   (let [ts (:timestamp msg-payload)
-        saved (get-in current-state [:entries-map ts])]
-    (let [new-entry (get-in current-state [:new-entries ts])
-          entry (u/deep-merge saved new-entry msg-payload)
-          parsed (p/parse-entry (:md entry))
-          updated (merge entry parsed)
-          new-state (assoc-in current-state [:new-entries ts] updated)]
-      (update-local-storage new-state)
-      {:new-state new-state})))
+        saved (get-in current-state [:entries-map ts])
+        relevant #(select-keys % [:md :questionnaires :custom-fields :task :habit :completed-time])
+        changed? (not= (relevant saved) (relevant msg-payload))]
+    (if changed?
+      (let [new-entry (get-in current-state [:new-entries ts])
+            entry (u/deep-merge saved new-entry msg-payload)
+            parsed (p/parse-entry (:md entry))
+            updated (merge entry parsed)
+            new-state (assoc-in current-state [:new-entries ts] updated)]
+        (update-local-storage new-state)
+        {:new-state new-state})
+      {})))
 
 (defn remove-local-fn
   "Remove new entry from local when saving is confirmed by backend."

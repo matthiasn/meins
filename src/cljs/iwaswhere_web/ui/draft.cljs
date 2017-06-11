@@ -71,7 +71,7 @@
                :onChange    on-change}])))
 
 (defn draft-text-editor
-  [editor-state md update-cb save-fn]
+  [editor-state md update-cb save-fn changed]
   (let [editor (adapt-react-class "EntryTextEditor")
         options (subscribe [:options])
         sorted-stories (reaction (:sorted-stories @options))
@@ -86,10 +86,11 @@
                                     (concat hashtags pvt-hashtags)
                                     hashtags)]
                      (map (fn [h] {:name h}) hashtags)))]
-    (fn [editor-state md update-cb save-fn]
+    (fn [editor-state md update-cb save-fn changed]
       [editor {:editorState editor-state
                :md          md
                :spellCheck  true
+               :changed     changed
                :mentions    @mentions
                :hashtags    @hashtags
                :stories     @stories-list
@@ -124,8 +125,7 @@
                         (put-fn [:entry/update entry])))
             md (or (:md @entry) "")]
         [:div
-         [draft-text-editor editor-state md editor-cb save-fn]
-         [:div.save
-          (when @unsaved
-            [:span.not-saved {:on-click save-fn}
-             [:span.fa.fa-floppy-o] "  click to save"])]]))))
+         [draft-text-editor editor-state md editor-cb save-fn @unsaved]
+         (when @unsaved
+           [:div.save [:span.not-saved {:on-click save-fn}
+                       [:span.fa.fa-floppy-o] "  click to save"]])]))))

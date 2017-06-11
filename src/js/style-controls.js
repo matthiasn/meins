@@ -44,7 +44,7 @@ const BLOCK_TYPES = [
 ];
 
 const StyleControls = (props) => {
-    const {editorState, state} = props;
+    const {editorState, state, show} = props;
     const selection = editorState.getSelection();
     const blockType = editorState
         .getCurrentContent()
@@ -52,28 +52,31 @@ const StyleControls = (props) => {
         .getType();
     const currentStyle = editorState.getCurrentInlineStyle();
 
-    return (
-        <div className="RichEditor-controls edit-menu">
-            {INLINE_STYLES.map(type =>
-                <StyleButton
-                    key={type.style}
-                    active={currentStyle.has(type.style)}
-                    icon={type.icon}
-                    onToggle={props.onToggleInline}
-                    style={type.style}
-                />
-            )}
-            {BLOCK_TYPES.map((type) =>
-                <StyleButton
-                    key={type.style}
-                    active={type.style === blockType}
-                    icon={type.icon}
-                    onToggle={props.onToggleBlockType}
-                    style={type.style}
-                />
-            )}
-        </div>
-    );
+    if (props.show) {
+        return (
+            <div className="RichEditor-controls edit-menu">
+                {INLINE_STYLES.map(type =>
+                    <StyleButton
+                        key={type.style}
+                        active={currentStyle.has(type.style)}
+                        icon={type.icon}
+                        onToggle={props.onToggleInline}
+                        style={type.style}
+                    />
+                )}
+                {BLOCK_TYPES.map((type) =>
+                    <StyleButton
+                        key={type.style}
+                        active={type.style === blockType}
+                        icon={type.icon}
+                        onToggle={props.onToggleBlockType}
+                        style={type.style}
+                    />
+                )}
+            </div>
+        );
+    }
+    return null;
 };
 
 export default StyleControls

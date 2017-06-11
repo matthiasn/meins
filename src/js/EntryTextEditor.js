@@ -194,6 +194,7 @@ export default class EntryTextEditor extends Component {
                 <StyleControls
                     editorState={editorState}
                     state={this}
+                    show={this.props.changed}
                     onToggleInline={this.toggleInlineStyle}
                     onToggleBlockType={this.toggleBlockType}
                 />
