@@ -23,6 +23,7 @@
           (:entry-count @stats) " entries, "
           (count (:hashtags @options)) " hashtags, "
           (count (:mentions @options)) " people, "
+          (Math/floor (:hours-logged @stats)) " hours, "
           (:word-count @stats) " words, "
           (:open-tasks-cnt @stats) " open tasks, "
           (:backlog-cnt @stats) " backlog, "

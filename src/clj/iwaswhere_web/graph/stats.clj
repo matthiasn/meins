@@ -140,6 +140,21 @@
         counts (map (fn [entry] (u/count-words entry)) entries)]
     (apply + counts)))
 
+(defn hours-logged
+  "Count total hours logged."
+  [current-state]
+  (let [g (:graph current-state)
+        entries (map #(uber/attrs g %) (:sorted-entries current-state))
+        seconds-logged (map (fn [entry]
+                              (let [completed (get entry :completed-time 0)
+                                    manual (gq/summed-durations entry)
+                                    summed (+ completed manual)]
+                                summed))
+                            entries)
+        total-seconds (apply + seconds-logged)
+        total-hours (/ total-seconds 60 60)]
+    total-hours))
+
 (defn stats-tags-fn
   "Generates stats and tags (they only change on insert anyway) and initiates
    publication thereof to all connected clients."
@@ -165,6 +180,12 @@
   (future
     (let [child-span (mk-child-span span "stats-tags-:word-count")
           stats {:word-count (count-words current-state)}
+          uid (:sente-uid msg-meta)]
+      (.finish child-span)
+      (put-fn (with-meta [:stats/result2 stats] {:sente-uid uid}))))
+  (future
+    (let [child-span (mk-child-span span "stats-tags-:hours-count")
+          stats {:hours-logged (hours-logged current-state)}
           uid (:sente-uid msg-meta)]
       (.finish child-span)
       (put-fn (with-meta [:stats/result2 stats] {:sente-uid uid}))))
