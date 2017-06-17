@@ -104,6 +104,8 @@
   .header-1 {
     display: flex;
     justify-content: space-between;
+    line-height: 0.6;
+    padding-top: 3px;
 
     .geoname {
       font-size: 0.6em;
@@ -112,7 +114,7 @@
     .flag {
       padding-left: 3px;
       position: relative;
-      top: -6px;
+      top: -4px;
       font-size: 1.5em;
     }
   }

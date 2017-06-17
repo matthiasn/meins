@@ -6,7 +6,7 @@
                             {:value 4 :desc "Quite a Bit"}
                             {:value 5 :desc "Extremely"}]}}
  :items   {:panas {:header       "The Positive and Negative Affect Schedule (PANAS; Watson et al., 1988)"
-                   :desc         "Indicate to what extent you feel this way right now, that is, at the present moment."
+                   :desc         "Indicate to what extent you feel this way right now, that is, at the present moment. (1-Very Slightly or Not at All, 2-A Little, 3-Moderately, 4-Quite a Bit, 5-Extremely)"
                    :reference    "Watson, D., Clark, L. A., & Tellegan, A. (1988). Development and validation of brief measures of positive and negative affect: The PANAS scales. Journal of Personality and Social Psychology, 54(6), 1063–1070."
                    :fields       [{:type :likert :path [1] :label "Interested"}
                                   {:type :likert :path [2] :label "Distressed"}

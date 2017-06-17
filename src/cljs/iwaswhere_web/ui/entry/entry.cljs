@@ -111,7 +111,6 @@
                                 :class    (when entry-active? "active")}
                 (str " linked: " (count (:linked-entries-list @entry)))]))]
           [a/entry-actions ts put-fn edit-mode? toggle-edit local-cfg]]
-         [hashtags-mentions-list ts tab-group put-fn]
          [es/story-name-field @entry edit-mode? put-fn]
          [es/saga-name-field @entry edit-mode? put-fn]
          [d/entry-editor entry put-fn]
@@ -130,6 +129,7 @@
          [b/briefing-view @entry put-fn edit-mode? local-cfg]
          [f/flight-view @entry put-fn edit-mode? local-cfg]
          [:div.footer
+          [hashtags-mentions-list ts tab-group put-fn]
           [:div.word-count (u/count-words-formatted @entry)]]]))))
 
 (defn entry-with-comments
