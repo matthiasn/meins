@@ -131,7 +131,7 @@
         all-path [:query-cfg :tab-groups tab-group :all]
         query-path [:query-cfg :queries]
         new-state (-> current-state
-                      (update-in all-path disj query-id)
+                      (update-in all-path #(disj (set %) query-id))
                       (previously-active query-id tab-group)
                       (update-in query-path dissoc query-id)
                       (update-in [:results] dissoc query-id))]
@@ -169,7 +169,7 @@
         new-state (-> current-state
                       (assoc-in [:query-cfg :tab-groups to :active] q-id)
                       (update-in [:query-cfg :tab-groups to :all] conj q-id)
-                      (update-in [:query-cfg :tab-groups from :all] disj q-id)
+                      (update-in [:query-cfg :tab-groups from :all] #(disj (set %) q-id))
                       (previously-active q-id from))]
     (reset! query-cfg (:query-cfg new-state))
     {:new-state new-state}))
