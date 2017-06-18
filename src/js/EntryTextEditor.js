@@ -204,6 +204,7 @@ export default class EntryTextEditor extends Component {
                     plugins={this.plugins}
                     handleKeyCommand={this.handleKeyCommand}
                     keyBindingFn={myKeyBindingFn}
+                    spellCheck={true}
                     ref={(element) => {
                         this.editor = element;
                     }}

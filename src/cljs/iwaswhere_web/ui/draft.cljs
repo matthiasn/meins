@@ -64,7 +64,6 @@
         on-change (on-editor-change update-cb)]
     (fn [editor-state send-fn]
       [editor {:editorState editor-state
-               :spellCheck  true
                :mentions    @mentions
                :hashtags    @hashtags
                :stories     @stories-list
@@ -89,7 +88,6 @@
     (fn [editor-state md update-cb save-fn changed]
       [editor {:editorState editor-state
                :md          md
-               :spellCheck  true
                :changed     changed
                :mentions    @mentions
                :hashtags    @hashtags
