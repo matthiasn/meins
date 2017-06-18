@@ -13,7 +13,7 @@
 
 (defn get-geoname [entry]
   (try
-    (when-not (:geoname entry)
+    (when (and (not (:geoname entry)) (not= (:geoname entry) :removed))
       (let [lat (:latitude entry)
             lon (:longitude entry)
             parser (fn [res] (cc/parse-string (:body res) #(keyword (->kebab-case %))))]

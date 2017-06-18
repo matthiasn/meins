@@ -38,17 +38,22 @@
         emoji-flags (aget js/window "deps" "emojiFlags")
         toggle-detail (fn [_] (swap! detail not))]
     (fn location-details-render [entry put-fn edit-mode?]
-      (when-let [geoname (:geoname entry)]
-        (let [admin-4-name (:admin-4-name geoname)
-              admin-3-name (:admin-3-name geoname)
-              admin-2-name (:admin-2-name geoname)
-              country-code (:country-code geoname)
-              flag (get (js->clj (.countryCode emoji-flags country-code)) "emoji")]
-          [:div {:on-click toggle-detail}
-           [:span.geoname (:name geoname)]
-           (when (and @detail admin-4-name) [:span.geoname  ", "admin-4-name])
-           (when (and @detail admin-3-name) [:span.geoname  ", "admin-3-name])
-           (when (and @detail admin-2-name) [:span.geoname  ", " admin-2-name])
-           (when-let [admin-1-name (:admin-1-name geoname)]
-             [:span.geoname ", " admin-1-name ])
-           [:span.flag flag]])))))
+      (let [geoname (:geoname entry)]
+        (when (and geoname (not= :removed geoname))
+          (let [admin-4-name (:admin-4-name geoname)
+                admin-3-name (:admin-3-name geoname)
+                admin-2-name (:admin-2-name geoname)
+                country-code (:country-code geoname)
+                flag (get (js->clj (.countryCode emoji-flags country-code)) "emoji")
+                remove (fn [ev]
+                         (let [updated (assoc-in entry [:geoname] :removed)]
+                           (put-fn [:entry/update updated])))]
+            [:div {:on-click toggle-detail}
+             [:span.geoname (:name geoname)]
+             (when (and @detail admin-4-name) [:span.geoname ", " admin-4-name])
+             (when (and @detail admin-3-name) [:span.geoname ", " admin-3-name])
+             (when (and @detail admin-2-name) [:span.geoname ", " admin-2-name])
+             (when-let [admin-1-name (:admin-1-name geoname)]
+               [:span.geoname ", " admin-1-name])
+             (when @detail [:span.fa.fa-trash {:on-click remove}])
+             [:span.flag flag]]))))))
