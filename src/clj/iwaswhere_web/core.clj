@@ -27,47 +27,49 @@
    Finally, sends all messages from store component to client via the ws
    component."
   [switchboard]
-  (sb/send-mult-cmd
-    switchboard
-    [[:cmd/init-comp #{(z/trace-cmp (sente/cmp-map :server/ws-cmp idx/sente-map))
-                       (z/trace-cmp (sched/cmp-map :server/scheduler-cmp))
-                       (z/trace-cmp (i/cmp-map :server/imports-cmp))
-                       (z/trace-cmp (st/cmp-map :server/store-cmp))
-                       (z/trace-cmp (up/cmp-map :server/upload-cmp))
-                       (z/trace-cmp (bl/cmp-map :server/blink-cmp))
-                       (z/trace-cmp (ft/cmp-map :server/ft-cmp))}]
+  (let [components #{(sente/cmp-map :server/ws-cmp idx/sente-map)
+                     (sched/cmp-map :server/scheduler-cmp)
+                     (i/cmp-map :server/imports-cmp)
+                     (st/cmp-map :server/store-cmp)
+                     (up/cmp-map :server/upload-cmp)
+                     (bl/cmp-map :server/blink-cmp)
+                     (ft/cmp-map :server/ft-cmp)}
+        traced-cmps (mapv z/trace-cmp components)]
+    (sb/send-mult-cmd
+      switchboard
+      [[:cmd/init-comp traced-cmps]
 
-     [:cmd/route {:from :server/ws-cmp
-                  :to   #{:server/store-cmp
-                          :server/blink-cmp
-                          :server/imports-cmp}}]
+       [:cmd/route {:from :server/ws-cmp
+                    :to   #{:server/store-cmp
+                            :server/blink-cmp
+                            :server/imports-cmp}}]
 
-     [:cmd/route {:from :server/imports-cmp
-                  :to   :server/store-cmp}]
+       [:cmd/route {:from :server/imports-cmp
+                    :to   :server/store-cmp}]
 
-     [:cmd/route {:from :server/upload-cmp
-                  :to   :server/store-cmp}]
+       [:cmd/route {:from :server/upload-cmp
+                    :to   :server/store-cmp}]
 
-     [:cmd/route {:from :server/store-cmp
-                  :to   #{:server/ws-cmp
-                          :server/ft-cmp}}]
+       [:cmd/route {:from :server/store-cmp
+                    :to   #{:server/ws-cmp
+                            :server/ft-cmp}}]
 
-     [:cmd/route {:from :server/scheduler-cmp
-                  :to   #{:server/store-cmp
-                          :server/blink-cmp
-                          :server/imports-cmp
-                          :server/ws-cmp}}]
+       [:cmd/route {:from :server/scheduler-cmp
+                    :to   #{:server/store-cmp
+                            :server/blink-cmp
+                            :server/imports-cmp
+                            :server/ws-cmp}}]
 
-     [:cmd/route {:from #{:server/store-cmp
-                          :server/blink-cmp
-                          :server/imports-cmp}
-                  :to   :server/scheduler-cmp}]
+       [:cmd/route {:from #{:server/store-cmp
+                            :server/blink-cmp
+                            :server/imports-cmp}
+                    :to   :server/scheduler-cmp}]
 
-     [:cmd/send {:to  :server/scheduler-cmp
-                 :msg [:cmd/schedule-new {:timeout (* 5 60 1000)
-                                          :message [:import/spotify]
-                                          :repeat  true
-                                          :initial true}]}]]))
+       [:cmd/send {:to  :server/scheduler-cmp
+                   :msg [:cmd/schedule-new {:timeout (* 5 60 1000)
+                                            :message [:import/spotify]
+                                            :repeat  true
+                                            :initial true}]}]])))
 
 (defn -main
   "Starts the application from command line, saves and logs process ID. The

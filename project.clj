@@ -22,7 +22,7 @@
                  [camel-snake-kebab "0.4.0"]
                  [matthiasn/systems-toolbox "0.6.9"]
                  [matthiasn/systems-toolbox-sente "0.6.15"]
-                 [matthiasn/systems-toolbox-zipkin "0.6.1-SNAPSHOT"]
+                 [matthiasn/systems-toolbox-zipkin "0.6.1"]
                  [reagent "0.6.2" :exclusions [cljsjs/react cljsjs/react-dom]]
                  [re-frame "0.9.4"]
                  [capacitor "0.6.0"]
