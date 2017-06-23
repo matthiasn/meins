@@ -26,7 +26,7 @@
 
 (defn started-tasks
   "Renders table with open entries, such as started tasks and open habits."
-  [tab-group local local-cfg put-fn]
+  [local local-cfg put-fn]
   (let [cfg (subscribe [:cfg])
         query-cfg (subscribe [:query-cfg])
         started-tasks (subscribe [:started-tasks])
@@ -63,8 +63,9 @@
                          (if (:show-pvt @cfg)
                            entries
                            (filter (u/pvt-filter conf entries-map) entries))))]
-    (fn started-tasks-list-render [tab-group local local-cfg put-fn]
-      (let [entries-list @entries-list]
+    (fn started-tasks-list-render [local local-cfg put-fn]
+      (let [entries-list @entries-list
+            tab-group (:tab-group local-cfg)]
         (when (seq entries-list)
           [:div.linked-tasks
            [:table.tasks

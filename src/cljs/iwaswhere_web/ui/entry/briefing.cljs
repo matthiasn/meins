@@ -145,8 +145,8 @@
                  " Logged: " [:strong dur] " in " (:total day-stats) " entries."])]
              [time/time-by-sagas entry day-stats local edit-mode? put-fn]
              [:div
-              [tasks/started-tasks tab-group local local-cfg put-fn]
+              [tasks/started-tasks local local-cfg put-fn]
               [tasks/open-linked-tasks ts local local-cfg put-fn]
-              [habits/waiting-habits tab-group entry local-cfg put-fn]
+              [habits/waiting-habits entry local local-cfg put-fn]
               (when day-stats
                 [time/time-by-stories day-stats local put-fn])]]]])))))
