@@ -24,6 +24,7 @@
    :br         [:spacer]
    :img        [:image]
    :pre        [:paragraph {:size 10 :family :courier}]
+   :code       [:chunk {:family :courier :style :bold}]
    :p          [:paragraph]
    :b          [:chunk {:style :bold}]
    :em         [:chunk {:style :italic}]
