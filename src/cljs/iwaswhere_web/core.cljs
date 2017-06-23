@@ -15,15 +15,11 @@
 
 (def sente-cfg {:relay-types #{:entry/update :entry/find :entry/trash
                                :import/geo :import/photos :import/phone
-                               :import/spotify :import/flight
-                               :cmd/keep-alive
-                               :stats/pomo-day-get
+                               :import/spotify :import/flight :export/pdf
+                               :cmd/keep-alive :stats/pomo-day-get
                                :stats/get :stats/get2 :import/movie :blink/busy
                                :state/stats-tags-get :import/weight
-                               :state/search :cfg/refresh
-                               :firehose/cmp-put
-                               :firehose/cmp-recv
-                               :firehose/cmp-publish-state}})
+                               :state/search :cfg/refresh}})
 
 (defn init!
   "Initializes client-side system by sending messages to the switchboard for

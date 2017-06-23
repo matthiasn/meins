@@ -16,15 +16,18 @@
                    "data"))
 (def daily-logs-path (str data-path "/daily-logs/"))
 (def clucy-path (str data-path "/clucy/"))
+(def export-path (str data-path "/export/"))
 
 (defn paths []
   (let [trash-path (str data-path "/trash/")]
     (fs/mkdirs daily-logs-path)
     (fs/mkdirs clucy-path)
+    (fs/mkdirs export-path)
     (fs/mkdirs trash-path)
     {:data-path       data-path
      :daily-logs-path daily-logs-path
      :clucy-path      clucy-path
+     :export-path     export-path
      :trash-path      trash-path}))
 
 (defn load-cfg

@@ -14,6 +14,7 @@
                  [enlive "1.1.6"]
                  [me.raynes/fs "1.4.6"]
                  [markdown-clj "0.9.99"]
+                 [clj-pdf "2.2.26"]
                  [cheshire "5.7.1"]
                  [cljsjs/moment "2.17.1-1"]
                  [com.drewnoakes/metadata-extractor "2.10.1"]

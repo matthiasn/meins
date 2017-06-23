@@ -131,6 +131,7 @@
                        (put-fn [:entry/remove-local {:timestamp ts}])
                        (put-fn [:entry/trash @entry]))
         open-external (up/add-search ts tab-group put-fn)
+        export-pdf #(put-fn [:export/pdf @entry])
         mouse-enter #(reset! visible true)]
     (fn entry-actions-render [ts put-fn edit-mode? toggle-edit local-cfg]
       (let [map? (:latitude @entry)
@@ -148,4 +149,5 @@
            [:span.fa.fa-external-link.toggle {:on-click open-external}])
          (when-not comment? [new-link @entry put-fn create-linked-entry])
          [add-location @entry put-fn]
+         [:span.fa.fa-file-pdf-o.toggle {:on-click export-pdf}]
          [trash-icon trash-entry]]))))

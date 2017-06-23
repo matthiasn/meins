@@ -13,6 +13,7 @@
             [iwaswhere-web.upload :as up]
             [iwaswhere-web.blink :as bl]
             [iwaswhere-web.imports :as i]
+            [iwaswhere-web.export :as e]
             [matthiasn.systems-toolbox.scheduler :as sched]
             [matthiasn.systems-toolbox-zipkin.core :as z]))
 
@@ -30,11 +31,12 @@
   (let [components #{(sente/cmp-map :server/ws-cmp idx/sente-map)
                      (sched/cmp-map :server/scheduler-cmp)
                      (i/cmp-map :server/imports-cmp)
+                     (e/cmp-map :server/export-cmp)
                      (st/cmp-map :server/store-cmp)
                      (up/cmp-map :server/upload-cmp)
                      (bl/cmp-map :server/blink-cmp)
                      (ft/cmp-map :server/ft-cmp)}
-        traced-cmps (mapv z/trace-cmp components)]
+        traced-cmps (set (mapv z/trace-cmp components))]
     (sb/send-mult-cmd
       switchboard
       [[:cmd/init-comp traced-cmps]
@@ -42,6 +44,7 @@
        [:cmd/route {:from :server/ws-cmp
                     :to   #{:server/store-cmp
                             :server/blink-cmp
+                            :server/export-cmp
                             :server/imports-cmp}}]
 
        [:cmd/route {:from :server/imports-cmp
