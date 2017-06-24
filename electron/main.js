@@ -5,7 +5,9 @@ const child_process = require('child_process');
 const path = require('path')
 const url = require('url')
 
-process.env.GOOGLE_API_KEY = 'AIzaSyD78NTnhgt--LCGBdIGPEg8GtBYzQl0gKU'
+process.env.GOOGLE_API_KEY = 'AIzaSyD78NTnhgt--LCGBdIGPEg8GtBYzQl0gKU';
+
+let started = false;
 
 // require('electron-context-menu')({
 //     prepend: (params, browserWindow) => [{
@@ -33,16 +35,15 @@ function createWindow() {
     );
 
     // and load the index.html of the app.
-    // mainWindow.loadURL(url.format({
-    //     pathname: path.join(__dirname, 'index.html'),
-    //     protocol: 'file:',
-    //     slashes: true
-    // }))
-
-    mainWindow.loadURL("http://localhost:7777/")
+    mainWindow.loadURL(url.format({
+        pathname: path.join(__dirname, 'index.html'),
+        protocol: 'file:',
+        slashes: true
+    }));
+    //mainWindow.loadURL("http://localhost:7777/")
 
     // Open the DevTools.
-    mainWindow.webContents.openDevTools()
+    //mainWindow.webContents.openDevTools()
 
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {
@@ -70,15 +71,19 @@ function waitUntilUp() {
 
                 // Examine the text in the response
                 response.text().then(function (data) {
-                    console.log("up");
                     createWindow();
                 });
             }
         )
         .catch(function (err) {
             //console.log('Fetch Error :-S', err);
-            console.log("retry");
-            setTimeout(waitUntilUp, 2000);
+            if (!started) {
+                console.log("Starting backend service...");
+                child_process.spawn('./run-packaged.sh', [], {detached: true, stdio: 'ignore'});
+                started = true;
+            }
+            console.log("Loading? Retry in 1000ms...");
+            setTimeout(waitUntilUp, 1000);
         });
 }
 
@@ -87,8 +92,9 @@ function start() {
     // child_process.exec('./run-packaged.sh', function (error, stdout, stderr) {
     //     console.log(stdout);
     // });
-    // waitUntilUp();
-    createWindow();
+
+    waitUntilUp();
+    //createWindow();
 
     // Create the Application's main menu
     var template = [{
