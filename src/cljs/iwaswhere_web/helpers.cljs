@@ -14,7 +14,8 @@
       (let [coords (.-coords pos)]
         (put-fn [:entry/geo-enrich
                  (merge data {:latitude  (.-latitude coords)
-                              :longitude (.-longitude coords)})])))))
+                              :longitude (.-longitude coords)})])))
+    (fn [err] (prn err))))
 
 (defn new-entry-fn
   "Create a new, empty entry. The opts map is merged last with the generated

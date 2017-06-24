@@ -10,6 +10,7 @@
 
 
 (defn parse-html [s]
+  (prn s)
   (-> (str "<html>" s "</html>")
       (.getBytes)
       (ByteArrayInputStream.)
@@ -54,7 +55,7 @@
     (->> (md/md-to-html-string md)
          (parse-html)
          (clojure.walk/postwalk
-           (fn [n] (if (:tag n) (transform-node n) n))))
+           (fn [n] (prn :n n) (if (:tag n) (transform-node n) n))))
     out))
 
 
