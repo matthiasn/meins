@@ -13,7 +13,8 @@
 (defn award-points-by
   "Counts awarded points."
   [k initial entries]
-  (let [entries (filter #(and (-> % k :done) (-> % k :points)) entries)
+  (let [done-entries (filter #(and (-> % k :done) (-> % k :points)) entries)
+        skipped-entries (filter #(and (-> % k :skipped) (-> % k :points)) entries)
         by-day-fn (fn [acc entry]
                     (let [entitity (k entry)
                           completion (:completion-ts entitity)
@@ -22,20 +23,28 @@
                         (let [completion-day (subs completion 0 10)]
                           (update-in acc [:by-day completion-day k] #(+ (or % 0) points)))
                         acc)))
-        by-day (reduce by-day-fn initial entries)
-        total (->> entries
+        by-day (reduce by-day-fn initial done-entries)
+        total (->> done-entries
                    (map k)
                    (filter :done)
                    (map :points)
                    (filter identity)
-                   (apply +))]
-    (update-in by-day [:total] #(+ (or % 0) total))))
+                   (apply +))
+        total-skipped (->> skipped-entries
+                           (map k)
+                           (filter :skipped)
+                           (map :points)
+                           (filter identity)
+                           (apply +))]
+    (-> by-day
+        (update-in [:total] #(+ (or % 0) total))
+        (update-in [:total-skipped] #(+ (or % 0) total-skipped)))))
 
 (defn claimed-points
   "Counts claimed award points."
   [current-state]
   (let [res (gq/get-filtered
-                  current-state {:tags #{"#reward"} :n Integer/MAX_VALUE})
+              current-state {:tags #{"#reward"} :n Integer/MAX_VALUE})
         entries (vals (:entries-map res))]
     (->> entries
          (map :reward)

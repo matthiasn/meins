@@ -302,9 +302,14 @@ $backlog-weekend: lighten($backlog, 30);
     color: $green;
     margin-right: 0.6em;
   }
-  .claimed {
+  .total-skipped {
     font-size: 1em;
     color: $red;
+    margin-right: 0.6em;
+  }
+  .claimed {
+    font-size: 1em;
+    color: orange;
   }
 
   svg {

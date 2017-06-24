@@ -47,11 +47,13 @@
       (let [award-points (:award-points @stats)
             by-day (sort-by first (:by-day award-points))
             total (:total award-points 0)
+            total-skipped (:total-skipped award-points 0)
             claimed (:claimed award-points 0)
-            balance (- total claimed)]
+            balance (- total claimed total-skipped)]
         [:div.award
          [:div.points [:span.fa.fa-diamond] balance]
          [:div
           [:span.total total]
+          [:span.total-skipped total-skipped]
           [:span.claimed claimed]]
          [points-by-day-chart by-day]]))))
