@@ -17,10 +17,12 @@
   "author": "GitHub",
   "license": "GNU AFFERO GENERAL PUBLIC LICENSE",
   "devDependencies": {
-    "electron": "^1.7.3"
+    "electron": "^1.7.3",
+    "electron-rebuild": "^1.5.11"
   },
   "dependencies": {
     "electron-context-menu": "^0.9.1",
-    "electron-fetch": "^1.0.0"
+    "electron-fetch": "^1.0.0",
+    "electron-spellchecker": "^1.1.0"
   }
 }

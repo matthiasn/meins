@@ -9,15 +9,6 @@ process.env.GOOGLE_API_KEY = 'AIzaSyD78NTnhgt--LCGBdIGPEg8GtBYzQl0gKU';
 
 let started = false;
 
-// require('electron-context-menu')({
-//     prepend: (params, browserWindow) => [{
-//         label: 'Rainbow',
-//         // Only show it when right-clicking images
-//         //visible: true,
-//         showInspectElement: true
-//     }]
-// });
-
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
@@ -43,7 +34,7 @@ function createWindow() {
     //mainWindow.loadURL("http://localhost:7777/")
 
     // Open the DevTools.
-    //mainWindow.webContents.openDevTools()
+    mainWindow.webContents.openDevTools()
 
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {
