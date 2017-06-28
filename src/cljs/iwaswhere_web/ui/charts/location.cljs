@@ -8,7 +8,7 @@
 (defn loc-table [expanded? per-location label]
   (let [emoji-flags (aget js/window "deps" "emojiFlags")]
     (when (and expanded? (seq per-location))
-      [:table
+      [:table.left-padding
        [:tbody
         [:tr
          [:th "Rank"]
@@ -16,7 +16,8 @@
          [:th label]
          [:th "Days"]]
         (for [[i [loc cnt]] per-location]
-          (let [country (js->clj (.countryCode emoji-flags (:country loc)))
+          (let [cc (:country loc)
+                country (when cc (js->clj (.countryCode emoji-flags cc)))
                 flag (get country "emoji")]
             ^{:key loc}
             [:tr
@@ -52,28 +53,27 @@
          [:div.content.white
           [:div.expand {:on-click #(swap! local update-in [:expanded] not)}
            [:span.fa {:class (if expanded? "fa-compress" "fa-expand")}]]
-          [:table
-           [:tbody
-            (when expanded?
-              [:tr
-               [:th "Rank"]
-               [:th "Flag"]
-               [:th "Country"]
-               [:th "Days"]])
-            (for [[i [cc cnt]] (if expanded? per-country (take 10 per-country))]
-              (let [country (js->clj (.countryCode emoji-flags cc))
-                    flag (get country "emoji")
-                    cname (get country "name")]
-                ^{:key cc}
-                [:tr
-                 [:td.rank (inc i) "."]
-                 [:td.flag flag]
-                 [:td.country cname]
-                 [:td.cnt cnt]]))]]
-          [loc-table expanded? per-location "Location"]
-          [loc-table expanded? per-admin-1 "Admin1"]
-          [loc-table expanded? per-admin-2 "Admin2"]
-          [loc-table expanded? per-admin-3 "Admin3"]
-          [loc-table expanded? per-admin-4 "Admin4"]
-          (when expanded?
-            [:div#plotly])]]))))
+          [:div.row
+           [:table
+            [:tbody
+             (when expanded?
+               [:tr
+                [:th "Rank"]
+                [:th "Flag"]
+                [:th "Country"]
+                [:th "Days"]])
+             (for [[i [cc cnt]] (if expanded? per-country (take 10 per-country))]
+               (let [country (js->clj (.countryCode emoji-flags cc))
+                     flag (get country "emoji")
+                     cname (get country "name")]
+                 ^{:key cc}
+                 [:tr
+                  [:td.rank (inc i) "."]
+                  [:td.flag flag]
+                  [:td.country cname]
+                  [:td.cnt cnt]]))]]
+           [loc-table expanded? per-location "Location"]
+           [loc-table expanded? per-admin-1 "Admin1"]
+           [loc-table expanded? per-admin-2 "Admin2"]
+           [loc-table expanded? per-admin-3 "Admin3"]
+           [loc-table expanded? per-admin-4 "Admin4"]]]]))))

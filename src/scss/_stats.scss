@@ -263,8 +263,14 @@ $backlog-weekend: lighten($backlog, 30);
       float: right;
     }
   }
+  .row {
+    display: flex;
+  }
   table {
     padding: 0 3px;
+  }
+  .left-padding {
+    padding-left: 30px;
   }
   .flag {
     font-size: 1.6em;
