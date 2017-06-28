@@ -13,6 +13,7 @@
             new-entries @new-entries
             filtered-entries (filter #(and
                                         (not (:comment-for %))
+                                        (:timestamp %)
                                         (not (contains? entries-map (:timestamp %))))
                                      (vals new-entries))]
         (when (seq filtered-entries)
