@@ -4,7 +4,7 @@
   :license {:name "GNU AFFERO GENERAL PUBLIC LICENSE"
             :url  "https://www.gnu.org/licenses/agpl-3.0.en.html"}
   :dependencies [[org.clojure/clojure "1.9.0-alpha17"]
-                 [org.clojure/clojurescript "1.9.562"]
+                 [org.clojure/clojurescript "1.9.660"]
                  [org.clojure/tools.logging "0.4.0"]
                  [ch.qos.logback/logback-classic "1.2.3"]
                  [hiccup "1.0.5"]
