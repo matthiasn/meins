@@ -34,9 +34,10 @@
 (s/def :iww.entry/entry-type #{:pomodoro :story :saga})
 (s/def :iww.entry/comment-for possible-timestamp?)
 
-(s/def :iww.entry/primary-story possible-timestamp?)
-(s/def :iww.entry/linked-stories #(and (set? %)
-                                       (s/coll-of possible-timestamp?)))
+(s/def :iww.entry/primary-story (s/nilable possible-timestamp?))
+(s/def :iww.entry/linked-stories (s/nilable
+                                   #(and (set? %)
+                                         (s/coll-of possible-timestamp?))))
 
 (s/def :iww.entry/latitude (s/nilable (number-in-range? -180.0 180.0)))
 (s/def :iww.entry/longitude (s/nilable (number-in-range? -180.0 180.0)))
