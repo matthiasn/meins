@@ -42,7 +42,7 @@
                              (not on-hold))))
         saga-filter (fn [entry]
                       (if-let [selected (:selected @local)]
-                        (let [story (get @stories (:linked-story entry))]
+                        (let [story (get @stories (:primary-story entry))]
                           (= selected (:linked-saga story)))
                         true))
         open-filter (fn [entry] (not (-> entry :task :done)))
@@ -138,7 +138,7 @@
             filter-fn (u/linked-filter-fn entries-w-done current-filter put-fn)
             saga-filter (fn [entry]
                           (if-let [selected (:selected @local)]
-                            (let [story (get @stories (:linked-story entry))]
+                            (let [story (get @stories (:primary-story entry))]
                               (= selected (:linked-saga story)))
                             true))
             active-filter (fn [t]

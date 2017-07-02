@@ -209,3 +209,31 @@
                 (log/error "Exception" ex "when parsing line:\n" line)))))))
     (let [deleted (:deleted @state)]
       (log/info (count deleted) " deleted."))))
+
+
+(defn migrate-linked-stories
+  ; (m/migrate-linked-stories "./data/migration/linked" "./data/migration/linked-out")
+  [path out-path]
+  (let [files (file-seq (clojure.java.io/file path))
+        ts-uuids (atom {})
+        line-count (atom 0)]
+    (doseq [f (f/filter-by-name files #"\d{4}-\d{2}-\d{2}a?.jrn")]
+      (with-open [reader (clojure.java.io/reader f)]
+        (let [filename (.getName f)]
+          (let [lines (line-seq reader)]
+            (doseq [line lines]
+              (try
+                (let [parsed (clojure.edn/read-string line)
+                      entry (if-let [linked-story (:linked-story parsed)]
+                              (-> parsed
+                                  (assoc-in [:linked-stories] #{linked-story})
+                                  (assoc-in [:primary-story] linked-story))
+                              parsed)
+                      ts (:timestamp parsed)
+                      serialized (str (pr-str entry) "\n")]
+                  (swap! line-count inc)
+                  (swap! ts-uuids assoc-in [ts] entry)
+                  (spit (str out-path "/" filename) serialized :append true))
+                (catch Exception ex
+                  (log/error "Exception" ex "when parsing line:\n" line)))))))
+      (log/info (count @ts-uuids) "entries in" @line-count "lines migrated."))))

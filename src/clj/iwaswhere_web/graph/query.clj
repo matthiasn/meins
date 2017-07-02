@@ -64,7 +64,7 @@
           mentions (set (map s/lower-case (set/union mentions entry-comments-mentions)))
 
           story-match? (if-let [story (:story q)]
-                         (or (= story (:linked-story entry))
+                         (or (= story (:primary-story entry))
                              (= story (:timestamp entry)))
                          true)
 

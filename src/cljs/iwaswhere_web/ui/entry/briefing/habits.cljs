@@ -25,7 +25,7 @@
         stories (reaction (:stories @options))
         saga-filter (fn [entry]
                       (if-let [selected (:selected @local)]
-                        (let [story (get @stories (:linked-story entry))]
+                        (let [story (get @stories (:primary-story entry))]
                           (= selected (:linked-saga story)))
                         true))
         entries-map (subscribe [:entries-map])

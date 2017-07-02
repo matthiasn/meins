@@ -277,7 +277,7 @@
   "When entry is linked to a story, add that entry timestamp to the set with
    the entry ids on that timeline."
   [current-state entry]
-  (if-let [linked-story (:linked-story entry)]
+  (if-let [linked-story (:primary-story entry)]
     (let [ts (:timestamp entry)
           path [:sorted-story-entries linked-story]
           entries-set (into (sorted-set) (get-in current-state path))]

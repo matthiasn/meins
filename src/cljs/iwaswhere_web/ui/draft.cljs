@@ -5,7 +5,8 @@
             [reagent.core :as r]
             [iwaswhere-web.utils.parse :as p]
             [iwaswhere-web.utils.misc :as u]
-            [iwaswhere-web.ui.entry.utils :as eu]))
+            [iwaswhere-web.ui.entry.utils :as eu]
+            [clojure.set :as set]))
 
 (defn editor-state-from-text
   [text]
@@ -103,12 +104,16 @@
         editor-cb (fn [md plain editor-state]
                     (when-not (= md (:md @entry))
                       (let [new-state (js->clj editor-state :keywordize-keys true)
-                            story (first (entry-stories new-state))
+                            parsed-stories (entry-stories new-state)
+                            stories (set/union (:linked-stories @entry) parsed-stories)
+                            story (first stories)
                             updated (merge
                                       @entry
                                       (p/parse-entry md)
-                                      (when story {:linked-story story})
-                                      {:editor-state new-state
+                                      (when (and story (not (:primary-story @entry)))
+                                        {:primary-story story})
+                                      {:linked-stories stories
+                                       :editor-state new-state
                                        :text         plain})]
                         (put-fn [:entry/update-local updated]))))]
     (fn [entry put-fn]

@@ -40,8 +40,8 @@
                               parent (when (and comment-for
                                                 (uc/has-node? g comment-for))
                                        (uc/attrs g comment-for))
-                              story (or (:linked-story parent)
-                                        (:linked-story entry)
+                              story (or (:primary-story parent)
+                                        (:primary-story entry)
                                         :no-story)
                               acc-time (get acc story 0)
                               completed (get entry :completed-time 0)
@@ -55,8 +55,8 @@
                               parent (when (and comment-for
                                                 (uc/has-node? g comment-for))
                                        (uc/attrs g comment-for))
-                              story-id (or (:linked-story parent)
-                                           (:linked-story entry)
+                              story-id (or (:primary-story parent)
+                                           (:primary-story entry)
                                            :no-story)
                               story (get-in stories [story-id])
                               acc-time (get acc story-id 0)

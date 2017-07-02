@@ -4,7 +4,8 @@
             [iwaswhere-web.helpers :as h]
             [reagent.core :as r]
             [iwaswhere-web.ui.entry.utils :as eu]
-            [iwaswhere-web.utils.misc :as u]))
+            [iwaswhere-web.utils.misc :as u]
+            [clojure.set :as set]))
 
 (defn trash-icon
   "Renders a trash icon, which transforms into a warning button that needs to be
@@ -53,7 +54,9 @@
       (let [ts (:currently-dragged @cfg)
             dropped (get @entries-map ts)
             story (:timestamp @entry)
-            updated (merge (assoc-in dropped [:linked-story] story)
+            updated (merge (-> dropped
+                               (update-in [:linked-stories] #(set/union #{story} %))
+                               (assoc-in [:primary-story] story))
                            (up/parse-entry (:md dropped)))]
         (when (and ts (not= ts story))
           (put-fn [:entry/update updated])))
@@ -122,9 +125,10 @@
                                       :value %}])
         show-comments #(show-hide-comments query-id)
         create-comment (h/new-entry-fn put-fn {:comment-for ts} show-comments)
-        story (:linked-story entry)
+        story (:primary-story entry)
         create-linked-entry (h/new-entry-fn put-fn {:linked-entries [ts]
-                                                    :linked-story   story} nil)
+                                                    :primary-story  story
+                                                    :linked-stories #{story}} nil)
         new-pomodoro (h/new-entry-fn
                        put-fn (p/pomodoro-defaults ts) show-comments)
         trash-entry #(if edit-mode?

@@ -19,11 +19,11 @@
     :timestamp 1450999100000
     :md        "Some #task"}
 
-   {:mentions     #{}
-    :tags         #{"#task"}
-    :linked-story 1484076392371
-    :timestamp    1450999200000
-    :md           "Some other #task"}
+   {:mentions      #{}
+    :tags          #{"#task"}
+    :primary-story 1484076392371
+    :timestamp     1450999200000
+    :md            "Some other #task"}
    {:mentions       #{}
     :tags           #{"#done"}
     :entry-type     :pomodoro
@@ -33,11 +33,11 @@
     :comment-for    1450999200000
     :md             "and #done"}
 
-   {:mentions     #{}
-    :tags         #{"#task"}
-    :timestamp    1450999000000
-    :linked-story 1484076392372
-    :md           "Some other #task"}
+   {:mentions      #{}
+    :tags          #{"#task"}
+    :timestamp     1450999000000
+    :primary-story 1484076392372
+    :md            "Some other #task"}
    {:mentions       #{}
     :tags           #{"#done"}
     :entry-type     :pomodoro
@@ -47,11 +47,11 @@
     :comment-for    1450999000000
     :md             "and #done"}
 
-   {:mentions     #{"@someone"}
-    :tags         #{"#task"}
-    :timestamp    1450999300000
-    :linked-story 1484076392372
-    :md           "Yet another #task"}
+   {:mentions      #{"@someone"}
+    :tags          #{"#task"}
+    :timestamp     1450999300000
+    :primary-story 1484076392372
+    :md            "Yet another #task"}
    {:mentions    #{"@someone"}
     :tags        #{"#backlog"}
     :timestamp   1450999300001

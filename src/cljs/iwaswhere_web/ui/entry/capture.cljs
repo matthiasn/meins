@@ -55,9 +55,10 @@
                                  (map (fn [[k v]] (:default-story v)))
                                  (filter identity)
                                  first)]
-          (when (and edit-mode? default-story (not (:linked-story entry)))
+          (when (and edit-mode? default-story (not (:primary-story entry)))
             (put-fn [:entry/update-local (merge entry
-                                                {:linked-story default-story})]))
+                                                {:primary-story default-story
+                                                 :linked-stories #{default-story}})]))
           [:form.custom-fields
            [for-day entry edit-mode? put-fn]
            (for [[tag conf] entry-field-tags]
