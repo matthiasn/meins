@@ -5,6 +5,8 @@
                      [matthiasn.systems-toolbox.component :as stc]
                      [iwaswhere-web.utils.parse :as p]))
 
+(def n 10)
+
 (def empty-entry
   {:mentions   #{}
    :tags       #{}
@@ -50,7 +52,7 @@
    :timestamp   nil
    :id          nil
    :linked      nil
-   :n           20})
+   :n           n})
 
 (def fulltext-search
   {:search-text "\"travel AND aircraft\""
@@ -65,7 +67,7 @@
    :timestamp   nil
    :id          nil
    :linked      nil
-   :n           20})
+   :n           n})
 
 (def open-tasks-search
   {:search-text "#task ~#done ~#backlog ~#outdated"
@@ -80,7 +82,7 @@
    :timestamp   nil
    :id          nil
    :linked      nil
-   :n           20})
+   :n           n})
 
 (def started-tasks-search
   {:search-text "#task ~#done ~#backlog ~#outdated :started"
@@ -95,7 +97,7 @@
    :timestamp   nil
    :id          nil
    :linked      nil
-   :n           20})
+   :n           n})
 
 (def tasks-done-search
   {:search-text "#task #done @myself"
@@ -110,7 +112,7 @@
    :timestamp   nil
    :id          nil
    :linked      nil
-   :n           20})
+   :n           n})
 
 (def day-search
   {:search-text "2016-06-07 #task #done @myself"
@@ -125,7 +127,7 @@
    :timestamp   nil
    :id          nil
    :linked      nil
-   :n           20})
+   :n           n})
 
 (def briefing-search
   {:search-text "b:2016-06-07"
@@ -140,7 +142,7 @@
    :timestamp   nil
    :id          nil
    :linked      nil
-   :n           20})
+   :n           n})
 
 (def timestamp-search
   {:search-text "1465325998053"
@@ -155,7 +157,7 @@
    :timestamp   "1465325998053"
    :linked      nil
    :id          nil
-   :n           20})
+   :n           n})
 
 (def linked-search
   {:search-text "l:1465325998053"
@@ -170,7 +172,7 @@
    :timestamp   nil
    :linked      "1465325998053"
    :id          nil
-   :n           20})
+   :n           n})
 
 (def country-search
   {:search-text "cc:DE"
@@ -185,7 +187,7 @@
    :timestamp   nil
    :linked      nil
    :id          nil
-   :n           20})
+   :n           n})
 
 (def id-search
   {:search-text "48cde500-0d4f-11e7-8d14-42a2f9d2d24d"
@@ -200,7 +202,7 @@
    :timestamp   nil
    :linked      nil
    :id          "48cde500-0d4f-11e7-8d14-42a2f9d2d24d"
-   :n           20})
+   :n           n})
 
 (deftest parse-search-test
   (testing

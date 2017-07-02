@@ -180,7 +180,7 @@
   [{:keys [current-state msg-payload]}]
   (let [query-path [:query-cfg :queries (:query-id msg-payload)]
         merged (merge (get-in current-state query-path) msg-payload)
-        new-query (update-in merged [:n] + 20)]
+        new-query (update-in merged [:n] + 10)]
     {:send-to-self [:search/update new-query]}))
 
 (defn search-refresh-fn

@@ -42,10 +42,11 @@
                                  {:current-state new-state
                                   :msg-payload   {:query-id :query-1}})
         updated-query (second send-to-self)
-        expected-query (update-in st/open-tasks-query [:n] + 20)]
+        expected-query (update-in st/open-tasks-query [:n] + 10)]
     (testing
       "send properly updated query, with increased number of results"
-      (is (= updated-query expected-query)))))
+      (is (= updated-query
+             expected-query)))))
 
 (deftest find-existing-test
   "Tests finding existing queries in tab."

@@ -52,14 +52,13 @@
      :id          (re-find id-regex text)
      :timestamp   (second (re-find #"(?:^|[^:])([0-9]{13})" text))
      :linked      (second (re-find #"l:([0-9]{13})" text))
-     :n           20}))
+     :n           10}))
 
 (defn add-search
   "Adds search by sending a message that'll open the specified search in a new
    tab."
   [query-string tab-group put-fn]
   (fn [_ev]
-    (prn :add-search query-string)
     (put-fn [:search/add
              {:tab-group (case tab-group
                            :briefing :left

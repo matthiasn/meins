@@ -115,7 +115,8 @@
   [{:keys [current-state msg-payload]}]
   (let [ts (:timestamp msg-payload)
         saved (get-in current-state [:entries-map ts])
-        relevant #(select-keys % [:md :questionnaires :custom-fields :task :habit :completed-time])
+        relevant #(select-keys % [:md :questionnaires :custom-fields :task
+                                  :habit :completed-time])
         changed? (not= (relevant saved) (relevant msg-payload))]
     (if changed?
       (let [new-entry (get-in current-state [:new-entries ts])

@@ -101,15 +101,16 @@
         {:keys [entry edit-mode entries-map new-entries unsaved]} (eu/entry-reaction ts)
         local (r/atom {:editor-state (:editor-state @entry)})
         editor-cb (fn [md plain editor-state]
-                    (let [new-state (js->clj editor-state :keywordize-keys true)
-                          story (first (entry-stories new-state))
-                          updated (merge
-                                    @entry
-                                    (p/parse-entry md)
-                                    (when story {:linked-story story})
-                                    {:editor-state new-state
-                                     :text         plain})]
-                      (put-fn [:entry/update-local updated])))]
+                    (when-not (= md (:md @entry))
+                      (let [new-state (js->clj editor-state :keywordize-keys true)
+                            story (first (entry-stories new-state))
+                            updated (merge
+                                      @entry
+                                      (p/parse-entry md)
+                                      (when story {:linked-story story})
+                                      {:editor-state new-state
+                                       :text         plain})]
+                        (put-fn [:entry/update-local updated]))))]
     (fn [entry put-fn]
       (let [latest-entry (dissoc @entry :comments)
             editor-state (when-let [editor-state (:editor-state latest-entry)]

@@ -15,6 +15,7 @@ import 'draft-js-linkify-plugin/lib/plugin.css'; // eslint-disable-line import/n
 import {fromJS} from 'immutable';
 import editorStyles from './editorStyles.css';
 import StyleControls from './style-controls';
+import throttle from 'lodash.throttle';
 
 const {hasCommandModifier} = KeyBindingUtil;
 
@@ -166,7 +167,7 @@ export default class EntryTextEditor extends Component {
         this.state.hashtagSuggestions = fromJS(props.hashtags);
         this.state.storySuggestions = fromJS(props.stories);
 
-        this.onChange = (newState) => {
+        this.saveExternal = (newState) => {
             const content = newState.getCurrentContent();
             const plain = content.getPlainText();
             const rawContent = convertToRaw(content);
@@ -174,10 +175,17 @@ export default class EntryTextEditor extends Component {
             const md = draftjsToMd(rawContent, myMdDict);
             const now = Date.now();
             props.onChange(md, plain, rawContent2);
+        };
+
+        this.throttledSave = throttle(this.saveExternal, 500);
+
+        this.onChange = (newState) => {
+            const now = Date.now();
             this.setState({
                 editorState: newState,
                 lastUpdated: now
             });
+            this.throttledSave(newState);
         };
     }
 
