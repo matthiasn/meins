@@ -327,7 +327,7 @@
   }
 }
 
-.custom-fields, .briefing-details, .task-details {
+.custom-fields, .briefing-details, .task-details, .habit-details {
   fieldset {
     font-size: 0.9em;
     margin-top: 0.5em;
@@ -396,9 +396,9 @@
       margin-right: 2px;
     }
     input {
-      margin-right: 6px;
+      margin-right: 4px;
       width: 90px;
-      padding: 1px 3px;
+      padding: 1px 2px;
     }
     input[type="number"], input[type="time"] {
       width: 65px;
@@ -419,7 +419,7 @@
       width: 130px;
     }
     input[type="datetime-local"] {
-      width: 160px;
+      width: 150px;
     }
     div {
       line-height: 1.5em;
@@ -436,7 +436,7 @@
   }
 }
 
-.task-details {
+.task-details, .habit-details {
   div {
     margin: 3px 0;
   }
@@ -445,6 +445,19 @@
   }
   time {
     font-weight: bold;
+  }
+}
+
+.habit-details {
+  .bonus {
+    color: $green;
+  }
+  .penalty {
+    color: $red;
+  }
+  input[type="number"] {
+    width: 50px!important;
+    margin-right: 15px;
   }
 }
 
@@ -459,9 +472,15 @@ u {
 }
 
 .habits, .tasks {
+  .fa-diamond {
+    color: $green;
+    &.penalty {
+      color: $red;
+    }
+  }
   .award-points, .estimate {
-    padding: 0 6px 0 4px;
-    text-align:right
+    padding: 0 4px 0 3px;
+    text-align:right;
   }
   .award-points {
     font-weight: 700;

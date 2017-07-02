@@ -33,7 +33,12 @@
         total-skipped (->> skipped-entries
                            (map k)
                            (filter :skipped)
-                           (map :points)
+                           (map (fn [entry]
+                                  (let [penalty (:penalty entry)
+                                        points (:points entry)]
+                                    (if (and penalty (pos-int? penalty))
+                                      penalty
+                                      points))))
                            (filter identity)
                            (apply +))]
     (-> by-day

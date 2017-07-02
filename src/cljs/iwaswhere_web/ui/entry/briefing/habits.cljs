@@ -53,6 +53,7 @@
              [:tr
               [:th [:span.fa.fa-exclamation-triangle]]
               [:th [:span.fa.fa-diamond]]
+              [:th [:span.fa.fa-diamond.penalty]]
               [:th "waiting habit"]]
              (for [entry entries-list]
                (let [ts (:timestamp entry)
@@ -65,4 +66,7 @@
                   [:td.award-points
                    (when-let [points (-> entry :habit :points)]
                      points)]
+                  [:td.award-points
+                   (when-let [penalty (-> entry :habit :penalty)]
+                     penalty)]
                   [:td.habit text]]))]]])))))

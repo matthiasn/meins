@@ -82,11 +82,11 @@
               ;; otherwise just toggle - follow-up is scheduled already
               (let [updated (update-in entry [:habit :skipped] not)]
                 (put-fn [:entry/update updated])))))
-        set-points (fn [entry]
+        set-points (fn [entry point-type]
                      (fn [ev]
                        (let [v (.. ev -target -value)
                              parsed (when (seq v) (js/parseFloat v))
-                             updated (assoc-in entry [:habit :points] parsed)]
+                             updated (assoc-in entry [:habit point-type] parsed)]
                          (when parsed
                            (put-fn [:entry/update-local updated])))))
         priority-select
@@ -102,11 +102,12 @@
                 habit {:days        (zipmap (range 7) (repeat true))
                        :priority    :B
                        :points      10
+                       :penalty     10
                        :active-from active-from
                        :done        false}
                 updated (assoc-in entry [:habit] habit)]
             (put-fn [:entry/update-local updated])))
-        [:form.task-details
+        [:form.habit-details
          [:fieldset
           [:legend "Habit details"]
           [:div
@@ -128,17 +129,22 @@
             [:option {:value :C} "C"]
             [:option {:value :D} "D"]
             [:option {:value :E} "E"]]
-           [:label "Active from: "]
+           [:label "Active: "]
            [:input {:type      :datetime-local
                     :read-only (not edit-mode?)
                     :on-input  (active-from entry)
                     :value     (get-in entry [:habit :active-from])}]]
           [:div
-           [:label "Reward points: "]
+           [:label [:span.fa.fa-diamond.bonus]]
            [:input {:type      :number
                     :read-only (not edit-mode?)
-                    :on-input  (set-points entry)
-                    :value     (get-in entry [:habit :points] 0)}]]
+                    :on-input  (set-points entry :points)
+                    :value     (get-in entry [:habit :points] 0)}]
+           [:label [:span.fa.fa-diamond.penalty]]
+           [:input {:type      :number
+                    :read-only (not edit-mode?)
+                    :on-input  (set-points entry :penalty)
+                    :value     (get-in entry [:habit :penalty] 0)}]]
           [:div
            [:label "Done? "]
            [:input {:type      :checkbox
