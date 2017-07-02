@@ -36,7 +36,9 @@
                      (up/cmp-map :server/upload-cmp)
                      (bl/cmp-map :server/blink-cmp)
                      (ft/cmp-map :server/ft-cmp)}
-        traced-cmps (set (mapv z/trace-cmp components))]
+        reporter (z/mk-reporter "http://localhost:9411")
+        trace-cmp (z/trace-cmp reporter)
+        traced-cmps (set (mapv trace-cmp components))]
     (sb/send-mult-cmd
       switchboard
       [[:cmd/init-comp traced-cmps]

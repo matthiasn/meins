@@ -66,10 +66,17 @@
   [entry tab-group put-fn]
   (let [options (subscribe [:options])
         stories (reaction (:stories @options))]
-    (fn story-select-render [entry put-fn]
-      (let [linked-story (:linked-story entry)]
+    (fn story-select-render [entry tab-group put-fn]
+      (let [linked-story (:linked-story entry)
+            click-fn (fn [_]
+                       (let [q (merge (up/parse-search "") {:story linked-story})]
+                         (put-fn [:search/add {:tab-group (case tab-group
+                                                            :briefing :left
+                                                            :left :right
+                                                            :left)
+                                               :query     q}])))]
         (when linked-story
-          [:div.story
+          [:div.story {:on-click click-fn}
            (:story-name (get @stories linked-story))])))))
 
 (defn saga-select

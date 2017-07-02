@@ -49,7 +49,8 @@
                                          {:story        story
                                           :editor-state editor-state})]
                             (put-fn [:search/update s])))]
-        (when-not (:briefing query)
+        (when (and (not (:briefing query))
+                   (not (:story query)))
           [:div.search
            [tags-view query]
            ^{:key query-id}
