@@ -1,6 +1,7 @@
 (ns iwaswhere-web.ui.entry.capture
   (:require [clojure.string :as s]
             [re-frame.core :refer [subscribe]]
+            [iwaswhere-web.ui.questionnaires :as q]
             [reagent.ratom :refer-macros [reaction]]))
 
 (defn select-elem
@@ -57,7 +58,7 @@
                                  first)]
           (when (and edit-mode? default-story (not (:primary-story entry)))
             (put-fn [:entry/update-local (merge entry
-                                                {:primary-story default-story
+                                                {:primary-story  default-story
                                                  :linked-stories #{default-story}})]))
           [:form.custom-fields
            [for-day entry edit-mode? put-fn]
@@ -117,10 +118,12 @@
         (let [ts (:timestamp entry)
               questionnaire-tags (:mapping questionnaires)
               q-tags (select-keys questionnaire-tags (:tags entry))
-              questionnaires (map (fn [[t k]] [k (get-in questionnaires [:items k])]) q-tags)]
+              q-mapper (fn [[t k]] [k (get-in questionnaires [:items k])])
+              questionnaires (map q-mapper q-tags)]
           [:div
            (for [[k conf] questionnaires]
-             (let [q-path [:questionnaires k]]
+             (let [q-path [:questionnaires k]
+                   scores (q/scores entry q-path conf)]
                ^{:key (str "cf" ts k)}
                [:form.questionnaire
                 [:h3 (:header conf)]
@@ -142,13 +145,7 @@
                            [:span.opt {:on-click click
                                        :class    (when (= value n) "sel")} n]))]]))]
                 [:div.agg
-                 (for [[k cfg] (:aggregations conf)]
-                   (let [items (filter identity
-                                       (vals (select-keys (get-in entry q-path)
-                                                          (:items cfg))))
-                         complete? (= (count items) (count (:items cfg)))
-                         res (apply + items)]
-                     (when complete?
-                       ^{:key k}
-                       [:span [:span (:label cfg)] [:span.res res]])))]
+                 (for [[k res] scores]
+                   ^{:key k}
+                   [:span [:span (:label res)] [:span.res (:score res)]])]
                 [:cite (:reference conf)]]))])))))
