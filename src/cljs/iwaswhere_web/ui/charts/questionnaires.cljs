@@ -97,7 +97,8 @@
             neg-mapper (points-mapper 200 cnt)]
         [:div.questionnaires
          [:svg
-          {:viewBox "0 0 300 210"
+          {:viewBox  "0 0 300 200"
+           :style    {:background :white}
            :on-click toggle-n}
           [:filter#blur1
            [:feGaussianBlur {:stdDeviation 2}]]
@@ -110,7 +111,6 @@
            [line 120 "#999" 1]
            [line 140 "#999" 1]
            [line 160 "#999" 1]
-           [line 180 "#999" 1]
-           [line 200 "#333" 2]]
+           [line 180 "#999" 1]]
           [chart-line neg-scores neg-mapper :red]
           [chart-line pos-scores pos-mapper :green]]]))))
