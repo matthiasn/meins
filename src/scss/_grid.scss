@@ -18,7 +18,7 @@
     height: 100vh;
     grid-gap: 5px;
     grid-template-columns: 130px minmax(250px, 1fr) minmax(250px, 1fr) minmax(250px, 1fr) 210px;
-    grid-template-rows: 50px 72px minmax(100px, 1fr) minmax(100px, 1fr) 30px;
+    grid-template-rows: 50px 72px minmax(100px, 2fr) 100px 30px;
   }
 
   .menu {
@@ -32,7 +32,11 @@
   }
   .custom {
     grid-column: 1 ;
-    grid-row: 3 / 5;
+    grid-row: 3 / 4;
+  }
+  .questionnaires {
+    grid-column: 1 ;
+    grid-row: 5;
   }
   .stats {
     grid-column: 5;

@@ -7,7 +7,8 @@
             [iwaswhere-web.ui.new-entries :as n]
             [iwaswhere-web.ui.stats :as stats]
             [re-frame.db :as rdb]
-            [iwaswhere-web.ui.award :as aw]
+            [iwaswhere-web.ui.charts.award :as aw]
+            [iwaswhere-web.ui.charts.questionnaires :as cq]
             [iwaswhere-web.ui.charts.custom-fields :as cf2]))
 
 ;; Subscription Handlers
@@ -46,7 +47,8 @@
       [menu/menu-view put-fn]]
      [aw/award-points put-fn]
      [:div.custom
-      [cf2/custom-fields-chart put-fn]]
+      [cf2/custom-fields-chart put-fn]
+      [cq/questionnaire-scores put-fn]]
      [:div.stats
       [stats/stats-view put-fn]]
      [:div.briefing

@@ -6,6 +6,7 @@
             [iwaswhere-web.graph.stats.awards :as aw]
             [iwaswhere-web.graph.stats.time :as t-s]
             [iwaswhere-web.graph.stats.location :as sl]
+            [iwaswhere-web.graph.stats.questionnaires :as q]
             [iwaswhere-web.graph.stats.custom-fields :as cf]
             [iwaswhere-web.utils.misc :as u]
             [clj-time.format :as ctf]
@@ -234,6 +235,12 @@
   (future
     (let [child-span (mk-child-span span "award-points")
           stats {:award-points (aw/award-points current-state)}
+          uid (:sente-uid msg-meta)]
+      (.finish child-span)
+      (put-fn (with-meta [:stats/result2 stats] {:sente-uid uid}))))
+  (future
+    (let [child-span (mk-child-span span "questionnaires")
+          stats {:questionnaires (q/questionnaires current-state)}
           uid (:sente-uid msg-meta)]
       (.finish child-span)
       (put-fn (with-meta [:stats/result2 stats] {:sente-uid uid}))))

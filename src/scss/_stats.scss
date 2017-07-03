@@ -19,6 +19,12 @@ $closed-weekend: lighten($closed, 30);
 $backlog: DarkOrange;
 $backlog-weekend: lighten($backlog, 30);
 
+.questionnaires {
+  background-color: $chart-bg;
+  margin-top: 5px;
+  height: 100px;
+}
+
 .stats {
   height: 100%;
   overflow: auto;
