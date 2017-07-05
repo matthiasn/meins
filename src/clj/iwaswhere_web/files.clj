@@ -77,10 +77,8 @@
     {:new-state    new-state
      :send-to-self (when-let [comment-for (:comment-for msg-payload)]
                      (with-meta [:entry/find {:timestamp comment-for}] msg-meta))
-     :emit-msg     [[:entry/saved entry]
-                    [:ft/add entry]
-                    [:cmd/schedule-new {:message [:state/stats-tags-get]
-                                        :timeout 200}]]}))
+     :emit-msg     [(with-meta [:entry/saved entry] {:sente-uid :broadcast})
+                    [:ft/add entry]]}))
 
 (defn move-attachment-to-trash
   "Moves attached media file to trash folder."

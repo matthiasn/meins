@@ -2,6 +2,7 @@
   (:require [iwaswhere-web.specs]
             [iwaswhere-web.client-store :as store]
             [iwaswhere-web.ui.re-frame :as rf]
+            [iwaswhere-web.router :as router]
             [iwaswhere-web.keepalive :as ka]
             [re-frisk.core :as frisk]
             [matthiasn.systems-toolbox.switchboard :as sb]
@@ -30,6 +31,7 @@
     switchboard
     [[:cmd/init-comp #{(sente/cmp-map :client/ws-cmp sente-cfg)
                        (store/cmp-map :client/store-cmp)
+                       (router/cmp-map :client/router-cmp)
                        (sched/cmp-map :client/scheduler-cmp)
                        (rf/cmp-map :client/ui-cmp)}]
 
@@ -38,12 +40,14 @@
                   :to   :client/ws-cmp}]
 
      [:cmd/route {:from #{:client/ws-cmp
-                          :client/ui-cmp}
+                          :client/ui-cmp
+                          :client/router-cmp}
                   :to   :client/store-cmp}]
 
      [:cmd/route {:from #{:client/store-cmp
                           :client/ui-cmp}
-                  :to   :client/scheduler-cmp}]
+                  :to   #{:client/scheduler-cmp
+                          :client/router-cmp}}]
 
      [:cmd/observe-state {:from :client/store-cmp
                           :to   :client/ui-cmp}]

@@ -26,6 +26,7 @@
                  [matthiasn/systems-toolbox-zipkin "0.6.2"]
                  [reagent "0.7.0" :exclusions [cljsjs/react cljsjs/react-dom]]
                  [re-frame "0.9.4"]
+                 [secretary "1.2.3"]
                  [capacitor "0.6.0"]
                  [clucy "0.4.0"]
                  [seesaw "1.4.5"]

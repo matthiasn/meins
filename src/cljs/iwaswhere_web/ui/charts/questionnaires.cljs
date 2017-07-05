@@ -94,7 +94,7 @@
             pos-scores (map :pos scores)
             neg-scores (map :neg scores)
             pos-mapper (points-mapper 100 cnt)
-            neg-mapper (points-mapper 200 cnt)]
+            neg-mapper (points-mapper 182 cnt)]
         [:div.questionnaires
          [:svg
           {:viewBox  "0 0 300 200"
@@ -106,11 +106,10 @@
            [line 20 "#999" 1]
            [line 40 "#999" 1]
            [line 60 "#999" 1]
-           [line 80 "#999" 1]
-           [line 100 "#333" 2]
-           [line 120 "#999" 1]
-           [line 140 "#999" 1]
-           [line 160 "#999" 1]
-           [line 180 "#999" 1]]
+           [line 81 "#333" 2]
+           [line 102 "#999" 1]
+           [line 122 "#999" 1]
+           [line 142 "#999" 1]
+           [line 162 "#333" 2]]
           [chart-line neg-scores neg-mapper :red]
           [chart-line pos-scores pos-mapper :green]]]))))

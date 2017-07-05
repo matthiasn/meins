@@ -2,7 +2,7 @@
   (:require-macros [reagent.ratom :refer [reaction]])
   (:require [reagent.core :as reagent]
             [iwaswhere-web.ui.menu :as menu]
-            [re-frame.core :refer [reg-sub]]
+            [re-frame.core :refer [reg-sub subscribe]]
             [iwaswhere-web.ui.grid :as g]
             [iwaswhere-web.ui.new-entries :as n]
             [iwaswhere-web.ui.stats :as stats]
@@ -15,6 +15,7 @@
 (reg-sub :custom-field-stats (fn [db _] (:custom-field-stats db)))
 (reg-sub :last-update (fn [db _] (:last-update (:query-cfg db))))
 (reg-sub :options (fn [db _] (:options db)))
+(reg-sub :current-page (fn [db _] (:current-page db)))
 (reg-sub :stories (fn [db _] (:stories (:options db))))
 (reg-sub :sagas (fn [db _] (:sagas (:options db))))
 (reg-sub :busy (fn [db _] (:busy db)))
@@ -37,7 +38,7 @@
                                         :daily-summary-stats
                                         :media-stats])))
 
-(defn re-frame-ui
+(defn main-page
   "Main view component"
   [put-fn]
   [:div.flex-container
@@ -60,6 +61,24 @@
      [:div.footer
       [stats/stats-text]]]]
    [n/new-entries-view put-fn]])
+
+(defn dashboard-1
+  "Dashboard view component"
+  [put-fn]
+  [:div.flex-container
+   [cq/questionnaire-scores put-fn]])
+
+
+(defn re-frame-ui
+  "Main view component"
+  [put-fn]
+  (let [current-page (subscribe [:current-page])]
+    (fn [put-fn]
+      (let [current-page @current-page]
+        (case (:page current-page)
+          :dashboard-1 [dashboard-1 put-fn]
+          [main-page put-fn])))))
+
 
 (defn state-fn
   "Renders main view component and wires the central re-frame app-db as the

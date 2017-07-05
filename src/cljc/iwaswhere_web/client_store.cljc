@@ -99,6 +99,14 @@
       {:new-state (assoc-in current-state [k] day-stats)}
       (prn "WARN: No key defined for " msg-payload))))
 
+
+(defn nav-handler
+  "Sets active page, with additional info."
+  [{:keys [current-state msg-payload]}]
+  (let [new-state (assoc-in current-state [:current-page] msg-payload)]
+    {:new-state new-state}))
+
+
 (defn cmp-map
   "Creates map for the component which holds the client-side application state."
   [cmp-id]
@@ -114,6 +122,7 @@
                               :state/stats-tags   stats-tags-fn
                               :state/stats-tags2  stats-tags-fn2
                               :cfg/save           c/save-cfg
+                              :nav/to             nav-handler
                               :cmd/toggle         c/toggle-set-fn
                               :cmd/set-opt        c/set-conj-fn
                               :cmd/set-dragged    c/set-currently-dragged
