@@ -9,6 +9,7 @@
             [re-frame.db :as rdb]
             [iwaswhere-web.ui.charts.award :as aw]
             [iwaswhere-web.ui.charts.questionnaires :as cq]
+            [iwaswhere-web.ui.charts.questionnaires2 :as cq2]
             [iwaswhere-web.ui.charts.custom-fields :as cf2]))
 
 ;; Subscription Handlers
@@ -66,7 +67,7 @@
   "Dashboard view component"
   [put-fn]
   [:div.flex-container
-   [cq/questionnaire-scores put-fn]])
+   [cq2/questionnaire-scores put-fn]])
 
 
 (defn re-frame-ui
