@@ -21,6 +21,20 @@ $backlog-weekend: lighten($backlog, 30);
 
 .questionnaires {
   margin-top: 5px;
+
+  .done {
+    fill: $done;
+  }
+  .done-weekend {
+    fill: $done-weekend;
+  }
+
+  .failed {
+    fill: lighten($tasks, 30)
+  }
+  .failed-weekend {
+    fill: lighten($tasks-weekend, 10)
+  }
 }
 
 .stats {
