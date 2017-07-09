@@ -4,7 +4,7 @@
             [iwaswhere-web.helpers :as h]))
 
 (defn task-details
-  [entry put-fn edit-mode?]
+  [entry local-cfg put-fn edit-mode?]
   (let [format-time #(.format (js/moment %) "ddd MMM DD - HH:mm")
         input-fn (fn [entry k]
                    (fn [ev]
@@ -21,18 +21,22 @@
                         (let [sel (keyword (-> ev .-nativeEvent .-target .-value))
                               updated (assoc-in entry [:task :priority] sel)]
                           (put-fn [:entry/update-local updated]))))
+        close-tab (fn []
+                    (when (= (str (:timestamp entry)) (:search-text local-cfg))
+                      (put-fn [:search/remove local-cfg])))
         done (fn [entry]
                (fn [ev]
                  (let [completion-ts (.format (js/moment))
                        updated (-> entry
                                    (assoc-in [:task :completion-ts] completion-ts)
                                    (update-in [:task :done] not))]
-                   (put-fn [:entry/update updated]))))
+                   (put-fn [:entry/update updated])
+                   (close-tab))))
         hold (fn [entry]
                (fn [ev]
                  (let [updated (update-in entry [:task :on-hold] not)]
                    (put-fn [:entry/update updated]))))]
-    (fn [entry put-fn edit-mode?]
+    (fn [entry local-cfg put-fn edit-mode?]
       (when (contains? (:tags entry) "#task")
         (when (and edit-mode? (not (:task entry)))
           (let [d (* 24 60 60 1000)

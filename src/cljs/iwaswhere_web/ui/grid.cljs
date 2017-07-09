@@ -61,9 +61,11 @@
   (let [query-cfg (subscribe [:query-cfg])
         query-id (reaction (get-in @query-cfg [:tab-groups tab-group :active]))
         story (reaction (get-in @query-cfg [:queries @query-id :story]))
-        local-cfg (reaction {:query-id  @query-id
-                             :tab-group tab-group
-                             :story     @story})]
+        search-text (reaction (get-in @query-cfg [:queries @query-id :search-text]))
+        local-cfg (reaction {:query-id    @query-id
+                             :search-text @search-text
+                             :tab-group   tab-group
+                             :story       @story})]
     (fn tabs-render [tab-group put-fn]
       [:div.tile-tabs
        [tabs-header-view tab-group put-fn]

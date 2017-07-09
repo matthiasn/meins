@@ -33,7 +33,7 @@
         (dissoc :longitude))))
 
 (defn habit-details
-  [entry put-fn edit-mode?]
+  [entry local-cfg put-fn edit-mode?]
   (let [active-from (fn [entry]
                       (fn [ev]
                         (let [dt (-> ev .-nativeEvent .-target .-value)
@@ -48,6 +48,9 @@
                        [:input {:type      :checkbox
                                 :checked   (get-in entry [:habit :days day])
                                 :on-change (day-select entry day)}])
+        close-tab (fn []
+                    (when (= (str (:timestamp entry)) (:search-text local-cfg))
+                      (put-fn [:search/remove local-cfg])))
         done
         (fn [entry]
           (fn [ev]
@@ -62,7 +65,8 @@
                                 (update-in [:habit :done] not))]
                 (put-fn [:entry/update next-entry])
                 (h/send-w-geolocation next-entry put-fn)
-                (put-fn [:entry/update updated]))
+                (put-fn [:entry/update updated])
+                (close-tab))
               ;; otherwise just toggle - follow-up is scheduled already
               (let [updated (update-in entry [:habit :done] not)]
                 (put-fn [:entry/update updated])))))
@@ -78,7 +82,8 @@
                                 (update-in [:habit :skipped] not))]
                 (put-fn [:entry/update next-entry])
                 (h/send-w-geolocation next-entry put-fn)
-                (put-fn [:entry/update updated]))
+                (put-fn [:entry/update updated])
+                (close-tab))
               ;; otherwise just toggle - follow-up is scheduled already
               (let [updated (update-in entry [:habit :skipped] not)]
                 (put-fn [:entry/update updated])))))
@@ -95,7 +100,7 @@
             (let [sel (keyword (-> ev .-nativeEvent .-target .-value))
                   updated (assoc-in entry [:habit :priority] sel)]
               (put-fn [:entry/update-local updated]))))]
-    (fn [entry put-fn edit-mode?]
+    (fn [entry local-cfg put-fn edit-mode?]
       (when (contains? (:tags entry) "#habit")
         (when (and edit-mode? (not (:habit entry)))
           (let [active-from (h/format-time (st/now))
