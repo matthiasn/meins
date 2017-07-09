@@ -98,6 +98,13 @@
 (defn barchart-row
   [days span start stats tag k y scale cls]
   [:g
+   [:text {:x           180
+           :y           (- y 12)
+           :font-size   12
+           :fill        "#777"
+           :font-weight :bold
+           :text-anchor "end"}
+    tag]
    (for [n (range (inc days))]
      (let [d (* 24 60 60 1000)
            offset (* n d)
@@ -125,7 +132,8 @@
         local (r/atom {:last-fetched 0 :n 30})
         toggle (fn [_] (swap! local assoc-in [:n] (if (= 7 (:n @local)) 30 7)))]
     (fn [put-fn]
-      (h/keep-updated :stats/custom-fields 30 local @last-update put-fn)
+      (prn :keep-updated)
+      (h/keep-updated :stats/custom-fields 31 local @last-update put-fn)
       (let [scores2 (->> @stats
                          :questionnaires
                          :panas
@@ -149,7 +157,7 @@
                 :style    {:background :white}
                 :on-click toggle}
           [:filter#blur1
-           [:feGaussianBlur {:stdDeviation 2}]]
+           [:feGaussianBlur {:stdDeviation 3}]]
           [:g
            (for [n (range (+ 2 days))]
              (let [offset (* n d)
@@ -173,6 +181,20 @@
           [chart-line neg-scores neg-mapper :red]
           [chart-line pos-scores pos-mapper :green]
           [:rect {:fill :white :x 0 :y 0 :height 600 :width 200}]
+          [:text {:x           180
+                  :y           145
+                  :font-size   12
+                  :fill        "#777"
+                  :font-weight :bold
+                  :text-anchor "end"}
+           "Positive Affect Score"]
+          [:text {:x           180
+                  :y           226
+                  :font-size   12
+                  :fill        "#777"
+                  :font-weight :bold
+                  :text-anchor "end"}
+           "Negative Affect Score"]
           (for [n (range (inc days))]
             (let [offset (* (+ n 0.5) d)
                   scaled (* 900 (/ offset span))
@@ -189,5 +211,6 @@
                       :text-anchor "middle"}
                (df ts month-day)]))
           [barchart-row days span start custom-field-stats "#sit-ups" :cnt 295 0.3 "done"]
-          [barchart-row days span start custom-field-stats "#beer" :vol 328 0.015 "failed"]
-          [barchart-row days span start custom-field-stats "#steps" :cnt 361 0.0015 "done"]]]))))
+          [barchart-row days span start custom-field-stats "#coffee" :cnt 328 0.04 "failed"]
+          [barchart-row days span start custom-field-stats "#steps" :cnt 361 0.0015 "done"]
+          [barchart-row days span start custom-field-stats "#running" :distance 394 0.6 "done"]]]))))
