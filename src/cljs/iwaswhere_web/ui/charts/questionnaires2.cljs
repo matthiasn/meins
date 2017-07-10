@@ -95,6 +95,27 @@
           :stroke-width w
           :stroke       s}])
 
+(defn rect
+  [v x y h cls n]
+  (let [local (r/atom {})
+        click (fn [_] (swap! local update-in [:show-label] not))]
+    (fn [v x y h cls n]
+      ^{:key n}
+      [:g
+       [:rect {:on-click click
+               :x        x
+               :y        (- y h)
+               :width    23
+               :height   h
+               :class    (cc/weekend-class cls ymd)}]
+       (when (:show-label @local)
+         [:text {:x           (+ x 11)
+                 :y           (- y 5)
+                 :font-size   8
+                 :fill        "#777"
+                 :text-anchor "middle"}
+          v])])))
+
 (defn barchart-row
   [days span start stats tag k y scale cls]
   [:g
@@ -109,19 +130,17 @@
      (let [d (* 24 60 60 1000)
            offset (* n d)
            scaled (* 900 (/ offset span))
-           x (+ 205 scaled)
+           x (+ 203 scaled)
            ts (+ start offset)
            ymd (df ts ymd)
            v (get-in stats [ymd tag k] 0)
            h (* v scale)
            weekday (df ts weekday)
-           weekend? (get #{"Sat" "Sun"} weekday)]
-       ^{:key n}
-       [:rect {:x      x
-               :y      (- y h)
-               :width  20
-               :height h
-               :class  (cc/weekend-class cls ymd)}]))])
+           weekend? (get #{"Sat" "Sun"} weekday)
+           display-v (if (= :duration k)
+                       (h/m-to-hh-mm v)
+                       v)]
+       [rect display-v x y h cls n]))])
 
 (defn questionnaire-scores
   "Simple view for questionnaire scores."
@@ -155,7 +174,8 @@
         [:div.questionnaires
          [:svg {:viewBox  "0 0 1200 500"
                 :style    {:background :white}
-                :on-click toggle}
+                ;:on-click toggle
+                }
           [:filter#blur1
            [:feGaussianBlur {:stdDeviation 3}]]
           [:g
@@ -164,7 +184,7 @@
                    scaled (* 900 (/ offset span))
                    x (+ 200 scaled)]
                ^{:key n}
-               [tick x "#CCC" 1 312 240]))
+               [tick x "#CCC" 1 346 255]))
            [line 100 "#333" 2]
            [line 120 "#888" 1]
            [line 140 "#888" 1]
@@ -177,7 +197,8 @@
            [line 296 "#333" 2]
            [line 329 "#333" 2]
            [line 362 "#333" 2]
-           [line 395 "#333" 2]]
+           [line 395 "#333" 2]
+           [line 428 "#333" 2]]
           [chart-line neg-scores neg-mapper :red]
           [chart-line pos-scores pos-mapper :green]
           [:rect {:fill :white :x 0 :y 0 :height 600 :width 200}]
@@ -213,4 +234,5 @@
           [barchart-row days span start custom-field-stats "#sit-ups" :cnt 295 0.3 "done"]
           [barchart-row days span start custom-field-stats "#coffee" :cnt 328 0.04 "failed"]
           [barchart-row days span start custom-field-stats "#steps" :cnt 361 0.0015 "done"]
-          [barchart-row days span start custom-field-stats "#running" :distance 394 0.6 "done"]]]))))
+          [barchart-row days span start custom-field-stats "#sleep" :duration 394 0.05 "done"]
+          [barchart-row days span start custom-field-stats "#running" :distance 427 2 "done"]]]))))

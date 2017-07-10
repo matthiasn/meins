@@ -38,7 +38,7 @@
                   (fn [[field v]]
                     (let [path [:custom-fields k field]
                           val-mapper #(get-in % path)
-                          op (if (= :number (:type (:cfg v)))
+                          op (if (contains? #{:number :time} (:type (:cfg v)))
                                (case (:agg v)
                                  :min #(when (seq %) (apply min %))
                                  :max #(when (seq %) (apply max %))

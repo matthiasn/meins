@@ -2,6 +2,7 @@
   (:require [clojure.string :as s]
             [re-frame.core :refer [subscribe]]
             [iwaswhere-web.ui.questionnaires :as q]
+            [iwaswhere-web.helpers :as h]
             [reagent.ratom :refer-macros [reaction]]))
 
 (defn select-elem
@@ -72,8 +73,7 @@
                       path [:custom-fields tag k]
                       value (get-in entry path)
                       value (if (and value (= :time input-type))
-                              (let [t (js/moment (* value 60 1000))]
-                                (.format (.utc t) "HH:mm"))
+                              (h/m-to-hh-mm value)
                               value)
                       on-change-fn
                       (fn [ev]

@@ -70,3 +70,8 @@
   (when (not= (:last-update last-update) (:last-fetched @local))
     (swap! local assoc-in [:last-fetched] (:last-update last-update))
     (get-stats stats-key n (:meta last-update {}) put-fn)))
+
+(defn m-to-hh-mm
+  [m]
+  (let [t (js/moment (* m 60 1000))]
+    (.format (.utc t) "HH:mm")))
