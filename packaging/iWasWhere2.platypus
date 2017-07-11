@@ -13,7 +13,7 @@
 	<key>BundledFiles</key>
 	<array>
 		<string>/Users/mn/github/iWasWhere/bin/blink1-tool</string>
-		<string>/Users/mn/github/iWasWhere/target/iwaswhere-web-0.1.45-standalone.jar</string>
+		<string>/Users/mn/github/iWasWhere/target/iwaswhere-web-0.1.46-standalone.jar</string>
 		<string>/Users/mn/Downloads/zulu8.20.0.5-jdk8.0.121-macosx_x64</string>
 	</array>
 	<key>Creator</key>
@@ -259,6 +259,6 @@
 	<key>UseXMLPlistFormat</key>
 	<false/>
 	<key>Version</key>
-	<string>0.1.45</string>
+	<string>0.1.46</string>
 </dict>
 </plist>

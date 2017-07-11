@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file. This change log follows the conventions of [keepachangelog.com](http://keepachangelog.com/).
 
+## [0.1.46] - 2017-07-11
+### Changed
+- page router
+- large charts
+
 ## [0.1.45] - 2017-06-07
 ### Changed
 - Draft.js based editor
