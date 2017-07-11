@@ -37,16 +37,11 @@
   (let [detail (r/atom false)
         emoji-flags (aget js/window "deps" "emojiFlags")
         toggle-detail (fn [_] (swap! detail not))
-        remove (fn [_]
-                 (let [updated (assoc-in @entry [:geoname] :removed)]
-                   (put-fn [:entry/update updated])))]
+        remove (put-fn [:entry/update (assoc-in @entry [:geoname] :removed)])]
     (fn location-details-render [entry put-fn edit-mode?]
       (let [geoname (:geoname @entry)]
         (when (and geoname (not= :removed geoname))
-          (let [admin-4-name (:admin-4-name geoname)
-                admin-3-name (:admin-3-name geoname)
-                admin-2-name (:admin-2-name geoname)
-                country-code (:country-code geoname)
+          (let [{:keys [admin-4-name admin-3-name admin-2-name country-code]} geoname
                 flag (get (js->clj (.countryCode emoji-flags country-code)) "emoji")]
             [:div {:on-click toggle-detail}
              [:span.geoname (:name geoname)]

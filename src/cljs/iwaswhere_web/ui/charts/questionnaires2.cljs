@@ -26,39 +26,6 @@
       :stroke       color
       :stroke-width w}]))
 
-(defn points-by-day-chart
-  "Renders bars."
-  [stats]
-  (let [chart-h 22
-        daily-totals (map (fn [[d v]] (h/add (:task v) (:habit v))) stats)
-        max-val (apply max daily-totals)
-        indexed (map-indexed (fn [idx [day v]] [idx [day v]])
-                             (take-last 14 stats))]
-    [:svg
-     [:g
-      (for [[idx [day v]] indexed]
-        (let [v (h/add (:task v) (:habit v))
-              y-scale (/ chart-h (or max-val 1))
-              h (if (pos? v) (* y-scale v) 0)]
-          (when (pos? max-val)
-            ^{:key (str day idx)}
-            [:rect {:x      (* 8 idx)
-                    :y      (- chart-h h)
-                    :fill   "#7FE283"
-                    :width  7
-                    :height h}])))
-      (for [[idx [day v]] indexed]
-        (let [v (:task v)
-              y-scale (/ chart-h (or max-val 1))
-              h (if (pos? v) (* y-scale v) 0)]
-          (when (pos? max-val)
-            ^{:key (str day idx)}
-            [:rect {:x      (* 8 idx)
-                    :y      (- chart-h h)
-                    :fill   "#42b8dd"
-                    :width  7
-                    :height h}])))]]))
-
 (defn points-mapper
   [btm-y k start end]
   (let [x-offset 200
@@ -130,6 +97,7 @@
      (let [d (* 24 60 60 1000)
            offset (* n d)
            scaled (* 900 (/ offset span))
+           scaled (* n 29)
            x (+ 203 scaled)
            ts (+ start offset)
            ymd (df ts ymd)
@@ -141,6 +109,44 @@
                        (h/m-to-hh-mm v)
                        v)]
        [rect display-v x y h cls n]))])
+
+
+(defn points-by-day-chart
+  "Renders bars."
+  [y]
+  (let [stats (subscribe [:stats])
+        ]
+    (fn [y]
+      (let [award-points (:award-points @stats)
+            by-day (sort-by first (:by-day award-points))
+            chart-h 30
+            daily-totals (map (fn [[d v]] (h/add (:task v) (:habit v))) by-day)
+            max-val (apply max daily-totals)
+            indexed (map-indexed (fn [idx [day v]] [idx [day v]])
+                                 (take-last 30 by-day))]
+        [:g
+         (for [[idx [day v]] indexed]
+           (let [v (h/add (:task v) (:habit v))
+                 y-scale (/ chart-h (or max-val 1))
+                 h (if (pos? v) (* y-scale v) 0)]
+             (when (pos? max-val)
+               ^{:key (str day idx)}
+               [:rect {:x      (+ 203 (* 29 idx))
+                       :y      (- y h)
+                       :fill   "#7FE283"
+                       :width  23
+                       :height h}])))
+         (for [[idx [day v]] indexed]
+           (let [v (:task v)
+                 y-scale (/ chart-h (or max-val 1))
+                 h (if (pos? v) (* y-scale v) 0)]
+             (when (pos? max-val)
+               ^{:key (str day idx)}
+               [:rect {:x      (+ 203 (* 29 idx))
+                       :y      (- y h)
+                       :fill   "#42b8dd"
+                       :width  23
+                       :height h}])))]))))
 
 (defn questionnaire-scores
   "Simple view for questionnaire scores."
@@ -184,7 +190,7 @@
                    scaled (* 900 (/ offset span))
                    x (+ 200 scaled)]
                ^{:key n}
-               [tick x "#CCC" 1 346 255]))
+               [tick x "#CCC" 1 386 275]))
            [line 100 "#333" 2]
            [line 120 "#888" 1]
            [line 140 "#888" 1]
@@ -198,7 +204,8 @@
            [line 329 "#333" 2]
            [line 362 "#333" 2]
            [line 395 "#333" 2]
-           [line 428 "#333" 2]]
+           [line 428 "#333" 2]
+           [line 461 "#333" 2]]
           [chart-line neg-scores neg-mapper :red]
           [chart-line pos-scores pos-mapper :green]
           [:rect {:fill :white :x 0 :y 0 :height 600 :width 200}]
@@ -235,4 +242,5 @@
           [barchart-row days span start custom-field-stats "#coffee" :cnt 328 0.04 "failed"]
           [barchart-row days span start custom-field-stats "#steps" :cnt 361 0.0015 "done"]
           [barchart-row days span start custom-field-stats "#sleep" :duration 394 0.05 "done"]
-          [barchart-row days span start custom-field-stats "#running" :distance 427 2 "done"]]]))))
+          [barchart-row days span start custom-field-stats "#running" :distance 427 2 "done"]
+          [points-by-day-chart 460]]]))))
