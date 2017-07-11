@@ -43,8 +43,7 @@
        vals
        (filter #(= (:type %) "$mention"))
        (map #(-> % :data :mention :id))
-       (map #(when % (js/parseInt %)))
-       (set)))
+       (map #(when % (js/parseInt %)))))
 
 (defn draft-search-field
   [editor-state update-cb]
@@ -105,8 +104,10 @@
                     (when-not (= md (:md @entry))
                       (let [new-state (js->clj editor-state :keywordize-keys true)
                             parsed-stories (entry-stories new-state)
-                            stories (set/union (:linked-stories @entry) parsed-stories)
-                            story (first stories)
+                            stories (set/union (:linked-stories @entry)
+                                               (set parsed-stories))
+                            stories (set (filter identity stories))
+                            story (first parsed-stories)
                             updated (merge
                                       @entry
                                       (p/parse-entry md)

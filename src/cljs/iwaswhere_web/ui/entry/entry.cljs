@@ -92,9 +92,9 @@
                      :on-drag-enter h/prevent-default}
          [:div.header-1
           [:div
-           [es/story-div @entry tab-group put-fn]
+           [es/story-div entry tab-group put-fn]
            [es/saga-select @entry put-fn edit-mode?]]
-          [loc/geonames @entry put-fn edit-mode?]]
+          [loc/geonames entry put-fn edit-mode?]]
          [:div.header
           [:div
            [:a [:time {:on-click add-search} formatted-time]]

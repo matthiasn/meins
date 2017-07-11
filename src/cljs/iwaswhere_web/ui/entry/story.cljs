@@ -65,19 +65,27 @@
   "Shows story name."
   [entry tab-group put-fn]
   (let [options (subscribe [:options])
-        stories (reaction (:stories @options))]
+        stories (reaction (:stories @options))
+        linked-story (reaction (:primary-story @entry))
+        story-name (reaction (:story-name (get @stories @linked-story)))
+        local (r/atom {})
+        click-fn (fn [_]
+                   (swap! local update-in [:show-del] not)
+                   (let [q (merge (up/parse-search "") {:story @linked-story})
+                         tab-group (case tab-group
+                                     :briefing :left
+                                     :left :right
+                                     :left)]
+                     (put-fn [:search/add {:tab-group tab-group :query q}])))
+        remove-story (fn [_]
+                       (let [updated (assoc-in @entry [:primary-story] nil)]
+                         (put-fn [:entry/update updated])))]
     (fn story-select-render [entry tab-group put-fn]
-      (let [linked-story (:primary-story entry)
-            click-fn (fn [_]
-                       (let [q (merge (up/parse-search "") {:story linked-story})]
-                         (put-fn [:search/add {:tab-group (case tab-group
-                                                            :briefing :left
-                                                            :left :right
-                                                            :left)
-                                               :query     q}])))]
-        (when linked-story
-          [:div.story {:on-click click-fn}
-           (:story-name (get @stories linked-story))])))))
+      (when linked-story
+        [:div.story {:on-click click-fn}
+         @story-name
+         (when (:show-del @local)
+           [:span.fa.fa-trash {:on-click remove-story}])]))))
 
 (defn saga-select
   "In edit mode, allow editing of story, otherwise show story name."
