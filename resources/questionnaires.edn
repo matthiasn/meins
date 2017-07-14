@@ -1,10 +1,19 @@
-{:mapping {"#PANAS" :panas}
- :types   {:likert {:type  :range
-                    :items [{:value 1 :desc "Very Slightly or Not at All"}
-                            {:value 2 :desc "A Little"}
-                            {:value 3 :desc "Moderately"}
-                            {:value 4 :desc "Quite a Bit"}
-                            {:value 5 :desc "Extremely"}]}}
+{:mapping {"#PANAS" :panas
+           "#FSS"   :fss}
+ :types   {:likert  {:type  :range
+                     :items [{:value 1 :desc "Very Slightly or Not at All"}
+                             {:value 2 :desc "A Little"}
+                             {:value 3 :desc "Moderately"}
+                             {:value 4 :desc "Quite a Bit"}
+                             {:value 5 :desc "Extremely"}]}
+           :likert7 {:type  :range
+                     :items [{:value 1 :desc "Strongly disagree"}
+                             {:value 2 :desc "A Disagree"}
+                             {:value 3 :desc "Somewhat disagree"}
+                             {:value 4 :desc "Neither agree or disagree"}
+                             {:value 5 :desc "Somewhat agree"}
+                             {:value 6 :desc "Agree"}
+                             {:value 7 :desc "Strongly agree"}]}}
  :items   {:panas {:header       "The Positive and Negative Affect Schedule (PANAS; Watson et al., 1988)"
                    :desc         "Indicate to what extent you feel this way right now, that is, at the present moment. (1-Very Slightly or Not at All, 2-A Little, 3-Moderately, 4-Quite a Bit, 5-Extremely)"
                    :reference    "Watson, D., Clark, L. A., & Tellegan, A. (1988). Development and validation of brief measures of positive and negative affect: The PANAS scales. Journal of Personality and Social Psychology, 54(6), 1063–1070."
@@ -33,4 +42,19 @@
                                         :items #{1 3 5 9 10 12 14 16 17 19}}
                                   :neg {:type  :sum
                                         :label "Negative Affect Score:"
-                                        :items #{2 4 6 7 8 11 13 15 18 20}}}}}}
+                                        :items #{2 4 6 7 8 11 13 15 18 20}}}}
+           :fss   {:header       "Fatigue Severity Scale (FSS)"
+                   :desc         "The Fatigue Severity Scale (FSS) is a method of evaluating the impact of fatigue on you. The FSS is a short questionnaire that requires you to rate your level of fatigue.\nThe FSS questionnaire contains nine statements that rate the severity of your fatigue symptoms. Read each statement and select a number from 1 to 7, based on how accurately it reflects your condition during the past week and the extent to which you agree or disagree that the statement applies to you.\n• A low value (e.g., 1) indicates strong disagreement with the statement, whereas a high value\n(e.g., 7) indicates strong agreement.\n• It is important that you select a number (1 to 7) for every question. "
+                   :reference    "Krupp LB, LaRocca NG, Muir-Nash J, Steinberg AD. The Fatigue Severity Scale: application to patients with multiple sclerosis and systemic lupus erythematosis. Arch Neurol 1989;46:1121–3."
+                   :fields       [{:type :likert7 :path [1] :label "My motivation is lower when I am fatigued."}
+                                  {:type :likert7 :path [2] :label "Exercise brings on my fatigue"}
+                                  {:type :likert7 :path [3] :label "I am easily fatigued."}
+                                  {:type :likert7 :path [4] :label "Fatigue interferes with my physical functioning."}
+                                  {:type :likert7 :path [5] :label "Fatigue causes frequent problems for me."}
+                                  {:type :likert7 :path [6] :label "My fatigue prevents sustained physical functioning."}
+                                  {:type :likert7 :path [7] :label "Fatigue interferes with carrying out certain duties and responsibilities."}
+                                  {:type :likert7 :path [8] :label "Fatigue is among my three most disabling symptoms."}
+                                  {:type :likert7 :path [9] :label "Fatigue interferes with my work, family, or social life."}]
+                   :aggregations {:fss {:type  :sum
+                                        :label "Total Score:"
+                                        :items #{1 2 3 4 5 6 7 8 9}}}}}}
