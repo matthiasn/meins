@@ -53,7 +53,9 @@
      [:div.left
       [g/tabs-view :left put-fn]]
      [:div.right
-      [g/tabs-view :right put-fn]]]]
+      [g/tabs-view :right put-fn]]
+     [:div.footer
+      [stats/stats-text]]]]
    [n/new-entries-view put-fn]])
 
 (defn charts-page

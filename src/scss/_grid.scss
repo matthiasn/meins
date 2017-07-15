@@ -18,7 +18,7 @@
     height: 100vh;
     grid-gap: 5px;
     grid-template-columns: 5px minmax(250px, 1fr) minmax(250px, 1fr) minmax(250px, 1fr) 5px;
-    grid-template-rows: 50px minmax(100px, 2fr);
+    grid-template-rows: 50px minmax(100px, 2fr) 30px;
   }
 
   .menu {
@@ -36,6 +36,10 @@
   .right {
     grid-column: 4;
     grid-row: 2;
+  }
+  .footer {
+    grid-column: 1 / 6;
+    grid-row: 3;
   }
 }
 
