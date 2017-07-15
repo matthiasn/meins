@@ -62,7 +62,7 @@
                 [:th "Flag"]
                 [:th "Country"]
                 [:th "Days"]])
-             (for [[i [cc cnt]] (if expanded? per-country (take 10 per-country))]
+             (for [[i [cc cnt]] per-country]
                (let [country (js->clj (.countryCode emoji-flags cc))
                      flag (get country "emoji")
                      cname (get country "name")]

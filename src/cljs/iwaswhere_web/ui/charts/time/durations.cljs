@@ -172,7 +172,7 @@
     (fn [stats chart-h y-scale put-fn]
       (let [sagas @sagas
             indexed (map-indexed idx-fn stats)
-            indexed-20 (map-indexed idx-fn (take-last 14 stats))
+            indexed-45 (map-indexed idx-fn (take-last 45 stats))
             day-stats (or (:mouse-over @local) (second (last stats)))
             expanded? (:expanded @local)
             past-7-days (->> stats
@@ -207,13 +207,13 @@
                      [:td [:div.legend {:style {:background-color color}}]]
                      [:td [:strong saga-name]]
                      [:td.time (u/duration-string v)]])))]]
-            [tfh/earlybird-nightowl indexed-20 local :saga-name 222 0.0022 put-fn]
+            [tfh/earlybird-nightowl indexed-45 local :saga-name 222 0.0022 put-fn]
             (when expanded?
-              [tfh/earlybird-nightowl indexed-20 local :story-name 220 0.0022 put-fn])
+              [tfh/earlybird-nightowl indexed-45 local :story-name 220 0.0022 put-fn])
             (when expanded?
-              [bars-by-saga indexed-20 local chart-h 0.0035 put-fn])
+              [bars-by-saga indexed-45 local chart-h 0.0035 put-fn])
             (when expanded?
-              [bars-by-story indexed-20 local chart-h 0.0035 put-fn])
+              [bars-by-story indexed-45 local chart-h 0.0035 put-fn])
             (when expanded?
               [:div.times-by-day
                [:div [:time fmt-date]

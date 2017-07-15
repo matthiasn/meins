@@ -116,7 +116,6 @@
             dom-node (rc/dom-node (rc/current-component))
             w (if dom-node (.-offsetWidth dom-node) 300)
             n (.floor js/Math (/ w 5))
-            n 31
             indexed (map-indexed (fn [idx [k v]] [idx v]) (take-last n @stats))]
         (h/keep-updated :stats/custom-fields n local @last-update put-fn)
         [:div.stats

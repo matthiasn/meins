@@ -8,6 +8,7 @@
   [page]
   (case page
     "dashboard1" :dashboard-1
+    "charts1" :charts-1
     :main))
 
 (defn state-fn

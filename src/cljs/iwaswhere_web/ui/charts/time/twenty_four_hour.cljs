@@ -25,6 +25,8 @@
             mouse-enter-fn (cc/mouse-enter-fn local day-stats)
             mouse-leave-fn (cc/mouse-leave-fn local day-stats)
             stories @stories
+            w 8
+            x-step 9
             midnight (* 26 60 60 y-scale)
             midnight-s (* 2 60 60 y-scale)
             time-by-ts (:time-by-ts day-stats)
@@ -47,27 +49,27 @@
                     y (max midnight-s y)]
                 [:rect {:fill           (cc/item-color item-name)
                         :on-mouse-enter #(prn item-name hh summed)
-                        :x              (+ 20 (* 13 idx))
+                        :x              (+ 20 (* x-step idx))
                         :y              y
-                        :width          11
+                        :width          w
                         :height         h}])
               (when (> (+ y h) midnight)
                 (let [h (- (+ y h) midnight)
                       y midnight-s]
                   [:rect {:fill           (cc/item-color item-name)
                           :on-mouse-enter #(prn item-name hh summed)
-                          :x              (+ 20 (* 13 (inc idx)))
+                          :x              (+ 20 (* x-step (inc idx)))
                           :y              y
-                          :width          11
+                          :width          w
                           :height         h}]))
               (when (< y midnight-s)
                 (let [h (- midnight-s y)
                       y (- midnight h)]
                   [:rect {:fill           (cc/item-color item-name)
                           :on-mouse-enter #(prn item-name hh summed)
-                          :x              (+ 20 (* 13 (dec idx)))
+                          :x              (+ 20 (* x-step (dec idx)))
                           :y              y
-                          :width          11
+                          :width          w
                           :height         h}]))]))]))))
 
 (defn legend [text x y]
@@ -92,7 +94,7 @@
             stroke-w (if (or (< h 2) (> h 26)) 0 stroke-w)]
         ^{:key h}
         [:line {:x1           17
-                :x2           202
+                :x2           500
                 :y1           y
                 :y2           y
                 :stroke-width stroke-w

@@ -10,7 +10,8 @@
             [iwaswhere-web.ui.charts.award :as aw]
             [iwaswhere-web.ui.charts.questionnaires :as cq]
             [iwaswhere-web.ui.charts.questionnaires2 :as cq2]
-            [iwaswhere-web.ui.charts.custom-fields :as cf2]))
+            [iwaswhere-web.ui.charts.custom-fields :as cf2]
+            [iwaswhere-web.ui.charts.location :as loc]))
 
 ;; Subscription Handlers
 (reg-sub :custom-field-stats (fn [db _] (:custom-field-stats db)))
@@ -47,18 +48,26 @@
     [:div.wrapper
      [:div.menu
       [menu/menu-view put-fn]]
-     [aw/award-points put-fn]
-     [:div.custom
-      [cf2/custom-fields-chart put-fn]
-      [cq/questionnaire-scores put-fn]]
-     [:div.stats
-      [stats/stats-view put-fn]]
      [:div.briefing
       [g/tabs-view :briefing put-fn]]
      [:div.left
       [g/tabs-view :left put-fn]]
      [:div.right
-      [g/tabs-view :right put-fn]]
+      [g/tabs-view :right put-fn]]]]
+   [n/new-entries-view put-fn]])
+
+(defn charts-page
+  "Main view component"
+  [put-fn]
+  [:div.flex-container
+   [:div.charts-grid
+    [:div.wrapper
+     [aw/award-points put-fn]
+     [:div.custom
+      [cf2/custom-fields-chart put-fn]]
+     [:div.stats
+      [stats/stats-view put-fn]]
+     [loc/location-chart]
      [:div.footer
       [stats/stats-text]]]]
    [n/new-entries-view put-fn]])
@@ -78,6 +87,7 @@
       (let [current-page @current-page]
         (case (:page current-page)
           :dashboard-1 [dashboard-1 put-fn]
+          :charts-1 [charts-page put-fn]
           [main-page put-fn])))))
 
 
