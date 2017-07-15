@@ -37,7 +37,7 @@
   (let [detail (r/atom false)
         emoji-flags (aget js/window "deps" "emojiFlags")
         toggle-detail (fn [_] (swap! detail not))
-        remove (put-fn [:entry/update (assoc-in @entry [:geoname] :removed)])]
+        remove #(put-fn [:entry/update (assoc-in @entry [:geoname] :removed)])]
     (fn location-details-render [entry put-fn edit-mode?]
       (let [geoname (:geoname @entry)]
         (when (and geoname (not= :removed geoname))
