@@ -119,31 +119,38 @@
               questionnaire-tags (:mapping questionnaires)
               q-tags (select-keys questionnaire-tags (:tags entry))
               q-mapper (fn [[t k]] [k (get-in questionnaires [:items k])])
-              questionnaires (map q-mapper q-tags)]
+              entry-questionnaires (map q-mapper q-tags)]
           [:div
-           (for [[k conf] questionnaires]
+           (for [[k conf] entry-questionnaires]
              (let [q-path [:questionnaires k]
                    scores (q/scores entry q-path conf)]
                ^{:key (str "cf" ts k)}
                [:form.questionnaire
                 [:h3 (:header conf)]
-                [:p (:desc conf)]
+                (:desc conf)
                 [:ol
-                 (for [{:keys [type path label]} (:fields conf)]
+                 (for [{:keys [type path label one-line]} (:fields conf)]
                    (let [path (concat q-path path)
-                         value (get-in entry path)]
+                         value (get-in entry path)
+                         items (get-in questionnaires [:types type :items])]
                      ^{:key (str "q" ts k path)}
                      [:li
-                      [:label {:class (when-not value "missing")} label]
+                      [:label {:class (str (when-not value "missing ")
+                                           (when-not one-line "multi-line"))}
+                       [:strong label]]
+                      (when-not one-line [:br])
                       [:span.range
-                       (for [n (range 1 6)]
-                         (let [click (fn [_ev]
-                                       (let [new-val (when-not (= value n) n)
+                       (for [item items]
+                         (let [v (:value item)
+                               click (fn [_ev]
+                                       (let [new-val (when-not (= value v) v)
                                              updated (assoc-in entry path new-val)]
                                          (put-fn [:entry/update-local updated])))]
-                           ^{:key (str "q" ts k path n)}
-                           [:span.opt {:on-click click
-                                       :class    (when (= value n) "sel")} n]))]]))]
+                           ^{:key (str "q" ts k path v)}
+                           [:span.opt.tooltip
+                            {:on-click click
+                             :class    (when (= value v) "sel")} v
+                            #_[:span.tooltiptext (:desc item)]]))]]))]
                 [:div.agg
                  (for [[k res] scores]
                    ^{:key k}

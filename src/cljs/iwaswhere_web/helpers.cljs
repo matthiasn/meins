@@ -67,8 +67,8 @@
 
 (defn keep-updated
   [stats-key n local last-update put-fn]
-  (when (not= (:last-update last-update) (:last-fetched @local))
-    (swap! local assoc-in [:last-fetched] (:last-update last-update))
+  (when (> (:last-update last-update) (:last-fetched @local 0))
+    (swap! local assoc-in [:last-fetched] (st/now))
     (get-stats stats-key n (:meta last-update {}) put-fn)))
 
 (defn m-to-hh-mm
