@@ -15,6 +15,7 @@
   []
   (let [stats (subscribe [:stats])
         options (subscribe [:options])
+        cfg (subscribe [:cfg])
         timing (subscribe [:timing])]
     (fn stats-text-render []
       [:div.stats-string
@@ -30,7 +31,7 @@
           (:completed-cnt @stats) " completed, "
           (:closed-cnt @stats) " closed, "
           (:import-cnt @stats) " tagged #import, "
-          (:new-cnt @stats) " #new."])
+          (:new-cnt @stats) " #new. PID: " (:pid @cfg)])
        (when-let [ms (:query @timing)]
          [:div
           (str "Query with " (:count @timing)

@@ -14,7 +14,8 @@
             [clojure.tools.logging :as log]
             [ubergraph.core :as uc]
             [clojure.set :as set]
-            [matthiasn.systems-toolbox-zipkin.core :as z]))
+            [matthiasn.systems-toolbox-zipkin.core :as z]
+            [clj-pid.core :as pid]))
 
 (defn tasks-mapper
   "Create mapper function for task stats"
@@ -131,7 +132,7 @@
    :stories       (gq/find-all-stories state)
    :sagas         (gq/find-all-sagas state)
    :locations     (gq/find-all-locations state)
-   :cfg           (:cfg state)})
+   :cfg           (merge (:cfg state) {:pid (pid/current)})})
 
 (defn count-words
   "Count total number of words."
