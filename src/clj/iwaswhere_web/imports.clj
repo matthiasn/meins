@@ -296,7 +296,7 @@
                            new-entries (map entry-mapper recently-played)]
                        (log/info "obtained response from spotify")
                        (doseq [entry new-entries]
-                         (put-fn [:entry/update entry]))))
+                         (put-fn [:entry/import entry]))))
         refresh-handler (fn [res]
                           (let [access-token (:access-token (parser res))
                                 url (str rp-url access-token)]
