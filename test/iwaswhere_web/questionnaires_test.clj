@@ -110,7 +110,10 @@
                               stats-test-entries)]
         (testing "correct scores for filled forms"
           (let [stats (sq/questionnaires new-state)]
-            (is (= {:panas {1450999000001 {:neg 10
+            (is (= {:cfq11 {}
+                    :fs    {}
+                    :fss   {}
+                    :panas {1450999000001 {:neg 10
                                            :pos 10}
                             1450999000002 {:neg 29
                                            :pos 31}
