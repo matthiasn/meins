@@ -77,7 +77,7 @@
   "Dashboard view component"
   [put-fn]
   [:div.flex-container
-   [cq2/questionnaire-scores put-fn]])
+   [cq2/dashboard put-fn]])
 
 
 (defn re-frame-ui
