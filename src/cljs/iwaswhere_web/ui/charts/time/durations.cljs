@@ -162,7 +162,7 @@
 
 (defn durations-bar-chart
   [stats chart-h y-scale put-fn]
-  (let [local (rc/atom {:last-fetched 0})
+  (let [local (rc/atom {})
         last-update (subscribe [:last-update])
         cfg (subscribe [:cfg])
         show-pvt? (reaction (:show-pvt @cfg))

@@ -154,10 +154,9 @@
   (let [stats (subscribe [:stats])
         custom-field-stats (subscribe [:custom-field-stats])
         last-update (subscribe [:last-update])
-        local (r/atom {:last-fetched 0 :n 30})
+        local (r/atom {:n 30})
         toggle (fn [_] (swap! local assoc-in [:n] (if (= 7 (:n @local)) 30 7)))]
     (fn [put-fn]
-      (prn :keep-updated)
       (h/keep-updated :stats/custom-fields 31 local @last-update put-fn)
       (let [scores2 (->> @stats
                          :questionnaires
@@ -178,8 +177,8 @@
             neg-mapper (points-mapper 282 :neg start end)
             custom-field-stats @custom-field-stats]
         [:div.questionnaires
-         [:svg {:viewBox  "0 0 1200 500"
-                :style    {:background :white}
+         [:svg {:viewBox "0 0 1200 500"
+                :style   {:background :white}
                 ;:on-click toggle
                 }
           [:filter#blur1

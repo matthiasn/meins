@@ -10,7 +10,7 @@
    On mouse-over on any of the bars, the date and the values for the date are
    shown in an info div next to the bars."
   [stats chart-h put-fn daily-target]
-  (let [local (rc/atom {:last-fetched 0})
+  (let [local (rc/atom {})
         last-update (subscribe [:last-update])]
     (fn [stats chart-h put-fn daily-target]
       (let [indexed (map-indexed (fn [idx [_k v]] [idx v]) stats)

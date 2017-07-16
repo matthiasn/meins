@@ -43,7 +43,7 @@
 (defn media-chart
   "Draws chart for daily media creation (photos, videos, audio)."
   [stats chart-h put-fn]
-  (let [local (rc/atom {:last-fetched 0})
+  (let [local (rc/atom {})
         last-update (subscribe [:last-update])]
     (fn [stats chart-h put-fn]
       (let [indexed (map-indexed (fn [idx [k v]] [idx v]) stats)

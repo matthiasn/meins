@@ -104,7 +104,7 @@
   "Draws custom fields chart, with a row for each configured chart. The
    position of each chart is calculated in the cf namespace."
   [put-fn]
-  (let [local (rc/atom {:last-fetched 0})
+  (let [local (rc/atom {})
         stats (subscribe [:custom-field-stats])
         options (subscribe [:options])
         last-update (subscribe [:last-update])]

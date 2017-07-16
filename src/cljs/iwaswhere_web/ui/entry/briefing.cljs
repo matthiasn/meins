@@ -10,7 +10,8 @@
             [iwaswhere-web.ui.entry.briefing.time :as time]
             [iwaswhere-web.utils.parse :as up]
             [clojure.string :as s]
-            [reagent.core :as r]))
+            [reagent.core :as r]
+            [iwaswhere-web.helpers :as h]))
 
 (defn planned-actual
   "Draws vertical stacked barchart."
@@ -82,6 +83,7 @@
   (let [chart-data (subscribe [:chart-data])
         query-cfg (subscribe [:query-cfg])
         cfg (subscribe [:cfg])
+        last-update (subscribe [:last-update])
         day (-> entry :briefing :day)
         today (.format (js/moment.) "YYYY-MM-DD")
         filter-btn (if (= day today) :active :open)
@@ -102,6 +104,9 @@
                   updated (assoc-in entry [:briefing :time-allocation saga] s)]
               (put-fn [:entry/update-local updated]))))]
     (fn briefing-render [entry put-fn edit-mode? local-cfg]
+      (h/keep-updated :stats/wordcount 60 local @last-update put-fn)
+      (h/keep-updated :stats/pomodoro 60 local @last-update put-fn)
+      (h/keep-updated :stats/tasks 60 local @last-update put-fn)
       (when (contains? (:tags entry) "#briefing")
         (let [ts (:timestamp entry)
               {:keys [pomodoro-stats task-stats wordcount-stats]} @chart-data
@@ -128,7 +133,7 @@
                 [:input {:type     :date
                          :on-input (input-fn entry)
                          :value    day}]])
-             (when tasks-cnt
+             (when true
                [:div
                 "Tasks: " [:strong tasks-cnt] " created, "
                 [:strong done-cnt] " done, "

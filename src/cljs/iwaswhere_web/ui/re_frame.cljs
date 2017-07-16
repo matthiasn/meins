@@ -37,7 +37,6 @@
                        (select-keys db [:pomodoro-stats
                                         :task-stats
                                         :wordcount-stats
-                                        :daily-summary-stats
                                         :media-stats])))
 
 (defn main-page

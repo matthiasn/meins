@@ -2,7 +2,9 @@
   (:require [matthiasn.systems-toolbox.component :as st]
             [goog.dom.Range]
             [clojure.string :as s]
-            [iwaswhere-web.utils.parse :as p]))
+            [iwaswhere-web.utils.parse :as p]
+            [matthiasn.systems-toolbox.component.helpers :as h]
+            [matthiasn.systems-toolbox.log :as l]))
 
 (defn send-w-geolocation
   "Calls geolocation, sends entry enriched by geo information inside the
@@ -67,9 +69,11 @@
 
 (defn keep-updated
   [stats-key n local last-update put-fn]
-  (when (> (:last-update last-update) (:last-fetched @local 0))
-    (swap! local assoc-in [:last-fetched] (st/now))
-    (get-stats stats-key n (:meta last-update {}) put-fn)))
+  (let [last-fetched (get-in @local [:last-fetched stats-key] 0)
+        last-update (:last-update last-update)]
+    (when (> last-update last-fetched)
+      (swap! local assoc-in [:last-fetched stats-key] (st/now))
+      (get-stats stats-key n (:meta last-update {}) put-fn))))
 
 (defn m-to-hh-mm
   [m]
