@@ -107,51 +107,50 @@
       (h/keep-updated :stats/wordcount 60 local @last-update put-fn)
       (h/keep-updated :stats/pomodoro 60 local @last-update put-fn)
       (h/keep-updated :stats/tasks 60 local @last-update put-fn)
-      (when (contains? (:tags entry) "#briefing")
-        (let [ts (:timestamp entry)
-              {:keys [pomodoro-stats task-stats wordcount-stats]} @chart-data
-              day (-> entry :briefing :day)
-              day-stats (get pomodoro-stats day)
-              excluded (:excluded (:briefing @cfg))
-              logged-s (->> day-stats
-                            :time-by-saga
-                            (filter (fn [[s _]] (not (contains? excluded s))))
-                            (map second)
-                            (apply +))
-              dur (u/duration-string logged-s)
-              word-stats (get wordcount-stats day)
-              {:keys [tasks-cnt done-cnt closed-cnt]} (get task-stats day)
-              tab-group (:tab-group local-cfg)
-              query (reaction (get-in @query-cfg [:queries (:query-id local-cfg)]))]
-          [:div.briefing
-           [:form.briefing-details
-            [:fieldset
-             [:legend (or day "date not set")]
-             (when edit-mode?
-               [:div
-                [:label " Day: "]
-                [:input {:type     :date
-                         :on-input (input-fn entry)
-                         :value    day}]])
-             (when true
-               [:div
-                "Tasks: " [:strong tasks-cnt] " created, "
-                [:strong done-cnt] " done, "
-                [:strong closed-cnt] " closed. "
-                [:strong (or (:word-count word-stats) 0)] " words written."])
-             [planned-actual entry]
+      (let [ts (:timestamp entry)
+            {:keys [pomodoro-stats task-stats wordcount-stats]} @chart-data
+            day (-> entry :briefing :day)
+            day-stats (get pomodoro-stats day)
+            excluded (:excluded (:briefing @cfg))
+            logged-s (->> day-stats
+                          :time-by-saga
+                          (filter (fn [[s _]] (not (contains? excluded s))))
+                          (map second)
+                          (apply +))
+            dur (u/duration-string logged-s)
+            word-stats (get wordcount-stats day)
+            {:keys [tasks-cnt done-cnt closed-cnt]} (get task-stats day)
+            tab-group (:tab-group local-cfg)
+            query (reaction (get-in @query-cfg [:queries (:query-id local-cfg)]))]
+        [:div.briefing
+         [:form.briefing-details
+          [:fieldset
+           [:legend (or day "date not set")]
+           (when edit-mode?
              [:div
-              "Total planned: "
-              [:strong
-               (u/duration-string
-                 (apply + (map second (-> entry :briefing :time-allocation))))]
-              (when (seq dur)
-                [:span
-                 " Logged: " [:strong dur] " in " (:total day-stats) " entries."])]
-             [time/time-by-sagas entry day-stats local edit-mode? put-fn]
+              [:label " Day: "]
+              [:input {:type     :date
+                       :on-input (input-fn entry)
+                       :value    day}]])
+           (when true
              [:div
-              [tasks/started-tasks local local-cfg put-fn]
-              [tasks/open-linked-tasks ts local local-cfg put-fn]
-              [habits/waiting-habits entry local local-cfg put-fn]
-              (when day-stats
-                [time/time-by-stories day-stats local put-fn])]]]])))))
+              "Tasks: " [:strong tasks-cnt] " created, "
+              [:strong done-cnt] " done, "
+              [:strong closed-cnt] " closed. "
+              [:strong (or (:word-count word-stats) 0)] " words written."])
+           [planned-actual entry]
+           [:div
+            "Total planned: "
+            [:strong
+             (u/duration-string
+               (apply + (map second (-> entry :briefing :time-allocation))))]
+            (when (seq dur)
+              [:span
+               " Logged: " [:strong dur] " in " (:total day-stats) " entries."])]
+           [time/time-by-sagas entry day-stats local edit-mode? put-fn]
+           [:div
+            [tasks/started-tasks local local-cfg put-fn]
+            [tasks/open-linked-tasks ts local local-cfg put-fn]
+            [habits/waiting-habits entry local local-cfg put-fn]
+            (when day-stats
+              [time/time-by-stories day-stats local put-fn])]]]]))))

@@ -126,7 +126,8 @@
          [task/task-details @entry local-cfg put-fn edit-mode?]
          [habit/habit-details @entry local-cfg put-fn edit-mode?]
          [reward/reward-details @entry put-fn edit-mode?]
-         [b/briefing-view @entry put-fn edit-mode? local-cfg]
+         (when (contains? (:tags @entry) "#briefing")
+           [b/briefing-view @entry put-fn edit-mode? local-cfg])
          [f/flight-view @entry put-fn edit-mode? local-cfg]
          [:div.footer
           [hashtags-mentions-list ts tab-group put-fn]
