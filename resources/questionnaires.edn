@@ -152,37 +152,31 @@
                              :tag   "#sit-ups"
                              :h     33
                              :k     :cnt
-                             :scale 0.3
                              :cls   "done"}
                             {:type  :barchart-row
                              :tag   "#coffee"
                              :h     33
                              :k     :cnt
-                             :scale 0.04
                              :cls   "failed"}
                             {:type  :barchart-row
                              :tag   "#steps"
                              :h     33
                              :k     :cnt
-                             :scale 0.0015
                              :cls   "done"}
                             {:type  :barchart-row
                              :tag   "#sleep"
                              :h     33
                              :k     :duration
-                             :scale 0.05
                              :cls   "done"}
                             {:type  :barchart-row
                              :tag   "#running"
                              :h     33
                              :k     :distance
-                             :scale 2
                              :cls   "done"}
                             {:type  :barchart-row
                              :tag   "#beer"
                              :h     33
                              :k     :vol
-                             :scale 0.02
                              :cls   "failed"}
                             {:type  :points-by-day
                              :label "Award points"

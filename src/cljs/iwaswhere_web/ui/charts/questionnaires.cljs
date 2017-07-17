@@ -72,9 +72,28 @@
                  :text-anchor "middle"}
           v])])))
 
+(defn indexed-days
+  [stats tag k start days]
+  (let [d (* 24 60 60 1000)
+        rng (range (inc days))
+        indexed (map-indexed (fn [n v]
+                               (let [offset (* n d)
+                                     ts (+ start offset)
+                                     ymd (df ts ymd)
+                                     v (get-in stats [ymd tag k] 0)
+                                     weekday (df ts weekday)]
+                                 [n {:ymd     ymd
+                                     :v       v
+                                     :weekday weekday}]))
+                             rng)]
+    indexed))
+
 (defn barchart-row
-  [{:keys [days span start stats tag k h y scale cls]}]
-  (let [btm-y (+ y h)]
+  [{:keys [days span start stats tag k h y cls]}]
+  (let [btm-y (+ y h)
+        indexed (indexed-days stats tag k start days)
+        mx (apply max (map #(:v (second %)) indexed))
+        scale (if (pos? mx) (/ (- h 3) mx) 1)]
     [:g
      [:text {:x           180
              :y           (+ y (+ 5 (/ h 2)))
@@ -83,17 +102,13 @@
              :font-weight :bold
              :text-anchor "end"}
       tag]
-     (for [n (range (inc days))]
+     (for [[n {:keys [ymd v weekday]}] indexed]
        (let [d (* 24 60 60 1000)
              offset (* n d)
              scaled (* 900 (/ offset span))
              scaled (* n 29)
              x (+ 203 scaled)
-             ts (+ start offset)
-             ymd (df ts ymd)
-             v (get-in stats [ymd tag k] 0)
              h (* v scale)
-             weekday (df ts weekday)
              weekend? (get #{"Sat" "Sun"} weekday)
              display-v (if (= :duration k)
                          (h/m-to-hh-mm v)
