@@ -110,7 +110,6 @@
   [state]
   {:entry-count (count (:sorted-entries state))
    :import-cnt  (res-count state {:tags #{"#import"}})
-   :new-cnt     (res-count state {:tags #{"#new"}})
    :locations   (sl/locations state)})
 
 (def started-tasks

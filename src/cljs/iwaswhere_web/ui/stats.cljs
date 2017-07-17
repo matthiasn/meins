@@ -30,8 +30,7 @@
           (:backlog-cnt @stats) " backlog, "
           (:completed-cnt @stats) " completed, "
           (:closed-cnt @stats) " closed, "
-          (:import-cnt @stats) " tagged #import, "
-          (:new-cnt @stats) " #new. PID: " (:pid @cfg)])
+          (:import-cnt @stats) " tagged #import. PID: " (:pid @cfg)])
        (when-let [ms (:query @timing)]
          [:div
           (str "Query with " (:count @timing)

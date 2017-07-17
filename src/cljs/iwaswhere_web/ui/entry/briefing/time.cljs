@@ -65,7 +65,8 @@
       (let [actual-times (:time-by-saga day-stats)
             filtered? (:outstanding-time-filter @local)
             filter-cls (when-not filtered? "inactive")
-            sagas (sort-by #(-> % second :saga-name) @sagas)]
+            sagas (sort-by #(-> % second :saga-name) @sagas)
+            selected (:selected @local)]
         [:table
          [:tbody
           [:tr
@@ -86,7 +87,8 @@
                     (when-not edit-mode?
                       (swap! local update-in [:selected] #(if (= k %) nil k))))]
               (when (or (pos? allocation) (get actual-times k) edit-mode?)
-                (when (or (not filtered?) (pos? remaining) edit-mode?)
+                (when (and (or (not filtered?) (pos? remaining) edit-mode?)
+                           (or (not selected) (= selected k)))
                   ^{:key (str :time-allocation k)}
                   [:tr {:on-click click
                         :class    (when (= k (:selected @local)) "selected")}
