@@ -98,7 +98,7 @@
              display-v (if (= :duration k)
                          (h/m-to-hh-mm v)
                          v)]
-         ^{:key n}
+         ^{:key (str tag n)}
          [rect display-v x btm-y h cls n]))
      [line (+ y h) "#000" 2]]))
 
@@ -244,7 +244,7 @@
                              :scores-chart scores-chart
                              :barchart-row barchart-row
                              :points-by-day points-by-day-chart)]
-              ^{:key (:label chart-cfg)}
+              ^{:key (str (:label chart-cfg) (:tag chart-cfg))}
               [chart-fn (merge common chart-cfg)]))
           (for [n (range (inc days))]
             (let [offset (* (+ n 0.5) d)
