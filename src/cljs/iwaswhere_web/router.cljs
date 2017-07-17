@@ -7,7 +7,7 @@
   "Maps page paths to view keywords."
   [page]
   (case page
-    "dashboard1" :dashboard-1
+    "dashboards" :dashboards
     "charts1" :charts-1
     :main))
 

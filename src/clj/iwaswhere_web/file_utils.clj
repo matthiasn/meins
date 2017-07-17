@@ -43,4 +43,4 @@
                         (fs/mkdirs data-path)
                         (spit conf-path (with-out-str (pp/pprint default)))
                         default)))]
-    (assoc-in conf [:questionnaires] questionnaires)))
+    (update-in conf [:questionnaires] #(merge-with merge questionnaires %))))

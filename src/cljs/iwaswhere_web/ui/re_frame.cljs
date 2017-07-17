@@ -72,7 +72,7 @@
       [stats/stats-text]]]]
    [n/new-entries-view put-fn]])
 
-(defn dashboard-1
+(defn dashboards
   "Dashboard view component"
   [put-fn]
   [:div.flex-container
@@ -86,7 +86,7 @@
     (fn [put-fn]
       (let [current-page @current-page]
         (case (:page current-page)
-          :dashboard-1 [dashboard-1 put-fn]
+          :dashboards [dashboards put-fn]
           :charts-1 [charts-page put-fn]
           [main-page put-fn])))))
 

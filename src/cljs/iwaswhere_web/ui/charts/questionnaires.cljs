@@ -220,6 +220,7 @@
   "Simple view for questionnaire scores."
   [put-fn]
   (let [custom-field-stats (subscribe [:custom-field-stats])
+        current-page (subscribe [:current-page])
         last-update (subscribe [:last-update])
         options (subscribe [:options])
         questionnaires (reaction (:questionnaires @options))
@@ -228,6 +229,7 @@
     (fn dashboard-render [put-fn]
       (h/keep-updated :stats/custom-fields 31 local @last-update put-fn)
       (let [days (:n @local)
+            dashboard-id (keyword (:id @current-page))
             now (st/now)
             d (* 24 60 60 1000)
             within-day (mod now d)
@@ -237,7 +239,7 @@
             custom-field-stats @custom-field-stats
             common {:start start :end end :w 900 :x-offset 200
                     :span  span :days days :stats custom-field-stats}
-            charts-cfg (get-in @questionnaires [:dashboards :dashboard-1])
+            charts-cfg (get-in @questionnaires [:dashboards dashboard-id])
             positioned-charts (charts-y-pos charts-cfg)
             end-y (+ (:last-y positioned-charts) (:last-h positioned-charts))]
         [:div.questionnaires
