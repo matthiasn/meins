@@ -37,6 +37,10 @@ Learn more about Electron and its API in the [documentation](http://electron.ato
     $ electron-packager --overwrite . iWasWhereUI
 
 
+## Clear webview cache
+
+You can clear the cache by deleting `/Users/<user>/Library/Application Support/iWasWhereUI/Cache`
+
 ## Other Example Apps
 
 For more example apps, see the
