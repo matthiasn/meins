@@ -31,7 +31,6 @@
 (defn questionnaires
   "Calculates scores for all defined questionnaires."
   [current-state]
-  (time
-    (let [mapping (-> current-state :cfg :questionnaires :mapping)
-          scores (map (fn [[tag k]] (by-tag current-state tag k)) mapping)]
-      (apply merge scores))))
+  (let [mapping (-> current-state :cfg :questionnaires :mapping)
+        scores (map (fn [[tag k]] (by-tag current-state tag k)) mapping)]
+    (apply merge scores)))

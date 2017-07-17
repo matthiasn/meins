@@ -9,7 +9,6 @@
             [re-frame.db :as rdb]
             [iwaswhere-web.ui.charts.award :as aw]
             [iwaswhere-web.ui.charts.questionnaires :as cq]
-            [iwaswhere-web.ui.charts.questionnaires2 :as cq2]
             [iwaswhere-web.ui.charts.custom-fields :as cf2]
             [iwaswhere-web.ui.charts.location :as loc]))
 
@@ -77,7 +76,7 @@
   "Dashboard view component"
   [put-fn]
   [:div.flex-container
-   [cq2/dashboard put-fn]])
+   [cq/dashboard put-fn]])
 
 
 (defn re-frame-ui

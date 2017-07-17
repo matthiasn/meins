@@ -1,126 +1,189 @@
-{:mapping {"#PANAS"         :panas
-           "#FSS"           :fss
-           "#fatigue-scale" :fs
-           "#CFQ11"         :cfq11}
- :types   {:likert          {:type  :range
-                             :items [{:value 1 :desc "Very Slightly or Not at All"}
-                                     {:value 2 :desc "A Little"}
-                                     {:value 3 :desc "Moderately"}
-                                     {:value 4 :desc "Quite a Bit"}
-                                     {:value 5 :desc "Extremely"}]}
-           :likert4-symptom {:type  :range
-                             :items [{:value 0 :desc "Better than usual"}
-                                     {:value 1 :desc "No worse than usual"}
-                                     {:value 2 :desc "Worse than usual"}
-                                     {:value 3 :desc "Much worse than usual"}]}
-           :likert4-less    {:type  :range
-                             :items [{:value 0 :desc "Less than usual"}
-                                     {:value 1 :desc "No more than usual"}
-                                     {:value 2 :desc "More than usual"}
-                                     {:value 3 :desc "Much more than usual"}]}
-           :likert7         {:type  :range
-                             :items [{:value 1 :desc "Strongly disagree"}
-                                     {:value 2 :desc "A Disagree"}
-                                     {:value 3 :desc "Somewhat disagree"}
-                                     {:value 4 :desc "Neither agree or disagree"}
-                                     {:value 5 :desc "Somewhat agree"}
-                                     {:value 6 :desc "Agree"}
-                                     {:value 7 :desc "Strongly agree"}]}}
- :items   {:panas {:header       "The Positive and Negative Affect Schedule (PANAS; Watson et al., 1988)"
-                   :desc         [:div
-                                  [:p "Indicate to what extent you feel this way right now, that is, at the present moment."]
-                                  [:p "1-Very Slightly or Not at All, 2-A Little, 3-Moderately, 4-Quite a Bit, 5-Extremely"]]
-                   :reference    "Watson, D., Clark, L. A., & Tellegan, A. (1988). Development and validation of brief measures of positive and negative affect: The PANAS scales. Journal of Personality and Social Psychology, 54(6), 1063–1070."
-                   :fields       [{:type :likert :path [1] :label "Interested" :one-line true}
-                                  {:type :likert :path [2] :label "Distressed" :one-line true}
-                                  {:type :likert :path [3] :label "Excited" :one-line true}
-                                  {:type :likert :path [4] :label "Upset" :one-line true}
-                                  {:type :likert :path [5] :label "Strong" :one-line true}
-                                  {:type :likert :path [6] :label "Guilty" :one-line true}
-                                  {:type :likert :path [7] :label "Scared" :one-line true}
-                                  {:type :likert :path [8] :label "Hostile" :one-line true}
-                                  {:type :likert :path [9] :label "Enthusiastic" :one-line true}
-                                  {:type :likert :path [10] :label "Proud" :one-line true}
-                                  {:type :likert :path [11] :label "Irritable" :one-line true}
-                                  {:type :likert :path [12] :label "Alert" :one-line true}
-                                  {:type :likert :path [13] :label "Ashamed" :one-line true}
-                                  {:type :likert :path [14] :label "Inspired" :one-line true}
-                                  {:type :likert :path [15] :label "Nervous" :one-line true}
-                                  {:type :likert :path [16] :label "Determined" :one-line true}
-                                  {:type :likert :path [17] :label "Attentive" :one-line true}
-                                  {:type :likert :path [18] :label "Jittery" :one-line true}
-                                  {:type :likert :path [19] :label "Active" :one-line true}
-                                  {:type :likert :path [20] :label "Afraid" :one-line true}]
-                   :aggregations {:pos {:type  :sum
-                                        :label "Positive Affect Score:"
-                                        :items #{1 3 5 9 10 12 14 16 17 19}}
-                                  :neg {:type  :sum
-                                        :label "Negative Affect Score:"
-                                        :items #{2 4 6 7 8 11 13 15 18 20}}}}
-           :fss   {:header       "Fatigue Severity Scale (FSS)"
-                   :desc         [:div
-                                  [:p "The Fatigue Severity Scale (FSS) is a method of evaluating the impact of fatigue on you. The\nFSS is a short questionnaire that requires you to rate your level of fatigue."]
-                                  [:p "The FSS questionnaire contains nine statements that rate the severity of your fatigue symptoms. Read each statement and circle a number from 1 to 7, based on how accurately it reflects your condition during the past week and the extent to which you agree or disagree that the statement applies to you."]
-                                  [:p "• A low value (e.g., 1) indicates strong disagreement with the statement, whereas a high value\n(e.g., 7) indicates strong agreement."]
-                                  [:p "• It is important that you circle a number (1 to 7) for every question."]]
-                   :reference    "Krupp LB, LaRocca NG, Muir-Nash J, Steinberg AD. The Fatigue Severity Scale: application to patients with multiple sclerosis and systemic lupus erythematosis. Arch Neurol 1989;46:1121–3."
-                   :fields       [{:type :likert7 :path [1] :label "My motivation is lower when I am fatigued."}
-                                  {:type :likert7 :path [2] :label "Exercise brings on my fatigue"}
-                                  {:type :likert7 :path [3] :label "I am easily fatigued."}
-                                  {:type :likert7 :path [4] :label "Fatigue interferes with my physical functioning."}
-                                  {:type :likert7 :path [5] :label "Fatigue causes frequent problems for me."}
-                                  {:type :likert7 :path [6] :label "My fatigue prevents sustained physical functioning."}
-                                  {:type :likert7 :path [7] :label "Fatigue interferes with carrying out certain duties and responsibilities."}
-                                  {:type :likert7 :path [8] :label "Fatigue is among my three most disabling symptoms."}
-                                  {:type :likert7 :path [9] :label "Fatigue interferes with my work, family, or social life."}]
-                   :aggregations {:fss {:type  :sum
-                                        :label "Total Score:"
-                                        :items #{1 2 3 4 5 6 7 8 9}}}}
-           :fs    {:header       "14-item Childer Fatigue Scale"
-                   :desc         [:div
-                                  [:p "0-Better than usual, 1-No worse than usual, 2-Worse than usual, 3-Much worse than usual"]]
-                   :reference    "Chalder T, Berelowitz G, Pawlikowska T, Watts L, Wessely S, Wright D, et al. Development of a Fatigue Scale. J Psychosomatic Res 1993;37:147–53."
-                   :fields       [; Physical symptoms
-                                  {:type :likert4-symptom :path [1] :label "Do you have problems with tiredness?"}
-                                  {:type :likert4-symptom :path [2] :label "Do you need to rest more?"}
-                                  {:type :likert4-symptom :path [3] :label "Do you feel sleepy or drowsy?"}
-                                  {:type :likert4-symptom :path [4] :label "Do you have problems starting things?"}
-                                  {:type :likert4-symptom :path [5] :label "Do you start things without difficulty but get weak as you go on?"}
-                                  {:type :likert4-symptom :path [6] :label "Are you lacking in energy?"}
-                                  {:type :likert4-symptom :path [7] :label "Do you have less strength in your muscles?"}
-                                  {:type :likert4-symptom :path [8] :label "Do you feel weak?"}
-                                  ; Mental symptoms
-                                  {:type :likert4-symptom :path [9] :label "Do you have difficulty concentrating?"}
-                                  {:type :likert4-symptom :path [10] :label "Do you have problems thinking clearly?"}
-                                  {:type :likert4-symptom :path [11] :label "Do you make slips of the tongue when speaking?"}
-                                  {:type :likert4-symptom :path [12] :label "Do you find it more difficult to find the correct word?"}
-                                  {:type :likert4-symptom :path [13] :label "How is your memory?"}
-                                  {:type :likert4-symptom :path [14] :label "Have you lost interest in the things you used to do?"}]
-                   :aggregations {:total    {:type  :sum
+{:mapping    {"#PANAS"         :panas
+              "#FSS"           :fss
+              "#fatigue-scale" :fs
+              "#CFQ11"         :cfq11}
+ :types      {:likert          {:type  :range
+                                :items [{:value 1 :desc "Very Slightly or Not at All"}
+                                        {:value 2 :desc "A Little"}
+                                        {:value 3 :desc "Moderately"}
+                                        {:value 4 :desc "Quite a Bit"}
+                                        {:value 5 :desc "Extremely"}]}
+              :likert4-symptom {:type  :range
+                                :items [{:value 0 :desc "Better than usual"}
+                                        {:value 1 :desc "No worse than usual"}
+                                        {:value 2 :desc "Worse than usual"}
+                                        {:value 3 :desc "Much worse than usual"}]}
+              :likert4-less    {:type  :range
+                                :items [{:value 0 :desc "Less than usual"}
+                                        {:value 1 :desc "No more than usual"}
+                                        {:value 2 :desc "More than usual"}
+                                        {:value 3 :desc "Much more than usual"}]}
+              :likert7         {:type  :range
+                                :items [{:value 1 :desc "Strongly disagree"}
+                                        {:value 2 :desc "A Disagree"}
+                                        {:value 3 :desc "Somewhat disagree"}
+                                        {:value 4 :desc "Neither agree or disagree"}
+                                        {:value 5 :desc "Somewhat agree"}
+                                        {:value 6 :desc "Agree"}
+                                        {:value 7 :desc "Strongly agree"}]}}
+ :items      {:panas {:header       "The Positive and Negative Affect Schedule (PANAS; Watson et al., 1988)"
+                      :desc         [:div
+                                     [:p "Indicate to what extent you feel this way right now, that is, at the present moment."]
+                                     [:p "1-Very Slightly or Not at All, 2-A Little, 3-Moderately, 4-Quite a Bit, 5-Extremely"]]
+                      :reference    "Watson, D., Clark, L. A., & Tellegan, A. (1988). Development and validation of brief measures of positive and negative affect: The PANAS scales. Journal of Personality and Social Psychology, 54(6), 1063–1070."
+                      :fields       [{:type :likert :path [1] :label "Interested" :one-line true}
+                                     {:type :likert :path [2] :label "Distressed" :one-line true}
+                                     {:type :likert :path [3] :label "Excited" :one-line true}
+                                     {:type :likert :path [4] :label "Upset" :one-line true}
+                                     {:type :likert :path [5] :label "Strong" :one-line true}
+                                     {:type :likert :path [6] :label "Guilty" :one-line true}
+                                     {:type :likert :path [7] :label "Scared" :one-line true}
+                                     {:type :likert :path [8] :label "Hostile" :one-line true}
+                                     {:type :likert :path [9] :label "Enthusiastic" :one-line true}
+                                     {:type :likert :path [10] :label "Proud" :one-line true}
+                                     {:type :likert :path [11] :label "Irritable" :one-line true}
+                                     {:type :likert :path [12] :label "Alert" :one-line true}
+                                     {:type :likert :path [13] :label "Ashamed" :one-line true}
+                                     {:type :likert :path [14] :label "Inspired" :one-line true}
+                                     {:type :likert :path [15] :label "Nervous" :one-line true}
+                                     {:type :likert :path [16] :label "Determined" :one-line true}
+                                     {:type :likert :path [17] :label "Attentive" :one-line true}
+                                     {:type :likert :path [18] :label "Jittery" :one-line true}
+                                     {:type :likert :path [19] :label "Active" :one-line true}
+                                     {:type :likert :path [20] :label "Afraid" :one-line true}]
+                      :aggregations {:pos {:type  :sum
+                                           :label "Positive Affect Score:"
+                                           :items #{1 3 5 9 10 12 14 16 17 19}}
+                                     :neg {:type  :sum
+                                           :label "Negative Affect Score:"
+                                           :items #{2 4 6 7 8 11 13 15 18 20}}}}
+              :fss   {:header       "Fatigue Severity Scale (FSS)"
+                      :desc         [:div
+                                     [:p "The Fatigue Severity Scale (FSS) is a method of evaluating the impact of fatigue on you. The\nFSS is a short questionnaire that requires you to rate your level of fatigue."]
+                                     [:p "The FSS questionnaire contains nine statements that rate the severity of your fatigue symptoms. Read each statement and circle a number from 1 to 7, based on how accurately it reflects your condition during the past week and the extent to which you agree or disagree that the statement applies to you."]
+                                     [:p "• A low value (e.g., 1) indicates strong disagreement with the statement, whereas a high value\n(e.g., 7) indicates strong agreement."]
+                                     [:p "• It is important that you circle a number (1 to 7) for every question."]]
+                      :reference    "Krupp LB, LaRocca NG, Muir-Nash J, Steinberg AD. The Fatigue Severity Scale: application to patients with multiple sclerosis and systemic lupus erythematosis. Arch Neurol 1989;46:1121–3."
+                      :fields       [{:type :likert7 :path [1] :label "My motivation is lower when I am fatigued."}
+                                     {:type :likert7 :path [2] :label "Exercise brings on my fatigue"}
+                                     {:type :likert7 :path [3] :label "I am easily fatigued."}
+                                     {:type :likert7 :path [4] :label "Fatigue interferes with my physical functioning."}
+                                     {:type :likert7 :path [5] :label "Fatigue causes frequent problems for me."}
+                                     {:type :likert7 :path [6] :label "My fatigue prevents sustained physical functioning."}
+                                     {:type :likert7 :path [7] :label "Fatigue interferes with carrying out certain duties and responsibilities."}
+                                     {:type :likert7 :path [8] :label "Fatigue is among my three most disabling symptoms."}
+                                     {:type :likert7 :path [9] :label "Fatigue interferes with my work, family, or social life."}]
+                      :aggregations {:fss {:type  :sum
+                                           :label "Total Score:"
+                                           :items #{1 2 3 4 5 6 7 8 9}}}}
+              :fs    {:header       "14-item Childer Fatigue Scale"
+                      :desc         [:div
+                                     [:p "0-Better than usual, 1-No worse than usual, 2-Worse than usual, 3-Much worse than usual"]]
+                      :reference    "Chalder T, Berelowitz G, Pawlikowska T, Watts L, Wessely S, Wright D, et al. Development of a Fatigue Scale. J Psychosomatic Res 1993;37:147–53."
+                      :fields       [; Physical symptoms
+                                     {:type :likert4-symptom :path [1] :label "Do you have problems with tiredness?"}
+                                     {:type :likert4-symptom :path [2] :label "Do you need to rest more?"}
+                                     {:type :likert4-symptom :path [3] :label "Do you feel sleepy or drowsy?"}
+                                     {:type :likert4-symptom :path [4] :label "Do you have problems starting things?"}
+                                     {:type :likert4-symptom :path [5] :label "Do you start things without difficulty but get weak as you go on?"}
+                                     {:type :likert4-symptom :path [6] :label "Are you lacking in energy?"}
+                                     {:type :likert4-symptom :path [7] :label "Do you have less strength in your muscles?"}
+                                     {:type :likert4-symptom :path [8] :label "Do you feel weak?"}
+                                     ; Mental symptoms
+                                     {:type :likert4-symptom :path [9] :label "Do you have difficulty concentrating?"}
+                                     {:type :likert4-symptom :path [10] :label "Do you have problems thinking clearly?"}
+                                     {:type :likert4-symptom :path [11] :label "Do you make slips of the tongue when speaking?"}
+                                     {:type :likert4-symptom :path [12] :label "Do you find it more difficult to find the correct word?"}
+                                     {:type :likert4-symptom :path [13] :label "How is your memory?"}
+                                     {:type :likert4-symptom :path [14] :label "Have you lost interest in the things you used to do?"}]
+                      :aggregations {:total    {:type  :sum
+                                                :label "Total Score:"
+                                                :items #{1 2 3 4 5 6 7 8 9 10 11 12 13 14}}
+                                     :physical {:type  :sum
+                                                :label "Physical Score:"
+                                                :items #{1 2 3 4 5 6 7 8}}
+                                     :mental   {:type  :sum
+                                                :label "Mental Score:"
+                                                :items #{9 10 11 12 13 14}}}}
+              :cfq11 {:header       "Chalder Fatigue Scale (CFQ 11)"
+                      :desc         [:div
+                                     [:p "We would like to know more about any problems you have had with feeling tired, weak or lacking in energy in the last month. Please answer ALL the questions by ticking the answer which applies to you most closely. If you have been feeling tired for a long while, then compare yourself to how you felt when you were last well. Please tick only one box per line."]
+                                     [:p "0-Better than usual, 1-No worse than usual, 2-Worse than usual, 3-Much worse than usual"]]
+                      :reference    "Cella, M. and T. Chalder (2010). \"Measuring fatigue in clinical and community settings.\" J Psychosom Res 69(1): 17-22."
+                      :fields       [{:type :likert4-less :path [1] :label "Do you have problems with tiredness?"}
+                                     {:type :likert4-less :path [2] :label "Do you need to rest more?"}
+                                     {:type :likert4-less :path [3] :label "Do you feel sleepy or drowsy?"}
+                                     {:type :likert4-less :path [4] :label "Do you have problems starting things?"}
+                                     {:type :likert4-less :path [5] :label "Do you lack energy?"}
+                                     {:type :likert4-less :path [6] :label "Do you have less strength in your muscles?"}
+                                     {:type :likert4-less :path [7] :label "Do you feel weak?"}
+                                     {:type :likert4-less :path [8] :label "Do you have difficulty concentrating?"}
+                                     {:type :likert4-less :path [9] :label "Do you make slips of the tongue when speaking?"}
+                                     {:type :likert4-less :path [10] :label "Do you find it more difficult to find the right word?"}
+                                     {:type :likert4-symptom :path [11] :label "How is your memory?"}]
+                      :aggregations {:total {:type  :sum
                                              :label "Total Score:"
-                                             :items #{1 2 3 4 5 6 7 8 9 10 11 12 13 14}}
-                                  :physical {:type  :sum
-                                             :label "Physical Score:"
-                                             :items #{1 2 3 4 5 6 7 8}}
-                                  :mental   {:type  :sum
-                                             :label "Mental Score:"
-                                             :items #{9 10 11 12 13 14}}}}
-           :cfq11 {:header       "Chalder Fatigue Scale (CFQ 11)"
-                   :desc         [:div
-                                  [:p "We would like to know more about any problems you have had with feeling tired, weak or lacking in energy in the last month. Please answer ALL the questions by ticking the answer which applies to you most closely. If you have been feeling tired for a long while, then compare yourself to how you felt when you were last well. Please tick only one box per line."]
-                                  [:p "0-Better than usual, 1-No worse than usual, 2-Worse than usual, 3-Much worse than usual"]]
-                   :reference    "Cella, M. and T. Chalder (2010). \"Measuring fatigue in clinical and community settings.\" J Psychosom Res 69(1): 17-22."
-                   :fields       [{:type :likert4-less :path [1] :label "Do you have problems with tiredness?"}
-                                  {:type :likert4-less :path [2] :label "Do you need to rest more?"}
-                                  {:type :likert4-less :path [3] :label "Do you feel sleepy or drowsy?"}
-                                  {:type :likert4-less :path [4] :label "Do you have problems starting things?"}
-                                  {:type :likert4-less :path [5] :label "Do you lack energy?"}
-                                  {:type :likert4-less :path [6] :label "Do you have less strength in your muscles?"}
-                                  {:type :likert4-less :path [7] :label "Do you feel weak?"}
-                                  {:type :likert4-less :path [8] :label "Do you have difficulty concentrating?"}
-                                  {:type :likert4-less :path [9] :label "Do you make slips of the tongue when speaking?"}
-                                  {:type :likert4-less :path [10] :label "Do you find it more difficult to find the right word?"}
-                                  {:type :likert4-symptom :path [11] :label "How is your memory?"}]
-                   :aggregations {:total {:type  :sum
-                                          :label "Total Score:"
-                                          :items #{1 2 3 4 5 6 7 8 9 10 11}}}}}}
+                                             :items #{1 2 3 4 5 6 7 8 9 10 11}}}}}
+ :dashboards {:dashboard-1 [{:type    :scores-chart
+                             :h       60
+                             :k       :panas
+                             :score-k :pos
+                             :label   "Positive Affect Score"
+                             :mn      10
+                             :mx      50
+                             :color   :green}
+                            {:type    :scores-chart
+                             :h       60
+                             :k       :panas
+                             :score-k :neg
+                             :label   "Negative Affect Score"
+                             :mn      10
+                             :mx      50
+                             :color   :red}
+                            {:type    :scores-chart
+                             :h       40
+                             :k       :cfq11
+                             :score-k :total
+                             :label   "CFQ11"
+                             :mn      0
+                             :mx      33
+                             :color   :blue}
+                            {:type  :barchart-row
+                             :tag   "#sit-ups"
+                             :h     33
+                             :k     :cnt
+                             :scale 0.3
+                             :cls   "done"}
+                            {:type  :barchart-row
+                             :tag   "#coffee"
+                             :h     33
+                             :k     :cnt
+                             :scale 0.04
+                             :cls   "failed"}
+                            {:type  :barchart-row
+                             :tag   "#steps"
+                             :h     33
+                             :k     :cnt
+                             :scale 0.0015
+                             :cls   "done"}
+                            {:type  :barchart-row
+                             :tag   "#sleep"
+                             :h     33
+                             :k     :duration
+                             :scale 0.05
+                             :cls   "done"}
+                            {:type  :barchart-row
+                             :tag   "#running"
+                             :h     33
+                             :k     :distance
+                             :scale 2
+                             :cls   "done"}
+                            {:type  :barchart-row
+                             :tag   "#beer"
+                             :h     33
+                             :k     :vol
+                             :scale 0.02
+                             :cls   "failed"}
+                            {:type  :points-by-day
+                             :label "Award points"
+                             :h     33}]}}
