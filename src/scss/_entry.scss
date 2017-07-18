@@ -132,7 +132,12 @@
     display: flex;
     justify-content: space-between;
 
-    div:nth-child(1) {
+    .starred {
+      color: gold;
+      font-size: 1.7em;
+    }
+
+    time {
       font-size: 0.6em;
     }
 
@@ -192,7 +197,6 @@
 
     div:nth-child(4) {
       flex-grow: 2;
-      font-size: 0.9em;
       display: flex;
       justify-content: flex-end;
       align-items: flex-end;

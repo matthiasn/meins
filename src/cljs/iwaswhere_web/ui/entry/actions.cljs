@@ -136,22 +136,28 @@
                        (put-fn [:entry/trash @entry]))
         open-external (up/add-search ts tab-group put-fn)
         export-pdf #(put-fn [:export/pdf @entry])
+        star-entry #(put-fn [:entry/update (update-in @entry [:starred] not)])
         mouse-enter #(reset! visible true)]
     (fn entry-actions-render [ts put-fn edit-mode? toggle-edit local-cfg]
       (let [map? (:latitude @entry)
             prev-saved? (or (:last-saved @entry) (< ts 1479563777132))
-            comment? (:comment-for @entry)]
+            comment? (:comment-for @entry)
+            starred (:starred @entry)]
         [:div {:on-mouse-enter mouse-enter
-               :on-mouse-leave hide-fn
-               :style          {:opacity (if (or edit-mode? @visible) 1 0)}}
-         (when map? [:span.fa.fa-map-o.toggle {:on-click toggle-map}])
-         (when prev-saved? [edit-icon toggle-edit edit-mode? @entry])
-         (when-not comment? [:span.fa.fa-clock-o.toggle {:on-click new-pomodoro}])
-         (when-not comment?
-           [:span.fa.fa-comment-o.toggle {:on-click create-comment}])
-         (when (and (not comment?) prev-saved?)
-           [:span.fa.fa-external-link.toggle {:on-click open-external}])
-         (when-not comment? [new-link @entry put-fn create-linked-entry])
-         [add-location @entry put-fn]
-         [:span.fa.fa-file-pdf-o.toggle {:on-click export-pdf}]
-         [trash-icon trash-entry]]))))
+               :on-mouse-leave hide-fn}
+         [:div {:style {:opacity (if (or edit-mode? @visible) 1 0)}}
+          (when map? [:span.fa.fa-map-o.toggle {:on-click toggle-map}])
+          (when prev-saved? [edit-icon toggle-edit edit-mode? @entry])
+          (when-not comment? [:span.fa.fa-clock-o.toggle {:on-click new-pomodoro}])
+          (when-not comment?
+            [:span.fa.fa-comment-o.toggle {:on-click create-comment}])
+          (when (and (not comment?) prev-saved?)
+            [:span.fa.fa-external-link.toggle {:on-click open-external}])
+          (when-not comment? [new-link @entry put-fn create-linked-entry])
+          [add-location @entry put-fn]
+          [:span.fa.fa-file-pdf-o.toggle {:on-click export-pdf}]
+          [trash-icon trash-entry]]
+         [:span.fa.toggle
+          {:on-click star-entry
+           :style    {:opacity (if (or starred edit-mode? @visible) 1 0)}
+           :class    (if starred "fa-star starred" "fa-star-o")}]]))))
