@@ -6,8 +6,7 @@
 </head>
 <body style="width:100%; height:100%; margin: 0; padding: 0">
 <div>
-    <webview src="http://localhost:7777/"
-             style="height:100vh"></webview>
+    <webview src="http://localhost:7777/" style="height:100vh" preload="./preload.js"></webview>
 </div>
 </body>
 <script>
@@ -24,11 +23,6 @@
         };
         webview.addEventListener('will-navigate', handleRedirect);
         webview.addEventListener('new-window', handleRedirect);
-
-        require('electron-context-menu')({
-            window: webview,
-            showInspectElement: true
-        });
     }
 
 </script>

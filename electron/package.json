@@ -13,7 +13,7 @@
     "journal"
   ],
   "author": "Matthias Nehlsen",
-  "license": "GNU AFFERO GENERAL PUBLIC LICENSE",
+  "license": "AGPL-3.0",
   "devDependencies": {
     "electron": "^1.7.3",
     "electron-rebuild": "^1.5.11"
