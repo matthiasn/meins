@@ -314,6 +314,30 @@
                              :mn      0
                              :mx      33
                              :color   :blue}
+                            {:type    :scores-chart
+                             :h       60
+                             :k       :jss
+                             :score-k :total
+                             :label   "JSS total"
+                             :mn      36
+                             :mx      216
+                             :color   :green}
+                            {:type    :scores-chart
+                             :h       20
+                             :k       :jss
+                             :score-k :communication
+                             :label   "JSS communication"
+                             :mn      4
+                             :mx      24
+                             :color   :green}
+                            {:type    :scores-chart
+                             :h       20
+                             :k       :jss
+                             :score-k :supervision
+                             :label   "JSS supervision"
+                             :mn      4
+                             :mx      24
+                             :color   :green}
                             {:type :barchart-row
                              :tag  "#sit-ups"
                              :h    33

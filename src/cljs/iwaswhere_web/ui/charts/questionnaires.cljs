@@ -185,7 +185,8 @@
                        x (* w (/ from-beginning span))]
                    (str (+ x-offset x) ","
                         (- btm-y (* (- (score-k itm) mn) scale)))))
-        lines (filter #(zero? (mod % 10)) (range 1 rng))]
+        line-inc (if (> mx 100) 50 10)
+        lines (filter #(zero? (mod % line-inc)) (range 1 rng))]
     (fn scores-chart-render [{:keys [y k score-k start end mn mx color]}]
       [:g
        (for [n lines]
