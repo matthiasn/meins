@@ -109,14 +109,13 @@
                               current-state
                               stats-test-entries)]
         (testing "correct scores for filled forms"
-          (let [stats (sq/questionnaires new-state)]
-            (is (= {:cfq11 {}
-                    :fs    {}
-                    :fss   {}
-                    :panas {1450999000001 {:neg 10
+          (let [stats (sq/questionnaires new-state)
+                with-results (into {} (filter #(seq (second %)) stats))
+                ]
+            (is (= {:panas {1450999000001 {:neg 10
                                            :pos 10}
                             1450999000002 {:neg 29
                                            :pos 31}
                             1450999000003 {}
                             1450999000004 {:pos 31}}}
-                   stats))))))))
+                   with-results))))))))
