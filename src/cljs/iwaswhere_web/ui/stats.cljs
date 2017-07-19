@@ -22,20 +22,19 @@
        (when stats
          [:div
           (:entry-count @stats) " entries, "
-          (count (:hashtags @options)) " hashtags, "
+          (count (:hashtags @options)) " tags, "
           (count (:mentions @options)) " people, "
           (Math/floor (:hours-logged @stats)) " hours, "
           (:word-count @stats) " words, "
           (:open-tasks-cnt @stats) " open tasks, "
           (:backlog-cnt @stats) " backlog, "
-          (:completed-cnt @stats) " completed, "
+          (:completed-cnt @stats) " done, "
           (:closed-cnt @stats) " closed, "
-          (:import-cnt @stats) " tagged #import. PID: " (:pid @cfg)])
-       (when-let [ms (:query @timing)]
-         [:div
-          (str "Query with " (:count @timing)
-               " results completed in " ms ", RTT "
-               (:rtt @timing) " ms")])])))
+          (:import-cnt @stats) " #import. PID: " (:pid @cfg)
+          (when-let [ms (:query @timing)]
+            (str ". Query with " (:count @timing)
+                 " results: " ms ", RTT "
+                 (:rtt @timing) " ms"))])])))
 
 (defn stats-view
   "Renders stats component."
