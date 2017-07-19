@@ -1,5 +1,6 @@
 {:mapping    {"#PANAS"         :panas
               "#FSS"           :fss
+              "#JSS"           :jss
               "#fatigue-scale" :fs
               "#CFQ11"         :cfq11}
  :types      {:likert          {:type  :range
@@ -18,6 +19,20 @@
                                         {:value 1 :desc "No more than usual"}
                                         {:value 2 :desc "More than usual"}
                                         {:value 3 :desc "Much more than usual"}]}
+              :likert6         {:type  :range
+                                :items [{:value 1 :desc "Disagree very much"}
+                                        {:value 2 :desc "Disagree moderately"}
+                                        {:value 3 :desc "Disagree slightly"}
+                                        {:value 4 :desc "Agree slightly"}
+                                        {:value 5 :desc "Agree moderately"}
+                                        {:value 6 :desc "Agree very much"}]}
+              :likert6-neg     {:type  :range
+                                :items [{:value 6 :label 1 :desc "Disagree very much"}
+                                        {:value 5 :label 2 :desc "Disagree moderately"}
+                                        {:value 4 :label 3 :desc "Disagree slightly"}
+                                        {:value 3 :label 4 :desc "Agree slightly"}
+                                        {:value 2 :label 5 :desc "Agree moderately"}
+                                        {:value 1 :label 6 :desc "Agree very much"}]}
               :likert7         {:type  :range
                                 :items [{:value 1 :desc "Strongly disagree"}
                                         {:value 2 :desc "A Disagree"}
@@ -26,7 +41,158 @@
                                         {:value 5 :desc "Somewhat agree"}
                                         {:value 6 :desc "Agree"}
                                         {:value 7 :desc "Strongly agree"}]}}
- :items      {:panas {:header       "The Positive and Negative Affect Schedule (PANAS; Watson et al., 1988)"
+ :items      {:jss   {:header       "JOB SATISFACTION SURVEY"
+                      :desc         [:div
+                                     [:p "Please select the one number for each question that comes closest to reflecting your opinion about it."]
+                                     [:ol
+                                      [:li "Disagree very much"]
+                                      [:li "Disagree moderately"]
+                                      [:li "Disagree slightly"]
+                                      [:li "Agree slightly"]
+                                      [:li "Agree moderately"]
+                                      [:li "Agree very much"]]]
+                      :reference    "Spector, P. E. (1985). Measurement of human service staff satisfaction: Development of the job satisfaction survey. American Journal of Community Psychology, 13, 693-713."
+                      :fields       [
+                                     {:type  :likert6
+                                      :path  [1]
+                                      :label "I feel I am being paid a fair amount for the work I do."}
+                                     {:type  :likert6-neg
+                                      :path  [2]
+                                      :label "There is really too little chance for promotion on my job."}
+                                     {:type  :likert6
+                                      :path  [3]
+                                      :label "My supervisor is quite competent in doing his/her job."}
+                                     {:type  :likert6-neg
+                                      :path  [4]
+                                      :label "I am not satisfied with the benefits I receive."}
+                                     {:type  :likert6
+                                      :path  [5]
+                                      :label "When I do a good job, I receive the recognition for it that I should receive."}
+                                     {:type  :likert6-neg
+                                      :path  [6]
+                                      :label "Many of our rules and procedures make doing a good job difficult."}
+                                     {:type  :likert6
+                                      :path  [7]
+                                      :label "I like the people I work with."}
+                                     {:type  :likert6-neg
+                                      :path  [8]
+                                      :label "I sometimes feel my job is meaningless."}
+                                     {:type  :likert6
+                                      :path  [9]
+                                      :label "Communications seem good within this organization."}
+                                     {:type  :likert6-neg
+                                      :path  [10]
+                                      :label "Raises are too few and far between."}
+                                     {:type  :likert6
+                                      :path  [11]
+                                      :label "Those who do well on the job stand a fair chance of being promoted."}
+                                     {:type  :likert6-neg
+                                      :path  [12]
+                                      :label "My supervisor is unfair to me."}
+                                     {:type  :likert6
+                                      :path  [13]
+                                      :label "The benefits we receive are as good as most other organizations offer."}
+                                     {:type  :likert6-neg
+                                      :path  [14]
+                                      :label "I do not feel that the work I do is appreciated."}
+                                     {:type  :likert6
+                                      :path  [15]
+                                      :label "My efforts to do a good job are seldom blocked by red tape."}
+                                     {:type  :likert6-neg
+                                      :path  [16]
+                                      :label "I find I have to work harder at my job because of the incompetence of people I work with."}
+                                     {:type  :likert6
+                                      :path  [17]
+                                      :label "I like doing the things I do at work."}
+                                     {:type  :likert6-neg
+                                      :path  [18]
+                                      :label "The goals of this organization are not clear to me."}
+                                     {:type  :likert6-neg
+                                      :path  [19]
+                                      :label "I feel unappreciated by the organization when I think about what they pay me."}
+                                     {:type  :likert6
+                                      :path  [20]
+                                      :label "People get ahead as fast here as they do in other places."}
+                                     {:type  :likert6-neg
+                                      :path  [21]
+                                      :label "My supervisor shows too little interest in the feelings of subordinates."}
+                                     {:type  :likert6
+                                      :path  [22]
+                                      :label "The benefit package we have is equitable."}
+                                     {:type  :likert6-neg
+                                      :path  [23]
+                                      :label "There are few rewards for those who work here."}
+                                     {:type  :likert6-neg
+                                      :path  [24]
+                                      :label "I have too much to do at work."}
+                                     {:type  :likert6
+                                      :path  [25]
+                                      :label "I enjoy my coworkers."}
+                                     {:type  :likert6-neg
+                                      :path  [26]
+                                      :label "I often feel that I do not know what is going on with the organization."}
+                                     {:type  :likert6
+                                      :path  [27]
+                                      :label "I feel a sense of pride in doing my job."}
+                                     {:type  :likert6
+                                      :path  [28]
+                                      :label "I feel satisfied with my chances for salary increases."}
+                                     {:type  :likert6-neg
+                                      :path  [29]
+                                      :label "There are benefits we do not have which we should have."}
+                                     {:type  :likert6
+                                      :path  [30]
+                                      :label "I like my supervisor."}
+                                     {:type  :likert6-neg
+                                      :path  [31]
+                                      :label "I have too much paperwork."}
+                                     {:type  :likert6-neg
+                                      :path  [32]
+                                      :label "I don't feel my efforts are rewarded the way they should be."}
+                                     {:type  :likert6
+                                      :path  [33]
+                                      :label "I am satisfied with my chances for promotion. "}
+                                     {:type  :likert6-neg
+                                      :path  [34]
+                                      :label "There is too much bickering and fighting at work."}
+                                     {:type  :likert6
+                                      :path  [35]
+                                      :label "My job is enjoyable."}
+                                     {:type  :likert6-neg
+                                      :path  [36]
+                                      :label "Work assignments are not fully explained."}]
+                      :aggregations {:total           {:type  :sum
+                                                       :label "Total Score:"
+                                                       :items #{1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
+                                                                21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36}}
+                                     :pay             {:type  :sum
+                                                       :label "Pay:"
+                                                       :items #{1 10 19 28}}
+                                     :promotion       {:type  :sum
+                                                       :label "Promotion:"
+                                                       :items #{2 11 20 33}}
+                                     :supervision     {:type  :sum
+                                                       :label "Supervision:"
+                                                       :items #{3 12 21 30}}
+                                     :fringe-benefits {:type  :sum
+                                                       :label "Fringe Benefits:"
+                                                       :items #{4 13 22 29}}
+                                     :rewards         {:type  :sum
+                                                       :label "Contingent rewards:"
+                                                       :items #{5 14 23 32}}
+                                     :op-conditions   {:type  :sum
+                                                       :label "Operating conditions:"
+                                                       :items #{6 15 24 31}}
+                                     :coworkers       {:type  :sum
+                                                       :label "Coworkers:"
+                                                       :items #{7 16 25 34}}
+                                     :work-nature     {:type  :sum
+                                                       :label "Nature of work:"
+                                                       :items #{8 17 27 35}}
+                                     :communication   {:type  :sum
+                                                       :label "Communication:"
+                                                       :items #{9 18 26 36}}}}
+              :panas {:header       "The Positive and Negative Affect Schedule (PANAS; Watson et al., 1988)"
                       :desc         [:div
                                      [:p "Indicate to what extent you feel this way right now, that is, at the present moment."]
                                      [:p "1-Very Slightly or Not at All, 2-A Little, 3-Moderately, 4-Quite a Bit, 5-Extremely"]]
@@ -148,36 +314,36 @@
                              :mn      0
                              :mx      33
                              :color   :blue}
-                            {:type  :barchart-row
-                             :tag   "#sit-ups"
-                             :h     33
-                             :k     :cnt
-                             :cls   "done"}
-                            {:type  :barchart-row
-                             :tag   "#coffee"
-                             :h     33
-                             :k     :cnt
-                             :cls   "failed"}
-                            {:type  :barchart-row
-                             :tag   "#steps"
-                             :h     33
-                             :k     :cnt
-                             :cls   "done"}
-                            {:type  :barchart-row
-                             :tag   "#sleep"
-                             :h     33
-                             :k     :duration
-                             :cls   "done"}
-                            {:type  :barchart-row
-                             :tag   "#running"
-                             :h     33
-                             :k     :distance
-                             :cls   "done"}
-                            {:type  :barchart-row
-                             :tag   "#beer"
-                             :h     33
-                             :k     :vol
-                             :cls   "failed"}
+                            {:type :barchart-row
+                             :tag  "#sit-ups"
+                             :h    33
+                             :k    :cnt
+                             :cls  "done"}
+                            {:type :barchart-row
+                             :tag  "#coffee"
+                             :h    33
+                             :k    :cnt
+                             :cls  "failed"}
+                            {:type :barchart-row
+                             :tag  "#steps"
+                             :h    33
+                             :k    :cnt
+                             :cls  "done"}
+                            {:type :barchart-row
+                             :tag  "#sleep"
+                             :h    33
+                             :k    :duration
+                             :cls  "done"}
+                            {:type :barchart-row
+                             :tag  "#running"
+                             :h    33
+                             :k    :distance
+                             :cls  "done"}
+                            {:type :barchart-row
+                             :tag  "#beer"
+                             :h    33
+                             :k    :vol
+                             :cls  "failed"}
                             {:type  :points-by-day
                              :label "Award points"
                              :h     33}]}}

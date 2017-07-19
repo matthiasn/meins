@@ -142,6 +142,7 @@
                       [:span.range
                        (for [item items]
                          (let [v (:value item)
+                               item-label (or (:label item) v)
                                click (fn [_ev]
                                        (let [new-val (when-not (= value v) v)
                                              updated (assoc-in entry path new-val)]
@@ -149,7 +150,7 @@
                            ^{:key (str "q" ts k path v)}
                            [:span.opt.tooltip
                             {:on-click click
-                             :class    (when (= value v) "sel")} v
+                             :class    (when (= value v) "sel")} item-label
                             #_[:span.tooltiptext (:desc item)]]))]]))]
                 [:div.agg
                  (for [[k res] scores]
