@@ -14,6 +14,17 @@
 
 .search-row {
   display: flex;
+  background-color: white;
+
+  .fa {
+    font-size: 1.6em;
+    cursor: pointer;
+    padding: 4px;
+
+    &.starred {
+      color: gold;
+    }
+  }
 }
 
 .search-field {

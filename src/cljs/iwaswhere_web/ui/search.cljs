@@ -38,21 +38,27 @@
 (defn search-field-view
   "Renders search field for current tab."
   [query-id put-fn]
-  (let [query-cfg (subscribe [:query-cfg])]
+  (let [query-cfg (subscribe [:query-cfg])
+        query (reaction (query-id (:queries @query-cfg)))
+        local (r/atom {:starred (:starred @query)})]
     (fn [query-id put-fn]
-      (let [query (query-id (:queries @query-cfg))
-            search-send (fn [text editor-state]
-                          (let [query (query-id (:queries @query-cfg))
-                                story (first (d/entry-stories editor-state))
-                                s (merge query
+      (let [search-send (fn [text editor-state]
+                          (let [story (first (d/entry-stories editor-state))
+                                s (merge @query
                                          (p/parse-search text)
                                          {:story        story
                                           :editor-state editor-state})]
-                            (put-fn [:search/update s])))]
+                            (put-fn [:search/update s])))
+            query @query
+            starred (:starred query)
+            star-fn #(put-fn [:search/update (update-in query [:starred] not)])]
         (when (and (not (:briefing query))
                    (not (:story query)))
           [:div.search
            [tags-view query]
            ^{:key query-id}
            [:div.search-row
-            [d/draft-search-field (editor-state query) search-send]]])))))
+            [d/draft-search-field (editor-state query) search-send]
+            [:div [:span.fa
+                   {:class    (if starred "fa-star starred" "fa-star-o")
+                    :on-click star-fn}]]]])))))

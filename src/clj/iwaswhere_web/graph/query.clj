@@ -67,7 +67,7 @@
                          (or (= story (:primary-story entry))
                              (= story (:timestamp entry)))
                          true)
-
+          starred-match? (if (:starred q) (:starred entry) true)
           opts (:opts q)
           opts-match?
           (cond
@@ -132,6 +132,7 @@
                       (or q-cc-match? (empty? q-country))
                       (or q-ts-match? (empty? q-timestamp))
                       story-match?
+                      starred-match?
                       opts-match?)]
       match?)))
 
@@ -242,6 +243,10 @@
                       ; set with timestamps matching the day
                       (:date-string query)
                       (get-nodes-for-day g query)
+
+                      ; set with starred entries
+                      (:starred query)
+                      (get-connected-nodes g :starred)
 
                       ; set with timestamps matching the day
                       (:briefing query)

@@ -264,6 +264,15 @@
         (uc/add-edges [:sagas (:timestamp entry)]))
     graph))
 
+(defn add-starred
+  "When entry is starred, add edge to starred entries. Otherwise do nothing."
+  [graph entry]
+  (if (:starred entry)
+    (-> graph
+        (uc/add-nodes :starred)
+        (uc/add-edges [:starred (:timestamp entry)]))
+    graph))
+
 (defn add-done
   "When entry is a task that's done, add edge to :done node for faster lookup."
   [graph entry]
@@ -330,6 +339,7 @@
           (update-in [:graph] add-parent-ref new-entry)
           (update-in [:graph] add-story new-entry)
           (update-in [:graph] add-saga new-entry)
+          (update-in [:graph] add-starred new-entry)
           (update-in [:graph] add-done new-entry)
           (update-in [:graph] add-location new-entry)
           (update-in [:graph] add-briefing new-entry)
