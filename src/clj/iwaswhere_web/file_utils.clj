@@ -10,10 +10,7 @@
             [clojure.tools.logging :as l]
             [clojure.pprint :as pp]))
 
-(def data-path (or (System/getenv "DATA_PATH")
-                   (let [path (str (System/getenv "HOME") "/iWasWhere/data")]
-                     (when (fs/exists? path) path))
-                   "data"))
+(def data-path (or (System/getenv "DATA_PATH") "data"))
 (def daily-logs-path (str data-path "/daily-logs/"))
 (def clucy-path (str data-path "/clucy/"))
 (def export-path (str data-path "/export/"))
