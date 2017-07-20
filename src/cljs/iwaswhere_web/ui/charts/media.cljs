@@ -1,6 +1,7 @@
 (ns iwaswhere-web.ui.charts.media
   (:require [reagent.core :as rc]
             [re-frame.core :refer [subscribe]]
+            [reagent.ratom :refer-macros [reaction]]
             [iwaswhere-web.ui.charts.common :as cc]
             [iwaswhere-web.helpers :as h]))
 
@@ -42,11 +43,13 @@
 
 (defn media-chart
   "Draws chart for daily media creation (photos, videos, audio)."
-  [stats chart-h put-fn]
+  [chart-h put-fn]
   (let [local (rc/atom {})
+        chart-data (subscribe [:chart-data])
+        stats (reaction (:media-stats @chart-data))
         last-update (subscribe [:last-update])]
-    (fn [stats chart-h put-fn]
-      (let [indexed (map-indexed (fn [idx [k v]] [idx v]) stats)
+    (fn [chart-h put-fn]
+      (let [indexed (map-indexed (fn [idx [k v]] [idx v]) @stats)
             stacked-bars (stacked-bars-fn indexed local put-fn)]
         (h/keep-updated :stats/media 60 local @last-update put-fn)
         [:div

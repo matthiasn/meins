@@ -39,13 +39,9 @@
 (defn stats-view
   "Renders stats component."
   [put-fn]
-  (let [chart-data (subscribe [:chart-data])]
-    (fn stats-view-render [put-fn]
-      (let [{:keys [pomodoro-stats task-stats
-                    wordcount-stats media-stats]} @chart-data]
-        [:div.stats
-         [:div.charts
-          [cd/durations-bar-chart pomodoro-stats 200 5 put-fn]
-          [ct/tasks-chart task-stats 250 put-fn]
-          [wc/wordcount-chart wordcount-stats 150 put-fn 1000]
-          [m/media-chart media-stats 150 put-fn]]]))))
+  [:div.stats
+   [:div.charts
+    [cd/durations-bar-chart 200 5 put-fn]
+    [ct/tasks-chart 250 put-fn]
+    [wc/wordcount-chart 150 put-fn 1000]
+    [m/media-chart 150 put-fn]]])

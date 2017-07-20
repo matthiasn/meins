@@ -1,6 +1,7 @@
 (ns iwaswhere-web.ui.charts.tasks
   (:require [reagent.core :as rc]
             [re-frame.core :refer [subscribe]]
+            [reagent.ratom :refer-macros [reaction]]
             [iwaswhere-web.ui.charts.common :as cc]
             [iwaswhere-web.helpers :as h]))
 
@@ -11,11 +12,14 @@
    depending on the maximum count found in the data.
    On mouse-over on any of the bars, the date and the values for the date are
    shown in an info div next to the bars."
-  [task-stats chart-h put-fn]
+  [chart-h put-fn]
   (let [local (rc/atom {})
+        chart-data (subscribe [:chart-data])
+        stats (reaction (:task-stats @chart-data))
         last-update (subscribe [:last-update])]
-    (fn [task-stats chart-h put-fn]
-      (let [indexed (map-indexed (fn [idx [_k v]] [idx v]) task-stats)
+    (fn [chart-h put-fn]
+      (let [task-stats (:task-stats @chart-data)
+            indexed (map-indexed (fn [idx [_k v]] [idx v]) task-stats)
             max-cnt (apply max (map (fn [[_idx v]]
                                       (max (:tasks-cnt v) (:done-cnt v)))
                                     indexed))]

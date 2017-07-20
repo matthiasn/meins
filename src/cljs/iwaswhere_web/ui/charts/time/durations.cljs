@@ -1,6 +1,7 @@
 (ns iwaswhere-web.ui.charts.time.durations
   (:require [reagent.core :as rc]
             [iwaswhere-web.ui.charts.common :as cc]
+            [reagent.ratom :refer-macros [reaction]]
             [iwaswhere-web.ui.charts.time.twenty-four-hour :as tfh]
             [iwaswhere-web.utils.misc :as u]
             [re-frame.core :refer [subscribe]]
@@ -161,16 +162,19 @@
                   [:td.time (u/duration-string v)]]))]]])))))
 
 (defn durations-bar-chart
-  [stats chart-h y-scale put-fn]
+  [chart-h y-scale put-fn]
   (let [local (rc/atom {})
+        chart-data (subscribe [:chart-data])
+        stats (reaction (:pomodoro-stats @chart-data))
         last-update (subscribe [:last-update])
         cfg (subscribe [:cfg])
         show-pvt? (reaction (:show-pvt @cfg))
         idx-fn (fn [idx [k v]] [idx v])
         sagas (subscribe [:sagas])
         chart-data (subscribe [:chart-data])]
-    (fn [stats chart-h y-scale put-fn]
+    (fn [chart-h y-scale put-fn]
       (let [sagas @sagas
+            stats @stats
             indexed (map-indexed idx-fn stats)
             indexed-45 (map-indexed idx-fn (take-last 45 stats))
             day-stats (or (:mouse-over @local) (second (last stats)))
