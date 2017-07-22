@@ -88,6 +88,22 @@
                              rng)]
     indexed))
 
+(defn indexed-days2
+  [stats k start days]
+  (let [d (* 24 60 60 1000)
+        rng (range (inc days))
+        indexed (map-indexed (fn [n v]
+                               (let [offset (* n d)
+                                     ts (+ start offset)
+                                     ymd (df ts ymd)
+                                     v (get-in stats [ymd k] 0)
+                                     weekday (df ts weekday)]
+                                 [n {:ymd     ymd
+                                     :v       v
+                                     :weekday weekday}]))
+                             rng)]
+    indexed))
+
 (defn barchart-row
   [{:keys [days span start stats tag k h y cls]}]
   (let [btm-y (+ y h)
@@ -114,6 +130,36 @@
                          (h/m-to-hh-mm v)
                          v)]
          ^{:key (str tag n)}
+         [rect display-v x btm-y h cls n]))
+     [line (+ y h) "#000" 2]]))
+
+(defn chart-data-row
+  [{:keys [days span start chart-data data-k label k h y cls]}]
+  (let [btm-y (+ y h)
+        stats (data-k chart-data)
+        indexed (indexed-days2 stats k start days)
+        mx (apply max (map #(:v (second %)) indexed))
+        scale (if (pos? mx) (/ (- h 3) mx) 1)]
+    [:g
+     [:text {:x           180
+             :y           (+ y (+ 5 (/ h 2)))
+             :font-size   12
+             :fill        "#777"
+             :font-weight :bold
+             :text-anchor "end"}
+      label]
+     (for [[n {:keys [ymd v weekday]}] indexed]
+       (let [d (* 24 60 60 1000)
+             offset (* n d)
+             scaled (* 900 (/ offset span))
+             scaled (* n 29)
+             x (+ 203 scaled)
+             h (* v scale)
+             weekend? (get #{"Sat" "Sun"} weekday)
+             display-v (if (= :duration k)
+                         (h/m-to-hh-mm v)
+                         v)]
+         ^{:key (str label n)}
          [rect display-v x btm-y h cls n]))
      [line (+ y h) "#000" 2]]))
 
@@ -221,14 +267,15 @@
   "Simple view for questionnaire scores."
   [put-fn]
   (let [custom-field-stats (subscribe [:custom-field-stats])
+        chart-data (subscribe [:chart-data])
         current-page (subscribe [:current-page])
         last-update (subscribe [:last-update])
         options (subscribe [:options])
         questionnaires (reaction (:questionnaires @options))
-        local (r/atom {:n 30})
-        toggle (fn [_] (swap! local assoc-in [:n] (if (= 7 (:n @local)) 30 7)))]
+        local (r/atom {:n 30})]
     (fn dashboard-render [put-fn]
       (h/keep-updated :stats/custom-fields 31 local @last-update put-fn)
+      (h/keep-updated :stats/wordcount 31 local @last-update put-fn)
       (let [days (:n @local)
             dashboard-id (keyword (:id @current-page))
             now (st/now)
@@ -239,15 +286,14 @@
             span (- end start)
             custom-field-stats @custom-field-stats
             common {:start start :end end :w 900 :x-offset 200
-                    :span  span :days days :stats custom-field-stats}
+                    :span  span :days days :stats custom-field-stats
+                    :chart-data @chart-data}
             charts-cfg (get-in @questionnaires [:dashboards dashboard-id])
             positioned-charts (charts-y-pos charts-cfg)
             end-y (+ (:last-y positioned-charts) (:last-h positioned-charts))]
         [:div.questionnaires
          [:svg {:viewBox "0 0 1200 800"
-                :style   {:background :white}
-                ;:on-click toggle
-                }
+                :style   {:background :white}}
           [:filter#blur1
            [:feGaussianBlur {:stdDeviation 3}]]
           [:g
@@ -261,6 +307,7 @@
             (let [chart-fn (case (:type chart-cfg)
                              :scores-chart scores-chart
                              :barchart-row barchart-row
+                             :chart-data-row chart-data-row
                              :points-by-day points-by-day-chart)]
               ^{:key (str (:label chart-cfg) (:tag chart-cfg))}
               [chart-fn (merge common chart-cfg)]))

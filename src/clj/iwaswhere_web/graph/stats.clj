@@ -44,7 +44,8 @@
           day-nodes-attrs (map #(uber/attrs g %) day-nodes)
           counts (map (fn [entry] (u/count-words entry)) day-nodes-attrs)
           day-stats {:date-string date-string
-                     :word-count  (apply + counts)}]
+                     :word-count  (apply + counts)
+                     :entry-count (count day-nodes)}]
       [date-string day-stats])))
 
 (defn media-mapper

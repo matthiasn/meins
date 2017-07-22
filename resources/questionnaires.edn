@@ -338,6 +338,18 @@
                              :mn      0
                              :mx      24
                              :color   :green}
+                            {:type      :chart-data-row
+                             :data-k    :wordcount-stats
+                             :h         33
+                             :label     "Words"
+                             :k         :word-count
+                             :cls       "done"}
+                            {:type      :chart-data-row
+                             :data-k    :wordcount-stats
+                             :h         33
+                             :label     "Entries"
+                             :k         :entry-count
+                             :cls       "done"}
                             {:type :barchart-row
                              :tag  "#sit-ups"
                              :h    33
