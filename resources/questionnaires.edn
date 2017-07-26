@@ -242,7 +242,7 @@
                       :aggregations {:fss {:type  :sum
                                            :label "Total Score:"
                                            :items #{1 2 3 4 5 6 7 8 9}}}}
-              :fs    {:header       "14-item Childer Fatigue Scale"
+              :fs    {:header       "14-item Chalder Fatigue Scale"
                       :desc         [:div
                                      [:p "0-Better than usual, 1-No worse than usual, 2-Worse than usual, 3-Much worse than usual"]]
                       :reference    "Chalder T, Berelowitz G, Pawlikowska T, Watts L, Wessely S, Wright D, et al. Development of a Fatigue Scale. J Psychosomatic Res 1993;37:147–53."

@@ -39,7 +39,7 @@
   "Renders search field for current tab."
   [query-id put-fn]
   (let [query-cfg (subscribe [:query-cfg])
-        query (reaction (query-id (:queries @query-cfg)))
+        query (reaction (when-let [qid @query-id] (qid (:queries @query-cfg))))
         local (r/atom {:starred (:starred @query)})]
     (fn [query-id put-fn]
       (let [search-send (fn [text editor-state]
@@ -56,7 +56,6 @@
                    (not (:story query)))
           [:div.search
            [tags-view query]
-           ^{:key query-id}
            [:div.search-row
             [d/draft-search-field (editor-state query) search-send]
             [:div [:span.fa

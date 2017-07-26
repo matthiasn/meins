@@ -274,7 +274,7 @@
                       (get-tags-mentions-matches g query)
 
                       ; set with all timestamps
-                      :else (:sorted-entries state))
+                      :else (take (+ n 100) (:sorted-entries state)))
         matched-entries (map mapper-fn (sort-fn matched-ids))
         parent-ids (filter identity (map :comment-for matched-entries))
         parents (map mapper-fn parent-ids)]

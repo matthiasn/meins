@@ -16,11 +16,14 @@
     onload = () => {
         const webview = document.querySelector('webview');
 
-        const handleRedirect = (e) => {
+        const handleRedirect = (e, callback) => {
             let url = e.url;
             if (!url.includes("localhost:7777")) {
                 require('electron').shell.openExternal(url);
                 e.preventDefault();
+                e.stopPropagation();
+                callback({ cancel: true });
+                return false;
             }
         };
         webview.addEventListener('will-navigate', handleRedirect);

@@ -15,12 +15,12 @@
   "author": "Matthias Nehlsen",
   "license": "AGPL-3.0",
   "devDependencies": {
-    "electron": "^1.7.3",
+    "electron": "^1.7.5",
     "electron-rebuild": "^1.5.11"
   },
   "dependencies": {
     "electron-context-menu": "^0.9.1",
     "electron-fetch": "^1.0.0",
-    "electron-spellchecker": "^1.1.0"
+    "electron-spellchecker": "^1.2.0"
   }
 }
