@@ -2,6 +2,7 @@
               "#FSS"           :fss
               "#JSS"           :jss
               "#fatigue-scale" :fs
+              "#GSE"           :gse
               "#CFQ11"         :cfq11}
  :types      {:likert          {:type  :range
                                 :items [{:value 1 :desc "Very Slightly or Not at All"}
@@ -19,6 +20,11 @@
                                         {:value 1 :desc "No more than usual"}
                                         {:value 2 :desc "More than usual"}
                                         {:value 3 :desc "Much more than usual"}]}
+              :likert4-gse     {:type  :range
+                                :items [{:value 1 :desc "Not at all true"}
+                                        {:value 2 :desc "Hardly true"}
+                                        {:value 3 :desc "Moderately true"}
+                                        {:value 4 :desc "Exactly true"}]}
               :likert6         {:type  :range
                                 :items [{:value 1 :desc "Disagree very much"}
                                         {:value 2 :desc "Disagree moderately"}
@@ -271,6 +277,44 @@
                                      :mental   {:type  :sum
                                                 :label "Mental Score:"
                                                 :items #{9 10 11 12 13 14}}}}
+              :gse   {:header       "The General Self-Efficacy Scale (GSE)"
+                      :desc         [:div
+                                     [:p "The construct of Perceived Self-Efficacy reflects an optimistic self-belief (Schwarzer, 1992). This is the belief that one can perform a novel or difficult tasks, or cope with adversity -- in various domains of human functioning.  Perceived self-efficacy facilitates goal-setting, effort investment,  persistence in face of barriers and recovery from setbacks. It can be regarded as a positive resistance resource factor. Ten items are designed to tap this construct. Each item refers to successful coping and implies an internal-stable attribution of success. Perceived self-efficacy is an operative construct, i.e., it is related to subsequent behavior and, therefore, is relevant for clinical practice and behavior change."]
+                                     [:p "1 = Not at all true   2 = Hardly true   3 = Moderately true   4 = Exactly true"]]
+                      :reference    "Schwarzer, R., & Jerusalem, M. (1995). Generalized Self-Efficacy scale. In J. Weinman, S. Wright, & M. Johnston, Measures in health psychology: A user’s portfolio. Causal and control beliefs (pp. 35-37). Windsor, UK: NFER-NELSON."
+                      :fields       [{:type  :likert4-gse
+                                      :path  [1]
+                                      :label "I can always manage to solve difficult problems if I try hard enough."}
+                                     {:type  :likert4-gse
+                                      :path  [2]
+                                      :label "If someone opposes me, I can find the means and ways to get what I want."}
+                                     {:type  :likert4-gse
+                                      :path  [3]
+                                      :label "It is easy for me to stick to my aims and accomplish my goals."}
+                                     {:type  :likert4-gse
+                                      :path  [4]
+                                      :label "I am confident that I could deal efficiently with unexpected events."}
+                                     {:type  :likert4-gse
+                                      :path  [5]
+                                      :label "Thanks to my resourcefulness, I know how to handle unforeseen situations."}
+                                     {:type  :likert4-gse
+                                      :path  [6]
+                                      :label "I can solve most problems if I invest the necessary effort."}
+                                     {:type  :likert4-gse
+                                      :path  [7]
+                                      :label "I can remain calm when facing difficulties because I can rely on my coping abilities."}
+                                     {:type  :likert4-gse
+                                      :path  [8]
+                                      :label "When I am confronted with a problem, I can usually find several solutions."}
+                                     {:type  :likert4-gse
+                                      :path  [9]
+                                      :label "If I am in trouble, I can usually think of a solution."}
+                                     {:type  :likert4-gse
+                                      :path  [10]
+                                      :label "I can usually handle whatever comes my way."}]
+                      :aggregations {:total {:type  :sum
+                                             :label "Total Score:"
+                                             :items #{1 2 3 4 5 6 7 8 9 10}}}}
               :cfq11 {:header       "Chalder Fatigue Scale (CFQ 11)"
                       :desc         [:div
                                      [:p "We would like to know more about any problems you have had with feeling tired, weak or lacking in energy in the last month. Please answer ALL the questions by ticking the answer which applies to you most closely. If you have been feeling tired for a long while, then compare yourself to how you felt when you were last well. Please tick only one box per line."]
@@ -315,6 +359,14 @@
                              :mx      33
                              :color   :blue}
                             {:type    :scores-chart
+                             :h       40
+                             :k       :gse
+                             :score-k :total
+                             :label   "GSE"
+                             :mn      10
+                             :mx      40
+                             :color   :blue}
+                            {:type    :scores-chart
                              :h       54
                              :k       :jss
                              :score-k :total
@@ -338,18 +390,18 @@
                              :mn      0
                              :mx      24
                              :color   :green}
-                            {:type      :chart-data-row
-                             :data-k    :wordcount-stats
-                             :h         33
-                             :label     "Words"
-                             :k         :word-count
-                             :cls       "done"}
-                            {:type      :chart-data-row
-                             :data-k    :wordcount-stats
-                             :h         33
-                             :label     "Entries"
-                             :k         :entry-count
-                             :cls       "done"}
+                            {:type   :chart-data-row
+                             :data-k :wordcount-stats
+                             :h      33
+                             :label  "Words"
+                             :k      :word-count
+                             :cls    "done"}
+                            {:type   :chart-data-row
+                             :data-k :wordcount-stats
+                             :h      33
+                             :label  "Entries"
+                             :k      :entry-count
+                             :cls    "done"}
                             {:type :barchart-row
                              :tag  "#sit-ups"
                              :h    33
