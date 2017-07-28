@@ -155,5 +155,5 @@
                 [:div.agg
                  (for [[k res] scores]
                    ^{:key k}
-                   [:span [:span (:label res)] [:span.res (:score res)]])]
+                   [:div [:span (:label res)] [:span.res (:score res)]])]
                 [:cite (:reference conf)]]))])))))
