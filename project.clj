@@ -4,7 +4,7 @@
   :license {:name "GNU AFFERO GENERAL PUBLIC LICENSE"
             :url  "https://www.gnu.org/licenses/agpl-3.0.en.html"}
   :dependencies [[org.clojure/clojure "1.9.0-alpha17"]
-                 [org.clojure/clojurescript "1.9.671"]
+                 [org.clojure/clojurescript "1.9.854"]
                  [org.clojure/tools.logging "0.4.0"]
                  [ch.qos.logback/logback-classic "1.2.3"]
                  [hiccup "1.0.5"]
@@ -14,7 +14,7 @@
                  [enlive "1.1.6"]
                  [me.raynes/fs "1.4.6"]
                  [markdown-clj "0.9.99"]
-                 [clj-pdf "2.2.28"]
+                 [clj-pdf "2.2.29"]
                  [cheshire "5.7.1"]
                  [cljsjs/moment "2.17.1-1"]
                  [com.drewnoakes/metadata-extractor "2.10.1"]
@@ -31,7 +31,7 @@
                  [clucy "0.4.0"]
                  [seesaw "1.4.5"]
                  [clj.qrgen "0.4.0"]
-                 [image-resizer "0.1.9"]
+                 [image-resizer "0.1.10"]
                  [danlentz/clj-uuid "0.1.7"]
                  [org.webjars.bower/fontawesome "4.7.0"]
                  [org.webjars.npm/randomcolor "0.4.4"]
@@ -52,7 +52,7 @@
   :profiles {:uberjar {:aot :all}
              :dev     {:dependencies [[re-frisk "0.4.5"]]}}
 
-  :plugins [[lein-cljsbuild "1.1.6"
+  :plugins [[lein-cljsbuild "1.1.7"
              :exclusions [org.apache.commons/commons-compress]]
             [lein-figwheel "0.5.11"]
             [lein-sassy "1.0.8"
