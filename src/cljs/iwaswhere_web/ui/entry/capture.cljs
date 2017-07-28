@@ -123,7 +123,8 @@
           [:div
            (for [[k conf] entry-questionnaires]
              (let [q-path [:questionnaires k]
-                   scores (q/scores entry q-path conf)]
+                   scores (q/scores entry q-path conf)
+                   reference (:reference conf)]
                ^{:key (str "cf" ts k)}
                [:form.questionnaire
                 [:h3 (:header conf)]
@@ -156,4 +157,6 @@
                  (for [[k res] scores]
                    ^{:key k}
                    [:div [:span (:label res)] [:span.res (:score res)]])]
-                [:cite (:reference conf)]]))])))))
+                (if (string? reference)
+                  [:cite reference]
+                  reference)]))])))))
