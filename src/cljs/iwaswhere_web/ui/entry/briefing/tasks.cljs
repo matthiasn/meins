@@ -163,29 +163,30 @@
          [filter-btn :done]
          [filter-btn :closed]
          [filter-btn :backlog]
-         [:table.tasks
-          [:tbody
-           [:tr
-            [:th ""]
-            [:th [:span.fa.fa-diamond]]
-            [:th [:span.fa.fa-clock-o]]
-            [:th [:strong "tasks"]]]
-           (for [task linked-tasks]
-             (let [ts (:timestamp task)
-                   on-drag-start (a/drag-start-fn task put-fn)
-                   text (eu/first-line task)]
-               ^{:key ts}
-               [:tr {:on-click (up/add-search ts tab-group put-fn)}
-                (let [prio (or (-> task :task :priority) "-")]
-                  [:td
-                   [:span.prio {:class         prio
-                                :draggable     true
-                                :on-drag-start on-drag-start}
-                    prio]])
-                [:td.award-points
-                 (when-let [points (-> task :task :points)]
-                   points)]
-                [:td.estimate
-                 (when-let [estimate (-> task :task :estimate-m)]
-                   (m-to-hhmm estimate))]
-                [:td.left [:strong text]]]))]]]))))
+         (when (seq linked-entries)
+           [:table.tasks
+            [:tbody
+             [:tr
+              [:th ""]
+              [:th [:span.fa.fa-diamond]]
+              [:th [:span.fa.fa-clock-o]]
+              [:th [:strong "tasks"]]]
+             (for [task linked-tasks]
+               (let [ts (:timestamp task)
+                     on-drag-start (a/drag-start-fn task put-fn)
+                     text (eu/first-line task)]
+                 ^{:key ts}
+                 [:tr {:on-click (up/add-search ts tab-group put-fn)}
+                  (let [prio (or (-> task :task :priority) "-")]
+                    [:td
+                     [:span.prio {:class         prio
+                                  :draggable     true
+                                  :on-drag-start on-drag-start}
+                      prio]])
+                  [:td.award-points
+                   (when-let [points (-> task :task :points)]
+                     points)]
+                  [:td.estimate
+                   (when-let [estimate (-> task :task :estimate-m)]
+                     (m-to-hhmm estimate))]
+                  [:td.left [:strong text]]]))]])]))))

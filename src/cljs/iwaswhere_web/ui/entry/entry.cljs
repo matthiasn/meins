@@ -158,7 +158,8 @@
                                     comments
                                     (filter pvt-filter comments))]
                      (map :timestamp comments)))
-        thumbnails? (reaction (:thumbnails @cfg))
+        thumbnails? (reaction (and (not (contains? (:tags @entry) "#briefing"))
+                                   (:thumbnails @cfg)))
         show-comments-for? (reaction (get-in @cfg [:show-comments-for ts]))
         query-id (:query-id local-cfg)
         toggle-comments #(put-fn [:cmd/assoc-in

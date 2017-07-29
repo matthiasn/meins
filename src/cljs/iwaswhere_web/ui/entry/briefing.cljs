@@ -126,18 +126,11 @@
          [:form.briefing-details
           [:fieldset
            [:legend (or day "date not set")]
-           (when edit-mode?
-             [:div
-              [:label " Day: "]
-              [:input {:type     :date
-                       :on-input (input-fn entry)
-                       :value    day}]])
-           (when true
-             [:div
-              "Tasks: " [:strong tasks-cnt] " created, "
-              [:strong done-cnt] " done, "
-              [:strong closed-cnt] " closed. "
-              [:strong (or (:word-count word-stats) 0)] " words written."])
+           [:div
+            "Tasks: " [:strong tasks-cnt] " created, "
+            [:strong done-cnt] " done, "
+            [:strong closed-cnt] " closed. "
+            [:strong (or (:word-count word-stats) 0)] " words written."]
            [planned-actual entry]
            [:div
             "Total planned: "
@@ -151,6 +144,4 @@
            [:div
             [tasks/started-tasks local local-cfg put-fn]
             [tasks/open-linked-tasks ts local local-cfg put-fn]
-            [habits/waiting-habits entry local local-cfg put-fn]
-            (when day-stats
-              [time/time-by-stories day-stats local put-fn])]]]]))))
+            [habits/waiting-habits entry local local-cfg put-fn]]]]]))))

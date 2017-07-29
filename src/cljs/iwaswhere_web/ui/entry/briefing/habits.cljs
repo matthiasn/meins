@@ -55,7 +55,7 @@
               [:th [:span.fa.fa-diamond]]
               [:th [:span.fa.fa-diamond.penalty]]
               [:th "waiting habit"]]
-             (for [entry entries-list]
+             (for [entry (take 15 entries-list)]
                (let [ts (:timestamp entry)
                      text (eu/first-line entry)]
                  ^{:key ts}

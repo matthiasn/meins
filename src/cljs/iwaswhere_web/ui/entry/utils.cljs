@@ -26,6 +26,7 @@
             (text)
             (s/replace "#task" "")
             (s/replace "#habit" "")
+            (s/replace "#pvt" "")
             (s/replace "#" "")
             (s/replace "@" "")
             s/trim
