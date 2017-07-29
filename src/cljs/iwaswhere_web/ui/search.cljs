@@ -52,8 +52,7 @@
             query @query
             starred (:starred query)
             star-fn #(put-fn [:search/update (update-in query [:starred] not)])]
-        (when (and (not (:briefing query))
-                   (not (:story query)))
+        (when-not (:briefing query)
           [:div.search
            [tags-view query]
            [:div.search-row
