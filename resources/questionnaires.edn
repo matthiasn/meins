@@ -794,4 +794,7 @@
                              :cls  "failed"}
                             {:type  :points-by-day
                              :label "Award points"
+                             :h     33}
+                            {:type  :points-lost-by-day
+                             :label "Award points lost"
                              :h     33}]}}

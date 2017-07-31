@@ -104,6 +104,16 @@
                              rng)]
     indexed))
 
+(defn row-label
+  [label y h]
+  [:text {:x           180
+          :y           (+ y (+ 5 (/ h 2)))
+          :font-size   12
+          :fill        "#777"
+          :font-weight :bold
+          :text-anchor "end"}
+   label])
+
 (defn barchart-row
   [{:keys [days span start stats tag k h y cls]}]
   (let [btm-y (+ y h)
@@ -111,13 +121,7 @@
         mx (apply max (map #(:v (second %)) indexed))
         scale (if (pos? mx) (/ (- h 3) mx) 1)]
     [:g
-     [:text {:x           180
-             :y           (+ y (+ 5 (/ h 2)))
-             :font-size   12
-             :fill        "#777"
-             :font-weight :bold
-             :text-anchor "end"}
-      tag]
+     [row-label tag y h]
      (for [[n {:keys [ymd v weekday]}] indexed]
        (let [d (* 24 60 60 1000)
              offset (* n d)
@@ -141,13 +145,7 @@
         mx (apply max (map #(:v (second %)) indexed))
         scale (if (pos? mx) (/ (- h 3) mx) 1)]
     [:g
-     [:text {:x           180
-             :y           (+ y (+ 5 (/ h 2)))
-             :font-size   12
-             :fill        "#777"
-             :font-weight :bold
-             :text-anchor "end"}
-      label]
+     [row-label label y h]
      (for [[n {:keys [ymd v weekday]}] indexed]
        (let [d (* 24 60 60 1000)
              offset (* n d)
@@ -162,7 +160,6 @@
          ^{:key (str label n)}
          [rect display-v x btm-y h cls n]))
      [line (+ y h) "#000" 2]]))
-
 
 (defn points-by-day-chart
   "Renders bars."
@@ -200,13 +197,34 @@
                        :width  23
                        :height h}])))
          [line (+ y h) "#000" 2]
-         [:text {:x           180
-                 :y           (+ y (+ 5 (/ h 2)))
-                 :font-size   12
-                 :fill        "#777"
-                 :font-weight :bold
-                 :text-anchor "end"}
-          label]]))))
+         [row-label label y h]]))))
+
+(defn points-lost-by-day-chart
+  "Renders bars."
+  [{:keys [y h label]}]
+  (let [stats (subscribe [:stats])
+        btm-y (+ y h)]
+    (fn points-by-day-render [{:keys [y h label]}]
+      (let [award-points (:award-points @stats)
+            by-day (sort-by first (:by-day-skipped award-points))
+            daily-totals (map (fn [[d v]] (:habit v)) by-day)
+            max-val (apply max daily-totals)
+            indexed (map-indexed (fn [idx [day v]] [idx [day v]])
+                                 (take-last 31 by-day))]
+        [:g
+         (for [[idx [day v]] indexed]
+           (let [v (:habit v)
+                 y-scale (/ h (or max-val 1))
+                 h (if (pos? v) (* y-scale v) 0)]
+             (when (pos? max-val)
+               ^{:key (str day idx)}
+               [:rect {:x      (+ 203 (* 29 idx))
+                       :y      (- btm-y h)
+                       :fill   "#f3b3b3"
+                       :width  23
+                       :height h}])))
+         [line (+ y h) "#000" 2]
+         [row-label label y h]]))))
 
 (defn scores-fn
   [stats k]
@@ -242,13 +260,7 @@
        [line y "#000" 2]
        [line (+ y h) "#000" 2]
        [:rect {:fill :white :x 0 :y y :height (+ h 5) :width 200}]
-       [:text {:x           180
-               :y           (+ y (+ 5 (/ h 2)))
-               :font-size   12
-               :fill        "#777"
-               :font-weight :bold
-               :text-anchor "end"}
-        label]])))
+       [row-label label y h]])))
 
 (defn charts-y-pos
   [cfg]
@@ -292,7 +304,7 @@
             positioned-charts (charts-y-pos charts-cfg)
             end-y (+ (:last-y positioned-charts) (:last-h positioned-charts))]
         [:div.questionnaires
-         [:svg {:viewBox "0 0 1200 800"
+         [:svg {:viewBox "0 0 1200 1600"
                 :style   {:background :white}}
           [:filter#blur1
            [:feGaussianBlur {:stdDeviation 3}]]
@@ -308,7 +320,8 @@
                              :scores-chart scores-chart
                              :barchart-row barchart-row
                              :chart-data-row chart-data-row
-                             :points-by-day points-by-day-chart)]
+                             :points-by-day points-by-day-chart
+                             :points-lost-by-day points-lost-by-day-chart)]
               ^{:key (str (:label chart-cfg) (:tag chart-cfg))}
               [chart-fn (merge common chart-cfg)]))
           (for [n (range (inc days))]

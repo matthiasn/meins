@@ -38,7 +38,6 @@
           (for [q queries]
             (let [query (get-in query-config [:queries q])
                   search-text (s/trim (str (:search-text query)))
-                  ;search-text (if (empty? search-text) "empty" search-text)
                   search-text (cond
                                 (empty? search-text) "empty"
                                 (:timestamp query) (fmt-ts query)

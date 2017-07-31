@@ -1,10 +1,9 @@
 (ns iwaswhere-web.graph.stats.awards
   "Get stats from graph."
   (:require [ubergraph.core :as uber]
+            [iwaswhere-web.datetime :as dt]
             [iwaswhere-web.graph.query :as gq]
-            [clj-time.core :as t]
             [iwaswhere-web.utils.misc :as u]
-            [clj-time.format :as ctf]
             [matthiasn.systems-toolbox.log :as l]
             [clojure.tools.logging :as log]
             [ubergraph.core :as uc]
@@ -16,14 +15,27 @@
   (let [done-entries (filter #(and (-> % k :done) (-> % k :points)) entries)
         skipped-entries (filter #(and (-> % k :skipped) (-> % k :points)) entries)
         by-day-fn (fn [acc entry]
-                    (let [entitity (k entry)
-                          completion (:completion-ts entitity)
-                          points (:points entitity)]
-                      (if (and (pos? points) (seq completion) (:done entitity))
-                        (let [completion-day (subs completion 0 10)]
-                          (update-in acc [:by-day completion-day k] #(+ (or % 0) points)))
+                    (let [entity (k entry)
+                          completion (:completion-ts entity)
+                          points (:points entity)]
+                      (if (and (pos? points) (seq completion) (:done entity))
+                        (let [completion-day (subs completion 0 10)
+                              path [:by-day completion-day k]]
+                          (update-in acc path #(+ (or % 0) points)))
                         acc)))
+        skipped-by-day-fn
+        (fn [acc entry]
+          (let [entity (k entry)
+                next-ts (:next-entry entity)
+                skipped-at (dt/fmt-from-long next-ts)
+                points (:points entity)]
+            (if (and (pos? points) (seq skipped-at))
+              (let [skipped-day (subs skipped-at 0 10)
+                    path [:by-day-skipped skipped-day k]]
+                (update-in acc path #(+ (or % 0) points)))
+              acc)))
         by-day (reduce by-day-fn initial done-entries)
+        by-day-skipped (reduce skipped-by-day-fn by-day skipped-entries)
         total (->> done-entries
                    (map k)
                    (filter :done)
@@ -41,7 +53,7 @@
                                       points))))
                            (filter identity)
                            (apply +))]
-    (-> by-day
+    (-> by-day-skipped
         (update-in [:total] #(+ (or % 0) total))
         (update-in [:total-skipped] #(+ (or % 0) total-skipped)))))
 

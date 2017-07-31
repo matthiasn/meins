@@ -1,5 +1,5 @@
 {:pvt-tags            #{}
- :pvt-displayed       #{"#pvt" "#private" "#nsfw" "#consumption"}
+ :pvt-displayed       #{"#pvt" "#nsfw"}
  :custom-fields       {"#duration" {:fields {:duration {:label "Minutes logged:" :cfg {:type :number :step 1}}}}
                        "#sit-ups"  {:fields {:cnt {:label "Completed:" :cfg {:type :number :step 1}} :comment {:label "Comment:" :agg :none}}}
                        "#pull-ups" {:fields {:cnt {:label "Completed:" :cfg {:type :number :step 1}}}}
