@@ -21,7 +21,7 @@
                  [ubergraph "0.4.0"]
                  [factual/geo "1.0.0"]
                  [camel-snake-kebab "0.4.0"]
-                 [matthiasn/systems-toolbox "0.6.9"]
+                 [matthiasn/systems-toolbox "0.6.10"]
                  [matthiasn/systems-toolbox-sente "0.6.15"]
                  [matthiasn/systems-toolbox-zipkin "0.6.3"]
                  [reagent "0.7.0" :exclusions [cljsjs/react cljsjs/react-dom]]
@@ -54,7 +54,7 @@
 
   :plugins [[lein-cljsbuild "1.1.7"
              :exclusions [org.apache.commons/commons-compress]]
-            [lein-figwheel "0.5.11"]
+            [lein-figwheel "0.5.12"]
             [lein-sassy "1.0.8"
              :exclusions [org.clojure/clojure org.codehaus.plexus/plexus-utils]]
             [com.jakemccrary/lein-test-refresh "0.20.0"]
