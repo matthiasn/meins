@@ -22,6 +22,7 @@
         query-cfg (subscribe [:query-cfg])
         waiting-habits (subscribe [:waiting-habits])
         options (subscribe [:options])
+        expand-fn #(swap! local update-in [:expanded-habits] not)
         stories (reaction (:stories @options))
         saga-filter (fn [entry]
                       (if-let [selected (:selected @local)]
@@ -29,7 +30,7 @@
                           (= selected (:linked-saga story)))
                         true))
         entries-map (subscribe [:entries-map])
-        entries-list
+        habits
         (reaction
           (let [entries-map @entries-map
                 find-missing (u/find-missing-entry entries-map put-fn)
@@ -42,20 +43,20 @@
               entries
               (filter (u/pvt-filter conf entries-map) entries))))]
     (fn waiting-habits-list-render [entry local local-cfg put-fn]
-      (let [entries-list @entries-list
+      (let [habits (if (:expanded-habits @local) @habits (take 12 @habits))
             tab-group (:tab-group local-cfg)
             today (.format (js/moment.) "YYYY-MM-DD")
             briefing-day (-> entry :briefing :day)]
-        (when (and (= today briefing-day) (seq entries-list))
+        (when (and (= today briefing-day) (seq habits))
           [:div
            [:table.habits
             [:tbody
-             [:tr
+             [:tr {:on-click expand-fn}
               [:th [:span.fa.fa-exclamation-triangle]]
               [:th [:span.fa.fa-diamond]]
               [:th [:span.fa.fa-diamond.penalty]]
               [:th "waiting habit"]]
-             (for [entry (take 15 entries-list)]
+             (for [entry habits]
                (let [ts (:timestamp entry)
                      text (eu/first-line entry)]
                  ^{:key ts}
