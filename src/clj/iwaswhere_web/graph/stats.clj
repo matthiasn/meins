@@ -93,13 +93,11 @@
                          nil)
           days (:days msg-payload)
           stats (when stats-mapper
-                  (let [child-span (mk-child-span span (str stats-type))
+                  (let [child-span (when span (mk-child-span span (str stats-type)))
                         res (mapv (stats-mapper current-state) days)]
-                    (.finish child-span)
+                    (when child-span (.finish child-span))
                     (into {} res)))]
       (log/info stats-type (count (str stats)))
-      (.tag span "meta" (str msg-meta))
-      (.tag span "tag" (:tag msg-meta))
       (if stats
         (put-fn (with-meta [:stats/result {:stats stats
                                            :type  stats-type}] msg-meta))
@@ -160,42 +158,42 @@
 (defn stats-tags-fn
   "Generates stats and tags (they only change on insert anyway) and initiates
    publication thereof to all connected clients."
-  [{:keys [current-state put-fn msg-meta span mk-child-span]}]
+  [{:keys [current-state put-fn msg-meta span mk-child-span] :as msg-map}]
   (future
-    (let [child-span (mk-child-span span "stats-tags-fn")
+    (let [child-span (when span (mk-child-span span "stats-tags-fn"))
           stats-tags (make-stats-tags current-state)
           uid (:sente-uid msg-meta)]
-      (.finish child-span)
+      (when child-span (.finish child-span))
       (put-fn (with-meta [:state/stats-tags stats-tags] {:sente-uid uid}))))
   (future
-    (let [child-span (mk-child-span span "stats-tags-:started-tasks")
+    (let [child-span (when span (mk-child-span span "stats-tags-:started-tasks"))
           stats {:started-tasks (:entries (gq/get-filtered current-state started-tasks))}
           uid (:sente-uid msg-meta)]
-      (.finish child-span)
+      (when child-span (.finish child-span))
       (put-fn (with-meta [:state/stats-tags2 stats] {:sente-uid uid}))))
   (future
-    (let [child-span (mk-child-span span "stats-tags-:waiting-habits")
+    (let [child-span (when span (mk-child-span span "stats-tags-:waiting-habits"))
           stats {:waiting-habits (:entries (gq/get-filtered current-state waiting-habits))}
           uid (:sente-uid msg-meta)]
-      (.finish child-span)
+      (when child-span (.finish child-span))
       (put-fn (with-meta [:state/stats-tags2 stats] {:sente-uid uid}))))
   (future
-    (let [child-span (mk-child-span span "stats-tags-:word-count")
+    (let [child-span (when span (mk-child-span span "stats-tags-:word-count"))
           stats {:word-count (count-words current-state)}
           uid (:sente-uid msg-meta)]
-      (.finish child-span)
+      (when child-span (.finish child-span))
       (put-fn (with-meta [:stats/result2 stats] {:sente-uid uid}))))
   (future
-    (let [child-span (mk-child-span span "stats-tags-:hours-count")
+    (let [child-span (when span (mk-child-span span "stats-tags-:hours-count"))
           stats {:hours-logged (hours-logged current-state)}
           uid (:sente-uid msg-meta)]
-      (.finish child-span)
+      (when child-span (.finish child-span))
       (put-fn (with-meta [:stats/result2 stats] {:sente-uid uid}))))
   (future
-    (let [child-span (mk-child-span span "stats-tags-:briefings")
+    (let [child-span (when span (mk-child-span span "stats-tags-:briefings"))
           stats {:briefings (gq/find-all-briefings current-state)}
           uid (:sente-uid msg-meta)]
-      (.finish child-span)
+      (when child-span (.finish child-span))
       (put-fn (with-meta [:state/stats-tags2 stats] {:sente-uid uid}))))
   {})
 
@@ -214,9 +212,10 @@
   "Generate some very basic stats about the graph for display in UI."
   [state k span mk-child-span msg-meta put-fn]
   (future
-    (let [child-span (mk-child-span span (str "task-summary-stats-" k))
+    (let [child-span (when span
+                       (mk-child-span span (str "task-summary-stats-" k)))
           res (task-summary-stats state k)]
-      (.finish child-span)
+      (when child-span (.finish child-span))
       (put-fn (with-meta [:stats/result2 {k res}] msg-meta)))))
 
 (defn get-stats-fn2
@@ -224,26 +223,26 @@
    publication thereof to all connected clients."
   [{:keys [current-state put-fn msg-meta span mk-child-span]}]
   (future
-    (let [child-span (mk-child-span span "get-basic-stats")
+    (let [child-span (when span (mk-child-span span "get-basic-stats"))
           stats (get-basic-stats current-state)
           uid (:sente-uid msg-meta)]
-      (.finish child-span)
+      (when child-span (.finish child-span))
       (put-fn (with-meta [:stats/result2 stats] {:sente-uid uid}))))
   (task-summary-stats-w current-state :open-tasks-cnt span mk-child-span msg-meta put-fn)
   (task-summary-stats-w current-state :backlog-cnt span mk-child-span msg-meta put-fn)
   (task-summary-stats-w current-state :completed-cnt span mk-child-span msg-meta put-fn)
   (task-summary-stats-w current-state :closed-cnt span mk-child-span msg-meta put-fn)
   (future
-    (let [child-span (mk-child-span span "award-points")
+    (let [child-span (when span (mk-child-span span "award-points"))
           stats {:award-points (aw/award-points current-state)}
           uid (:sente-uid msg-meta)]
-      (.finish child-span)
+      (when child-span (.finish child-span))
       (put-fn (with-meta [:stats/result2 stats] {:sente-uid uid}))))
   (future
-    (let [child-span (mk-child-span span "questionnaires")
+    (let [child-span (when span (mk-child-span span "questionnaires"))
           stats {:questionnaires (q/questionnaires current-state)}
           uid (:sente-uid msg-meta)]
-      (.finish child-span)
+      (when child-span (.finish child-span))
       (put-fn (with-meta [:stats/result2 stats] {:sente-uid uid}))))
   {})
 

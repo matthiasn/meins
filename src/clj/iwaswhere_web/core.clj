@@ -36,12 +36,14 @@
                      (up/cmp-map :server/upload-cmp)
                      (bl/cmp-map :server/blink-cmp)
                      (ft/cmp-map :server/ft-cmp)}
-        reporter (z/mk-reporter "http://localhost:9411")
-        trace-cmp (z/trace-cmp reporter)
-        traced-cmps (set (mapv trace-cmp components))]
+        components (if (System/getenv "ZIPKIN")
+                     (let [reporter (z/mk-reporter "http://localhost:9411")
+                           trace-cmp (z/trace-cmp reporter)]
+                       (set (mapv trace-cmp components)))
+                     components)]
     (sb/send-mult-cmd
       switchboard
-      [[:cmd/init-comp traced-cmps]
+      [[:cmd/init-comp components]
 
        [:cmd/route {:from :server/ws-cmp
                     :to   #{:server/store-cmp
