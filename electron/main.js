@@ -7,6 +7,8 @@ const url = require('url');
 const {spawn} = require('child_process');
 const log = require('electron-log');
 
+const userData = app.getPath("userData");
+
 log.transports.console.level = 'info';
 log.transports.console.format = '{h}:{i}:{s}:{ms} {text}';
 log.transports.file.level = 'info';
@@ -16,6 +18,7 @@ log.transports.file.file = '/tmp/iWasWhereUI.log';
 process.env.GOOGLE_API_KEY = 'AIzaSyD78NTnhgt--LCGBdIGPEg8GtBYzQl0gKU';
 
 let started = false;
+let jvmService;
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -67,19 +70,32 @@ function waitUntilUp() {
         )
         .catch(function (err) {
             if (!started) {
-                log.warn("Starting backend service...");
+                log.info("Starting backend service...");
 
-                const child = spawn('./run-packaged.sh', [], {
+                const jarPath = userData + "/bin/iwaswhere.jar";
+                const dataPath = userData + "/data";
+                const jarArg = "-jar '" + jarPath + "'";
+
+                log.info('Jar:', jarPath, jarArg);
+                log.info('User data in:', dataPath);
+
+                jvmService = spawn('/usr/bin/java', [jarArg], {
                     detached: false,
-                    shell: true
+                    shell: "/bin/bash",
+                    cwd: userData,
+                    env: {
+                        PORT: 7778,
+                        UPLOAD_PORT: 3233,
+                        DATA_PATH: dataPath
+                    }
                 });
 
-                child.stdout.on('data', (data) => {
+                jvmService.stdout.on('data', (data) => {
                     log.info(`- ${data}`);
                 });
 
-                child.stderr.on('data', (data) => {
-                    console.error(`- ${data}`);
+                jvmService.stderr.on('data', (data) => {
+                    log.error(`- ${data}`);
                 });
 
                 started = true;
@@ -90,8 +106,6 @@ function waitUntilUp() {
 }
 
 function start() {
-
-    log.info('Hello, log');
 
     waitUntilUp();
 
@@ -105,9 +119,12 @@ function start() {
             },
             {type: "separator"},
             {
-                label: "Quit", accelerator: "Cmd+Q", click: function () {
-                app.quit();
-            }
+                label: "Quit",
+                accelerator: "Cmd+Q",
+                click: function () {
+                    jvmService.kill('SIGHUP');
+                    app.quit();
+                }
             }
         ]
     }, {
