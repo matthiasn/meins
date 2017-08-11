@@ -117,6 +117,11 @@ function start() {
             }, {
                 type: "separator"
             }, {
+                label: "Start Background Process",
+                click: function () {
+                    waitUntilUp();
+                }
+            }, {
                 label: "Stop Background Process",
                 accelerator: "Shift+Cmd+Q",
                 click: function () {
@@ -124,6 +129,7 @@ function start() {
                     const pidFile = userData + "/iwaswhere.pid";
                     const pid = fs.readFileSync(pidFile, "utf8");
                     log.warn("shutting down", pid);
+                    started = false;
                     spawn('/bin/kill', ["-KILL", + pid], {});
                 }
             }, {
