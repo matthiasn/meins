@@ -2,8 +2,16 @@ const {app, BrowserWindow, Menu} = require('electron');
 const fetch = require('electron-fetch');
 const shell = require('electron').shell;
 const child_process = require('child_process');
-const path = require('path')
-const url = require('url')
+const path = require('path');
+const url = require('url');
+const {spawn} = require('child_process');
+const log = require('electron-log');
+
+log.transports.console.level = 'info';
+log.transports.console.format = '{h}:{i}:{s}:{ms} {text}';
+log.transports.file.level = 'info';
+log.transports.file.format = '{h}:{i}:{s}:{ms} {text}';
+log.transports.file.file = '/tmp/iWasWhereUI.log';
 
 process.env.GOOGLE_API_KEY = 'AIzaSyD78NTnhgt--LCGBdIGPEg8GtBYzQl0gKU';
 
@@ -11,7 +19,7 @@ let started = false;
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let mainWindow
+let mainWindow;
 
 function createWindow() {
     // Create the browser window.
@@ -31,10 +39,6 @@ function createWindow() {
         protocol: 'file:',
         slashes: true
     }));
-    //mainWindow.loadURL("http://localhost:7777/")
-
-    // Open the DevTools.
-    mainWindow.webContents.openDevTools()
 
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {
@@ -45,17 +49,12 @@ function createWindow() {
     })
 }
 
-function delayed() {
-    console.log("delayed");
-    setTimeout(createWindow, 10000);
-}
-
 function waitUntilUp() {
-    fetch("http://localhost:7777")
+    fetch("http://localhost:7778")
         .then(
             function (response) {
                 if (response.status !== 200) {
-                    console.log('Looks like there was a problem. Status Code: ' +
+                    log.info('Looks like there was a problem. Status Code: ' +
                         response.status);
                     return;
                 }
@@ -67,44 +66,77 @@ function waitUntilUp() {
             }
         )
         .catch(function (err) {
-            //console.log('Fetch Error :-S', err);
             if (!started) {
-                console.log("Starting backend service...");
-                child_process.spawn('./run-packaged.sh', [], {detached: true, stdio: 'ignore'});
+                log.warn("Starting backend service...");
+
+                const child = spawn('./run-packaged.sh', [], {
+                    detached: false,
+                    shell: true
+                });
+
+                child.stdout.on('data', (data) => {
+                    log.info(`- ${data}`);
+                });
+
+                child.stderr.on('data', (data) => {
+                    console.error(`- ${data}`);
+                });
+
                 started = true;
             }
-            console.log("Loading? Retry in 1000ms...");
+            log.info("Loading? Retry in 1000ms...");
             setTimeout(waitUntilUp, 1000);
         });
 }
 
 function start() {
-    // // exec: spawns a shell.
-    // child_process.exec('./run-packaged.sh', function (error, stdout, stderr) {
-    //     console.log(stdout);
-    // });
+
+    log.info('Hello, log');
 
     waitUntilUp();
-    //createWindow();
 
     // Create the Application's main menu
-    var template = [{
+    const template = [{
         label: "Application",
         submenu: [
-            { label: "About Application", selector: "orderFrontStandardAboutPanel:" },
-            { type: "separator" },
-            { label: "Quit", accelerator: "Command+Q", click: function() { app.quit(); }}
-        ]}, {
+            {
+                label: "About iWasWhere",
+                selector: "orderFrontStandardAboutPanel:"
+            },
+            {type: "separator"},
+            {
+                label: "Quit", accelerator: "Cmd+Q", click: function () {
+                app.quit();
+            }
+            }
+        ]
+    }, {
         label: "Edit",
         submenu: [
-            { label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:" },
-            { label: "Redo", accelerator: "Shift+CmdOrCtrl+Z", selector: "redo:" },
-            { type: "separator" },
-            { label: "Cut", accelerator: "CmdOrCtrl+X", selector: "cut:" },
-            { label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:" },
-            { label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:" },
-            { label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:" }
-        ]}
+            {label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:"},
+            {
+                label: "Redo",
+                accelerator: "Shift+CmdOrCtrl+Z",
+                selector: "redo:"
+            },
+            {type: "separator"},
+            {label: "Cut", accelerator: "CmdOrCtrl+X", selector: "cut:"},
+            {label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:"},
+            {label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:"},
+            {
+                label: "Select All",
+                accelerator: "CmdOrCtrl+A",
+                selector: "selectAll:"
+            },
+            {
+                label: "Dev Tools",
+                accelerator: "Option+Cmd+I",
+                click: function () {
+                    mainWindow.webContents.openDevTools()
+                }
+            }
+        ]
+    }
     ];
 
     Menu.setApplicationMenu(Menu.buildFromTemplate(template));
@@ -114,7 +146,7 @@ function start() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', start)
+app.on('ready', start);
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
@@ -123,7 +155,7 @@ app.on('window-all-closed', function () {
     if (process.platform !== 'darwin') {
         app.quit()
     }
-})
+});
 
 app.on('activate', function () {
     // On OS X it's common to re-create a window in the app when the
@@ -131,7 +163,4 @@ app.on('activate', function () {
     if (mainWindow === null) {
         createWindow()
     }
-})
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
+});
