@@ -6,6 +6,7 @@ const path = require('path');
 const url = require('url');
 const {spawn} = require('child_process');
 const log = require('electron-log');
+const fs = require('fs');
 
 const userData = app.getPath("userData");
 
@@ -72,14 +73,11 @@ function waitUntilUp() {
             if (!started) {
                 log.info("Starting backend service...");
 
-                const jarPath = userData + "/bin/iwaswhere.jar";
+                const jarPath = "'" + userData + "/bin/iwaswhere.jar'";
                 const dataPath = userData + "/data";
-                const jarArg = "-jar '" + jarPath + "'";
-
-                log.info('Jar:', jarPath, jarArg);
                 log.info('User data in:', dataPath);
 
-                jvmService = spawn('/usr/bin/java', [jarArg], {
+                jvmService = spawn('/usr/bin/java', ["-jar", jarPath], {
                     detached: false,
                     shell: "/bin/bash",
                     cwd: userData,
@@ -116,44 +114,61 @@ function start() {
             {
                 label: "About iWasWhere",
                 selector: "orderFrontStandardAboutPanel:"
-            },
-            {type: "separator"},
-            {
+            }, {
+                type: "separator"
+            }, {
+                label: "Stop Background Process",
+                accelerator: "Shift+Cmd+Q",
+                click: function () {
+                    //jvmService.kill('SIGHUP');
+                    const pidFile = userData + "/iwaswhere.pid";
+                    const pid = fs.readFileSync(pidFile, "utf8");
+                    log.warn("shutting down", pid);
+                    spawn('/bin/kill', ["-KILL", + pid], {});
+                }
+            }, {
                 label: "Quit",
                 accelerator: "Cmd+Q",
                 click: function () {
-                    jvmService.kill('SIGHUP');
                     app.quit();
                 }
             }
         ]
     }, {
-        label: "Edit",
-        submenu: [
-            {label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:"},
-            {
-                label: "Redo",
-                accelerator: "Shift+CmdOrCtrl+Z",
-                selector: "redo:"
-            },
-            {type: "separator"},
-            {label: "Cut", accelerator: "CmdOrCtrl+X", selector: "cut:"},
-            {label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:"},
-            {label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:"},
-            {
-                label: "Select All",
-                accelerator: "CmdOrCtrl+A",
-                selector: "selectAll:"
-            },
-            {
-                label: "Dev Tools",
-                accelerator: "Option+Cmd+I",
-                click: function () {
-                    mainWindow.webContents.openDevTools()
+            label: "Edit",
+            submenu: [
+                {label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:"},
+                {
+                    label: "Redo",
+                    accelerator: "Shift+CmdOrCtrl+Z",
+                    selector: "redo:"
+                }, {
+                type: "separator"
+                }, {
+                    label: "Cut",
+                    accelerator: "CmdOrCtrl+X",
+                    selector: "cut:"
+                }, {
+                    label: "Copy",
+                    accelerator: "CmdOrCtrl+C",
+                    selector: "copy:"
+                }, {
+                    label: "Paste",
+                    accelerator: "CmdOrCtrl+V",
+                    selector: "paste:"
+                }, {
+                    label: "Select All",
+                    accelerator: "CmdOrCtrl+A",
+                    selector: "selectAll:"
+                }, {
+                    label: "Dev Tools",
+                    accelerator: "Option+Cmd+I",
+                    click: function () {
+                        mainWindow.webContents.openDevTools()
+                    }
                 }
-            }
-        ]
-    }
+            ]
+        }
     ];
 
     Menu.setApplicationMenu(Menu.buildFromTemplate(template));
