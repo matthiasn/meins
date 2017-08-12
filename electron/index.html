@@ -6,15 +6,38 @@
 </head>
 <body style="width:100%; height:100%; margin: 0; padding: 0">
 <div>
-    <webview src="http://localhost:7778/" style="height:100vh" preload="./preload.js" allowpopups></webview>
+    <webview src="http://localhost:8765/" style="height:100vh"
+             preload="./preload.js" allowpopups></webview>
 </div>
 </body>
 <script>
     // You can also require other files to run in this process
-    require('./renderer.js')
+    require('./renderer.js');
 
     onload = () => {
         const webview = document.querySelector('webview');
+        const {ipcRenderer} = require('electron');
+
+        // Register for IPC events
+        ipcRenderer.on('cmd', (event, message) => {
+            console.log("Received cmd:", message.msg);
+            ipcRenderer.send('pong', 'pong2');
+            const msg = message.msg;
+            let wc = webview.getWebContents();
+
+            if (msg === "hide-menu") {
+                wc.executeJavaScript("iwaswhere_web.ui.menu.hide()");
+            }
+            if (msg === "new-entry") {
+                wc.executeJavaScript("iwaswhere_web.ui.menu.new_entry()");
+            }
+            if (msg === "new-story") {
+                wc.executeJavaScript("iwaswhere_web.ui.menu.new_story()");
+            }
+            if (msg === "new-saga") {
+                wc.executeJavaScript("iwaswhere_web.ui.menu.new_saga()");
+            }
+        });
 
         const handleRedirect = (e, callback) => {
             let url = e.url;
@@ -22,7 +45,7 @@
                 require('electron').shell.openExternal(url);
                 e.preventDefault();
                 e.stopPropagation();
-                callback({ cancel: true });
+                callback({cancel: true});
                 return false;
             }
         };

@@ -1,4 +1,4 @@
-const {app, BrowserWindow, Menu} = require('electron');
+const {app, BrowserWindow, Menu, ipcMain} = require('electron');
 const fetch = require('electron-fetch');
 const shell = require('electron').shell;
 const child_process = require('child_process');
@@ -7,6 +7,7 @@ const url = require('url');
 const {spawn} = require('child_process');
 const log = require('electron-log');
 const fs = require('fs');
+const {session} = require('electron');
 
 const userData = app.getPath("userData");
 
@@ -141,6 +142,27 @@ function start() {
             }
         ]
     }, {
+            label: "File",
+            submenu: [
+                {
+                    label: "New Entry",
+                    accelerator: "CmdOrCtrl+N",
+                    click: function () {
+                        mainWindow.webContents.send('cmd' , {msg:'new-entry'});
+                    }
+                }, {
+                    label: "New Story",
+                    click: function () {
+                        mainWindow.webContents.send('cmd' , {msg:'new-story'});
+                    }
+                }, {
+                    label: "New Saga",
+                    click: function () {
+                        mainWindow.webContents.send('cmd' , {msg:'new-saga'});
+                    }
+                }
+            ]
+        }, {
             label: "Edit",
             submenu: [
                 {label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:"},
@@ -166,11 +188,33 @@ function start() {
                     label: "Select All",
                     accelerator: "CmdOrCtrl+A",
                     selector: "selectAll:"
-                }, {
+                }
+            ]
+        }, {
+            label: "View",
+            submenu: [
+                {
+                    label: "New Window",
+                    accelerator: "Option+Cmd+N",
+                    click: function () {
+                        createWindow();
+                    }
+                },{
                     label: "Dev Tools",
                     accelerator: "Option+Cmd+I",
                     click: function () {
                         mainWindow.webContents.openDevTools()
+                    }
+                }, {
+                    label: "Hide Menu",
+                    click: function () {
+                        mainWindow.webContents.send('cmd' , {msg:'hide-menu'});
+                    }
+                }, {
+                    label: "Clear Cache",
+                    click: function () {
+                        const ses = session.defaultSession;
+                        ses.clearCache(() => {log.info("cleared cache");});
                     }
                 }
             ]
@@ -199,6 +243,6 @@ app.on('activate', function () {
     // On OS X it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (mainWindow === null) {
-        createWindow()
+        createWindow();
     }
 });

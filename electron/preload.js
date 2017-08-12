@@ -1,5 +1,3 @@
-window.ItWorked = true;
-
 const {SpellCheckHandler, ContextMenuListener, ContextMenuBuilder} = require('electron-spellchecker');
 
 window.spellCheckHandler = new SpellCheckHandler();

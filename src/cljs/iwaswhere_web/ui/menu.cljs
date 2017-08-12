@@ -27,21 +27,28 @@
 (defn new-import-view
   "Renders new and import buttons."
   [put-fn]
-  [:div.new-import
-   [:button.menu-new {:on-click (h/new-entry-fn put-fn {} nil)}
-    [:span.fa.fa-plus-square] " new"]
-   [:button.menu-new
-    {:on-click (h/new-entry-fn put-fn {:entry-type :saga} nil)}
-    [:span.fa.fa-plus-square] " new saga"]
-   [:button.menu-new
-    {:on-click (h/new-entry-fn put-fn {:entry-type :story} nil)}
-    [:span.fa.fa-plus-square] " new story"]
-   [:button {:on-click #(do (put-fn [:import/photos])
-                            (put-fn [:import/geo])
-                            (put-fn [:import/spotify])
-                            (put-fn [:import/weight])
-                            (put-fn [:import/phone]))}
-    [:span.fa.fa-map] " import"]])
+  (let [local (r/atom {:show true})]
+    (def new-entry (h/new-entry-fn put-fn {} nil))
+    (def new-story (h/new-entry-fn put-fn {:entry-type :story} nil))
+    (def new-saga (h/new-entry-fn put-fn {:entry-type :saga} nil))
+    (defn hide [] (swap! local update-in [:show] not))
+    (fn [put-fn]
+      (when (:show @local)
+        [:div.new-import
+         [:button.menu-new {:on-click (h/new-entry-fn put-fn {} nil)}
+          [:span.fa.fa-plus-square] " new"]
+         [:button.menu-new
+          {:on-click (h/new-entry-fn put-fn {:entry-type :saga} nil)}
+          [:span.fa.fa-plus-square] " new saga"]
+         [:button.menu-new
+          {:on-click (h/new-entry-fn put-fn {:entry-type :story} nil)}
+          [:span.fa.fa-plus-square] " new story"]
+         [:button {:on-click #(do (put-fn [:import/photos])
+                                  (put-fn [:import/geo])
+                                  (put-fn [:import/spotify])
+                                  (put-fn [:import/weight])
+                                  (put-fn [:import/phone]))}
+          [:span.fa.fa-map] " import"]]))))
 
 (defn cfg-view
   "Renders component for toggling display of options such as maps, comments.
