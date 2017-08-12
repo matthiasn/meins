@@ -10,6 +10,8 @@ const fs = require('fs');
 const {session} = require('electron');
 
 const userData = app.getPath("userData");
+const PORT = 7777;
+const UPLOAD_PORT = 3002;
 
 log.transports.console.level = 'info';
 log.transports.console.format = '{h}:{i}:{s}:{ms} {text}';
@@ -27,6 +29,7 @@ let jvmService;
 let mainWindow;
 
 function createWindow() {
+    log.info("creating main window");
     // Create the browser window.
     mainWindow = new BrowserWindow(
         {
@@ -55,7 +58,7 @@ function createWindow() {
 }
 
 function waitUntilUp() {
-    fetch("http://localhost:7778")
+    fetch("http://localhost:" + PORT)
         .then(
             function (response) {
                 if (response.status !== 200) {
@@ -83,8 +86,8 @@ function waitUntilUp() {
                     shell: "/bin/bash",
                     cwd: userData,
                     env: {
-                        PORT: 7778,
-                        UPLOAD_PORT: 3233,
+                        PORT: PORT,
+                        UPLOAD_PORT: UPLOAD_PORT,
                         DATA_PATH: dataPath
                     }
                 });

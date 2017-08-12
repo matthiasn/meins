@@ -1,5 +1,5 @@
 {
-  "name": "iWasWhereUI",
+  "name": "iWasWhere",
   "version": "1.0.0",
   "description": "Desktop Client for iWasWhere - thin wrapper over webview",
   "main": "main.js",
