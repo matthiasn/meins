@@ -202,6 +202,16 @@ function start() {
                     label: "Select All",
                     accelerator: "CmdOrCtrl+A",
                     selector: "selectAll:"
+                }, {
+                    label: "Spell Check: English",
+                    click: function () {
+                        mainWindow.webContents.send('cmd' , {msg:'spellcheck-en'});
+                    }
+                }, {
+                    label: "Spell Check: German",
+                    click: function () {
+                        mainWindow.webContents.send('cmd' , {msg:'spellcheck-de'});
+                    }
                 }
             ]
         }, {

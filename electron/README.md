@@ -29,7 +29,7 @@ Learn more about Electron and its API in the [documentation](http://electron.ato
 
 ## Packaging
 
-    $ electron-packager --overwrite . iWasWhereUI
+    $ electron-packager --overwrite --out out . iWasWhere
 
 
 ## Clear webview cache

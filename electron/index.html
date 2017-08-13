@@ -26,11 +26,18 @@
 
         // Register for IPC events
         ipcRenderer.on('cmd', (event, message) => {
+            const webview = document.querySelector('webview');
             console.log("Received cmd:", message.msg);
             ipcRenderer.send('pong', 'pong2');
             const msg = message.msg;
             let wc = webview.getWebContents();
 
+            if (msg === "spellcheck-de") {
+                wc.executeJavaScript("window.spellCheckHandler.switchLanguage('de-DE');");
+            }
+            if (msg === "spellcheck-en") {
+                wc.executeJavaScript("window.spellCheckHandler.switchLanguage('en-US');");
+            }
             if (msg === "hide-menu") {
                 wc.executeJavaScript("iwaswhere_web.ui.menu.hide()");
             }
