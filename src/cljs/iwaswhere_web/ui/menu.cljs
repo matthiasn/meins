@@ -58,22 +58,23 @@
    The default is always false, as initially the key would not be defined at
    all (unless set in default-config)."
   [put-fn]
-  (let [cfg (subscribe [:cfg])]
+  (let [cfg (subscribe [:cfg])
+        toggle-qr-code
+        (fn [_ev]
+          (let [msg {:path [:cfg :qr-code]}
+                reset-msg (merge msg {:reset-to false})]
+            (put-fn [:cmd/schedule-new {:timeout 20000
+                                        :message [:cmd/toggle-key reset-msg]}])
+            (put-fn [:cmd/toggle-key (merge msg {:reset-to true})])))]
+    (def upload toggle-qr-code)
     (fn [put-fn]
-      (let [toggle-qr-code
-            (fn [_ev]
-              (let [msg {:path [:cfg :qr-code]}
-                    reset-msg (merge msg {:reset-to false})]
-                (put-fn [:cmd/schedule-new {:timeout 20000
-                                            :message [:cmd/toggle-key reset-msg]}])
-                (put-fn [:cmd/toggle-key (merge msg {:reset-to true})])))]
-        [:div
-         (for [option toggle-options]
-           ^{:key (str "toggle" (:cls option))}
-           [toggle-option-view option put-fn])
-         [:span.fa.fa-qrcode.toggle
-          {:on-click toggle-qr-code
-           :class    (when-not (:qr-code @cfg) "inactive")}]]))))
+      [:div
+       (for [option toggle-options]
+         ^{:key (str "toggle" (:cls option))}
+         [toggle-option-view option put-fn])
+       [:span.fa.fa-qrcode.toggle
+        {:on-click toggle-qr-code
+         :class    (when-not (:qr-code @cfg) "inactive")}]])))
 
 (defn upload-view
   "Renders QR-code with upload address."

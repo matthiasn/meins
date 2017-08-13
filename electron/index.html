@@ -18,6 +18,12 @@
         const webview = document.querySelector('webview');
         const {ipcRenderer} = require('electron');
 
+        webview.addEventListener('did-finish-load', () => {
+            console.log("close menu");
+            let wc = webview.getWebContents();
+            wc.executeJavaScript("iwaswhere_web.ui.menu.hide()");
+        });
+
         // Register for IPC events
         ipcRenderer.on('cmd', (event, message) => {
             console.log("Received cmd:", message.msg);
@@ -27,6 +33,9 @@
 
             if (msg === "hide-menu") {
                 wc.executeJavaScript("iwaswhere_web.ui.menu.hide()");
+            }
+            if (msg === "upload") {
+                wc.executeJavaScript("iwaswhere_web.ui.menu.upload()");
             }
             if (msg === "new-entry") {
                 wc.executeJavaScript("iwaswhere_web.ui.menu.new_entry()");

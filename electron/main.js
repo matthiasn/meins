@@ -10,6 +10,8 @@ const fs = require('fs');
 const {session} = require('electron');
 
 const userData = app.getPath("userData");
+const binPath = app.getPath("exe");
+const resourcePath = process.resourcesPath;
 const PORT = 7777;
 const UPLOAD_PORT = 3002;
 
@@ -18,6 +20,9 @@ log.transports.console.format = '{h}:{i}:{s}:{ms} {text}';
 log.transports.file.level = 'info';
 log.transports.file.format = '{h}:{i}:{s}:{ms} {text}';
 log.transports.file.file = '/tmp/iWasWhereUI.log';
+
+log.info("bin path", binPath);
+log.info("resources path", resourcePath);
 
 process.env.GOOGLE_API_KEY = 'AIzaSyD78NTnhgt--LCGBdIGPEg8GtBYzQl0gKU';
 
@@ -162,6 +167,12 @@ function start() {
                     label: "New Saga",
                     click: function () {
                         mainWindow.webContents.send('cmd' , {msg:'new-saga'});
+                    }
+                }, {
+                    label: "Upload",
+                    accelerator: "CmdOrCtrl+U",
+                    click: function () {
+                        mainWindow.webContents.send('cmd' , {msg:'upload'});
                     }
                 }
             ]
