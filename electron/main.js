@@ -8,6 +8,7 @@ const {spawn} = require('child_process');
 const log = require('electron-log');
 const fs = require('fs');
 const {session} = require('electron');
+const geocoder1 = require('./geocoder');
 
 const userData = app.getPath("userData");
 const binPath = app.getPath("exe");

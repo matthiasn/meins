@@ -22,7 +22,9 @@
   "dependencies": {
     "electron-context-menu": "^0.9.1",
     "electron-fetch": "^1.0.0",
+    "electron-log": "^2.2.7",
     "electron-spellchecker": "^1.2.0",
-    "electron-log": "^2.2.7"
+    "local-reverse-geocoder": "^0.3.2",
+    "tcp-port-used": "^0.1.2"
   }
 }
