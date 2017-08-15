@@ -6,6 +6,14 @@ const tcpPortUsed = require('tcp-port-used');
 
 const PORT = Number(process.env.GEOPORT || 3003);
 
+log.transports.file.level = 'info';
+log.transports.file.format = '{h}:{i}:{s}:{ms} {text}';
+log.transports.file.file = '/tmp/iWasWhereUI.log';
+
+console.log = function (d) {
+    log.info("GEOCODER:", d);
+};
+
 svc.get(/geocode/, function (req, res) {
     const lat = req.query.latitude || false;
     const lon = req.query.longitude || false;

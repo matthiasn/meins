@@ -4,12 +4,12 @@ const shell = require('electron').shell;
 const child_process = require('child_process');
 const path = require('path');
 const url = require('url');
-const {spawn} = require('child_process');
+const {spawn, fork} = require('child_process');
 const log = require('electron-log');
 const fs = require('fs');
 const {session} = require('electron');
-const geocoder = require('./geocoder');
 const spotify = require('./spotify');
+const geocoder = fork('geocoder.js');
 
 const userData = app.getPath("userData");
 const binPath = app.getPath("exe");
