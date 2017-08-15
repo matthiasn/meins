@@ -28,16 +28,16 @@ svc.get(/geocode/, function (req, res) {
         if (err) {
             return res.status(500).send(err);
         }
-        log.info("Geocoder found:", lat, lon);
+        log.info("GEOCODER: found:", lat, lon);
         return res.send(addresses);
     });
 });
 
 function initGeocoderSvc() {
     geocoder.init({dumpDirectory: '/tmp/geonames'}, function () {
-        log.info("Starting Geocoder on port " + PORT);
+        log.info("GEOCODER: starting on port " + PORT);
         svc.listen(PORT, 'localhost', function () {
-            log.info('Local reverse geocoder listening on port ' + PORT);
+            log.info('GEOCODER: listening on port ' + PORT);
         });
     });
 }
@@ -45,10 +45,10 @@ function initGeocoderSvc() {
 tcpPortUsed.check(PORT)
     .then(function (inUse) {
         if (inUse) {
-            log.error("Port already in use:", PORT)
+            log.error("GEOCODER: Port already in use:", PORT)
         } else {
             initGeocoderSvc();
         }
     }, function (err) {
-        log.error('Error on check:', err.message);
+        log.error('GEOCODER: Error on check:', err.message);
     });
