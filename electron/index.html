@@ -41,6 +41,15 @@
             if (msg === "hide-menu") {
                 wc.executeJavaScript("iwaswhere_web.ui.menu.hide()");
             }
+            if (msg === "nav-charts") {
+                wc.executeJavaScript("window.location = '/#/charts1'");
+            }
+            if (msg === "nav-main") {
+                wc.executeJavaScript("window.location = '/#/'");
+            }
+            if (msg === "nav-dashboards") {
+                wc.executeJavaScript("window.location = '/#/dashboards/dashboard-1'");
+            }
             if (msg === "upload") {
                 wc.executeJavaScript("iwaswhere_web.ui.menu.upload()");
             }

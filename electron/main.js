@@ -237,6 +237,21 @@ function start() {
                         mainWindow.webContents.send('cmd' , {msg:'hide-menu'});
                     }
                 }, {
+                    label: "Main View",
+                    click: function () {
+                        mainWindow.webContents.send('cmd' , {msg:'nav-main'});
+                    }
+                }, {
+                    label: "Charts",
+                    click: function () {
+                        mainWindow.webContents.send('cmd' , {msg:'nav-charts'});
+                    }
+                }, {
+                    label: "Dashboards",
+                    click: function () {
+                        mainWindow.webContents.send('cmd' , {msg:'nav-dashboards'});
+                    }
+                }, {
                     label: "Clear Cache",
                     click: function () {
                         const ses = session.defaultSession;
