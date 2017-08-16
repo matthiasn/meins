@@ -42,13 +42,15 @@ svc.get(/geocode/, function (req, res) {
 });
 
 function initGeocoderSvc() {
+    log.info("GEOCODER: starting on port " + PORT);
     geocoder.init({dumpDirectory: '/tmp/geonames'}, function () {
-        log.info("GEOCODER: starting on port " + PORT);
         svc.listen(PORT, 'localhost', function () {
             log.info('GEOCODER: listening on port ' + PORT);
         });
     });
 }
+
+log.info("GEOCODER: check port " + PORT);
 
 tcpPortUsed.check(PORT)
     .then(function (inUse) {

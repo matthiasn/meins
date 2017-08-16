@@ -45,6 +45,7 @@
 
   :clean-targets ^{:protect false} ["resources/public/js/build/" "target/" "packages/"]
   :auto-clean false
+  :uberjar-name "iwaswhere.jar"
 
   :main iwaswhere-web.core
   :jvm-opts ["-XX:-OmitStackTraceInFastThrow"]
@@ -60,6 +61,7 @@
             [com.jakemccrary/lein-test-refresh "0.20.0"]
             [test2junit "1.3.3"]
             [lein-doo "0.1.7"]
+            [lein-shell "0.5.0"]
             [lein-ancient "0.6.10"]
             [lein-codox "0.10.3"]]
 
@@ -75,8 +77,15 @@
                  :changes-only      false
                  :watch-dirs        ["src" "test"]}
 
-  :aliases {"build" ["do" "clean" ["cljsbuild" "once" "release"]
-                     ["sass" "once"] "uberjar"]}
+  :aliases {"build"   ["do" "clean" ["cljsbuild" "once" "release"]
+                       ["sass" "once"] "uberjar"]
+            "package" ["do"
+                       "clean"
+                       ["cljsbuild" "once" "release"]
+                       ["sass" "once"]
+                       "uberjar"
+                       ["shell" "cp" "target/iwaswhere.jar" "electron/bin/"]
+                       ["shell" "./package.sh"]]}
 
   :codox {:output-path "codox"
           :source-uri  "https://github.com/matthiasn/iWasWhere/blob/master/iwaswhere-web/{filepath}#L{line}"}

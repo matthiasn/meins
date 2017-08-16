@@ -17,7 +17,7 @@
    homebrew with 'brew install blink1'. Does nothing when the binary doesn't
    exist."
   [args]
-  (let [blink-path "./bin/blink1-tool"]
+  (let [blink-path (get (System/getenv) "BLINK_PATH" "./bin/blink1-tool")]
     (if (fs/exists? blink-path)
       (sh blink-path args))))
 

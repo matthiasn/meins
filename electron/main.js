@@ -1,7 +1,5 @@
 const {app, BrowserWindow, Menu, ipcMain} = require('electron');
 const fetch = require('electron-fetch');
-const shell = require('electron').shell;
-const child_process = require('child_process');
 const path = require('path');
 const url = require('url');
 const {spawn, fork} = require('child_process');
@@ -9,13 +7,23 @@ const log = require('electron-log');
 const fs = require('fs');
 const {session} = require('electron');
 const spotify = require('./spotify');
-const geocoder = fork('geocoder.js');
 
 const userData = app.getPath("userData");
 const binPath = app.getPath("exe");
 const resourcePath = process.resourcesPath;
 const PORT = 7777;
 const UPLOAD_PORT = 3002;
+
+let appPath;
+let packaged = false;
+try {
+    fs.readFileSync(resourcePath + "/app/geocoder.js", "utf8");
+    appPath = resourcePath + "/app";
+    packaged = true;
+} catch (err) {
+    appPath = process.cwd();
+}
+const geocoder = fork("geocoder.js", [], {cwd: appPath});
 
 log.transports.console.level = 'info';
 log.transports.console.format = '{h}:{i}:{s}:{ms} {text}';
@@ -24,6 +32,8 @@ log.transports.file.format = '{h}:{i}:{s}:{ms} {text}';
 log.transports.file.file = '/tmp/iWasWhereUI.log';
 
 log.info("bin path", binPath);
+log.info("process.execPath", process.execPath);
+log.info("process.cwd", process.cwd());
 log.info("resources path", resourcePath);
 
 process.env.GOOGLE_API_KEY = 'AIzaSyD78NTnhgt--LCGBdIGPEg8GtBYzQl0gKU';
@@ -82,20 +92,23 @@ function waitUntilUp() {
         )
         .catch(function (err) {
             if (!started) {
-                log.info("Starting backend service...");
-
-                const jarPath = "'" + userData + "/bin/iwaswhere.jar'";
+                const javaPath = appPath + "/bin/zulu8.23.0.3-jdk8.0.144-macosx_x64/bin/java";
+                const jarPath = appPath + "/bin/iwaswhere.jar";
+                const blinkPath = appPath + "/bin/blink1-tool";
                 const dataPath = userData + "/data";
+
+                log.info("Starting backend service...");
                 log.info('User data in:', dataPath);
 
-                jvmService = spawn('/usr/bin/java', ["-jar", jarPath], {
+                jvmService = spawn(javaPath, ["-Dapple.awt.UIElement=true", "-jar", jarPath], {
                     detached: false,
                     shell: "/bin/bash",
                     cwd: userData,
                     env: {
                         PORT: PORT,
                         UPLOAD_PORT: UPLOAD_PORT,
-                        DATA_PATH: dataPath
+                        DATA_PATH: dataPath,
+                        BLINK_PATH: blinkPath
                     }
                 });
 
