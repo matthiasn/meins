@@ -49,6 +49,7 @@
                     :to   #{:server/store-cmp
                             :server/blink-cmp
                             :server/export-cmp
+                            :server/upload-cmp
                             :server/imports-cmp}}]
 
        [:cmd/route {:from :server/imports-cmp
@@ -65,10 +66,12 @@
                     :to   #{:server/store-cmp
                             :server/blink-cmp
                             :server/imports-cmp
+                            :server/upload-cmp
                             :server/ws-cmp}}]
 
        [:cmd/route {:from #{:server/store-cmp
                             :server/blink-cmp
+                            :server/upload-cmp
                             :server/imports-cmp}
                     :to   :server/scheduler-cmp}]
 

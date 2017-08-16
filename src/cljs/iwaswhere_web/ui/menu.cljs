@@ -65,6 +65,7 @@
                 reset-msg (merge msg {:reset-to false})]
             (put-fn [:cmd/schedule-new {:timeout 20000
                                         :message [:cmd/toggle-key reset-msg]}])
+            (put-fn [:import/listen])
             (put-fn [:cmd/toggle-key (merge msg {:reset-to true})])))]
     (def upload toggle-qr-code)
     (fn [put-fn]

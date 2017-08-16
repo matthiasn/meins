@@ -19,7 +19,7 @@
                                :import/spotify :import/flight :export/pdf
                                :cmd/keep-alive :stats/pomo-day-get
                                :stats/get :stats/get2 :import/movie :blink/busy
-                               :state/stats-tags-get :import/weight
+                               :state/stats-tags-get :import/weight :import/listen
                                :state/search :cfg/refresh}})
 
 (defn init!
