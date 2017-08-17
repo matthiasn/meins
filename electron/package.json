@@ -16,7 +16,7 @@
       "acl": "public-read"
     }
   },
-  "version": "0.2.23",
+  "version": "0.2.25",
   "description": "Desktop Client for iWasWhere",
   "main": "main.js",
   "scripts": {

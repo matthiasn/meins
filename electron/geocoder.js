@@ -1,14 +1,19 @@
 const express = require('express');
 const svc = express();
+const os = require('os');
 const geocoder = require('local-reverse-geocoder');
 const log = require('electron-log');
 const tcpPortUsed = require('tcp-port-used');
+const win32 = process.platform === "win32";
 
 const PORT = Number(process.env.GEOPORT || 3003);
 
 log.transports.file.level = 'info';
 log.transports.file.format = '{h}:{i}:{s}:{ms} {text}';
-log.transports.file.file = '/tmp/iWasWhereUI.log';
+
+if (!win32) {
+    log.transports.file.file = '/tmp/geocoder.log';
+}
 
 console.log = function (d) {
     log.info("GEOCODER:", d);
@@ -42,9 +47,10 @@ svc.get(/geocode/, function (req, res) {
 });
 
 function initGeocoderSvc() {
+    let tmpDir = win32 ? os.tmpdir() : "/tmp";
     log.info("GEOCODER: starting on port " + PORT);
     geocoder.init({
-        dumpDirectory: '/tmp/geonames',
+        dumpDirectory: tmpDir + "/geonames",
         load: {
             admin1: true,
             admin2: true,

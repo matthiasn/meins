@@ -1,4 +1,5 @@
 const {app, BrowserWindow} = require('electron');
+const os = require('os');
 const {setMenu} = require("./appMenu");
 const {startJVM} = require("./startup");
 const fetch = require('electron-fetch');
@@ -37,6 +38,7 @@ if (process.platform !== "win32") {
 autoUpdater.logger = log;
 
 log.info("platform", platform);
+log.info("temp", os.tmpdir());
 log.info("appPath", appPath);
 log.info("process.execPath", process.execPath);
 log.info("process.cwd", process.cwd());

@@ -10,8 +10,8 @@
  */
 
 const {app} = require('electron');
-const express = require('express'); // Express web server framework
-const request = require('request'); // "Request" library
+const express = require('express');
+const request = require('request');
 const querystring = require('querystring');
 const cookieParser = require('cookie-parser');
 const fs = require('fs');
@@ -23,10 +23,6 @@ const userData = app.getPath("userData");
 const client_id = '30912a450a164a18b42ecdcba0097703'; // Your client id
 const redirect_uri = 'http://localhost:8888/callback'; // Your redirect uri
 let client_secret;
-
-log.transports.file.level = 'info';
-log.transports.file.format = '{h}:{i}:{s}:{ms} {text}';
-log.transports.file.file = '/tmp/iWasWhereUI.log';
 
 try {
     client_secret = fs.readFileSync(userData + "/SPOTIFY_SECRET", "utf8");
