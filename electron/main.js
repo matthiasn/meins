@@ -16,14 +16,12 @@ const PORT = 7777;
 const UPLOAD_PORT = 3002;
 
 let appPath;
-let packaged = false;
-try {
-    fs.readFileSync(resourcePath + "/app/geocoder.js", "utf8");
+if (fs.existsSync(resourcePath + "/app/main.js")) {
     appPath = resourcePath + "/app";
-    packaged = true;
-} catch (err) {
+} else {
     appPath = process.cwd();
 }
+
 const geocoder = fork("geocoder.js", [], {cwd: appPath});
 
 log.transports.console.level = 'info';
@@ -33,7 +31,8 @@ log.transports.file.format = '{h}:{i}:{s}:{ms} {text}';
 log.transports.file.file = '/tmp/iWasWhereUI.log';
 autoUpdater.logger = log;
 
-log.info("bin path", binPath);
+log.info("binPath", binPath);
+log.info("appPath", appPath);
 log.info("process.execPath", process.execPath);
 log.info("process.cwd", process.cwd());
 log.info("resources path", resourcePath);

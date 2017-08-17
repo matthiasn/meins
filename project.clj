@@ -1,21 +1,21 @@
-(defproject matthiasn/iwaswhere-web "0.2.1"
+(defproject matthiasn/iwaswhere-web "0.2.4"
   :description "Sample application built with systems-toolbox library"
   :url "https://github.com/matthiasn/systems-toolbox"
   :license {:name "GNU AFFERO GENERAL PUBLIC LICENSE"
             :url  "https://www.gnu.org/licenses/agpl-3.0.en.html"}
   :dependencies [[org.clojure/clojure "1.9.0-alpha17"]
-                 [org.clojure/clojurescript "1.9.854"]
+                 [org.clojure/clojurescript "1.9.908"]
                  [org.clojure/tools.logging "0.4.0"]
                  [ch.qos.logback/logback-classic "1.2.3"]
                  [hiccup "1.0.5"]
                  [clj-pid "0.1.2"]
                  [clj-time "0.14.0"]
-                 [clj-http "3.6.1"]
+                 [clj-http "3.7.0"]
                  [enlive "1.1.6"]
                  [me.raynes/fs "1.4.6"]
                  [markdown-clj "0.9.99"]
                  [clj-pdf "2.2.29"]
-                 [cheshire "5.7.1"]
+                 [cheshire "5.8.0"]
                  [cljsjs/moment "2.17.1-1"]
                  [com.drewnoakes/metadata-extractor "2.10.1"]
                  [ubergraph "0.4.0"]
@@ -25,7 +25,7 @@
                  [matthiasn/systems-toolbox-sente "0.6.15"]
                  [matthiasn/systems-toolbox-zipkin "0.6.3"]
                  [reagent "0.7.0" :exclusions [cljsjs/react cljsjs/react-dom]]
-                 [re-frame "0.9.4"]
+                 [re-frame "0.10.1"]
                  [secretary "1.2.3"]
                  [capacitor "0.6.0"]
                  [clucy "0.4.0"]
@@ -55,7 +55,7 @@
 
   :plugins [[lein-cljsbuild "1.1.7"
              :exclusions [org.apache.commons/commons-compress]]
-            [lein-figwheel "0.5.12"]
+            [lein-figwheel "0.5.13"]
             [lein-sassy "1.0.8"
              :exclusions [org.clojure/clojure org.codehaus.plexus/plexus-utils]]
             [com.jakemccrary/lein-test-refresh "0.20.0"]
