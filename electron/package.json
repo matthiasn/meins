@@ -12,7 +12,7 @@
     ],
     "publish": {
       "provider": "s3",
-      "bucket": "iwaswhere-lon",
+      "bucket": "iwaswhere",
       "acl": "public-read"
     }
   },
@@ -36,7 +36,7 @@
   "license": "AGPL-3.0",
   "devDependencies": {
     "electron": "^1.7.6",
-    "electron-builder": "^19.22.2",
+    "electron-builder": "^19.22.4",
     "electron-packager": "^8.7.2",
     "electron-publisher-s3": "^19.21.0"
   },
