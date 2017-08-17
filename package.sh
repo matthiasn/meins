@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
 cd electron
-electron-packager --overwrite --out out . iWasWhere
-open out
+DEBUG=electron-builder,electron-builder:* electron-builder --publish always -m zip
+open dist
 cd ..

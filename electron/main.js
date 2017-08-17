@@ -7,6 +7,7 @@ const log = require('electron-log');
 const fs = require('fs');
 const {session} = require('electron');
 const spotify = require('./spotify');
+const {autoUpdater} = require("electron-updater");
 
 const userData = app.getPath("userData");
 const binPath = app.getPath("exe");
@@ -27,9 +28,10 @@ const geocoder = fork("geocoder.js", [], {cwd: appPath});
 
 log.transports.console.level = 'info';
 log.transports.console.format = '{h}:{i}:{s}:{ms} {text}';
-log.transports.file.level = 'info';
+log.transports.file.level = 'debug';
 log.transports.file.format = '{h}:{i}:{s}:{ms} {text}';
 log.transports.file.file = '/tmp/iWasWhereUI.log';
+autoUpdater.logger = log;
 
 log.info("bin path", binPath);
 log.info("process.execPath", process.execPath);
@@ -127,8 +129,15 @@ function waitUntilUp() {
         });
 }
 
-function start() {
+function killJVM() {
+    const pidFile = userData + "/iwaswhere.pid";
+    const pid = fs.readFileSync(pidFile, "utf8");
+    log.warn("shutting down", pid);
+    started = false;
+    spawn('/bin/kill', ["-KILL", + pid], {});
+}
 
+function start() {
     waitUntilUp();
 
     // Create the Application's main menu
@@ -148,13 +157,17 @@ function start() {
             }, {
                 label: "Stop Background Process",
                 accelerator: "Shift+Cmd+Q",
+                click: killJVM
+            }, {
+                label: "Check for Updates",
                 click: function () {
-                    //jvmService.kill('SIGHUP');
-                    const pidFile = userData + "/iwaswhere.pid";
-                    const pid = fs.readFileSync(pidFile, "utf8");
-                    log.warn("shutting down", pid);
-                    started = false;
-                    spawn('/bin/kill', ["-KILL", + pid], {});
+                    autoUpdater.checkForUpdates();
+                }
+            }, {
+                label: "Install Updates",
+                click: function () {
+                    killJVM();
+                    autoUpdater.quitAndInstall(false);
                 }
             }, {
                 label: "Quit",
@@ -299,4 +312,26 @@ app.on('activate', function () {
     if (mainWindow === null) {
         createWindow();
     }
+});
+
+autoUpdater.on('checking-for-update', () => {
+    log.info('Checking for update...');
+});
+autoUpdater.on('update-available', (info) => {
+    log.info('Update available.');
+});
+autoUpdater.on('update-not-available', (info) => {
+    log.info('Update not available.');
+});
+autoUpdater.on('error', (err) => {
+    log.info('Error in auto-updater.');
+});
+autoUpdater.on('download-progress', (progressObj) => {
+    let log_message = "Download speed: " + progressObj.bytesPerSecond;
+    log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
+    log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
+    log.info(log_message);
+});
+autoUpdater.on('update-downloaded', (info) => {
+    log.info('Update can be installed')
 });

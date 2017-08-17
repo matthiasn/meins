@@ -1,4 +1,4 @@
-(defproject matthiasn/iwaswhere-web "0.1.46"
+(defproject matthiasn/iwaswhere-web "0.2.1"
   :description "Sample application built with systems-toolbox library"
   :url "https://github.com/matthiasn/systems-toolbox"
   :license {:name "GNU AFFERO GENERAL PUBLIC LICENSE"
@@ -77,15 +77,16 @@
                  :changes-only      false
                  :watch-dirs        ["src" "test"]}
 
-  :aliases {"build"   ["do" "clean" ["cljsbuild" "once" "release"]
-                       ["sass" "once"] "uberjar"]
-            "package" ["do"
-                       "clean"
-                       ["cljsbuild" "once" "release"]
-                       ["sass" "once"]
-                       "uberjar"
-                       ["shell" "cp" "target/iwaswhere.jar" "electron/bin/"]
-                       ["shell" "./package.sh"]]}
+  :aliases {"build" ["do" "clean" ["cljsbuild" "once" "release"]
+                     ["sass" "once"] "uberjar"]
+            "dist"  ["do"
+                     ["clean"]
+                     ["test2junit"]
+                     ["cljsbuild" "once" "release"]
+                     ["sass" "once"]
+                     ["uberjar"]
+                     ["shell" "cp" "target/iwaswhere.jar" "electron/bin/"]
+                     ["shell" "./package.sh"]]}
 
   :codox {:output-path "codox"
           :source-uri  "https://github.com/matthiasn/iWasWhere/blob/master/iwaswhere-web/{filepath}#L{line}"}
