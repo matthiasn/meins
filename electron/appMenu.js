@@ -1,7 +1,45 @@
-const {Menu} = require('electron');
+const {app, Menu} = require('electron');
 const {killJVM, clearCache} = require("./util");
+const log = require('electron-log');
+const {autoUpdater} = require("electron-updater");
 
-function setMenu (waitUntilUp, autoUpdater, mainWindow, app) {
+var mainWindow;
+var createWindow;
+
+function updateMenuItem(progress) {
+    var label = "Check for Updates";
+    const finished = progress === 100;
+    if (progress !== undefined) {
+        label = "Downloading Update: " + Math.floor(progress) + "%"
+    }
+    if (progress === -1) {
+        label = "No Updates available";
+        setTimeout(function () {
+            setMenu(mainWindow, createWindow)
+        }, 20000)
+    }
+
+    if (finished) {
+        label = "Install Update"
+    }
+
+    return {
+        label: label,
+        click: function () {
+            if (finished) {
+                killJVM();
+                clearCache();
+                autoUpdater.quitAndInstall(false);
+            } else {
+                autoUpdater.checkForUpdates();
+            }
+        }
+    }
+}
+
+function setMenu(mw, cw, progress) {
+    mainWindow = mw;
+    createWindow = cw;
     const template = [{
         label: "Application",
         submenu: [
@@ -10,21 +48,10 @@ function setMenu (waitUntilUp, autoUpdater, mainWindow, app) {
                 selector: "orderFrontStandardAboutPanel:"
             }, {
                 type: "separator"
-            }, {
-                label: "Check for Updates",
-                click: function () {
-                    autoUpdater.checkForUpdates();
-                }
-            }, {
-                label: "Install Updates",
-                click: function () {
-                    killJVM();
-                    clearCache();
-                    autoUpdater.quitAndInstall(false);
-                }
-            }, {
+            },
+            updateMenuItem(progress),
+            {
                 label: "Quit and Stop Background Process",
-                accelerator: "Cmd+Q",
                 click: function () {
                     killJVM();
                     app.quit();
@@ -147,5 +174,36 @@ function setMenu (waitUntilUp, autoUpdater, mainWindow, app) {
 
     Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 }
+
+
+autoUpdater.on('checking-for-update', () => {
+    log.info('Checking for update...');
+});
+
+autoUpdater.on('update-available', (info) => {
+    log.info('Update available.');
+});
+
+autoUpdater.on('update-not-available', (info) => {
+    log.info('Update not available.');
+    setMenu(mainWindow, createWindow, -1);
+});
+
+autoUpdater.on('error', (err) => {
+    log.info('Error in auto-updater.');
+});
+
+autoUpdater.on('download-progress', (progressObj) => {
+    let log_message = "Download speed: " + progressObj.bytesPerSecond;
+    log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
+    log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
+    log.info(log_message);
+    setMenu(mainWindow, createWindow, progressObj.percent);
+});
+
+autoUpdater.on('update-downloaded', (info) => {
+    log.info('Update can be installed')
+});
+
 
 module.exports.setMenu = setMenu;
