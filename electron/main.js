@@ -1,4 +1,5 @@
 const {app, BrowserWindow, Menu, ipcMain} = require('electron');
+const {setMenu} = require("./appMenu");
 const fetch = require('electron-fetch');
 const path = require('path');
 const url = require('url');
@@ -17,7 +18,7 @@ const UPLOAD_PORT = 3002;
 
 let appPath;
 if (fs.existsSync(resourcePath + "/app/main.js")) {
-    appPath = resourcePath + "/app";
+    appPath = path.normalize(resourcePath + "/app");
 } else {
     appPath = process.cwd();
 }
@@ -28,9 +29,14 @@ log.transports.console.level = 'info';
 log.transports.console.format = '{h}:{i}:{s}:{ms} {text}';
 log.transports.file.level = 'debug';
 log.transports.file.format = '{h}:{i}:{s}:{ms} {text}';
-log.transports.file.file = '/tmp/iWasWhereUI.log';
+
+if (process.platform !== "win32") {
+    log.transports.file.file = '/tmp/iWasWhereUI.log';
+}
+
 autoUpdater.logger = log;
 
+log.info("platform", process.platform);
 log.info("binPath", binPath);
 log.info("appPath", appPath);
 log.info("process.execPath", process.execPath);
@@ -93,17 +99,24 @@ function waitUntilUp() {
         )
         .catch(function (err) {
             if (!started) {
-                const javaPath = appPath + "/bin/zulu8.23.0.3-jdk8.0.144-macosx_x64/bin/java";
-                const jarPath = appPath + "/bin/iwaswhere.jar";
-                const blinkPath = appPath + "/bin/blink1-tool";
-                const dataPath = userData + "/data";
+                var javaPath = "/usr/bin/java";
+                if (process.platform === 'darwin') {
+                    javaPath = appPath + "/bin/zulu8.23.0.3-jdk8.0.144-mac_x64/bin/java";
+                }
+                if (process.platform === 'win32') {
+                    javaPath = path.normalize(appPath + "/bin/zulu8.23.0.3-jdk8.0.144-win_x64/bin/java.exe");
+                }
+
+                const jarPath = path.normalize(appPath + "/bin/iwaswhere.jar");
+                const blinkPath = path.normalize(appPath + "/bin/blink1-mac-cli");
+                const dataPath = path.normalize(userData + "/data");
 
                 log.info("Starting backend service...");
                 log.info('User data in:', dataPath);
 
                 jvmService = spawn(javaPath, ["-Dapple.awt.UIElement=true", "-jar", jarPath], {
                     detached: false,
-                    shell: "/bin/bash",
+                    //shell: "/bin/bash",
                     cwd: userData,
                     env: {
                         PORT: PORT,
@@ -128,172 +141,9 @@ function waitUntilUp() {
         });
 }
 
-function killJVM() {
-    const pidFile = userData + "/iwaswhere.pid";
-    const pid = fs.readFileSync(pidFile, "utf8");
-    log.warn("shutting down", pid);
-    started = false;
-    spawn('/bin/kill', ["-KILL", +pid], {});
-}
-
-function clearCache() {
-    const ses = session.defaultSession;
-    ses.clearCache(() => {
-        log.info("cleared cache");
-    });
-}
-
 function start() {
     waitUntilUp();
-
-    // Create the Application's main menu
-    const template = [{
-        label: "Application",
-        submenu: [
-            {
-                label: "About iWasWhere",
-                selector: "orderFrontStandardAboutPanel:"
-            }, {
-                type: "separator"
-            }, {
-                label: "Start Background Process",
-                click: function () {
-                    waitUntilUp();
-                }
-            }, {
-                label: "Stop Background Process",
-                accelerator: "Shift+Cmd+Q",
-                click: killJVM
-            }, {
-                label: "Check for Updates",
-                click: function () {
-                    autoUpdater.checkForUpdates();
-                }
-            }, {
-                label: "Install Updates",
-                click: function () {
-                    killJVM();
-                    clearCache();
-                    autoUpdater.quitAndInstall(false);
-                }
-            }, {
-                label: "Quit",
-                accelerator: "Cmd+Q",
-                click: function () {
-                    app.quit();
-                }
-            }
-        ]
-    }, {
-        label: "File",
-        submenu: [
-            {
-                label: "New Entry",
-                accelerator: "CmdOrCtrl+N",
-                click: function () {
-                    mainWindow.webContents.send('cmd', {msg: 'new-entry'});
-                }
-            }, {
-                label: "New Story",
-                click: function () {
-                    mainWindow.webContents.send('cmd', {msg: 'new-story'});
-                }
-            }, {
-                label: "New Saga",
-                click: function () {
-                    mainWindow.webContents.send('cmd', {msg: 'new-saga'});
-                }
-            }, {
-                label: "Upload",
-                accelerator: "CmdOrCtrl+U",
-                click: function () {
-                    mainWindow.webContents.send('cmd', {msg: 'upload'});
-                }
-            }
-        ]
-    }, {
-        label: "Edit",
-        submenu: [
-            {label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:"},
-            {
-                label: "Redo",
-                accelerator: "Shift+CmdOrCtrl+Z",
-                selector: "redo:"
-            }, {
-                type: "separator"
-            }, {
-                label: "Cut",
-                accelerator: "CmdOrCtrl+X",
-                selector: "cut:"
-            }, {
-                label: "Copy",
-                accelerator: "CmdOrCtrl+C",
-                selector: "copy:"
-            }, {
-                label: "Paste",
-                accelerator: "CmdOrCtrl+V",
-                selector: "paste:"
-            }, {
-                label: "Select All",
-                accelerator: "CmdOrCtrl+A",
-                selector: "selectAll:"
-            }, {
-                label: "Spell Check: English",
-                click: function () {
-                    mainWindow.webContents.send('cmd', {msg: 'spellcheck-en'});
-                }
-            }, {
-                label: "Spell Check: German",
-                click: function () {
-                    mainWindow.webContents.send('cmd', {msg: 'spellcheck-de'});
-                }
-            }
-        ]
-    }, {
-        label: "View",
-        submenu: [
-            {
-                label: "New Window",
-                accelerator: "Option+Cmd+N",
-                click: function () {
-                    createWindow();
-                }
-            }, {
-                label: "Dev Tools",
-                accelerator: "Option+Cmd+I",
-                click: function () {
-                    mainWindow.webContents.openDevTools()
-                }
-            }, {
-                label: "Hide Menu",
-                click: function () {
-                    mainWindow.webContents.send('cmd', {msg: 'hide-menu'});
-                }
-            }, {
-                label: "Main View",
-                click: function () {
-                    mainWindow.webContents.send('cmd', {msg: 'nav-main'});
-                }
-            }, {
-                label: "Charts",
-                click: function () {
-                    mainWindow.webContents.send('cmd', {msg: 'nav-charts'});
-                }
-            }, {
-                label: "Dashboards",
-                click: function () {
-                    mainWindow.webContents.send('cmd', {msg: 'nav-dashboards'});
-                }
-            }, {
-                label: "Clear Cache",
-                click: clearCache
-            }
-        ]
-    }
-    ];
-
-    Menu.setApplicationMenu(Menu.buildFromTemplate(template));
-
+    setMenu(waitUntilUp, autoUpdater, mainWindow, app);
 }
 
 // This method will be called when Electron has finished

@@ -3,13 +3,20 @@
   "build": {
     "appId": "matthiasn.iWasWhere",
     "asar": false,
+    "files": [
+      "**/*",
+      "!bin/",
+      "bin/blink1-${os}*",
+      "bin/zulu8.23.0.3-jdk8.0.144-${os}_x64/**",
+      "bin/iwaswhere.jar"
+    ],
     "publish": {
       "provider": "s3",
       "bucket": "iwaswhere",
       "acl": "public-read"
     }
   },
-  "version": "0.2.5",
+  "version": "0.2.17",
   "description": "Desktop Client for iWasWhere",
   "main": "main.js",
   "scripts": {
