@@ -43,7 +43,15 @@ svc.get(/geocode/, function (req, res) {
 
 function initGeocoderSvc() {
     log.info("GEOCODER: starting on port " + PORT);
-    geocoder.init({dumpDirectory: '/tmp/geonames'}, function () {
+    geocoder.init({
+        dumpDirectory: '/tmp/geonames',
+        load: {
+            admin1: true,
+            admin2: true,
+            admin3And4: false,
+            alternateNames: false
+        }
+    }, function () {
         svc.listen(PORT, 'localhost', function () {
             log.info('GEOCODER: listening on port ' + PORT);
         });
