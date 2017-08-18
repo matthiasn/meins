@@ -45,11 +45,11 @@ log.info("process.cwd", process.cwd());
 log.info("resources path", resourcePath);
 
 let started = false;
-let mainWindow;
+var mainWindow;
 
 function createWindow() {
     log.info("creating main window");
-    mainWindow = new BrowserWindow(
+    let window = new BrowserWindow(
         {
             width: 1200,
             height: 800,
@@ -58,15 +58,22 @@ function createWindow() {
             }
         }
     );
-
-    // and load the index.html of the app.
-    mainWindow.loadURL(url.format({
+    window.loadURL(url.format({
         pathname: path.join(__dirname, 'index.html'),
         protocol: 'file:',
         slashes: true
     }));
 
-    mainWindow.on('closed', function () {
+    mainWindow = window;
+    setMenu(window, createWindow);
+
+    window.on('focus', function () {
+        log.info("focused");
+        mainWindow = window;
+        setMenu(window, createWindow);
+    });
+    window.on('closed', function () {
+        window = null;
         mainWindow = null
     })
 }
@@ -79,10 +86,7 @@ function waitUntilUp() {
                         response.status);
                     return;
                 }
-                response.text().then(function (data) {
-                    createWindow();
-                    setMenu(mainWindow, createWindow);
-                });
+                response.text().then(createWindow);
             }
         )
         .catch(function (err) {

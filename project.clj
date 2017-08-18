@@ -1,4 +1,4 @@
-(defproject matthiasn/iwaswhere-web "0.2.29"
+(defproject matthiasn/iwaswhere-web "0.2.30"
   :description "Sample application built with systems-toolbox library"
   :url "https://github.com/matthiasn/systems-toolbox"
   :license {:name "GNU AFFERO GENERAL PUBLIC LICENSE"
@@ -84,6 +84,7 @@
                      ["test2junit"]
                      ["cljsbuild" "once" "release"]
                      ["sass" "once"]
+                     ["shell" "npm" "install"]
                      ["shell" "webpack" "-p"]
                      ["uberjar"]
                      ["shell" "cp" "target/iwaswhere.jar" "electron/bin/"]

@@ -3,10 +3,7 @@ const {killJVM, clearCache} = require("./util");
 const log = require('electron-log');
 const {autoUpdater} = require("electron-updater");
 
-var mainWindow;
-var createWindow;
-
-function updateMenuItem(progress) {
+function updateMenuItem(progress, mainWindow, createWindow) {
     var label = "Check for Updates";
     const finished = progress === 100;
     if (progress !== undefined) {
@@ -14,9 +11,7 @@ function updateMenuItem(progress) {
     }
     if (progress === -1) {
         label = "No Updates available";
-        setTimeout(function () {
-            setMenu(mainWindow, createWindow)
-        }, 20000)
+        setTimeout(() => setMenu(mainWindow, createWindow), 20000)
     }
 
     if (finished) {
@@ -37,9 +32,17 @@ function updateMenuItem(progress) {
     }
 }
 
-function setMenu(mw, cw, progress) {
-    mainWindow = mw;
-    createWindow = cw;
+function sendToWindow(currentWindow, msg) {
+    return (ev) => {
+        try {
+            currentWindow.webContents.send('cmd', {msg: msg});
+        } catch (err) {
+            log.error("MENU error:", err)
+        }
+    }
+}
+
+function setMenu(currWindow, createWindow, progress) {
     const template = [{
         label: "Application",
         submenu: [
@@ -49,7 +52,7 @@ function setMenu(mw, cw, progress) {
             }, {
                 type: "separator"
             },
-            updateMenuItem(progress),
+            updateMenuItem(progress, currWindow, createWindow),
             {
                 label: "Quit and Stop Background Process",
                 click: function () {
@@ -57,11 +60,13 @@ function setMenu(mw, cw, progress) {
                     app.quit();
                 }
             }, {
+                label: "Close Window",
+                accelerator: "Cmd+W",
+                click: () => currWindow.close()
+            }, {
                 label: "Quit",
                 accelerator: "Cmd+Q",
-                click: function () {
-                    app.quit();
-                }
+                click: () => app.quit()
             }
         ]
     }, {
@@ -70,25 +75,17 @@ function setMenu(mw, cw, progress) {
             {
                 label: "New Entry",
                 accelerator: "CmdOrCtrl+N",
-                click: function () {
-                    mainWindow.webContents.send('cmd', {msg: 'new-entry'});
-                }
+                click: sendToWindow(currWindow, 'new-entry')
             }, {
                 label: "New Story",
-                click: function () {
-                    mainWindow.webContents.send('cmd', {msg: 'new-story'});
-                }
+                click: sendToWindow(currWindow, 'new-story')
             }, {
                 label: "New Saga",
-                click: function () {
-                    mainWindow.webContents.send('cmd', {msg: 'new-saga'});
-                }
+                click: sendToWindow(currWindow, 'new-saga')
             }, {
                 label: "Upload",
                 accelerator: "CmdOrCtrl+U",
-                click: function () {
-                    mainWindow.webContents.send('cmd', {msg: 'upload'});
-                }
+                click: sendToWindow(currWindow, 'upload')
             }
         ]
     }, {
@@ -122,36 +119,24 @@ function setMenu(mw, cw, progress) {
                 submenu: [
                     {
                         label: "English",
-                        click: function () {
-                            mainWindow.webContents.send('cmd', {msg: 'spellcheck-en'});
-                        }
+                        click: sendToWindow(currWindow, 'spellcheck-en')
                     }, {
                         label: "French",
-                        click: function () {
-                            mainWindow.webContents.send('cmd', {msg: 'spellcheck-fr'});
-                        }
+                        click: sendToWindow(currWindow, 'spellcheck-fr')
                     }, {
                         label: "German",
-                        click: function () {
-                            mainWindow.webContents.send('cmd', {msg: 'spellcheck-de'});
-                        }
+                        click: sendToWindow(currWindow, 'spellcheck-de')
                     }, {
                         label: "Italian",
-                        click: function () {
-                            mainWindow.webContents.send('cmd', {msg: 'spellcheck-it'});
-                        }
+                        click: sendToWindow(currWindow, 'spellcheck-it')
                     }, {
                         label: "Spanish",
-                        click: function () {
-                            mainWindow.webContents.send('cmd', {msg: 'spellcheck-es'});
-                        }
+                        click: sendToWindow(currWindow, 'spellcheck-es')
                     }, {
                         type: "separator"
                     }, {
                         label: "None",
-                        click: function () {
-                            mainWindow.webContents.send('cmd', {msg: 'spellcheck-none'});
-                        }
+                        click: sendToWindow(currWindow, 'spellcheck-none')
                     }
                 ]
             }
@@ -162,35 +147,21 @@ function setMenu(mw, cw, progress) {
             {
                 label: "New Window",
                 accelerator: "Option+Cmd+N",
-                click: function () {
-                    createWindow();
-                }
+                click: createWindow
             }, {
                 label: "Dev Tools",
                 accelerator: "Option+Cmd+I",
-                click: function () {
-                    mainWindow.webContents.openDevTools()
-                }
+                click: () => currWindow.webContents.openDevTools()
+
             }, {
                 label: "Hide Menu",
-                click: function () {
-                    mainWindow.webContents.send('cmd', {msg: 'hide-menu'});
-                }
-            }, {
-                label: "Main View",
-                click: function () {
-                    mainWindow.webContents.send('cmd', {msg: 'nav-main'});
-                }
+                click: sendToWindow(currWindow, 'hide-menu')
             }, {
                 label: "Charts",
-                click: function () {
-                    mainWindow.webContents.send('cmd', {msg: 'nav-charts'});
-                }
+                click: sendToWindow(currWindow, 'nav-charts')
             }, {
                 label: "Dashboards",
-                click: function () {
-                    mainWindow.webContents.send('cmd', {msg: 'nav-dashboards'});
-                }
+                click: sendToWindow(currWindow, 'nav-dashboards')
             }, {
                 label: "Clear Cache",
                 click: clearCache
