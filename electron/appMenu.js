@@ -118,15 +118,42 @@ function setMenu(mw, cw, progress) {
                 accelerator: "CmdOrCtrl+A",
                 selector: "selectAll:"
             }, {
-                label: "Spell Check: English",
-                click: function () {
-                    mainWindow.webContents.send('cmd', {msg: 'spellcheck-en'});
-                }
-            }, {
-                label: "Spell Check: German",
-                click: function () {
-                    mainWindow.webContents.send('cmd', {msg: 'spellcheck-de'});
-                }
+                label: "Spelling",
+                submenu: [
+                    {
+                        label: "English",
+                        click: function () {
+                            mainWindow.webContents.send('cmd', {msg: 'spellcheck-en'});
+                        }
+                    }, {
+                        label: "French",
+                        click: function () {
+                            mainWindow.webContents.send('cmd', {msg: 'spellcheck-fr'});
+                        }
+                    }, {
+                        label: "German",
+                        click: function () {
+                            mainWindow.webContents.send('cmd', {msg: 'spellcheck-de'});
+                        }
+                    }, {
+                        label: "Italian",
+                        click: function () {
+                            mainWindow.webContents.send('cmd', {msg: 'spellcheck-it'});
+                        }
+                    }, {
+                        label: "Spanish",
+                        click: function () {
+                            mainWindow.webContents.send('cmd', {msg: 'spellcheck-es'});
+                        }
+                    }, {
+                        type: "separator"
+                    }, {
+                        label: "None",
+                        click: function () {
+                            mainWindow.webContents.send('cmd', {msg: 'spellcheck-none'});
+                        }
+                    }
+                ]
             }
         ]
     }, {

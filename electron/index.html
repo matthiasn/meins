@@ -38,6 +38,18 @@
             if (msg === "spellcheck-en") {
                 wc.executeJavaScript("window.spellCheckHandler.switchLanguage('en-US');");
             }
+            if (msg === "spellcheck-fr") {
+                wc.executeJavaScript("window.spellCheckHandler.switchLanguage('fr-FR');");
+            }
+            if (msg === "spellcheck-es") {
+                wc.executeJavaScript("window.spellCheckHandler.switchLanguage('es-ES');");
+            }
+            if (msg === "spellcheck-it") {
+                wc.executeJavaScript("window.spellCheckHandler.switchLanguage('it-IT');");
+            }
+            if (msg === "spellcheck-none") {
+                wc.executeJavaScript("window.spellCheckHandler.currentSpellchecker=null;;")
+            }
             if (msg === "hide-menu") {
                 wc.executeJavaScript("iwaswhere_web.ui.menu.hide()");
             }
