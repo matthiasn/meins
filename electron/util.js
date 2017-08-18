@@ -9,12 +9,16 @@ const userData = app.getPath("userData");
 
 function killJVM() {
     const pidFile = path.normalize(userData + "/iwaswhere.pid");
-    const pid = fs.readFileSync(pidFile, "utf8");
-    log.warn("shutting down", pid);
-    if (process.platform === 'win32') {
-        spawn('TaskKill', ["-F", "/PID," +pid], {});
+    if (fs.existsSync(pidFile)) {
+        const pid = fs.readFileSync(pidFile, "utf8");
+        log.warn("shutting down", pid);
+        if (process.platform === 'win32') {
+            spawn('TaskKill', ["-F", "/PID," + pid], {});
+        } else {
+            spawn('/bin/kill', ["-KILL", pid], {});
+        }
     } else {
-        spawn('/bin/kill', ["-KILL", +pid], {});
+        log.warn("Tried to shut down JVM but no pidfile found")
     }
 }
 
