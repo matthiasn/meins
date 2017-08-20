@@ -82,7 +82,6 @@
                 require('electron').shell.openExternal(url);
                 e.preventDefault();
                 e.stopPropagation();
-                callback({cancel: true});
                 return false;
             }
         };

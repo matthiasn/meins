@@ -1,4 +1,4 @@
-(defproject matthiasn/iwaswhere-web "0.2.30"
+(defproject matthiasn/iwaswhere-web "0.2.31"
   :description "Sample application built with systems-toolbox library"
   :url "https://github.com/matthiasn/systems-toolbox"
   :license {:name "GNU AFFERO GENERAL PUBLIC LICENSE"
@@ -48,7 +48,7 @@
   :uberjar-name "iwaswhere.jar"
 
   :main iwaswhere-web.core
-  :jvm-opts ["-XX:-OmitStackTraceInFastThrow"]
+  :jvm-opts ["-XX:-OmitStackTraceInFastThrow" "-XX:+AggressiveOpts"]
 
   :profiles {:uberjar {:aot :all}
              :dev     {:dependencies [[re-frisk "0.4.5"]]}}

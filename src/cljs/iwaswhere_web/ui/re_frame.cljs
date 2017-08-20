@@ -69,8 +69,7 @@
       [stats/stats-view put-fn]]
      [loc/location-chart]
      [:div.footer
-      [stats/stats-text]]]]
-   [n/new-entries-view put-fn]])
+      [stats/stats-text]]]]])
 
 (defn dashboards
   "Dashboard view component"

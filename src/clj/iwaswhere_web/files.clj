@@ -9,7 +9,6 @@
             [clj-time.core :as time]
             [clj-time.format :as tf]
             [clojure.tools.logging :as log]
-            [ubergraph.core :as uber]
             [matthiasn.systems-toolbox.component :as st]
             [me.raynes.fs :as fs]
             [clojure.java.io :as io]
@@ -42,8 +41,8 @@
         entry (loc/enrich-geoname entry)
         ts (:timestamp entry)
         graph (:graph current-state)
-        exists? (uber/has-node? graph ts)
-        existing (when exists? (uber/attrs graph ts))
+        exists? (uc/has-node? graph ts)
+        existing (when exists? (uc/attrs graph ts))
         node-to-add (if exists?
                       (if (= (:md existing) "No departure recorded #visit")
                         entry

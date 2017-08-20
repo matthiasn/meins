@@ -34,7 +34,7 @@ function startJVM (PORT, UPLOAD_PORT) {
     log.info("Starting backend service...");
     log.info('User data in:', dataPath);
 
-    jvmService = spawn(javaPath, ["-Dapple.awt.UIElement=true", "-jar", jarPath], {
+    jvmService = spawn(javaPath, ["-Dapple.awt.UIElement=true", "-XX:+AggressiveOpts", "-jar", jarPath], {
         detached: false,
         cwd: userData,
         env: {
