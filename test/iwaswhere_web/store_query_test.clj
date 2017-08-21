@@ -15,7 +15,7 @@
 (deftest query-test
   "Test that different queries return the expected results."
   (let [test-ts (System/currentTimeMillis)
-        {:keys [current-state logs-path]} (st/mk-test-state test-ts)]
+        {:keys [current-state logs-path test-path]} (st/mk-test-state test-ts)]
     (with-redefs [fu/daily-logs-path logs-path
                   loc/enrich-geoname stc/enrich-geoname-mock]
       (let [simple-query-uid (comp/make-uuid)

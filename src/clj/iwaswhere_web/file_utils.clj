@@ -12,6 +12,7 @@
 
 (def data-path (or (System/getenv "DATA_PATH") "data"))
 (def daily-logs-path (str data-path "/daily-logs/"))
+(def app-cache-file (str data-path "/cache.dat"))
 (def clucy-path (str data-path "/clucy/"))
 (def export-path (str data-path "/export/"))
 
@@ -22,6 +23,7 @@
     (fs/mkdirs export-path)
     (fs/mkdirs trash-path)
     {:data-path       data-path
+     :app-cache       app-cache-file
      :daily-logs-path daily-logs-path
      :clucy-path      clucy-path
      :export-path     export-path

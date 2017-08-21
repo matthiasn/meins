@@ -1,4 +1,4 @@
-(defproject matthiasn/iwaswhere-web "0.2.31"
+(defproject matthiasn/iwaswhere-web "0.2.32"
   :description "Sample application built with systems-toolbox library"
   :url "https://github.com/matthiasn/systems-toolbox"
   :license {:name "GNU AFFERO GENERAL PUBLIC LICENSE"
@@ -16,6 +16,7 @@
                  [markdown-clj "0.9.99"]
                  [clj-pdf "2.2.29"]
                  [cheshire "5.8.0"]
+                 [com.taoensso/nippy "2.13.0"]
                  [cljsjs/moment "2.17.1-1"]
                  [com.drewnoakes/metadata-extractor "2.10.1"]
                  [ubergraph "0.4.0"]
@@ -76,6 +77,8 @@
   :test-refresh {:notify-on-success false
                  :changes-only      false
                  :watch-dirs        ["src" "test"]}
+
+  :test2junit-run-ant true
 
   :aliases {"build" ["do" "clean" ["cljsbuild" "once" "release"]
                      ["sass" "once"] "uberjar"]

@@ -51,29 +51,32 @@
           (log/info "Indexed" (count @entries-to-index) "entries." t))
         (reset! entries-to-index [])))))
 
-(defn state-fn
-  "Initial state function, creates state atom and then parses all files in
-   data directory into the component state.
+(defn recreate-state
+  "Creates state atom and then parses all files in data directory into the
+   component state.
    Entries are stored as attributes of graph nodes, where the node itself is
    timestamp of an entry. A sort order by descending timestamp is maintained
-   in a sorted set of the nodes."
+   in a sorted set of the nodes timestamps."
   [put-fn]
   (let [conf (fu/load-cfg)
         entries-to-index (atom {})
         state (atom {:sorted-entries (sorted-set-by >)
                      :graph          (uber/graph)
-                     :cfg            conf
-                     :client-queries {}
-                     :hashtags       #{}
-                     :mentions       #{}
-                     :stats          {:entry-count     0
-                                      :node-count      0
-                                      :edge-count      0
-                                      :daily-summaries {}}})
+                     :cfg            conf})
         t (with-out-str (time (read-dir state entries-to-index conf)))]
     (log/info "Read" (count @entries-to-index) "entries." t)
     (ft-index entries-to-index put-fn)
     {:state state}))
+
+(defn state-fn
+  "Initial state function. If persisted state exists, read that (much faster),
+   otherwise recreate it from then append log. Should be deleted or renamed
+   whenever there is an application update to avoid inconsistencies."
+  [put-fn]
+  (if (and (System/getenv "CACHED_APPSTATE")
+           (fs/exists? (:app-cache (fu/paths))))
+    (f/state-from-file)
+    (recreate-state put-fn)))
 
 (defn refresh-cfg
   "Refresh configuration by reloading the config file."

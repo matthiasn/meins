@@ -41,7 +41,8 @@ function startJVM (PORT, UPLOAD_PORT) {
             PORT: PORT,
             UPLOAD_PORT: UPLOAD_PORT,
             DATA_PATH: dataPath,
-            BLINK_PATH: blinkPath
+            BLINK_PATH: blinkPath,
+            CACHED_APPSTATE: true
         }
     });
 

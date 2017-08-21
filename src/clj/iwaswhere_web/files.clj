@@ -13,11 +13,13 @@
             [me.raynes.fs :as fs]
             [clojure.java.io :as io]
             [clojure.edn :as edn]
+            [taoensso.nippy :as nippy]
             [clojure.tools.logging :as l]
             [clojure.pprint :as pp]
             [iwaswhere-web.file-utils :as fu]
             [iwaswhere-web.location :as loc]
-            [ubergraph.core :as uc]))
+            [ubergraph.core :as uc])
+  (:import [java.io DataInputStream DataOutputStream]))
 
 (defn filter-by-name
   "Filter a sequence of files by their name, matched via regular expression."
@@ -59,6 +61,24 @@
     {:new-state (ga/add-node current-state ts node-to-add false)
      :emit-msg  [[:ft/add entry]]}))
 
+(defn persist-state! [state]
+  (log/info "Persisting application state")
+  (let [file-path (:app-cache (fu/paths))
+        serializable (update-in state [:graph] uc/ubergraph->edn)]
+    (with-open [writer (io/output-stream file-path)]
+      (nippy/freeze-to-out! (DataOutputStream. writer) serializable))
+    (log/info "Application state saved to" file-path)))
+
+(defn state-from-file []
+  (let [file-path (:app-cache (fu/paths))
+        thawed (with-open [reader (io/input-stream file-path)]
+                 (nippy/thaw-from-in! (DataInputStream. reader)))
+        state (-> thawed
+                  (update-in [:sorted-entries] #(into (sorted-set-by >) %))
+                  (update-in [:graph] uc/edn->ubergraph))]
+    (log/info "Application state read from" file-path)
+    {:state (atom state)}))
+
 (defn geo-entry-persist-fn
   "Handler function for persisting journal entry."
   [{:keys [current-state msg-payload msg-meta]}]
@@ -66,13 +86,14 @@
         id (or (:id msg-payload) (uuid/v1))
         entry (merge msg-payload {:last-saved (st/now) :id id})
         entry (loc/enrich-geoname entry)
-        new-state (ga/add-node current-state ts entry false)
-        cfg (:cfg current-state)
         g (:graph current-state)
-        prev (when (uc/has-node? g ts) (uc/attrs g ts))]
+        prev (when (uc/has-node? g ts) (uc/attrs g ts))
+        new-state (ga/add-node current-state ts entry false)]
+    (when (System/getenv "CACHED_APPSTATE")
+      (future (persist-state! new-state)))
     (when (not= (dissoc prev :last-saved)
                 (dissoc entry :last-saved))
-      (append-daily-log cfg entry))
+      (append-daily-log (:cfg current-state) entry))
     {:new-state    new-state
      :send-to-self (when-let [comment-for (:comment-for msg-payload)]
                      (with-meta [:entry/find {:timestamp comment-for}] msg-meta))
