@@ -49,7 +49,7 @@ var mainWindow;
 
 function createWindow() {
     log.info("creating main window");
-    let window = new BrowserWindow(
+    let newWindow = new BrowserWindow(
         {
             width: 1200,
             height: 800,
@@ -58,24 +58,25 @@ function createWindow() {
             }
         }
     );
-    window.loadURL(url.format({
+    newWindow.loadURL(url.format({
         pathname: path.join(__dirname, 'index.html'),
         protocol: 'file:',
         slashes: true
     }));
 
-    mainWindow = window;
-    setMenu(window, createWindow);
+    mainWindow = newWindow;
+    setMenu(newWindow, createWindow);
 
-    window.on('focus', function () {
+    newWindow.on('focus', function () {
         log.info("focused");
-        mainWindow = window;
-        setMenu(window, createWindow);
+        mainWindow = newWindow;
+        setMenu(newWindow, createWindow);
     });
-    window.on('closed', function () {
-        window = null;
+    newWindow.on('closed', function () {
+        newWindow = null;
         mainWindow = null
-    })
+    });
+    return newWindow;
 }
 
 function waitUntilUp() {
