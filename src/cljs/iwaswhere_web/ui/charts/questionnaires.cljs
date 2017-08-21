@@ -27,22 +27,30 @@
     :stroke-width w}])
 
 (defn chart-line [scores point-mapper color]
-  (let [points (s/join " " (map-indexed point-mapper scores))]
+  (let [points (map-indexed point-mapper scores)
+        line-points (s/join " " (map :s points))]
     [:g
      [:g {:filter "url(#blur1)"}
       [:rect {:width  "100%"
               :height "100%"
               :style  {:fill   :none
                        :stroke :none}}]
-      [:polyline {:points points
+      [:polyline {:points line-points
                   :style  {:stroke       color
                            :stroke-width 2
                            :fill         :none}}]]
      [:g
-      [:polyline {:points points
+      [:polyline {:points line-points
                   :style  {:stroke       color
                            :stroke-width 1
-                           :fill         :none}}]]]))
+                           :fill         :none}}]
+      (for [p points]
+        ^{:key (str p)}
+        [:circle {:cx    (:x p)
+                  :cy    (:y p)
+                  :r     2
+                  :fill  :none
+                  :style {:stroke color}}])]]))
 
 (defn line [y s w]
   [:line {:x1           200
@@ -246,9 +254,12 @@
         mapper (fn [idx itm]
                  (let [ts (:timestamp itm)
                        from-beginning (- ts start)
-                       x (* w (/ from-beginning span))]
-                   (str (+ x-offset x) ","
-                        (- btm-y (* (- (score-k itm) mn) scale)))))
+                       x (+ x-offset (* w (/ from-beginning span)))
+                       y (- btm-y (* (- (score-k itm) mn) scale))
+                       s (str x "," y)]
+                   {:x x
+                    :y y
+                    :s s}))
         line-inc (if (> mx 100) 50 10)
         lines (filter #(zero? (mod % line-inc)) (range 1 rng))]
     (fn scores-chart-render [{:keys [y k score-k start end mn mx color]}]
@@ -297,8 +308,8 @@
             end (+ (- now within-day) d)
             span (- end start)
             custom-field-stats @custom-field-stats
-            common {:start start :end end :w 900 :x-offset 200
-                    :span  span :days days :stats custom-field-stats
+            common {:start      start :end end :w 900 :x-offset 200
+                    :span       span :days days :stats custom-field-stats
                     :chart-data @chart-data}
             charts-cfg (get-in @questionnaires [:dashboards dashboard-id])
             positioned-charts (charts-y-pos charts-cfg)

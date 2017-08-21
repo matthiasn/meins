@@ -1,4 +1,4 @@
-(defproject matthiasn/iwaswhere-web "0.2.38"
+(defproject matthiasn/iwaswhere-web "0.2.39"
   :description "Sample application built with systems-toolbox library"
   :url "https://github.com/matthiasn/systems-toolbox"
   :license {:name "GNU AFFERO GENERAL PUBLIC LICENSE"
@@ -91,7 +91,7 @@
                      ["shell" "webpack" "-p"]
                      ["uberjar"]
                      ["shell" "cp" "target/iwaswhere.jar" "electron/bin/"]
-                     ["shell" "./package.sh"]]}
+                     ["shell" "./publish.sh"]]}
 
   :codox {:output-path "codox"
           :source-uri  "https://github.com/matthiasn/iWasWhere/blob/master/iwaswhere-web/{filepath}#L{line}"}
