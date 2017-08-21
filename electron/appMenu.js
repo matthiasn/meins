@@ -1,9 +1,9 @@
 const {app, Menu} = require('electron');
-const {killJVM, clearCache} = require("./util");
+const {killJVM, clearCache, clearIwwCache} = require("./util");
 const log = require('electron-log');
 const {autoUpdater} = require("electron-updater");
 
-function updateMenuItem(progress, mainWindow, createWindow) {
+function updateMenuItem(progress, currWindow, createWindow) {
     var label = "Check for Updates";
     const finished = progress === 100;
     if (progress !== undefined) {
@@ -11,7 +11,7 @@ function updateMenuItem(progress, mainWindow, createWindow) {
     }
     if (progress === -1) {
         label = "No Updates available";
-        setTimeout(() => setMenu(mainWindow, createWindow), 20000)
+        setTimeout(() => setMenu(currWindow, createWindow), 20000)
     }
 
     if (finished) {
@@ -24,6 +24,7 @@ function updateMenuItem(progress, mainWindow, createWindow) {
             if (finished) {
                 killJVM();
                 clearCache();
+                clearIwwCache();
                 autoUpdater.quitAndInstall(false);
             } else {
                 autoUpdater.checkForUpdates();
@@ -42,7 +43,13 @@ function sendToWindow(currentWindow, msg) {
     }
 }
 
+var currWindowCache;
+var createWindowCache;
+
 function setMenu(currWindow, createWindow, progress) {
+    currWindowCache = currWindow;
+    createWindowCache = createWindow;
+
     const template = [{
         label: "Application",
         submenu: [
@@ -184,7 +191,7 @@ autoUpdater.on('update-available', (info) => {
 
 autoUpdater.on('update-not-available', (info) => {
     log.info('Update not available.');
-    setMenu(mainWindow, createWindow, -1);
+    setMenu(currWindowCache, createWindowCache, -1);
 });
 
 autoUpdater.on('error', (err) => {
@@ -196,7 +203,7 @@ autoUpdater.on('download-progress', (progressObj) => {
     log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
     log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
     log.info(log_message);
-    setMenu(mainWindow, createWindow, progressObj.percent);
+    setMenu(currWindowCache, createWindowCache, progressObj.percent);
 });
 
 autoUpdater.on('update-downloaded', (info) => {

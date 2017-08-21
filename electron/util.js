@@ -25,9 +25,18 @@ function killJVM() {
 function clearCache() {
     const ses = session.defaultSession;
     ses.clearCache(() => {
-        log.info("cleared cache");
+        log.info("cleared electron cache");
     });
+}
+
+function clearIwwCache() {
+    const iwwCache = path.normalize(userData + "cache.dat");
+    if (fs.existsSync(iwwCache)) {
+        fs.renameSync(iwwCache, iwwCache + ".bak");
+        log.info("cleared iWasWhere cache");
+    }
 }
 
 module.exports.killJVM = killJVM;
 module.exports.clearCache = clearCache;
+module.exports.clearIwwCache = clearIwwCache;
