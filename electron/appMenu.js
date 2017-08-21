@@ -172,6 +172,9 @@ function setMenu(currWindow, createWindow, progress) {
             }, {
                 label: "Clear Cache",
                 click: clearCache
+            }, {
+                label: "Clear Cache #2",
+                click: clearIwwCache()
             }
         ]
     }

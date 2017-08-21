@@ -30,7 +30,8 @@ function clearCache() {
 }
 
 function clearIwwCache() {
-    const iwwCache = path.normalize(userData + "/cache.dat");
+    const iwwCache = path.normalize(userData + "/data/cache.dat");
+    log.info("clearing", iwwCache);
     if (fs.existsSync(iwwCache)) {
         fs.renameSync(iwwCache, iwwCache + ".bak");
         log.info("cleared iWasWhere cache");
