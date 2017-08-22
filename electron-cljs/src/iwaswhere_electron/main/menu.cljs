@@ -9,6 +9,8 @@
         [{:label   "Application"
           :submenu [{:label    "About iWasWhere"
                      :selector "orderFrontStandardAboutPanel:"}
+                    {:label "Check for Updates"
+                     :click #(put-fn [:update/check])}
                     {:label       "Close Window"
                      :accelerator "Cmd+W"
                      :click       #(put-fn [:window/close])}

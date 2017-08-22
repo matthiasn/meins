@@ -1,11 +1,26 @@
 {
-  "name": "iwaswhere-electron",
+  "name": "iWasWhere",
   "version": "0.2.40",
   "description": "",
   "main": "package/main/main.js",
   "scripts": {
     "start": "electron .",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "build": {
+    "appId": "matthiasn.iWasWhere",
+    "asar": false,
+    "files": [
+      "**/*",
+      "package/**",
+      "package/main/**",
+      "package/render/**"
+    ],
+    "publish": {
+      "provider": "s3",
+      "bucket": "iwaswhere-electron",
+      "acl": "public-read"
+    }
   },
   "repository": {
     "type": "git",
@@ -19,18 +34,21 @@
   "homepage": "https://github.com/matthiasn/iWasWhere",
   "dependencies": {
     "@cljs-oss/module-deps": "^1.1.1",
+    "asar": "^0.13.0",
     "browser-resolve": "^1.11.2",
     "electron-log": "^2.2.7",
-    "electron-spellchecker": "^1.2.0",
     "module-deps": "^4.1.1",
     "moment": "^2.18.1",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
-    "resolve": "^1.4.0"
+    "resolve": "^1.4.0",
+    "s": "^0.1.1"
   },
   "devDependencies": {
     "electron": "^1.7.6",
-    "electron-packager": "8.7.2",
-    "electron-rebuild": "1.6.0"
+    "electron-builder": "^19.24.1",
+    "electron-packager": "^8.7.2",
+    "electron-publisher-s3": "19.24.0",
+    "electron-updater": "^2.8.7"
   }
 }

@@ -23,7 +23,7 @@
         close (fn [_]
                 (log/info "Closed" window-id)
                 (swap! cmp-state assoc-in [:active] nil))]
-    (log/info "Opening new window" url)
+    (log/info "Opening new window" url cwd)
     (.loadURL window url)
     (.on window "focus" focus)
     (.on window "close" close)

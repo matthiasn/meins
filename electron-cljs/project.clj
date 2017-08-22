@@ -12,12 +12,14 @@
                                        :target         :nodejs
                                        :output-dir     "package/main"
                                        :externs        ["externs.js"]
-                                       :npm-deps       {:electron-log          "2.2.7"
-                                                        :moment                "2.18.1"
-                                                        :react                 "15.6.1"
-                                                        :react-dom             "15.6.1"
-                                                        :electron-spellchecker "1.2.0"
-                                                        :electron              "1.7.6"}
+                                       :npm-deps       {:electron-log      "2.2.7"
+                                                        :moment            "2.18.1"
+                                                        :react             "15.6.1"
+                                                        :react-dom         "15.6.1"
+                                                        :electron-builder  "19.24.1"
+                                                        :electron-updater  "2.8.7"
+                                                        :electron-packager "8.7.2"
+                                                        :electron          "1.7.6"}
                                        :install-deps   true
                                        :optimizations  :none
                                        :pretty-print   true
@@ -29,12 +31,14 @@
                                        :target         :nodejs
                                        :output-dir     "package/renderer"
                                        :externs        ["externs.js"]
-                                       :npm-deps       {:electron-log          "2.2.7"
-                                                        :moment                "2.18.1"
-                                                        :react                 "15.6.1"
-                                                        :react-dom             "15.6.1"
-                                                        :electron-spellchecker "1.2.0"
-                                                        :electron              "1.7.6"}
+                                       :npm-deps       {:electron-log      "2.2.7"
+                                                        :moment            "2.18.1"
+                                                        :react             "15.6.1"
+                                                        :react-dom         "15.6.1"
+                                                        :electron-builder  "19.24.1"
+                                                        :electron-updater  "2.8.7"
+                                                        :electron-packager "8.7.2"
+                                                        :electron          "1.7.6"}
                                        :install-deps   true
                                        :optimizations  :none
                                        :pretty-print   true
