@@ -21,6 +21,7 @@
     "@cljs-oss/module-deps": "^1.1.1",
     "browser-resolve": "^1.11.2",
     "electron-log": "^2.2.7",
+    "electron-spellchecker": "^1.2.0",
     "module-deps": "^4.1.1",
     "moment": "^2.18.1",
     "react": "^15.6.1",
