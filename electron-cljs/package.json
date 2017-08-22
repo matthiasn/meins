@@ -36,6 +36,7 @@
     "@cljs-oss/module-deps": "^1.1.1",
     "asar": "^0.13.0",
     "browser-resolve": "^1.11.2",
+    "electron-fetch": "1.0.0",
     "electron-log": "^2.2.7",
     "module-deps": "^4.1.1",
     "moment": "^2.18.1",

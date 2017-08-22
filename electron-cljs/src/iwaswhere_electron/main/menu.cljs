@@ -11,6 +11,8 @@
                      :selector "orderFrontStandardAboutPanel:"}
                     {:label "Check for Updates"
                      :click #(put-fn [:update/check])}
+                    {:label "Install Updates"
+                     :click #(put-fn [:update/install])}
                     {:label       "Close Window"
                      :accelerator "Cmd+W"
                      :click       #(put-fn [:window/close])}
