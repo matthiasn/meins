@@ -1,7 +1,7 @@
-(ns iwaswhere-electron.core
-  (:require [iwaswhere-electron.log :as log]
-            [iwaswhere-electron.menu :as menu]
-            [iwaswhere-electron.window-manager :as wm]
+(ns iwaswhere-electron.main.core
+  (:require [iwaswhere-electron.main.log :as log]
+            [iwaswhere-electron.main.menu :as menu]
+            [iwaswhere-electron.main.window-manager :as wm]
             [electron :refer [app]]
             [matthiasn.systems-toolbox.switchboard :as sb]
             [cljs.nodejs :as nodejs :refer [process]]))

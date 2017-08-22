@@ -11,20 +11,6 @@
 </body>
 
 <script>
-    require('./renderer.js');
-
-    onload = () => {
-        const webview = document.querySelector('webview');
-        const {ipcRenderer} = require('electron');
-
-        // Register for IPC events
-        ipcRenderer.on('cmd', (event, message) => {
-            const wv = document.querySelector('webview');
-            console.log("Received command:", message);
-            ipcRenderer.send('pong', 'pong2');
-            let wc = wv.getWebContents();
-            wc.executeJavaScript("iwaswhere_web.ui.menu.hide()");
-        });
-    }
+    require('./package/renderer/renderer.js');
 </script>
 </html>

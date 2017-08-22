@@ -1,5 +1,5 @@
-(ns iwaswhere-electron.menu
-  (:require [iwaswhere-electron.log :as log]
+(ns iwaswhere-electron.main.menu
+  (:require [iwaswhere-electron.main.log :as log]
             [electron :refer [app Menu]]
             [matthiasn.systems-toolbox.switchboard :as sb]
             [cljs.nodejs :as nodejs :refer [process]]))
@@ -10,8 +10,9 @@
         [{:label   "Application"
           :submenu [{:label    "About iWasWhere"
                      :selector "orderFrontStandardAboutPanel:"}
-                    {:label "test"
-                     :click #(put-fn [:cmd/test "click"])}
+                    {:label "Close Window"
+                     :accelerator "Cmd+W"
+                     :click #(put-fn [:window/close])}
                     {:label       "Quit",
                      :accelerator "Cmd+Q",
                      :click       (fn [_]

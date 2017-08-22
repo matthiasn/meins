@@ -2,7 +2,7 @@
   "name": "iwaswhere-electron",
   "version": "0.2.40",
   "description": "",
-  "main": "package/main.js",
+  "main": "package/main/main.js",
   "scripts": {
     "start": "electron .",
     "test": "echo \"Error: no test specified\" && exit 1"

@@ -1,6 +1,6 @@
-(ns iwaswhere-electron.window-manager
+(ns iwaswhere-electron.main.window-manager
   (:require [clojure.string :as str]
-            [iwaswhere-electron.log :as log]
+            [iwaswhere-electron.main.log :as log]
             [electron :refer [BrowserWindow ipcMain]]
             [matthiasn.systems-toolbox.switchboard :as sb]
             [matthiasn.systems-toolbox.component :as stc]
@@ -9,7 +9,7 @@
 
 (defn new-window
   [{:keys [current-state cmp-state]}]
-  (let [window (BrowserWindow. {:width 1200 :height 800})
+  (let [window (BrowserWindow. (clj->js {:width 1200 :height 800}))
         window-id (stc/make-uuid)
         cwd (.cwd process)
         url (str "file://" cwd "/index.html")
@@ -25,7 +25,6 @@
                 (swap! cmp-state assoc-in [:active] nil))]
     (log/info "Opening new window" url)
     (.loadURL window url)
-    (pp/pprint new-state)
     (.on window "focus" focus)
     (.on window "close" close)
     {:new-state new-state}))
@@ -52,9 +51,16 @@
 
 
 (defn dev-tools
-  [{:keys [current-state msg-payload]}]
+  [{:keys [current-state]}]
   (when-let [web-contents (web-contents current-state)]
     (.openDevTools web-contents))
+  {})
+
+
+(defn close-window
+  [{:keys [current-state]}]
+  (when-let [active-window (active-window current-state)]
+    (.close active-window ))
   {})
 
 
@@ -63,4 +69,5 @@
   {:cmp-id      cmp-id
    :handler-map {:window/new       new-window
                  :window/send      send-cmd
+                 :window/close     close-window
                  :window/dev-tools dev-tools}})

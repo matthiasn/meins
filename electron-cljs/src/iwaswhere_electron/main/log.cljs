@@ -1,4 +1,4 @@
-(ns iwaswhere-electron.log
+(ns iwaswhere-electron.main.log
   (:require [electron-log :as l]
             [cljs.nodejs :as nodejs]))
 
