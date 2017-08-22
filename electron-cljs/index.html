@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>iWasWhere</title>
+</head>
+<body style="width:100%; height:100%; margin: 0; padding: 0">
+<div>
+    <webview src="http://localhost:8765/" style="height:100vh"></webview>
+</div>
+</body>
+
+<script>
+    require('./renderer.js');
+
+    onload = () => {
+        const webview = document.querySelector('webview');
+        const {ipcRenderer} = require('electron');
+
+        // Register for IPC events
+        ipcRenderer.on('cmd', (event, message) => {
+            const wv = document.querySelector('webview');
+            console.log("Received command:", message);
+            ipcRenderer.send('pong', 'pong2');
+            let wc = wv.getWebContents();
+            wc.executeJavaScript("iwaswhere_web.ui.menu.hide()");
+        });
+    }
+</script>
+</html>

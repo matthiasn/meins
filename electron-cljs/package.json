@@ -1,0 +1,35 @@
+{
+  "name": "iwaswhere-electron",
+  "version": "0.2.40",
+  "description": "",
+  "main": "package/main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matthiasn/iWasWhere.git"
+  },
+  "author": "Matthias Nehlsen",
+  "license": "AGPL-1.0",
+  "bugs": {
+    "url": "https://github.com/matthiasn/iWasWhere/issues"
+  },
+  "homepage": "https://github.com/matthiasn/iWasWhere",
+  "dependencies": {
+    "@cljs-oss/module-deps": "^1.1.1",
+    "browser-resolve": "^1.11.2",
+    "electron-log": "^2.2.7",
+    "module-deps": "^4.1.1",
+    "moment": "^2.18.1",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
+    "resolve": "^1.4.0"
+  },
+  "devDependencies": {
+    "electron": "^1.7.6",
+    "electron-packager": "8.7.2",
+    "electron-rebuild": "1.6.0"
+  }
+}
