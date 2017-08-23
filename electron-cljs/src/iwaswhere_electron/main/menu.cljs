@@ -11,6 +11,8 @@
                      :selector "orderFrontStandardAboutPanel:"}
                     {:label "Check for Updates"
                      :click #(put-fn [:update/check])}
+                    {:label "Check for Updates..."
+                     :click #(put-fn [:window/updater])}
                     {:label "Install Updates"
                      :click #(put-fn [:update/install])}
                     {:label       "Close Window"
@@ -117,8 +119,10 @@
                      :click #(put-fn [:window/send
                                       {:cmd      "iwaswhere_web.ui.menu.hide()"
                                        :cmd-type "cmd"}])}]}]
-        menu (.buildFromTemplate Menu (clj->js menu-tpl))]
+        menu (.buildFromTemplate Menu (clj->js menu-tpl))
+        activate #(put-fn [:window/activate])]
     (log/info "Starting Menu Component")
+    (.on app "activate" activate)
     (.setApplicationMenu Menu menu))
   {:state (atom {})})
 

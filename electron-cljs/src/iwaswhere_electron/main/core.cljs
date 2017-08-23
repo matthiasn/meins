@@ -17,12 +17,14 @@
     switchboard
     [[:cmd/init-comp #{(wm/cmp-map :electron/wm-cmp #{:exec/js})
                        (upd/cmp-map :electron/update-cmp)
-                       (menu/cmp-map :electron/menu-cmp)
-                       }]
+                       (menu/cmp-map :electron/menu-cmp)}]
 
      [:cmd/route {:from :electron/menu-cmp
                   :to   #{:electron/wm-cmp
                           :electron/update-cmp}}]
+
+     [:cmd/route {:from :electron/wm-cmp
+                  :to   :electron/update-cmp}]
 
      [:cmd/send {:to  :electron/wm-cmp
                  :msg [:window/new "main"]}]]))

@@ -1,6 +1,7 @@
 (defproject matthiasn/iwaswhere-electron "0.2.40"
   :dependencies [[org.clojure/clojure "1.9.0-alpha17"]
                  [org.clojure/clojurescript "1.9.908"]
+                 [re-frame "0.10.1"]
                  [matthiasn/systems-toolbox "0.6.10"]]
 
   :plugins [[lein-cljsbuild "1.1.7"]]
@@ -65,9 +66,28 @@
                        {:id           "renderer-prod"
                         :source-paths ["src/iwaswhere_electron/renderer"]
                         :compiler     {:main           iwaswhere-electron.renderer.core
-                                       :output-to      "renderer/renderer.js"
+                                       :output-to      "renderer-prod/renderer.js"
                                        :target         :nodejs
-                                       :output-dir     "renderer"
+                                       :output-dir     "renderer-prod"
+                                       :externs        ["externs.js"]
+                                       :npm-deps       {:electron-log      "2.2.7"
+                                                        :moment            "2.18.1"
+                                                        :react             "15.6.1"
+                                                        :react-dom         "15.6.1"
+                                                        :electron-builder  "19.24.1"
+                                                        :electron-updater  "2.8.7"
+                                                        :electron-packager "8.7.2"
+                                                        :electron          "1.7.6"}
+                                       :install-deps   true
+                                       :optimizations  :advanced
+                                       :pretty-print   true
+                                       :parallel-build true}}
+                       {:id           "updater"
+                        :source-paths ["src/iwaswhere_electron/update"]
+                        :compiler     {:main           iwaswhere-electron.update.core
+                                       :output-to      "updater/update.js"
+                                       :target         :nodejs
+                                       :output-dir     "updater"
                                        :externs        ["externs.js"]
                                        :npm-deps       {:electron-log      "2.2.7"
                                                         :moment            "2.18.1"

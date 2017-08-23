@@ -5,3 +5,4 @@ node_modules
 dist/
 renderer/
 prod/
+updater/
