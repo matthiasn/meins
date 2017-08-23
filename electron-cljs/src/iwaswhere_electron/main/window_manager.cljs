@@ -1,7 +1,7 @@
 (ns iwaswhere-electron.main.window-manager
   (:require [clojure.string :as str]
             [iwaswhere-electron.main.log :as log]
-            [electron :refer [BrowserWindow ipcMain]]
+            [electron :refer [app BrowserWindow]]
             [matthiasn.systems-toolbox.switchboard :as sb]
             [matthiasn.systems-toolbox.component :as stc]
             [cljs.nodejs :as nodejs :refer [process]]
@@ -12,7 +12,10 @@
   (let [window (BrowserWindow. (clj->js {:width 1200 :height 800}))
         window-id (stc/make-uuid)
         cwd (.cwd process)
-        url (str "file://" cwd "/index.html")
+        rp (.-resourcesPath process)
+        url (if (= "/" cwd)
+              (str "file://" rp "/app/index.html")
+              (str "file://" cwd "/index.html"))
         new-state (-> current-state
                       (assoc-in [:main-window] window)
                       (assoc-in [:windows window-id] window)
@@ -22,9 +25,11 @@
                 (swap! cmp-state assoc-in [:active] window-id))
         close (fn [_]
                 (log/info "Closed" window-id)
-                (swap! cmp-state assoc-in [:active] nil))]
+                (swap! cmp-state assoc-in [:active] nil)
+                (swap! cmp-state update-in [:windows] dissoc window-id))]
     (log/info "Opening new window" url cwd)
     (.loadURL window url)
+    (.openDevTools (.-webContents window))
     (.on window "focus" focus)
     (.on window "close" close)
     {:new-state new-state}))
@@ -49,6 +54,14 @@
       (.send web-contents cmd-type cmd))
     {}))
 
+(defn relay-msg
+  [{:keys [current-state msg-type msg-meta msg-payload]}]
+  (when-let [web-contents (web-contents current-state)]
+    (let [serializable [msg-type {:msg-payload msg-payload :msg-meta msg-meta}]]
+      (log/info "Relaying" (str msg-type) (str msg-payload))
+      (.send web-contents "relay" (pr-str serializable))))
+  {})
+
 
 (defn dev-tools
   [{:keys [current-state]}]
@@ -60,14 +73,16 @@
 (defn close-window
   [{:keys [current-state]}]
   (when-let [active-window (active-window current-state)]
-    (.close active-window ))
+    (.close active-window))
   {})
 
 
 (defn cmp-map
-  [cmp-id]
-  {:cmp-id      cmp-id
-   :handler-map {:window/new       new-window
-                 :window/send      send-cmd
-                 :window/close     close-window
-                 :window/dev-tools dev-tools}})
+  [cmp-id relay-types]
+  (let [relay-map (zipmap relay-types (repeat relay-msg))]
+    {:cmp-id      cmp-id
+     :handler-map (merge relay-map
+                         {:window/new       new-window
+                          :window/send      send-cmd
+                          :window/close     close-window
+                          :window/dev-tools dev-tools})}))

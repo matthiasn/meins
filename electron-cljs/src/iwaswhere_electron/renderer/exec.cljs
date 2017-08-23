@@ -10,9 +10,10 @@
 
 (defn exec-js [{:keys [current-state msg-payload]}]
   (log/info "EXEC:" msg-payload)
-  (let [wc (:web-contents current-state)]
-    (when wc
-      (.executeJavaScript wc msg-payload))
+  (let [webview (.querySelector js/document "webview")
+        web-contents (.getWebContents webview)]
+    (when web-contents
+      (.executeJavaScript web-contents msg-payload))
     {}))
 
 (defn cmp-map [cmp-id]

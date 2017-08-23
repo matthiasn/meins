@@ -15,9 +15,10 @@
   (log/info "Starting CORE:" (.-resourcesPath process))
   (sb/send-mult-cmd
     switchboard
-    [[:cmd/init-comp #{(wm/cmp-map :electron/wm-cmp)
+    [[:cmd/init-comp #{(wm/cmp-map :electron/wm-cmp #{:exec/js})
                        (upd/cmp-map :electron/update-cmp)
-                       (menu/cmp-map :electron/menu-cmp)}]
+                       (menu/cmp-map :electron/menu-cmp)
+                       }]
 
      [:cmd/route {:from :electron/menu-cmp
                   :to   #{:electron/wm-cmp

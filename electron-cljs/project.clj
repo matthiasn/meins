@@ -8,9 +8,9 @@
   :cljsbuild {:builds [{:id           "main"
                         :source-paths ["src/iwaswhere_electron/main"]
                         :compiler     {:main           iwaswhere-electron.main.core
-                                       :output-to      "package/main/main.js"
                                        :target         :nodejs
-                                       :output-dir     "package/main"
+                                       :output-to      "package/main.js"
+                                       :output-dir     "package"
                                        :externs        ["externs.js"]
                                        :npm-deps       {:electron-log      "2.2.7"
                                                         :moment            "2.18.1"
@@ -24,12 +24,12 @@
                                        :optimizations  :none
                                        :pretty-print   true
                                        :parallel-build true}}
-                       {:id           "renderer"
-                        :source-paths ["src/iwaswhere_electron/renderer"]
-                        :compiler     {:main           iwaswhere-electron.renderer.core
-                                       :output-to      "package/renderer/renderer.js"
+                       {:id           "main-prod"
+                        :source-paths ["src/iwaswhere_electron/main"]
+                        :compiler     {:main           iwaswhere-electron.main.core
                                        :target         :nodejs
-                                       :output-dir     "package/renderer"
+                                       :output-to      "prod/main.js"
+                                       :output-dir     "prod"
                                        :externs        ["externs.js"]
                                        :npm-deps       {:electron-log      "2.2.7"
                                                         :moment            "2.18.1"
@@ -40,6 +40,44 @@
                                                         :electron-packager "8.7.2"
                                                         :electron          "1.7.6"}
                                        :install-deps   true
-                                       :optimizations  :none
+                                       :optimizations  :advanced
+                                       :pretty-print   true
+                                       :parallel-build true}}
+                       {:id           "renderer"
+                        :source-paths ["src/iwaswhere_electron/renderer"]
+                        :compiler     {:main           iwaswhere-electron.renderer.core
+                                       :output-to      "renderer/renderer.js"
+                                       :target         :nodejs
+                                       :output-dir     "renderer"
+                                       :externs        ["externs.js"]
+                                       :npm-deps       {:electron-log      "2.2.7"
+                                                        :moment            "2.18.1"
+                                                        :react             "15.6.1"
+                                                        :react-dom         "15.6.1"
+                                                        :electron-builder  "19.24.1"
+                                                        :electron-updater  "2.8.7"
+                                                        :electron-packager "8.7.2"
+                                                        :electron          "1.7.6"}
+                                       :install-deps   true
+                                       :optimizations  :advanced
+                                       :pretty-print   true
+                                       :parallel-build true}}
+                       {:id           "renderer-prod"
+                        :source-paths ["src/iwaswhere_electron/renderer"]
+                        :compiler     {:main           iwaswhere-electron.renderer.core
+                                       :output-to      "renderer/renderer.js"
+                                       :target         :nodejs
+                                       :output-dir     "renderer"
+                                       :externs        ["externs.js"]
+                                       :npm-deps       {:electron-log      "2.2.7"
+                                                        :moment            "2.18.1"
+                                                        :react             "15.6.1"
+                                                        :react-dom         "15.6.1"
+                                                        :electron-builder  "19.24.1"
+                                                        :electron-updater  "2.8.7"
+                                                        :electron-packager "8.7.2"
+                                                        :electron          "1.7.6"}
+                                       :install-deps   true
+                                       :optimizations  :advanced
                                        :pretty-print   true
                                        :parallel-build true}}]})

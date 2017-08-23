@@ -24,10 +24,7 @@
          {:label   "File"
           :submenu [{:label       "New Entry"
                      :accelerator "Cmd+N",
-                     :click       #(put-fn
-                                     [:window/send
-                                      {:cmd      "iwaswhere_web.ui.menu.new_entry()"
-                                       :cmd-type "cmd"}])}
+                     :click       #(put-fn [:exec/js "iwaswhere_web.ui.menu.new_entry()"])}
                     {:label "New Story"
                      :click #(put-fn
                                [:window/send
