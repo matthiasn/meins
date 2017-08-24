@@ -1,4 +1,4 @@
-(ns iwaswhere-electron.main.window-manager
+(ns iwaswhere-electron.main.update-window
   (:require [clojure.string :as str]
             [iwaswhere-electron.main.log :as log]
             [electron :refer [app BrowserWindow ipcMain]]
@@ -8,30 +8,28 @@
             [cljs.reader :refer [read-string]]
             [clojure.pprint :as pp]))
 
-(defn new-window
-  [{:keys [current-state cmp-state]}]
-  (let [window (BrowserWindow. (clj->js {:width 1200 :height 800}))
+(defn updater-window
+  [{:keys [current-state cmp-state put-fn]}]
+  (let [window (BrowserWindow. (clj->js {:width 600 :height 300}))
         window-id (stc/make-uuid)
         cwd (.cwd process)
         rp (.-resourcesPath process)
         url (if (= "/" cwd)
-              (str "file://" rp "/app/index.html")
-              (str "file://" cwd "/index.html"))
+              (str "file://" rp "/app/updater.html")
+              (str "file://" cwd "/updater.html"))
         new-state (-> current-state
-                      (assoc-in [:main-window] window)
                       (assoc-in [:windows window-id] window)
                       (assoc-in [:active] window-id))
         focus (fn [_]
-                (log/info "Focused" window-id)
+                (log/info "Focused updater-window" window-id)
                 (swap! cmp-state assoc-in [:active] window-id))
         blur (fn [_]
-               (log/info "Blurred" window-id)
+               (log/info "Blurred updater-window" window-id)
                (swap! cmp-state assoc-in [:active] nil))
         close (fn [_]
-                (log/info "Closed" window-id)
-                (swap! cmp-state assoc-in [:active] nil)
-                (swap! cmp-state update-in [:windows] dissoc window-id))]
-    (log/info "Opening new window" url cwd)
+                (log/info "Closed updater-window")
+                (swap! cmp-state assoc-in [:updater-window] nil))]
+    (log/info "Opening new updater window" url cwd)
     (.loadURL window url)
     (.on window "focus" focus)
     (.on window "blur" blur)
@@ -47,13 +45,6 @@
   [current-state]
   (when-let [active-window (active-window current-state)]
     (.-webContents active-window)))
-
-(defn send-cmd
-  [{:keys [current-state msg-payload]}]
-  (let [{:keys [cmd-type cmd]} msg-payload]
-    (when-let [web-contents (web-contents current-state)]
-      (.send web-contents cmd-type cmd))
-    {}))
 
 (defn relay-msg
   [{:keys [current-state msg-type msg-meta msg-payload]}]
@@ -72,36 +63,32 @@
 (defn close-window
   [{:keys [current-state]}]
   (when-let [active-window (active-window current-state)]
-    (log/info "Closing:" (:active current-state))
+    (log/info "Closing Updater Window:" (:active current-state))
     (.close active-window))
   {})
 
-(defn activate
-  [{:keys [current-state]}]
-  (log/info "Activate APP")
-  (when (empty? (:windows current-state))
-    {:send-to-self [:window/new]}))
-
 (defn state-fn
   [put-fn]
-  (let [relay (fn [ev m]
+  (let [state (atom {})
+        relay (fn [ev m]
                 (let [parsed (read-string m)
                       msg-type (first parsed)
                       {:keys [msg-payload msg-meta]} (second parsed)
                       msg (with-meta [msg-type msg-payload] msg-meta)]
-                  (log/info "IPC relay:" (with-out-str (pp/pprint msg)))
-                  (put-fn msg)))]
+                  (log/info "Update IPC relay:" (with-out-str (pp/pprint msg)))
+                  (if (= msg-type :window/close)
+                    (close-window {:current-state @state})
+                    (put-fn msg))))]
     (.on ipcMain "relay" relay)
-    {:state (atom {})}))
+    {:state state}))
 
 (defn cmp-map
-  [cmp-id relay-types]
-  (let [relay-map (zipmap relay-types (repeat relay-msg))]
+  [cmp-id]
+  (let [relay-types #{:update/status}
+        relay-map (zipmap relay-types (repeat relay-msg))]
     {:cmp-id      cmp-id
      :state-fn    state-fn
      :handler-map (merge relay-map
-                         {:window/new       new-window
-                          :window/activate  activate
-                          :window/send      send-cmd
+                         {:window/updater   updater-window
                           :window/close     close-window
                           :window/dev-tools dev-tools})}))

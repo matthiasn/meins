@@ -1,0 +1,52 @@
+@import "variables.scss";
+
+body {
+  color: $font-color;
+  background-color: $tab-bg;
+  font-size: 12px;
+  font-weight: 300;
+  font-family: $font-family;
+  overflow: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: $header-font-family;
+}
+
+.flex-container {
+  display: flex;
+  flex-flow: column;
+  height: 100vh;
+}
+
+.updater {
+  padding: 1em;
+}
+
+@import "buttons.scss";
+
+
+// https://css-tricks.com/css3-progress-bars/
+.meter {
+  height: 10px;
+  position: relative;
+  background: #555;
+  border-radius: 10px;
+  padding: 5px;
+  box-shadow: inset 0 -1px 1px rgba(255, 255, 255, 0.3);
+}
+
+.meter > span {
+  display: block;
+  height: 100%;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  background-color: rgb(43, 194, 83);
+  box-shadow: inset 0 2px 9px rgba(255, 255, 255, 0.3),
+              inset 0 -2px 6px rgba(0, 0, 0, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+

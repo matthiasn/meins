@@ -1,10 +1,14 @@
-(defproject matthiasn/iwaswhere-electron "0.2.40"
-  :dependencies [[org.clojure/clojure "1.9.0-alpha17"]
+(defproject matthiasn/iwaswhere-electron "0.2.43"
+  :dependencies [[org.clojure/clojure "1.9.0-alpha18"]
                  [org.clojure/clojurescript "1.9.908"]
                  [re-frame "0.10.1"]
-                 [matthiasn/systems-toolbox "0.6.10"]]
+                 [matthiasn/systems-toolbox "0.6.11"]]
 
-  :plugins [[lein-cljsbuild "1.1.7"]]
+  :plugins [[lein-cljsbuild "1.1.7"]
+            [lein-sassy "1.0.8"]]
+
+  :sass {:src "src/scss/"
+         :dst "resources/public/css/"}
 
   :cljsbuild {:builds [{:id           "main"
                         :source-paths ["src/iwaswhere_electron/main"]
