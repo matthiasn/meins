@@ -1,5 +1,5 @@
 (defproject matthiasn/iwaswhere-electron "0.2.43"
-  :dependencies [[org.clojure/clojure "1.9.0-alpha18"]
+  :dependencies [[org.clojure/clojure "1.9.0-alpha19"]
                  [org.clojure/clojurescript "1.9.908"]
                  [re-frame "0.10.1"]
                  [matthiasn/systems-toolbox "0.6.11"]]

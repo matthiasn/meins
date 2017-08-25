@@ -16,4 +16,5 @@
 
 (defn error
   [& args]
-  (apply l/error args))
+  (apply l/error (cons "ERROR: " args)))
+

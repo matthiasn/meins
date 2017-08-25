@@ -2,6 +2,7 @@
   (:require [iwaswhere-electron.main.log :as log]
             [iwaswhere-electron.main.menu :as menu]
             [iwaswhere-electron.main.update :as upd]
+            [iwaswhere-electron.main.startup :as st]
             [iwaswhere-electron.main.window-manager :as wm]
             [iwaswhere-electron.main.update-window :as um]
             [electron :refer [app]]
@@ -18,6 +19,7 @@
   (sb/send-mult-cmd
     switchboard
     [[:cmd/init-comp #{(wm/cmp-map :electron/wm-cmp #{:exec/js})
+                       (st/cmp-map :electron/startup-cmp)
                        (upd/cmp-map :electron/update-cmp)
                        (sched/cmp-map :electron/scheduler-cmp)
                        (um/cmp-map :electron/update-win-cmp)
@@ -35,8 +37,20 @@
      [:cmd/route {:from :electron/update-cmp
                   :to   :electron/update-win-cmp}]
 
-     [:cmd/send {:to  :electron/wm-cmp
-                 :msg [:window/new "main"]}]
+     [:cmd/route {:from :electron/scheduler-cmp
+                  :to   :electron/startup-cmp}]
+
+     [:cmd/route {:from :electron/startup-cmp
+                  :to   :electron/scheduler-cmp}]
+
+     [:cmd/route {:from :electron/startup-cmp
+                  :to   :electron/wm-cmp}]
+
+     [:cmd/send {:to  :electron/startup-cmp
+                 :msg [:jvm/start]}]
+
+     [:cmd/send {:to  :electron/startup-cmp
+                 :msg [:jvm/loaded?]}]
 
      [:cmd/send {:to  :electron/scheduler-cmp
                  :msg [:cmd/schedule-new {:timeout (* 24 60 60 1000)

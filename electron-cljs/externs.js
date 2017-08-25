@@ -71,3 +71,28 @@ var document = {};
 document.querySelector = {};
 document.querySelector.getWebContents = function() {};
 document.querySelector.getWebContents.executeJavaScript = function() {};
+
+
+var child_process = {};
+child_process.ChildProcess = function(var_args) {};
+child_process.ChildProcess.spawn = function(command, args, options) {};
+child_process.exec = function(command, options, callback) {};
+child_process.fork = function(modulePath, args, options) {};
+child_process.ChildProcess.prototype.stdin;
+child_process.ChildProcess.prototype.stdout;
+child_process.ChildProcess.prototype.stderr;
+child_process.ChildProcess.prototype.pid;
+
+
+var http = {};
+http.get = function(options, callback) {};
+http.IncomingMessage = function() {};
+http.IncomingMessage.prototype.method;
+http.IncomingMessage.prototype.url;
+http.IncomingMessage.prototype.headers;
+http.IncomingMessage.prototype.trailers;
+http.IncomingMessage.prototype.httpVersion;
+http.IncomingMessage.prototype.httpVersionMajor;
+http.IncomingMessage.prototype.httpVersionMinor;
+http.IncomingMessage.prototype.connection;
+http.IncomingMessage.prototype.statusCode;

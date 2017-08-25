@@ -21,6 +21,10 @@
                       (assoc-in [:main-window] window)
                       (assoc-in [:windows window-id] window)
                       (assoc-in [:active] window-id))
+        new-state (if-let [loading (:loading new-state)]
+                    (do (.close loading)
+                        (dissoc new-state :loading))
+                    new-state)
         focus (fn [_]
                 (log/info "Focused" window-id)
                 (swap! cmp-state assoc-in [:active] window-id))
@@ -37,6 +41,21 @@
     (.on window "blur" blur)
     (.on window "close" close)
     {:new-state new-state}))
+
+(defn loading
+  [{:keys [current-state cmp-state]}]
+  (when-not (:loading current-state)
+    (let [window (BrowserWindow. (clj->js {:width 400 :height 300}))
+          window-id (stc/make-uuid)
+          cwd (.cwd process)
+          rp (.-resourcesPath process)
+          url (if (= "/" cwd)
+                (str "file://" rp "/app/loading.html")
+                (str "file://" cwd "/loading.html"))
+          new-state (assoc-in current-state [:loading] window)]
+      (log/info "Opening new load window" url cwd)
+      (.loadURL window url)
+      {:new-state new-state})))
 
 (defn active-window
   [current-state]
@@ -101,6 +120,7 @@
      :state-fn    state-fn
      :handler-map (merge relay-map
                          {:window/new       new-window
+                          :window/loading   loading
                           :window/activate  activate
                           :window/send      send-cmd
                           :window/close     close-window
