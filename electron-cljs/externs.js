@@ -62,7 +62,9 @@ process.resourcesPath;
 var electronUpdater = {};
 electronUpdater.autoUpdater = {};
 electronUpdater.autoUpdater.on = function() {};
+electronUpdater.autoUpdater.logger = function() {};
 electronUpdater.autoUpdater.checkForUpdates = function() {};
+electronUpdater.autoUpdater.downloadUpdate = function() {};
 electronUpdater.autoUpdater.quitAndInstall = function() {};
 
 var document = {};

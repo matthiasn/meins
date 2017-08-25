@@ -29,11 +29,19 @@
      " "
      [:button {:on-click check} "check"]]))
 
-(defn update-available [put-fn]
-  (let []
+(defn update-available [status-msg put-fn]
+  (let [download (fn [_]
+                   (log/info "Download button clicked")
+                   (put-fn [:update/download]))
+        {:keys [version releaseDate]} (:info status-msg)]
     [:div.updater
      [:h1 "New version of iWasWhere available."]
-     [cancel-btn put-fn]]))
+     [:div.info
+      [:div [:strong "Version: "] version]
+      [:div [:strong "Release date: "] (subs releaseDate 0 10)]]
+     [cancel-btn put-fn]
+     " "
+     [:button {:on-click download} "download"]]))
 
 (defn downloading [status-msg put-fn]
   (let [{:keys [total percent bytesPerSecond transferred]} (:info status-msg)
@@ -45,10 +53,11 @@
      [:h1 "Downloading new version of iWasWhere."]
      [:div.meter
       [:span {:style {:width (str percent "%")}}]]
-     [:div [:strong "Total size: "] total " MB"]
-     [:div [:strong "Transferred: "] total " MB"]
-     [:div [:strong "Progress: "] percent "%"]
-     [:div [:strong "Speed: "] mbs " MB/s"]
+     [:div.info
+      [:div [:strong "Total size: "] total " MB"]
+      [:div [:strong "Transferred: "] total " MB"]
+      [:div [:strong "Progress: "] percent "%"]
+      [:div [:strong "Speed: "] mbs " MB/s"]]
      [cancel-btn put-fn]]))
 
 (defn update-downloaded [put-fn]
@@ -72,10 +81,10 @@
          (case status
            :update/checking [checking put-fn]
            :update/not-available [no-update put-fn]
-           :update/available [update-available put-fn]
+           :update/available [update-available status-msg put-fn]
            :update/downloading [downloading status-msg put-fn]
            :update/downloaded [update-downloaded put-fn]
-           [:h1 "Updater: " (str status)])]))))
+           [:h1 "iWasWhere Updater: " (str status)])]))))
 
 (defn state-fn
   "Renders main view component and wires the central re-frame app-db as the

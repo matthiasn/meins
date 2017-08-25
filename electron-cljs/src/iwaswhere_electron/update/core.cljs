@@ -13,6 +13,7 @@
   (sb/send-mult-cmd
     switchboard
     [[:cmd/init-comp #{(ipc/cmp-map :updater/ipc-cmp #{:update/check
+                                                       :update/download
                                                        :update/install
                                                        :window/close})
                        (ui/cmp-map :updater/ui-cmp)}]
