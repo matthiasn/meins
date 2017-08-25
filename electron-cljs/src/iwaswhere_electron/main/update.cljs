@@ -5,15 +5,17 @@
 
 (defn state-fn
   [put-fn]
-  (let [no-update-available (fn [_]
+  (let [state (atom {:open-window false})
+        no-update-available (fn [_]
                               (log/info "Update not available.")
                               (put-fn [:update/status {:status :update/not-available}]))
         update-available (fn [info]
                            (let [info (js->clj info :keywordize-keys true)]
-
                              (log/info "Update available.")
-                             (put-fn [:update/status {:status :update/available
-                                                      :info   info}])))
+                             (if (:open-window @state)
+                               (put-fn [:window/updater])
+                               (put-fn [:update/status {:status :update/available
+                                                        :info   info}]))))
         checking (fn [_]
                    (log/info "Checking for update...")
                    (put-fn [:update/status {:status :update/checking}]))
@@ -37,13 +39,14 @@
     (.on autoUpdater "update-downloaded" downloaded)
     (.on autoUpdater "download-progress" downloading)
     (.on autoUpdater "error" error)
-    {:state (atom {})}))
+    {:state state}))
 
 (defn check-updates
-  [{:keys []}]
-  (log/info "UPDATE: check")
-  (.checkForUpdates autoUpdater)
-  {})
+  [open-window]
+  (fn [{:keys [current-state]}]
+    (log/info "UPDATE: check")
+    (.checkForUpdates autoUpdater)
+    {:new-state (assoc-in current-state [:open-window] open-window)}))
 
 (defn download-updates
   [{:keys []}]
@@ -61,7 +64,8 @@
   [cmp-id]
   {:cmp-id      cmp-id
    :state-fn    state-fn
-   :handler-map {:update/check    check-updates
-                 :update/download download-updates
-                 :update/install  install-updates}})
+   :handler-map {:update/check      (check-updates false)
+                 :update/auto-check (check-updates true)
+                 :update/download   download-updates
+                 :update/install    install-updates}})
 
