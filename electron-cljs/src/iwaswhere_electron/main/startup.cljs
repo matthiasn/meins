@@ -1,6 +1,6 @@
 (ns iwaswhere-electron.main.startup
   (:require [iwaswhere-electron.main.log :as log]
-            [child_process :refer [spawn]]
+            [child_process :refer [spawn fork]]
             [path :refer [normalize]]
             [electron :refer [app]]
             [http :as http]
@@ -70,10 +70,19 @@
                                             :BLINK_PATH      blink-path
                                             :CACHED_APPSTATE true}}))
         std-out (.-stdout service)
-        std-err (.-stderr service)]
+        std-err (.-stderr service)
+        geocoder (fork (str app-path "/geocoder.js")
+                       (clj->js [])
+                       (clj->js {:cwd cwd}))
+        spotify (fork (str app-path "spotify.js")
+                      (clj->js [])
+                      (clj->js {:cwd cwd
+                                :env {:USER_DATA user-data}}))]
     (log/info "JVM: startup" platform)
     (log/info "JVM: jvm-path" jar-path)
+    (log/info "JVM: cwd" cwd)
     (log/info "JVM: app-path" app-path)
+    (log/info "JVM: user-data" user-data)
     (log/info "JVM: rp" rp)
     (.on std-out "data" #(log/info "JVM " (.toString % "utf8")))
     (.on std-err "data" #(log/error "JVM " (.toString % "utf8")))

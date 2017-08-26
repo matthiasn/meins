@@ -3,6 +3,7 @@
 cd electron-cljs
 
 lein dist
+npm install
 
 export ELECTRON_BUILDER_COMPRESSION_LEVEL=3
 

@@ -1,6 +1,6 @@
 {
-  "name": "iWasWhere1",
-  "version": "0.2.45",
+  "name": "iWasWhere",
+  "version": "0.2.47",
   "description": "",
   "main": "prod/main.js",
   "scripts": {
@@ -36,15 +36,19 @@
     "@cljs-oss/module-deps": "^1.1.1",
     "asar": "^0.13.0",
     "browser-resolve": "^1.11.2",
+    "cookie-parser": "1.4.3",
     "electron-fetch": "^1.0.0",
     "electron-log": "^2.2.7",
+    "electron-spellchecker": "1.2.0",
     "electron-updater": "^2.8.7",
+    "local-reverse-geocoder": "0.3.2",
     "module-deps": "^4.1.1",
     "moment": "^2.18.1",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
     "resolve": "^1.4.0",
-    "s": "^0.1.1"
+    "s": "^0.1.1",
+    "tcp-port-used": "0.1.2"
   },
   "devDependencies": {
     "browser-resolve": "1.11.2",
