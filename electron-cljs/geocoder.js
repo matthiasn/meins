@@ -4,6 +4,7 @@ const os = require('os');
 const geocoder = require('local-reverse-geocoder');
 const log = require('electron-log');
 const tcpPortUsed = require('tcp-port-used');
+const npid = require('npid');
 const win32 = process.platform === "win32";
 
 const PORT = Number(process.env.GEOPORT || 3003);
@@ -46,11 +47,25 @@ svc.get(/geocode/, function (req, res) {
     });
 });
 
+const pid = process.pid;
+
 function initGeocoderSvc() {
-    let tmpDir = win32 ? os.tmpdir() : "/tmp";
-    log.info("GEOCODER: starting on port " + PORT);
+    const tmpDir = win32 ? os.tmpdir() : "/tmp";
+    const dumpDir = tmpDir + "/geonames";
+    const pidFile = dumpDir + '/geocoder.pid';
+    log.info("GEOCODER: starting on port", PORT, "PID", pid);
+    npid.remove(pidFile);
+
+    try {
+        const pid = npid.create(pidFile);
+        pid.removeOnExit();
+    } catch (err) {
+        log.info(err);
+        process.exit(1);
+    }
+
     geocoder.init({
-        dumpDirectory: tmpDir + "/geonames",
+        dumpDirectory: dumpDir,
         load: {
             admin1: true,
             admin2: true,
@@ -64,15 +79,17 @@ function initGeocoderSvc() {
     });
 }
 
-log.info("GEOCODER: check port " + PORT);
+log.info("GEOCODER: check PORT", PORT, "PID", pid);
 
 tcpPortUsed.check(PORT)
     .then(function (inUse) {
         if (inUse) {
-            log.error("GEOCODER: Port already in use:", PORT)
+            log.info("GEOCODER: Port already in use:", PORT);
+            process.exit(1);
         } else {
             initGeocoderSvc();
         }
     }, function (err) {
-        log.error('GEOCODER: Error on check:', err.message);
+        log.info('GEOCODER: Error on check:', err.message);
+        process.exit(1);
     });

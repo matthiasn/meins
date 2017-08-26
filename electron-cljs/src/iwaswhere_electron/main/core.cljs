@@ -46,6 +46,7 @@
      [:cmd/route {:from :electron/startup-cmp
                   :to   :electron/wm-cmp}]
 
+     #_
      [:cmd/send {:to  :electron/startup-cmp
                  :msg [:jvm/start]}]
 

@@ -10,11 +10,13 @@
 (def PORT 7788)
 
 (defn jvm-up?
-  [{:keys [put-fn] :as m}]
-  (log/info "JVM up?")
+  [{:keys [put-fn current-state cmp-state]}]
+  (log/info "JVM up?" (:attempt current-state))
   (let [try-again
         (fn [_]
           (log/info "- Nope, trying again")
+          (when-not (:service @cmp-state)
+            (put-fn [:cmd/schedule-new {:timeout 10 :message [:jvm/start]}]))
           (put-fn [:window/loading])
           (put-fn [:cmd/schedule-new {:timeout 1000 :message [:jvm/loaded?]}]))
         res-handler
@@ -24,9 +26,9 @@
             (if (= status-code 200)
               (put-fn [:window/new "main"])
               (try-again res))))
-        req (http/get (clj->js {:host "localhost" :port 7788}) res-handler)]
+        req (http/get (clj->js {:host "localhost" :port PORT}) res-handler)]
     (.on req "error" try-again)
-    {}))
+    {:new-state (update-in current-state [:attempt] #(inc (or % 0)))}))
 
 (def runtime-info
   (let [user-data (.getPath app "userData")
@@ -73,8 +75,9 @@
         std-err (.-stderr service)
         geocoder (fork (str app-path "/geocoder.js")
                        (clj->js [])
-                       (clj->js {:cwd cwd}))
-        spotify (fork (str app-path "spotify.js")
+                       (clj->js {:detached true
+                                 :cwd      cwd}))
+        spotify (fork (str app-path "/spotify.js")
                       (clj->js [])
                       (clj->js {:cwd cwd
                                 :env {:USER_DATA user-data}}))]
@@ -86,7 +89,7 @@
     (log/info "JVM: rp" rp)
     (.on std-out "data" #(log/info "JVM " (.toString % "utf8")))
     (.on std-err "data" #(log/error "JVM " (.toString % "utf8")))
-    {}))
+    {:new-state (assoc-in current-state [:service] service)}))
 
 (defn cmp-map
   [cmp-id]
