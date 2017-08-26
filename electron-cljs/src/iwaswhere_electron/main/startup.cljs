@@ -66,7 +66,6 @@
                        (clj->js {:detached false
                                  :cwd      user-data
                                  :env      {:PORT            PORT
-                                            :UPLOAD_PORT     3002
                                             :DATA_PATH       data-path
                                             :BLINK_PATH      blink-path
                                             :CACHED_APPSTATE true}}))

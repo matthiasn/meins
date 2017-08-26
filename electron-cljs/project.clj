@@ -1,4 +1,4 @@
-(defproject matthiasn/iwaswhere-electron "0.2.43"
+(defproject matthiasn/iwaswhere-electron "0.2.45"
   :dependencies [[org.clojure/clojure "1.9.0-alpha19"]
                  [org.clojure/clojurescript "1.9.908"]
                  [re-frame "0.10.1"]
@@ -9,6 +9,14 @@
 
   :sass {:src "src/scss/"
          :dst "resources/public/css/"}
+
+
+  :aliases {"dist" ["do"
+                    ["clean"]
+                    ["cljsbuild" "once" "main-prod"]
+                    ["cljsbuild" "once" "renderer"]
+                    ["cljsbuild" "once" "updater"]
+                    ["sass" "once"]]}
 
   :cljsbuild {:builds [{:id           "main"
                         :source-paths ["src/iwaswhere_electron/main"]

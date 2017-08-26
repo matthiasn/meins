@@ -55,7 +55,7 @@
       [:span {:style {:width (str percent "%")}}]]
      [:div.info
       [:div [:strong "Total size: "] total " MB"]
-      [:div [:strong "Transferred: "] total " MB"]
+      [:div [:strong "Transferred: "] transferred " MB"]
       [:div [:strong "Progress: "] percent "%"]
       [:div [:strong "Speed: "] mbs " MB/s"]]
      [cancel-btn put-fn]]))

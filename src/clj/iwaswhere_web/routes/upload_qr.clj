@@ -2,7 +2,8 @@
   "Functions for rendering a QR code that contains the IP address for upload."
   (:require [compojure.core :refer [GET]]
             [clj.qrgen :as qr]
-            [iwaswhere-web.upload :as up])
+            [iwaswhere-web.upload :as up]
+            [clojure.tools.logging :as log])
   (:import (java.net NetworkInterface Inet4Address)))
 
 ; ip-filter, ip-extract, and ips functions borrowed from:
@@ -25,6 +26,7 @@
 (def address-qr-route
   (GET "/upload-address/:uuid/qrcode.png" [_uuid]
     (qr/as-input-stream
-      (let [ip (ffirst (ips))]
-        (qr/from (str "http://" ip ":" up/upload-port "/upload/")
-                 :size [300 300])))))
+      (let [ip (ffirst (ips))
+            url (str "http://" ip ":" @up/upload-port "/upload/")]
+        (log/info "QR Code for:")
+        (qr/from url :size [300 300])))))

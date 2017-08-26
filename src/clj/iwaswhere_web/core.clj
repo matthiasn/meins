@@ -56,7 +56,8 @@
                     :to   :server/store-cmp}]
 
        [:cmd/route {:from :server/upload-cmp
-                    :to   :server/store-cmp}]
+                    :to   #{:server/store-cmp
+                            :server/ws-cmp}}]
 
        [:cmd/route {:from :server/store-cmp
                     :to   #{:server/ws-cmp

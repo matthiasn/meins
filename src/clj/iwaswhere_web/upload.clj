@@ -8,9 +8,16 @@
             [image-resizer.util :refer :all]
             [clojure.string :as s]
             [clojure.tools.logging :as log]
-            [iwaswhere-web.file-utils :as fu]))
+            [iwaswhere-web.file-utils :as fu])
+  (:import (java.net ServerSocket)))
 
-(def upload-port (Integer/parseInt (get (System/getenv) "UPLOAD_PORT" "3001")))
+(def upload-port (atom nil))
+
+(defn get-free-port []
+  (let [socket (ServerSocket. 0)
+        port (.getLocalPort socket)]
+    (.close socket)
+    port))
 
 (defn start-server
   "Fires up REST endpoint that accepts import files:
@@ -22,7 +29,8 @@
   (when-let [server (:server current-state)]
     (log/info "Stopping Upload Server")
     (.stop server))
-  (log/info "Starting Upload Server")
+  (reset! upload-port (get-free-port))
+  (log/info "Starting Upload Server on port" @upload-port)
   (let [post-fn (fn [filename req put-fn]
                   (with-open [rdr (io/reader (:body req))]
                     (case filename
@@ -43,11 +51,14 @@
                 (binary-post-fn dir file r))
               (POST "/upload/:filename" [filename :as r]
                 (post-fn filename r put-fn)))
-        server (j/run-jetty app {:port upload-port :join? false})]
+        server (j/run-jetty app {:port @upload-port :join? false})]
     {:new-state (assoc-in current-state [:server] server)
-     :emit-msg  [:cmd/schedule-new
-                 {:timeout 120000
-                  :message [:import/stop-server]}]}))
+     :emit-msg  [[:cmd/schedule-new
+                  {:timeout 120000
+                   :message [:import/stop-server]}]
+                 (with-meta
+                   [:cmd/toggle-key {:path [:cfg :qr-code] :reset-to true}]
+                   {:sente-uid :broadcast})]}))
 
 (defn stop-server
   [{:keys [current-state]}]

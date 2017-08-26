@@ -1,9 +1,9 @@
-(defproject matthiasn/iwaswhere-web "0.2.39"
+(defproject matthiasn/iwaswhere-web "0.2.45"
   :description "Sample application built with systems-toolbox library"
   :url "https://github.com/matthiasn/systems-toolbox"
   :license {:name "GNU AFFERO GENERAL PUBLIC LICENSE"
             :url  "https://www.gnu.org/licenses/agpl-3.0.en.html"}
-  :dependencies [[org.clojure/clojure "1.9.0-alpha17"]
+  :dependencies [[org.clojure/clojure "1.9.0-alpha19"]
                  [org.clojure/clojurescript "1.9.908"]
                  [org.clojure/tools.logging "0.4.0"]
                  [ch.qos.logback/logback-classic "1.2.3"]
@@ -91,6 +91,7 @@
                      ["shell" "webpack" "-p"]
                      ["uberjar"]
                      ["shell" "cp" "target/iwaswhere.jar" "electron/bin/"]
+                     ["shell" "cp" "target/iwaswhere.jar" "electron-cljs/bin/"]
                      ["shell" "./publish.sh"]]}
 
   :codox {:output-path "codox"
