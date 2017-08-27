@@ -1,8 +1,8 @@
 {
   "name": "iWasWhere",
-  "version": "0.2.86",
+  "version": "0.2.88",
   "description": "",
-  "main": "prod/main.js",
+  "main": "prod/main/main.js",
   "scripts": {
     "start": "electron .",
     "test": "echo \"Error: no test specified\" && exit 1"

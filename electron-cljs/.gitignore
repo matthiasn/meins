@@ -1,9 +1,6 @@
 target
 pom.xml
-package
 node_modules
 dist/
-renderer/
 prod/
-updater/
 resources/
