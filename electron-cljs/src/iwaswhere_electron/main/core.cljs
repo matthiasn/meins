@@ -28,27 +28,25 @@
      [:cmd/route {:from :electron/menu-cmp
                   :to   #{:electron/wm-cmp
                           :electron/update-win-cmp
+                          :electron/startup-cmp
                           :electron/update-cmp}}]
 
      [:cmd/route {:from #{:electron/update-win-cmp
                           :electron/scheduler-cmp}
-                  :to   :electron/update-cmp}]
+                  :to   #{:electron/update-cmp
+                          :electron/startup-cmp}}]
 
      [:cmd/route {:from :electron/update-cmp
-                  :to   :electron/update-win-cmp}]
+                  :to   #{:electron/update-win-cmp
+                          :electron/scheduler-cmp}}]
 
-     [:cmd/route {:from :electron/scheduler-cmp
+     [:cmd/route {:from #{:electron/update-cmp
+                          :electron/scheduler-cmp}
                   :to   :electron/startup-cmp}]
 
      [:cmd/route {:from :electron/startup-cmp
-                  :to   :electron/scheduler-cmp}]
-
-     [:cmd/route {:from :electron/startup-cmp
-                  :to   :electron/wm-cmp}]
-
-     #_
-     [:cmd/send {:to  :electron/startup-cmp
-                 :msg [:jvm/start]}]
+                  :to   #{:electron/scheduler-cmp
+                          :electron/wm-cmp}}]
 
      [:cmd/send {:to  :electron/startup-cmp
                  :msg [:jvm/loaded?]}]

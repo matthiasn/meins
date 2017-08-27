@@ -33,6 +33,10 @@ electron.Menu = {};
 electron.Menu.buildFromTemplate = function() {};
 electron.Menu.setApplicationMenu = function() {};
 
+electron.session = {};
+electron.session.defaultSession = {};
+electron.session.clearCache = function() {};
+
 /**
  * @constructor
  * @extends events.EventEmitter
@@ -96,3 +100,12 @@ http.IncomingMessage.prototype.httpVersionMajor;
 http.IncomingMessage.prototype.httpVersionMinor;
 http.IncomingMessage.prototype.connection;
 http.IncomingMessage.prototype.statusCode;
+
+
+var path = {};
+path.normalize = function(p) {};
+
+var fs = {};
+fs.renameSync = function(oldPath, newPath) {};
+fs.existsSync = function(path) {};
+fs.readFileSync = function(path) {};

@@ -11,17 +11,20 @@
                      :selector "orderFrontStandardAboutPanel:"}
                     {:label "Check for Updates..."
                      :click #(put-fn [:window/updater])}
+                    {:label "Clear Caches"
+                     :click #(do (put-fn [:app/clear-iww-cache])
+                                 (put-fn [:app/clear-cache]))}
                     {:label       "Close Window"
                      :accelerator "Cmd+W"
                      :click       #(put-fn [:window/close])}
-                    {:label       "Quit",
-                     :accelerator "Cmd+Q",
-                     :click       (fn [_]
-                                    (log/info "Shutting down")
-                                    (.quit app))}]}
+                    {:label       "Quit Background Service"
+                     :click       #(put-fn [:app/shutdown-jvm])}
+                    {:label       "Quit"
+                     :accelerator "Cmd+Q"
+                     :click       #(put-fn [:app/shutdown])}]}
          {:label   "File"
           :submenu [{:label       "New Entry"
-                     :accelerator "Cmd+N",
+                     :accelerator "Cmd+N"
                      :click       #(put-fn [:exec/js "iwaswhere_web.ui.menu.new_entry()"])}
                     {:label "New Story"
                      :click #(put-fn
@@ -92,7 +95,7 @@
                                             :cmd-type "cmd"}])}]}]}
          {:label   "View"
           :submenu [{:label       "New Window"
-                     :accelerator "Option+Cmd+N",
+                     :accelerator "Option+Cmd+N"
                      :click       #(put-fn [:window/new "main"])}
                     {:label "Open Dev Tools"
                      :click #(put-fn [:window/dev-tools])}

@@ -57,6 +57,15 @@
 (defn install-updates
   [{:keys []}]
   (log/info "UPDATE: install")
+  {:emit-msg [[:app/clear-cache]
+              [:app/clear-iww-cache]
+              [:app/shutdown-jvm]
+              [:cmd/schedule-new {:timeout 1000
+                                  :message [:update/quit-install]}]]})
+
+(defn quit-install
+  [{:keys []}]
+  (log/info "UPDATE: quit and install")
   (.quitAndInstall autoUpdater false)
   {})
 
@@ -64,8 +73,9 @@
   [cmp-id]
   {:cmp-id      cmp-id
    :state-fn    state-fn
-   :handler-map {:update/check      (check-updates false)
-                 :update/auto-check (check-updates true)
-                 :update/download   download-updates
-                 :update/install    install-updates}})
+   :handler-map {:update/check        (check-updates false)
+                 :update/auto-check   (check-updates true)
+                 :update/download     download-updates
+                 :update/install      install-updates
+                 :update/quit-install quit-install}})
 
