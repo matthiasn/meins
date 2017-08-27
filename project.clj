@@ -1,4 +1,4 @@
-(defproject matthiasn/iwaswhere-web "0.2.62"
+(defproject matthiasn/iwaswhere-web "0.2.71"
   :description "Sample application built with systems-toolbox library"
   :url "https://github.com/matthiasn/systems-toolbox"
   :license {:name "GNU AFFERO GENERAL PUBLIC LICENSE"
@@ -13,17 +13,17 @@
                  [clj-http "3.7.0"]
                  [enlive "1.1.6"]
                  [me.raynes/fs "1.4.6"]
-                 [markdown-clj "0.9.99"]
+                 [markdown-clj "1.0.1"]
                  [clj-pdf "2.2.29"]
                  [cheshire "5.8.0"]
                  [com.taoensso/nippy "2.13.0"]
                  [cljsjs/moment "2.17.1-1"]
                  [com.drewnoakes/metadata-extractor "2.10.1"]
                  [ubergraph "0.4.0"]
-                 [factual/geo "1.0.0"]
+                 [factual/geo "1.1.0"]
                  [camel-snake-kebab "0.4.0"]
-                 [matthiasn/systems-toolbox "0.6.10"]
-                 [matthiasn/systems-toolbox-sente "0.6.15"]
+                 [matthiasn/systems-toolbox "0.6.11"]
+                 [matthiasn/systems-toolbox-sente "0.6.16"]
                  [matthiasn/systems-toolbox-zipkin "0.6.3"]
                  [reagent "0.7.0" :exclusions [cljsjs/react cljsjs/react-dom]]
                  [re-frame "0.10.1"]
@@ -59,7 +59,7 @@
             [lein-figwheel "0.5.13"]
             [lein-sassy "1.0.8"
              :exclusions [org.clojure/clojure org.codehaus.plexus/plexus-utils]]
-            [com.jakemccrary/lein-test-refresh "0.20.0"]
+            [com.jakemccrary/lein-test-refresh "0.21.1"]
             [test2junit "1.3.3"]
             [lein-doo "0.1.7"]
             [lein-shell "0.5.0"]
@@ -90,7 +90,6 @@
                      ["shell" "npm" "install"]
                      ["shell" "webpack" "-p"]
                      ["uberjar"]
-                     ["shell" "cp" "target/iwaswhere.jar" "electron/bin/"]
                      ["shell" "cp" "target/iwaswhere.jar" "electron-cljs/bin/"]
                      ["shell" "./publish.sh"]]}
 

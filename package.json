@@ -1,6 +1,6 @@
 {
   "name": "iWasWhere",
-  "version": "0.2.62",
+  "version": "0.2.71",
   "author": "matthias.nehlsen@gmail.com",
   "scripts": {
     "watch": "webpack -d --watch",
