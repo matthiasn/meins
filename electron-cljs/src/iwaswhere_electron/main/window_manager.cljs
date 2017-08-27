@@ -34,7 +34,7 @@
                 (swap! cmp-state update-in [:windows] dissoc window-id))]
     (log/info "Opening new window" url)
     (.loadURL window url)
-    (.on window "focus" focus)
+    (.on window "focus" #(js/setTimeout focus 10))
     (.on window "blur" blur)
     (.on window "close" close)
     {:new-state new-state}))

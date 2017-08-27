@@ -15,14 +15,22 @@
     (.close existing))
   (let [window (BrowserWindow. (clj->js {:width 600 :height 300}))
         url (str "file://" (:app-path rt/runtime-info) "/updater.html")
-        new-state (assoc-in current-state [:updater-window] window)
+        new-state (-> current-state
+                      (assoc-in [:updater-window] window)
+                      (assoc-in [:active] true))
         close (fn [_]
                 (log/info "Closed updater-window")
-                (swap! cmp-state assoc-in [:updater-window] nil))]
+                (swap! cmp-state assoc-in [:updater-window] nil))
+        focus (fn [_]
+                (log/info "Focused updater-window")
+                (swap! cmp-state assoc-in [:active] true))
+        blur (fn [_]
+                (log/info "Blurred updater-window")
+                (swap! cmp-state assoc-in [:active] false))]
     (log/info "Opening new updater window" url)
     (.loadURL window url)
-    (.on window "focus" #(swap! cmp-state assoc-in [:active] true))
-    (.on window "blur" #(swap! cmp-state assoc-in [:active] false))
+    (.on window "focus" focus)
+    (.on window "blur" blur)
     (.on window "close" close)
     {:new-state new-state}))
 
@@ -37,10 +45,11 @@
 
 (defn close-window
   [{:keys [current-state]}]
+  (log/info "Closing Updater Window")
   (when-let [updater-window (:updater-window current-state)]
     (when (:active current-state)
-      (log/info "Closing Updater Window:")
-      (.close updater-window)))
+      (.close updater-window)
+      (log/info "Closed Updater Window")))
   {})
 
 (defn state-fn
