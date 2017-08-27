@@ -14,7 +14,7 @@
   (when-let [existing (:updater-window current-state)]
     (.close existing))
   (let [window (BrowserWindow. (clj->js {:width 600 :height 300}))
-        url (str (:app-path rt/runtime-info) "/updater.html")
+        url (str "file://" (:app-path rt/runtime-info) "/updater.html")
         new-state (assoc-in current-state [:updater-window] window)
         close (fn [_]
                 (log/info "Closed updater-window")

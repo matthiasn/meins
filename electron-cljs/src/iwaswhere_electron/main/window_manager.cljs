@@ -1,6 +1,7 @@
 (ns iwaswhere-electron.main.window-manager
   (:require [clojure.string :as str]
             [iwaswhere-electron.main.log :as log]
+            [iwaswhere-electron.main.runtime :as rt]
             [electron :refer [app BrowserWindow ipcMain]]
             [matthiasn.systems-toolbox.switchboard :as sb]
             [matthiasn.systems-toolbox.component :as stc]
@@ -12,11 +13,7 @@
   [{:keys [current-state cmp-state]}]
   (let [window (BrowserWindow. (clj->js {:width 1200 :height 800}))
         window-id (stc/make-uuid)
-        cwd (.cwd process)
-        rp (.-resourcesPath process)
-        url (if (= "/" cwd)
-              (str "file://" rp "/app/index.html")
-              (str "file://" cwd "/index.html"))
+        url (str "file://" (:app-path rt/runtime-info) "/index.html")
         new-state (-> current-state
                       (assoc-in [:main-window] window)
                       (assoc-in [:windows window-id] window)
@@ -35,7 +32,7 @@
                 (log/info "Closed" window-id)
                 (swap! cmp-state assoc-in [:active] nil)
                 (swap! cmp-state update-in [:windows] dissoc window-id))]
-    (log/info "Opening new window" url cwd)
+    (log/info "Opening new window" url)
     (.loadURL window url)
     (.on window "focus" focus)
     (.on window "blur" blur)
@@ -47,13 +44,9 @@
   (when-not (:loading current-state)
     (let [window (BrowserWindow. (clj->js {:width 400 :height 300}))
           window-id (stc/make-uuid)
-          cwd (.cwd process)
-          rp (.-resourcesPath process)
-          url (if (= "/" cwd)
-                (str "file://" rp "/app/loading.html")
-                (str "file://" cwd "/loading.html"))
+          url (str "file://" (:app-path rt/runtime-info) "/loading.html")
           new-state (assoc-in current-state [:loading] window)]
-      (log/info "Opening new load window" url cwd)
+      (log/info "Opening new load window" url)
       (.loadURL window url)
       {:new-state new-state})))
 
