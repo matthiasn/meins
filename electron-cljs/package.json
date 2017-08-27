@@ -1,30 +1,11 @@
 {
   "name": "iWasWhere",
-  "version": "0.2.71",
+  "version": "0.2.86",
   "description": "",
   "main": "prod/main.js",
   "scripts": {
     "start": "electron .",
     "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "build": {
-    "appId": "matthiasn.iWasWhere",
-    "asar": false,
-    "files": [
-      "**/*",
-      "package/**",
-      "package/main/**",
-      "package/render/**",
-      "!bin/",
-      "bin/blink1-${os}*",
-      "bin/zulu8.23.0.3-jdk8.0.144-${os}_x64/**",
-      "bin/iwaswhere.jar"
-    ],
-    "publish": {
-      "provider": "s3",
-      "bucket": "iwaswhere-electron",
-      "acl": "public-read"
-    }
   },
   "repository": {
     "type": "git",
@@ -43,6 +24,7 @@
     "cookie-parser": "1.4.3",
     "electron-fetch": "^1.0.0",
     "electron-log": "^2.2.7",
+    "electron-packager": "^8.7.2",
     "electron-spellchecker": "1.2.0",
     "electron-updater": "^2.8.7",
     "local-reverse-geocoder": "0.3.2",
@@ -59,8 +41,7 @@
     "browser-resolve": "1.11.2",
     "electron": "^1.7.6",
     "electron-builder": "^19.24.1",
-    "electron-packager": "^8.7.2",
-    "electron-publisher-s3": "19.24.0",
+    "electron-publisher-s3": "19.25.0",
     "module-deps": "4.1.1",
     "resolve": "1.4.0"
   }

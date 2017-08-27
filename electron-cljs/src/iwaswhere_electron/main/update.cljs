@@ -3,6 +3,14 @@
             [electron-log :as electron-log]
             [electron-updater :refer [autoUpdater]]))
 
+(defn set-feed [channel]
+  (.setFeedURL autoUpdater (clj->js
+                             {:url      "https://iwaswhere-electron.s3.amazonaws.com"
+                              :provider "s3"
+                              :bucket   "iwaswhere-electron"
+                              :acl      "public-read"
+                              :channel  channel})))
+
 (defn state-fn
   [put-fn]
   (let [state (atom {:open-window false})
@@ -44,9 +52,17 @@
 (defn check-updates
   [open-window]
   (fn [{:keys [current-state]}]
-    (log/info "UPDATE: check")
+    (log/info "UPDATE: check release versions")
+    (set-feed "release")
     (.checkForUpdates autoUpdater)
     {:new-state (assoc-in current-state [:open-window] open-window)}))
+
+(defn check-updates-beta
+  [{:keys []}]
+  (log/info "UPDATE: check beta versions")
+  (set-feed "beta")
+  (.checkForUpdates autoUpdater)
+  {})
 
 (defn download-updates
   [{:keys []}]
@@ -75,6 +91,7 @@
    :state-fn    state-fn
    :handler-map {:update/check        (check-updates false)
                  :update/auto-check   (check-updates true)
+                 :update/check-beta   check-updates-beta
                  :update/download     download-updates
                  :update/install      install-updates
                  :update/quit-install quit-install}})

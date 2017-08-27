@@ -91,7 +91,17 @@
                      ["shell" "webpack" "-p"]
                      ["uberjar"]
                      ["shell" "cp" "target/iwaswhere.jar" "electron-cljs/bin/"]
-                     ["shell" "./publish.sh"]]}
+                     ["shell" "./publish.sh"]]
+            "beta"  ["do"
+                     ["clean"]
+                     ["test2junit"]
+                     ["cljsbuild" "once" "release"]
+                     ["sass" "once"]
+                     ["shell" "npm" "install"]
+                     ["shell" "webpack" "-p"]
+                     ["uberjar"]
+                     ["shell" "cp" "target/iwaswhere.jar" "electron-cljs/bin/"]
+                     ["shell" "./publish_beta.sh"]]}
 
   :codox {:output-path "codox"
           :source-uri  "https://github.com/matthiasn/iWasWhere/blob/master/iwaswhere-web/{filepath}#L{line}"}

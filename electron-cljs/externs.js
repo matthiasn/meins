@@ -70,6 +70,7 @@ electronUpdater.autoUpdater.logger = function() {};
 electronUpdater.autoUpdater.checkForUpdates = function() {};
 electronUpdater.autoUpdater.downloadUpdate = function() {};
 electronUpdater.autoUpdater.quitAndInstall = function() {};
+electronUpdater.autoUpdater.setFeedURL = function() {};
 
 var document = {};
 document.querySelector = {};

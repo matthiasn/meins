@@ -22,12 +22,17 @@
 (defn no-update [put-fn]
   (let [check (fn [_]
                 (log/info "Check button clicked")
-                (put-fn [:update/check]))]
+                (put-fn [:update/check]))
+        check-beta (fn [_]
+                     (log/info "Check beta versions")
+                     (put-fn [:update/check-beta]))]
     [:div.updater
      [:h1 "You already have the latest version of iWasWhere."]
      [cancel-btn put-fn]
      " "
-     [:button {:on-click check} "check"]]))
+     [:button {:on-click check} "check"]
+     " "
+     [:button {:on-click check-beta} "check for beta version"]]))
 
 (defn update-available [status-msg put-fn]
   (let [download (fn [_]
@@ -84,7 +89,7 @@
            :update/available [update-available status-msg put-fn]
            :update/downloading [downloading status-msg put-fn]
            :update/downloaded [update-downloaded put-fn]
-           [:h1 "iWasWhere Updater: " (str status)])]))))
+           [:h1 "iWasWhere Updater: " (str status-msg)])]))))
 
 (defn state-fn
   "Renders main view component and wires the central re-frame app-db as the

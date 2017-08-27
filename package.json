@@ -1,6 +1,6 @@
 {
   "name": "iWasWhere",
-  "version": "0.2.71",
+  "version": "0.2.72",
   "author": "matthias.nehlsen@gmail.com",
   "scripts": {
     "watch": "webpack -d --watch",
@@ -18,6 +18,7 @@
     "draft-js-mention-plugin": "2.0.0-rc2",
     "draft-js-plugins-editor": "2.0.0-rc2",
     "draftjs-md-converter": "0.1.5",
+    "electron-builder": "^19.24.1",
     "emoji-flags": "1.2.0",
     "lodash.throttle": "4.1.1",
     "moment": "2.18.1",
