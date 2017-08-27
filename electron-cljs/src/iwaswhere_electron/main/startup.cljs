@@ -1,40 +1,20 @@
 (ns iwaswhere-electron.main.startup
   (:require [iwaswhere-electron.main.log :as log]
             [child_process :refer [spawn fork]]
-            [path :refer [normalize]]
             [electron :refer [app session]]
             [http :as http]
+            [iwaswhere-electron.main.runtime :as rt]
             [fs :refer [existsSync renameSync readFileSync]]
             [cljs.nodejs :as nodejs :refer [process]]
-            [clojure.pprint :as pp]))
+            [clojure.pprint :as pp]
+            [clojure.string :as s]))
 
 
 (def PORT 7788)
 
-(def runtime-info
-  (let [user-data (.getPath app "userData")
-        cwd (.cwd process)
-        rp (.-resourcesPath process)
-        app-path (if (= "/" cwd)
-                   (str rp "/app")
-                   (str cwd))
-        info {:platform       (.-platform process)
-              :java           (str app-path "/bin/zulu8.23.0.3-jdk8.0.144-mac_x64/bin/java")
-              :data-path      (str user-data "/data")
-              :cache          (str user-data "/data/cache.dat")
-              :jar            (str app-path "/bin/iwaswhere.jar")
-              :blink          (str app-path "/bin/blink1-mac-cli")
-              :user-data      user-data
-              :cwd            cwd
-              :pid-file       (str user-data "/iwaswhere.pid")
-              :resources-path rp
-              :app-path       app-path}]
-    (into {} (map (fn [[k v]] [k (normalize v)]) info))))
-
-
 (defn jvm-up?
   [{:keys [put-fn current-state cmp-state]}]
-  (log/info "JVM up?" (:attempt current-state) (with-out-str (pp/pprint runtime-info)))
+  (log/info "JVM up?" (:attempt current-state))
   (let [try-again
         (fn [_]
           (log/info "- Nope, trying again")
@@ -58,7 +38,7 @@
 
 (defn start-jvm
   [{:keys [current-state]}]
-  (let [{:keys [user-data app-path jar blink data-path java cwd]} runtime-info
+  (let [{:keys [user-data app-path jar blink data-path java cwd]} rt/runtime-info
         service (spawn-process java
                                ["-Dapple.awt.UIElement=true"
                                 "-XX:+AggressiveOpts"
@@ -80,7 +60,7 @@
                       (clj->js [])
                       (clj->js {:cwd cwd
                                 :env {:USER_DATA user-data}}))]
-    (log/info "JVM: startup" (with-out-str (pp/pprint runtime-info)))
+    (log/info "JVM: startup" (with-out-str (pp/pprint rt/runtime-info)))
     (.on std-out "data" #(log/info "JVM " (.toString % "utf8")))
     (.on std-err "data" #(log/error "JVM " (.toString % "utf8")))
     {:new-state (assoc-in current-state [:service] service)}))
@@ -93,11 +73,10 @@
 
 (defn shutdown-jvm
   [{:keys [current-state]}]
-  (log/info "Shutting down JVM service")
-  (let [pid (readFileSync (:pid-file runtime-info) "utf-8")]
+  (let [pid (readFileSync (:pid-file rt/runtime-info) "utf-8")]
     (log/info "Shutting down JVM service" pid)
     (when pid
-      (if (= (:platform runtime-info) "win32")
+      (if (= (:platform rt/runtime-info) "win32")
         (spawn-process "TaskKill" ["-F" "/PID" pid] {})
         (spawn-process "/bin/kill" ["-KILL" pid] {}))))
   {:send-to-self [:app/shutdown]})
@@ -112,7 +91,7 @@
 (defn clear-iww-cache
   [{:keys []}]
   (log/info "Clearing iWasWhere Cache")
-  (let [cache-file (:cache runtime-info)
+  (let [cache-file (:cache rt/runtime-info)
         cache-exists? (.existsSync fs cache-file)]
     (when cache-exists?
       (.renameSync fs cache-file (str cache-file ".bak"))))
@@ -129,5 +108,5 @@
                  :app/clear-cache     clear-cache}})
 
 (.on app "window-all-closed"
-     #(when-not (= (:platform runtime-info) "darwin")
+     #(when-not (= (:platform rt/runtime-info) "darwin")
         (.quit app)))

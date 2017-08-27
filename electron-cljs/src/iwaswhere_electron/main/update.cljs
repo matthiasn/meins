@@ -58,7 +58,7 @@
   [{:keys []}]
   (log/info "UPDATE: install")
   {:emit-msg [[:app/clear-cache]
-              [:app/clear-iww-cache]
+              ;[:app/clear-iww-cache]
               [:app/shutdown-jvm]
               [:cmd/schedule-new {:timeout 1000
                                   :message [:update/quit-install]}]]})

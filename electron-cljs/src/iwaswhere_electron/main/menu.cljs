@@ -11,14 +11,16 @@
                      :selector "orderFrontStandardAboutPanel:"}
                     {:label "Check for Updates..."
                      :click #(put-fn [:window/updater])}
-                    {:label "Clear Caches"
-                     :click #(do (put-fn [:app/clear-iww-cache])
-                                 (put-fn [:app/clear-cache]))}
+                    {:label   "Clear Caches"
+                     :submenu [{:label "Clear Electron Cache"
+                                :click #(put-fn [:app/clear-cache])}
+                               {:label "Clear iWasWhere Snapshot"
+                                :click #(put-fn [:app/clear-iww-cache])}]}
                     {:label       "Close Window"
                      :accelerator "Cmd+W"
                      :click       #(put-fn [:window/close])}
-                    {:label       "Quit Background Service"
-                     :click       #(put-fn [:app/shutdown-jvm])}
+                    {:label "Quit Background Service"
+                     :click #(put-fn [:app/shutdown-jvm])}
                     {:label       "Quit"
                      :accelerator "Cmd+Q"
                      :click       #(put-fn [:app/shutdown])}]}

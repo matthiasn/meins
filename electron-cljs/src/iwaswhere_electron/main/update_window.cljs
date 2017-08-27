@@ -6,23 +6,20 @@
             [matthiasn.systems-toolbox.component :as stc]
             [cljs.nodejs :as nodejs :refer [process]]
             [cljs.reader :refer [read-string]]
-            [clojure.pprint :as pp]))
+            [clojure.pprint :as pp]
+            [iwaswhere-electron.main.runtime :as rt]))
 
 (defn updater-window
   [{:keys [current-state cmp-state put-fn]}]
   (when-let [existing (:updater-window current-state)]
     (.close existing))
   (let [window (BrowserWindow. (clj->js {:width 600 :height 300}))
-        cwd (.cwd process)
-        rp (.-resourcesPath process)
-        url (if (= "/" cwd)
-              (str "file://" rp "/app/updater.html")
-              (str "file://" cwd "/updater.html"))
+        url (str (:app-path rt/runtime-info) "/updater.html")
         new-state (assoc-in current-state [:updater-window] window)
         close (fn [_]
                 (log/info "Closed updater-window")
                 (swap! cmp-state assoc-in [:updater-window] nil))]
-    (log/info "Opening new updater window" url cwd)
+    (log/info "Opening new updater window" url)
     (.loadURL window url)
     (.on window "close" close)
     {:new-state new-state}))
