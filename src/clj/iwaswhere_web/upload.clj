@@ -56,9 +56,7 @@
      :emit-msg  [[:cmd/schedule-new
                   {:timeout 120000
                    :message [:import/stop-server]}]
-                 (with-meta
-                   [:cmd/toggle-key {:path [:cfg :qr-code] :reset-to true}]
-                   {:sente-uid :broadcast})]}))
+                 (with-meta [:cfg/show-qr] {:sente-uid :broadcast})]}))
 
 (defn stop-server
   [{:keys [current-state]}]

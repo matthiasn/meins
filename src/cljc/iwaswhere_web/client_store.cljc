@@ -124,6 +124,7 @@
                               :state/stats-tags2  stats-tags-fn2
                               :cfg/save           c/save-cfg
                               :nav/to             nav-handler
+                              :cfg/show-qr        c/show-qr-code
                               :cmd/toggle         c/toggle-set-fn
                               :cmd/set-opt        c/set-conj-fn
                               :cmd/set-dragged    c/set-currently-dragged

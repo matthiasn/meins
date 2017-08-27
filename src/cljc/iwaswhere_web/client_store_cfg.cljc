@@ -35,6 +35,13 @@
     {:new-state    new-state
      :send-to-self [:cfg/save]}))
 
+(defn show-qr-code [{:keys []}]
+  {:send-to-self [:cmd/toggle-key {:path [:cfg :qr-code] :reset-to true}]
+   :emit-msg     [:cmd/schedule-new
+                  {:timeout 20000
+                   :message [:cmd/toggle-key {:path     [:cfg :qr-code]
+                                              :reset-to false}]}]})
+
 (defn set-currently-dragged
   "Set the currently dragged entry for drag and drop."
   [{:keys [current-state msg-payload]}]
