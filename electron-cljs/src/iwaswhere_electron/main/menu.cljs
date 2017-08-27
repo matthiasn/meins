@@ -20,7 +20,8 @@
                      :accelerator "Cmd+W"
                      :click       #(put-fn [:window/close])}
                     {:label "Quit Background Service"
-                     :click #(put-fn [:app/shutdown-jvm])}
+                     :click #(do (put-fn [:app/shutdown-jvm])
+                                 (put-fn [:app/shutdown]))}
                     {:label       "Quit"
                      :accelerator "Cmd+Q"
                      :click       #(put-fn [:app/shutdown])}]}

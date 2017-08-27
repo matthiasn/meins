@@ -21,6 +21,8 @@
                 (swap! cmp-state assoc-in [:updater-window] nil))]
     (log/info "Opening new updater window" url)
     (.loadURL window url)
+    (.on window "focus" #(swap! cmp-state assoc-in [:active] true))
+    (.on window "blur" #(swap! cmp-state assoc-in [:active] false))
     (.on window "close" close)
     {:new-state new-state}))
 
@@ -36,8 +38,9 @@
 (defn close-window
   [{:keys [current-state]}]
   (when-let [updater-window (:updater-window current-state)]
-    (log/info "Closing Updater Window:")
-    (.close updater-window))
+    (when (:active current-state)
+      (log/info "Closing Updater Window:")
+      (.close updater-window)))
   {})
 
 (defn state-fn

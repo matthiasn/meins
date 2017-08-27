@@ -66,7 +66,7 @@
 (defn quit-install
   [{:keys []}]
   (log/info "UPDATE: quit and install")
-  (.quitAndInstall autoUpdater false)
+  (.quitAndInstall autoUpdater)
   {})
 
 (defn cmp-map

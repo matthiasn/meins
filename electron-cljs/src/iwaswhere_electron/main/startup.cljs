@@ -79,7 +79,7 @@
       (if (= (:platform rt/runtime-info) "win32")
         (spawn-process "TaskKill" ["-F" "/PID" pid] {})
         (spawn-process "/bin/kill" ["-KILL" pid] {}))))
-  {:send-to-self [:app/shutdown]})
+  {})
 
 (defn clear-cache
   [{:keys []}]
@@ -108,5 +108,7 @@
                  :app/clear-cache     clear-cache}})
 
 (.on app "window-all-closed"
-     #(when-not (= (:platform rt/runtime-info) "darwin")
-        (.quit app)))
+     (fn [ev]
+       (log/info "window-all-closed")
+       (when-not (= (:platform rt/runtime-info) "darwin")
+         (.quit app))))
