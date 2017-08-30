@@ -9,6 +9,7 @@
   (case page
     "dashboards" :dashboards
     "charts1" :charts-1
+    "countries" :countries
     :main))
 
 (defn state-fn

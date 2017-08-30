@@ -8,7 +8,8 @@
             [iwaswhere-web.helpers :as h]
             [cljsjs.moment]
             [re-frame.core :refer [subscribe]]
-            [cljs.pprint :as pp]))
+            [cljs.pprint :as pp]
+            [iwaswhere-web.ui.charts.award :as aw]))
 
 (defn stats-text
   "Renders stats text component."
@@ -41,7 +42,7 @@
   [put-fn]
   [:div.stats
    [:div.charts
-    [cd/durations-bar-chart 200 5 put-fn]
+    [cd/durations-table 200 5 put-fn]
     [ct/tasks-chart 250 put-fn]
     [wc/wordcount-chart 150 put-fn 1000]
     [m/media-chart 150 put-fn]]])

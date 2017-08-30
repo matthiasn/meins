@@ -10,7 +10,8 @@
             [iwaswhere-web.ui.charts.award :as aw]
             [iwaswhere-web.ui.charts.questionnaires :as cq]
             [iwaswhere-web.ui.charts.custom-fields :as cf2]
-            [iwaswhere-web.ui.charts.location :as loc]))
+            [iwaswhere-web.ui.charts.location :as loc]
+            [iwaswhere-web.ui.charts.time.durations :as cd]))
 
 ;; Subscription Handlers
 (reg-sub :custom-field-stats (fn [db _] (:custom-field-stats db)))
@@ -62,14 +63,20 @@
   [:div.flex-container
    [:div.charts-grid
     [:div.wrapper
-     [aw/award-points put-fn]
+     [:div.durations
+      [:div.charts
+       [cd/durations-bar-chart 200 5 put-fn]]]
      [:div.custom
       [cf2/custom-fields-chart put-fn]]
+     [aw/award-points put-fn]
      [:div.stats
-      [stats/stats-view put-fn]]
-     [loc/location-chart]
-     [:div.footer
-      [stats/stats-text]]]]])
+      [stats/stats-view put-fn]]]]])
+
+(defn countries-page
+  "Main view component"
+  [put-fn]
+  [:div.flex-container
+   [loc/location-chart]])
 
 (defn dashboards
   "Dashboard view component"
@@ -87,8 +94,8 @@
         (case (:page current-page)
           :dashboards [dashboards put-fn]
           :charts-1 [charts-page put-fn]
+          :countries [countries-page put-fn]
           [main-page put-fn])))))
-
 
 (defn state-fn
   "Renders main view component and wires the central re-frame app-db as the

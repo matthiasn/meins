@@ -25,8 +25,8 @@
             mouse-enter-fn (cc/mouse-enter-fn local day-stats)
             mouse-leave-fn (cc/mouse-leave-fn local day-stats)
             stories @stories
-            w 8
-            x-step 9
+            w 9
+            x-step 10
             midnight (* 26 60 60 y-scale)
             midnight-s (* 2 60 60 y-scale)
             time-by-ts (:time-by-ts day-stats)

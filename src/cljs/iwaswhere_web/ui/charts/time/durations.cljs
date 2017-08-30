@@ -161,7 +161,7 @@
                   [:td [:strong story-name]]
                   [:td.time (u/duration-string v)]]))]]])))))
 
-(defn durations-bar-chart
+(defn durations-table
   [chart-h y-scale put-fn]
   (let [local (rc/atom {})
         chart-data (subscribe [:chart-data])
@@ -211,9 +211,6 @@
                      [:td [:div.legend {:style {:background-color color}}]]
                      [:td [:strong saga-name]]
                      [:td.time (u/duration-string v)]])))]]
-            [tfh/earlybird-nightowl indexed-45 local :saga-name 222 0.0022 put-fn]
-            (when expanded?
-              [tfh/earlybird-nightowl indexed-45 local :story-name 220 0.0022 put-fn])
             (when expanded?
               [bars-by-saga indexed-45 local chart-h 0.0035 put-fn])
             (when expanded?
@@ -223,3 +220,38 @@
                [:div [:time fmt-date]
                 " - " [:strong dur] " in " (:total day-stats) " entries."]
                [time-by-stories-list day-stats]])]]]]))))
+
+(defn durations-bar-chart
+  [chart-h y-scale put-fn]
+  (let [local (rc/atom {})
+        chart-data (subscribe [:chart-data])
+        stats (reaction (:pomodoro-stats @chart-data))
+        last-update (subscribe [:last-update])
+        cfg (subscribe [:cfg])
+        show-pvt? (reaction (:show-pvt @cfg))
+        idx-fn (fn [idx [k v]] [idx v])
+        sagas (subscribe [:sagas])
+        chart-data (subscribe [:chart-data])]
+    (fn [chart-h y-scale put-fn]
+      (let [sagas @sagas
+            stats @stats
+            indexed (map-indexed idx-fn stats)
+            indexed-45 (map-indexed idx-fn (take-last 45 stats))
+            day-stats (or (:mouse-over @local) (second (last stats)))
+            expanded? (:expanded @local)
+            past-7-days (->> stats
+                             (cd/past-7-days :time-by-saga)
+                             (sort-by second >))
+            dur (u/duration-string (:total-time day-stats))
+            fmt-date (.format (js/moment (:date-string day-stats)) "ddd YY-MM-DD")]
+        (h/keep-updated :stats/pomodoro 60 local @last-update put-fn)
+        [:div
+         [:div.times-by-day
+          [:div.story-time
+           {:class (when expanded? "expanded")}
+           [:div.content.white
+            [:div {:on-click #(swap! local update-in [:expanded] not)}
+             [:span.fa {:class (if expanded? "fa-compress" "fa-expand")}]]
+            [tfh/earlybird-nightowl indexed-45 local :saga-name 222 0.0022 put-fn]
+            (when expanded?
+              [tfh/earlybird-nightowl indexed-45 local :story-name 220 0.0022 put-fn])]]]]))))

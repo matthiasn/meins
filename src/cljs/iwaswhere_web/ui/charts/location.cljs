@@ -28,7 +28,7 @@
 
 (defn location-chart [chart-h put-fn]
   (let [local (rc/atom {:last-fetched 0
-                        :expand       false})
+                        :expanded     true})
         stats (subscribe [:stats])
         emoji-flags (aget js/window "deps" "emojiFlags")
         last-update (subscribe [:last-update])]

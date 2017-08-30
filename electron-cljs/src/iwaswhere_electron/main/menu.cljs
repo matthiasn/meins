@@ -109,6 +109,11 @@
                                [:window/send
                                 {:cmd      "window.location = '/#/charts1'"
                                  :cmd-type "cmd"}])}
+                    {:label "Countries"
+                     :click #(put-fn
+                               [:window/send
+                                {:cmd      "window.location = '/#/countries'"
+                                 :cmd-type "cmd"}])}
                     {:label "Dashboards"
                      :click #(put-fn
                                [:window/send
