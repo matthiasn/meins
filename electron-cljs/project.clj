@@ -1,4 +1,4 @@
-(defproject matthiasn/iwaswhere-electron "0.2.71"
+(defproject matthiasn/iwaswhere-electron "0.2.95"
   :dependencies [[org.clojure/clojure "1.9.0-alpha19"]
                  [org.clojure/clojurescript "1.9.908"]
                  [re-frame "0.10.1"]
@@ -28,8 +28,6 @@
                                        :externs        ["externs.js"]
                                        :npm-deps       {:electron-log      "2.2.7"
                                                         :moment            "2.18.1"
-                                                        :react             "15.6.1"
-                                                        :react-dom         "15.6.1"
                                                         :electron-builder  "19.24.1"
                                                         :electron-updater  "2.8.7"
                                                         :electron-packager "8.7.2"
@@ -44,14 +42,11 @@
                                        :target         :nodejs
                                        :output-dir     "prod/renderer"
                                        :externs        ["externs.js"]
-                                       :npm-deps       {:electron-log      "2.2.7"
-                                                        :moment            "2.18.1"
-                                                        :react             "15.6.1"
-                                                        :react-dom         "15.6.1"
-                                                        :electron-builder  "19.24.1"
-                                                        :electron-updater  "2.8.7"
-                                                        :electron-packager "8.7.2"
-                                                        :electron          "1.7.6"}
+                                       :npm-deps       {:electron-log "2.2.7"
+                                                        :moment       "2.18.1"
+                                                        :react        "15.6.1"
+                                                        :react-dom    "15.6.1"
+                                                        :electron     "1.7.6"}
                                        :install-deps   true
                                        :optimizations  :advanced
                                        :parallel-build true}}
@@ -62,14 +57,11 @@
                                        :target         :nodejs
                                        :output-dir     "prod/updater"
                                        :externs        ["externs.js"]
-                                       :npm-deps       {:electron-log      "2.2.7"
-                                                        :moment            "2.18.1"
-                                                        :react             "15.6.1"
-                                                        :react-dom         "15.6.1"
-                                                        :electron-builder  "19.24.1"
-                                                        :electron-updater  "2.8.7"
-                                                        :electron-packager "8.7.2"
-                                                        :electron          "1.7.6"}
+                                       :npm-deps       {:electron-log "2.2.7"
+                                                        :moment       "2.18.1"
+                                                        :react        "15.6.1"
+                                                        :react-dom    "15.6.1"
+                                                        :electron     "1.7.6"}
                                        :install-deps   true
                                        :optimizations  :advanced
                                        :parallel-build true}}]})

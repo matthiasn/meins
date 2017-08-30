@@ -41,10 +41,7 @@
                                  :cmd-type "cmd"}])}
                     {:label       "Upload"
                      :accelerator "Cmd+U"
-                     :click       #(put-fn
-                                     [:window/send
-                                      {:cmd      "iwaswhere_web.ui.menu.upload()"
-                                       :cmd-type "cmd"}])}]}
+                     :click       #(put-fn [:import/listen])}]}
          {:label   "Edit"
           :submenu [{:label       "Undo"
                      :accelerator "CmdOrCtrl+Z"

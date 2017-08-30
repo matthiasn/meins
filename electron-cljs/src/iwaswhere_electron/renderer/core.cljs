@@ -16,7 +16,7 @@
   (sb/send-mult-cmd
     switchboard
     [[:cmd/init-comp #{(ipc/cmp-map :renderer/ipc-cmp)
-                       (exec/cmp-map :renderer/exec-cmp)}]
+                       (exec/cmp-map :renderer/exec-cmp #{:import/listen})}]
 
      [:cmd/route {:from :renderer/ipc-cmp
                   :to   #{:renderer/exec-cmp}}]
@@ -28,7 +28,7 @@
                  :msg [:exec/js "iwaswhere_web.ui.menu.hide()"]}]]))
 
 (defn load-handler [ev]
-  (log/info "CORE loaded")
+  (log/info "RENDERER loaded")
   (let [webview (.querySelector js/document "webview")]
     (.addEventListener webview "console-message" console-msg-handler)
     (start)))

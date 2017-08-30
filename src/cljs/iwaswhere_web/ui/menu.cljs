@@ -3,8 +3,10 @@
             [re-frame.core :refer [subscribe]]
             [matthiasn.systems-toolbox.component :as stc]
             [reagent.core :as r]
+            [cljs.reader :refer [read-string]]
             [iwaswhere-web.utils.parse :as up]
-            [iwaswhere-web.utils.parse :as p]))
+            [iwaswhere-web.utils.parse :as p]
+            [clojure.pprint :as pp]))
 
 (defn toggle-option-view
   "Render button for toggle option."
@@ -50,6 +52,14 @@
                                   (put-fn [:import/phone]))}
           [:span.fa.fa-map] " import"]]))))
 
+(defn relay-msg-fn [put-fn]
+  (fn [serialized]
+    (let [parsed (read-string serialized)
+          msg-type (first parsed)
+          {:keys [msg-payload msg-meta]} (second parsed)
+          msg (with-meta [msg-type msg-payload] msg-meta)]
+      (put-fn msg))))
+
 (defn cfg-view
   "Renders component for toggling display of options such as maps, comments.
    The options, with their respective config key and Font-Awesome icon classes
@@ -60,7 +70,7 @@
   [put-fn]
   (let [cfg (subscribe [:cfg])
         toggle-qr-code #(put-fn [:import/listen])]
-    (def upload toggle-qr-code)
+    (def relay (relay-msg-fn put-fn))
     (fn [put-fn]
       [:div
        (for [option toggle-options]
@@ -92,7 +102,7 @@
                                 md (str "## " weekday "'s #briefing")
                                 new-entry (merge
                                             (p/parse-entry md)
-                                            {:briefing     {:day fmt}
+                                            {:briefing      {:day fmt}
                                              :primary-story (-> @cfg :briefing :story)})
                                 new-entry-fn (h/new-entry-fn put-fn new-entry nil)]
                             (new-entry-fn)))
