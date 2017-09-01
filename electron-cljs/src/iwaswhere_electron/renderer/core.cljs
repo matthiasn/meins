@@ -1,5 +1,6 @@
 (ns iwaswhere-electron.renderer.core
-  (:require [iwaswhere-electron.renderer.log :as log]
+  (:require [iwaswhere-electron.renderer.log]
+            [taoensso.timbre :as timbre :refer-macros [info debug]]
             [iwaswhere-electron.renderer.ipc :as ipc]
             [iwaswhere-electron.renderer.exec :as exec]
             [electron :refer [ipcRenderer]]
@@ -8,11 +9,11 @@
 (defonce switchboard (sb/component :renderer/switchboard))
 
 (defn console-msg-handler [ev]
-  (log/info "GUEST:" (.-message ev)))
+  (info "GUEST:" (.-message ev)))
 
 
 (defn start []
-  (log/info "Starting SYSTEM")
+  (info "Starting SYSTEM")
   (sb/send-mult-cmd
     switchboard
     [[:cmd/init-comp #{(ipc/cmp-map :renderer/ipc-cmp)
@@ -28,7 +29,7 @@
                  :msg [:exec/js "iwaswhere_web.ui.menu.hide()"]}]]))
 
 (defn load-handler [ev]
-  (log/info "RENDERER loaded")
+  (info "RENDERER loaded")
   (let [webview (.querySelector js/document "webview")]
     (.addEventListener webview "console-message" console-msg-handler)
     (start)))

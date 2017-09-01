@@ -3,14 +3,14 @@
   (:require [reagent.core :as rc]
             [re-frame.core :refer [reg-sub subscribe]]
             [re-frame.db :as rdb]
-            [iwaswhere-electron.update.log :as log]))
+            [taoensso.timbre :as timbre :refer-macros [info debug]]))
 
 ;; Subscription Handlers
 (reg-sub :current-page (fn [db _] (:current-page db)))
 
 (defn cancel-btn [put-fn]
   (let [cancel (fn [_]
-                 (log/info "Cancel button clicked")
+                 (info "Cancel button clicked")
                  (put-fn [:window/close]))]
     [:button {:on-click cancel} "cancel"]))
 
@@ -21,10 +21,10 @@
 
 (defn no-update [put-fn]
   (let [check (fn [_]
-                (log/info "Check button clicked")
+                (info "Check button clicked")
                 (put-fn [:update/check]))
         check-beta (fn [_]
-                     (log/info "Check beta versions")
+                     (info "Check beta versions")
                      (put-fn [:update/check-beta]))]
     [:div.updater
      [:h1 "You already have the latest version of iWasWhere."]
@@ -36,7 +36,7 @@
 
 (defn update-available [status-msg put-fn]
   (let [download (fn [_]
-                   (log/info "Download button clicked")
+                   (info "Download button clicked")
                    (put-fn [:update/download]))
         {:keys [version releaseDate]} (:info status-msg)]
     [:div.updater
@@ -67,7 +67,7 @@
 
 (defn update-downloaded [put-fn]
   (let [install (fn [_]
-                  (log/info "Install button clicked")
+                  (info "Install button clicked")
                   (put-fn [:update/install]))]
     [:div.updater
      [:h1 "New version of iWasWhere ready to install."]

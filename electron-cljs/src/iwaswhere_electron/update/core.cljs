@@ -1,5 +1,6 @@
 (ns iwaswhere-electron.update.core
-  (:require [iwaswhere-electron.update.log :as log]
+  (:require [iwaswhere-electron.update.log]
+            [taoensso.timbre :as timbre :refer-macros [info debug]]
             [iwaswhere-electron.update.ipc :as ipc]
             [iwaswhere-electron.update.ui :as ui]
             [electron :refer [ipcRenderer]]
@@ -9,7 +10,7 @@
 
 
 (defn start []
-  (log/info "Starting UPDATER")
+  (info "Starting UPDATER")
   (sb/send-mult-cmd
     switchboard
     [[:cmd/init-comp #{(ipc/cmp-map :updater/ipc-cmp #{:update/check

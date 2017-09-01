@@ -1,5 +1,5 @@
 (ns iwaswhere-electron.renderer.exec
-  (:require [iwaswhere-electron.renderer.log :as log]
+  (:require [taoensso.timbre :as timbre :refer-macros [info]]
             [electron :refer [ipcRenderer]]
             [cljs.spec.alpha :as s]))
 
@@ -8,11 +8,11 @@
 (defn state-fn [put-fn]
   (let [webview (.querySelector js/document "webview")
         web-contents (.getWebContents webview)]
-    (log/info "Starting EXEC Component")
+    (info "Starting EXEC Component")
     {:state (atom {:web-contents web-contents})}))
 
 (defn exec-js [{:keys [current-state msg-payload]}]
-  (log/info "EXEC:" msg-payload)
+  (info "EXEC:" msg-payload)
   (let [webview (.querySelector js/document "webview")
         web-contents (.getWebContents webview)]
     (when web-contents
@@ -25,7 +25,7 @@
         web-contents (.getWebContents webview)
         serialized (pr-str [msg-type {:msg-payload msg-payload :msg-meta msg-meta}])
         js (str "iwaswhere_web.ui.menu.relay('" serialized "')")]
-    (log/info "RENDERER relaying" (str msg-type) (str msg-payload))
+    (info "RENDERER relaying" (str msg-type) (str msg-payload))
     (when web-contents
       (.executeJavaScript web-contents js)))
   {})

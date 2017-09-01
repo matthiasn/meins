@@ -1,5 +1,5 @@
 (ns iwaswhere-electron.main.startup
-  (:require [taoensso.timbre :as timbre :refer-macros [info]]
+  (:require [taoensso.timbre :as timbre :refer-macros [info error]]
             [child_process :refer [spawn fork]]
             [electron :refer [app session]]
             [http :as http]
