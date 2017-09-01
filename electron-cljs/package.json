@@ -1,6 +1,6 @@
 {
   "name": "iWasWhere",
-  "version": "0.2.99",
+  "version": "0.2.100",
   "description": "",
   "main": "prod/main/main.js",
   "scripts": {

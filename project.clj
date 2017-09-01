@@ -22,6 +22,7 @@
                  [ubergraph "0.4.0"]
                  [factual/geo "1.1.0"]
                  [camel-snake-kebab "0.4.0"]
+                 [matthiasn/systems-toolbox-kafka "0.6.13"]
                  [matthiasn/systems-toolbox "0.6.11"]
                  [matthiasn/systems-toolbox-sente "0.6.16"]
                  [matthiasn/systems-toolbox-zipkin "0.6.3"]

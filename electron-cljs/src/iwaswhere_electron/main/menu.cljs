@@ -1,5 +1,5 @@
 (ns iwaswhere-electron.main.menu
-  (:require [iwaswhere-electron.main.log :as log]
+  (:require [taoensso.timbre :as timbre :refer-macros [info]]
             [electron :refer [app Menu]]
             [cljs.nodejs :as nodejs :refer [process]]))
 
@@ -125,7 +125,7 @@
                                        :cmd-type "cmd"}])}]}]
         menu (.buildFromTemplate Menu (clj->js menu-tpl))
         activate #(put-fn [:window/activate])]
-    (log/info "Starting Menu Component")
+    (info "Starting Menu Component")
     (.on app "activate" activate)
     (.setApplicationMenu Menu menu))
   {:state (atom {})})

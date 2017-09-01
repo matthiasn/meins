@@ -1,6 +1,6 @@
 (ns iwaswhere-electron.main.update-window
   (:require [clojure.string :as str]
-            [iwaswhere-electron.main.log :as log]
+            [taoensso.timbre :as timbre :refer-macros [info]]
             [electron :refer [app BrowserWindow ipcMain]]
             [matthiasn.systems-toolbox.switchboard :as sb]
             [matthiasn.systems-toolbox.component :as stc]
@@ -19,15 +19,15 @@
                       (assoc-in [:updater-window] window)
                       (assoc-in [:active] true))
         close (fn [_]
-                (log/info "Closed updater-window")
+                (info "Closed updater-window")
                 (swap! cmp-state assoc-in [:updater-window] nil))
         focus (fn [_]
-                (log/info "Focused updater-window")
+                (info "Focused updater-window")
                 (swap! cmp-state assoc-in [:active] true))
         blur (fn [_]
-                (log/info "Blurred updater-window")
+                (info "Blurred updater-window")
                 (swap! cmp-state assoc-in [:active] false))]
-    (log/info "Opening new updater window" url)
+    (info "Opening new updater window" url)
     (.loadURL window url)
     (.on window "focus" focus)
     (.on window "blur" blur)
@@ -39,17 +39,17 @@
   (when-let [updater-window (:updater-window current-state)]
     (let [web-contents (.-webContents updater-window)
           serializable [msg-type {:msg-payload msg-payload :msg-meta msg-meta}]]
-      (log/info "Relaying" (str msg-type) (str msg-payload))
+      (info "Relaying" (str msg-type) (str msg-payload))
       (.send web-contents "relay" (pr-str serializable))))
   {})
 
 (defn close-window
   [{:keys [current-state]}]
-  (log/info "Closing Updater Window")
+  (info "Closing Updater Window")
   (when-let [updater-window (:updater-window current-state)]
     (when (:active current-state)
       (.close updater-window)
-      (log/info "Closed Updater Window")))
+      (info "Closed Updater Window")))
   {})
 
 (defn state-fn
@@ -60,7 +60,7 @@
                       msg-type (first parsed)
                       {:keys [msg-payload msg-meta]} (second parsed)
                       msg (with-meta [msg-type msg-payload] msg-meta)]
-                  (log/info "Update IPC relay:" (with-out-str (pp/pprint msg)))
+                  (info "Update IPC relay:" (with-out-str (pp/pprint msg)))
                   (if (= msg-type :window/close)
                     (close-window {:current-state @state})
                     (put-fn msg))))]

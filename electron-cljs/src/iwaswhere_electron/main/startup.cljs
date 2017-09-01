@@ -1,5 +1,5 @@
 (ns iwaswhere-electron.main.startup
-  (:require [iwaswhere-electron.main.log :as log]
+  (:require [taoensso.timbre :as timbre :refer-macros [info]]
             [child_process :refer [spawn fork]]
             [electron :refer [app session]]
             [http :as http]
@@ -14,10 +14,10 @@
 
 (defn jvm-up?
   [{:keys [put-fn current-state cmp-state]}]
-  (log/info "JVM up?" (:attempt current-state))
+  (info "JVM up?" (:attempt current-state))
   (let [try-again
         (fn [_]
-          (log/info "- Nope, trying again")
+          (info "- Nope, trying again")
           (when-not (:service @cmp-state)
             (put-fn [:cmd/schedule-new {:timeout 10 :message [:jvm/start]}]))
           (put-fn [:window/loading])
@@ -25,7 +25,7 @@
         res-handler
         (fn [res]
           (let [status-code (.-statusCode res)]
-            (log/info "HTTP response: " status-code (= status-code 200))
+            (info "HTTP response: " status-code (= status-code 200))
             (if (= status-code 200)
               (put-fn [:window/new "main"])
               (try-again res))))
@@ -60,21 +60,21 @@
                       (clj->js [])
                       (clj->js {:cwd cwd
                                 :env {:USER_DATA user-data}}))]
-    (log/info "JVM: startup" (with-out-str (pp/pprint rt/runtime-info)))
-    (.on std-out "data" #(log/info "JVM " (.toString % "utf8")))
-    (.on std-err "data" #(log/error "JVM " (.toString % "utf8")))
+    (info "JVM: startup" (with-out-str (pp/pprint rt/runtime-info)))
+    (.on std-out "data" #(info "JVM " (.toString % "utf8")))
+    (.on std-err "data" #(error "JVM " (.toString % "utf8")))
     {:new-state (assoc-in current-state [:service] service)}))
 
 (defn shutdown
   [{:keys []}]
-  (log/info "Shutting down")
+  (info "Shutting down")
   (.quit app)
   {})
 
 (defn shutdown-jvm
   [{:keys [current-state]}]
   (let [pid (readFileSync (:pid-file rt/runtime-info) "utf-8")]
-    (log/info "Shutting down JVM service" pid)
+    (info "Shutting down JVM service" pid)
     (when pid
       (if (= (:platform rt/runtime-info) "win32")
         (spawn-process "TaskKill" ["-F" "/PID" pid] {})
@@ -83,14 +83,14 @@
 
 (defn clear-cache
   [{:keys []}]
-  (log/info "Clearing Electron Cache")
+  (info "Clearing Electron Cache")
   (let [session (.-defaultSession session)]
-    (.clearCache session #(log/info "Electron Cache Cleared")))
+    (.clearCache session #(info "Electron Cache Cleared")))
   {})
 
 (defn clear-iww-cache
   [{:keys []}]
-  (log/info "Clearing iWasWhere Cache")
+  (info "Clearing iWasWhere Cache")
   (let [cache-file (:cache rt/runtime-info)
         cache-exists? (.existsSync fs cache-file)]
     (when cache-exists?
@@ -109,6 +109,6 @@
 
 (.on app "window-all-closed"
      (fn [ev]
-       (log/info "window-all-closed")
+       (info "window-all-closed")
        (when-not (= (:platform rt/runtime-info) "darwin")
          (.quit app))))

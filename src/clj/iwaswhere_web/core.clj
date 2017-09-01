@@ -8,6 +8,7 @@
             [iwaswhere-web.specs]
             [clojure.tools.logging :as log]
             [clj-pid.core :as pid]
+            [matthiasn.systems-toolbox-kafka.kafka-producer2 :as kp2]
             [iwaswhere-web.store :as st]
             [iwaswhere-web.fulltext-search :as ft]
             [iwaswhere-web.upload :as up]
@@ -18,6 +19,20 @@
             [matthiasn.systems-toolbox-zipkin.core :as z]))
 
 (defonce switchboard (sb/component :server/switchboard))
+
+(defn make-observable
+  [components]
+  (if (System/getenv "OBSERVER")
+    (let [cfg {:cfg         {:bootstrap-servers "localhost:9092"
+                             :auto-offset-reset "latest"
+                             :topic             "iww-firehose"}
+               :relay-types #{:firehose/cmp-put
+                              :firehose/cmp-recv}}
+          mapper #(assoc-in % [:opts :msgs-on-firehose] true)
+          components (set (mapv mapper components))
+          firehose-kafka (kp2/cmp-map :server/kafka-firehose cfg)]
+      (conj components firehose-kafka))
+    components))
 
 (defn restart!
   "Starts or restarts system by asking switchboard to fire up the ws-cmp for
@@ -40,7 +55,8 @@
                      (let [reporter (z/mk-reporter "http://localhost:9411")
                            trace-cmp (z/trace-cmp reporter)]
                        (set (mapv trace-cmp components)))
-                     components)]
+                     components)
+        components (make-observable components)]
     (sb/send-mult-cmd
       switchboard
       [[:cmd/init-comp components]
@@ -75,6 +91,9 @@
                             :server/upload-cmp
                             :server/imports-cmp}
                     :to   :server/scheduler-cmp}]
+
+       (when (System/getenv "OBSERVER")
+         [:cmd/attach-to-firehose :server/kafka-firehose])
 
        [:cmd/send {:to  :server/scheduler-cmp
                    :msg [:cmd/schedule-new {:timeout (* 5 60 1000)

@@ -9,9 +9,9 @@
   {:emit-msg [:cmd/keep-alive-res]})
 
 ; Probably not all that useful until there's a login status, and then
-; it should be configurable. For now: one week
+; it should be configurable. For now: ten minutes
 ; TODO: rethink
-(def max-age (* 7 24 60 60 1000))
+(def max-age (* 10 60 1000))
 
 ;; Client side
 (defn init-keepalive!
@@ -21,7 +21,7 @@
   (sb/send-mult-cmd
     switchboard
     [[:cmd/send {:to  :client/scheduler-cmp
-                 :msg [:cmd/schedule-new {:timeout 1000
+                 :msg [:cmd/schedule-new {:timeout 10000
                                           :message [:cmd/keep-alive]
                                           :repeat true
                                           :initial false}]}]]))

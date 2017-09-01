@@ -1,6 +1,8 @@
 (ns iwaswhere-electron.main.log
   (:require [electron-log :as l]
-            [cljs.nodejs :as nodejs]))
+            [cljs.nodejs :as nodejs]
+            [taoensso.encore :as enc]
+            [taoensso.timbre :as timbre]))
 
 (aset l "transports" "console" "level" "info")
 (aset l "transports" "console" "format" "{h}:{i}:{s}:{ms} {text}")
@@ -10,11 +12,39 @@
 
 (nodejs/enable-util-print!)
 
-(defn info
-  [& args]
-  (apply l/info args))
+(defn ns-filter
+  "From: https://github.com/yonatane/timbre-ns-pattern-level"
+  [fltr]
+  (-> fltr enc/compile-ns-filter taoensso.encore/memoize_))
 
-(defn error
-  [& args]
-  (apply l/error (cons "ERROR: " args)))
+(defn middleware
+  "From: https://github.com/yonatane/timbre-ns-pattern-level"
+  [ns-patterns]
+  (fn log-by-ns-pattern [{:keys [?ns-str config level] :as opts}]
+    (let [namesp (or (some->> ns-patterns
+                              keys
+                              (filter #(and (string? %)
+                                            ((ns-filter %) ?ns-str)))
+                              not-empty
+                              (apply max-key count))
+                     :all)
+          log-level (get ns-patterns namesp (get config :level))]
+      (when (and (taoensso.timbre/may-log? log-level namesp)
+                 (taoensso.timbre/level>= level log-level))
+        opts))))
 
+; See https://github.com/ptaoussanis/timbre
+(def timbre-config
+  {:ns-whitelist [] #_["my-app.foo-ns"]
+   :ns-blacklist [] #_["taoensso.*"]
+
+   :middleware   [(middleware {"iwaswhere-electron.main.window-manager" :debug
+                               :all                                     :info})]
+
+   :appenders    {:console {:enabled? true
+                            :fn       (fn [data]
+                                        (let [{:keys [output_]} data
+                                              formatted-output-str (force output_)]
+                                          (l/info formatted-output-str)))}}})
+
+(timbre/merge-config! timbre-config)

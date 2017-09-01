@@ -1,6 +1,6 @@
 (ns iwaswhere-electron.main.window-manager
   (:require [clojure.string :as str]
-            [iwaswhere-electron.main.log :as log]
+            [taoensso.timbre :as timbre :refer-macros [info debug]]
             [iwaswhere-electron.main.runtime :as rt]
             [electron :refer [app BrowserWindow ipcMain]]
             [matthiasn.systems-toolbox.switchboard :as sb]
@@ -23,16 +23,16 @@
                         (dissoc new-state :loading))
                     new-state)
         focus (fn [_]
-                (log/info "Focused" window-id)
+                (info "Focused" window-id)
                 (swap! cmp-state assoc-in [:active] window-id))
         blur (fn [_]
-               (log/info "Blurred" window-id)
+               (info "Blurred" window-id)
                (swap! cmp-state assoc-in [:active] nil))
         close (fn [_]
-                (log/info "Closed" window-id)
+                (info "Closed" window-id)
                 (swap! cmp-state assoc-in [:active] nil)
                 (swap! cmp-state update-in [:windows] dissoc window-id))]
-    (log/info "Opening new window" url)
+    (info "Opening new window" url)
     (.loadURL window url)
     (.on window "focus" #(js/setTimeout focus 10))
     (.on window "blur" blur)
@@ -46,7 +46,7 @@
           window-id (stc/make-uuid)
           url (str "file://" (:app-path rt/runtime-info) "/loading.html")
           new-state (assoc-in current-state [:loading] window)]
-      (log/info "Opening new load window" url)
+      (info "Opening new load window" url)
       (.loadURL window url)
       {:new-state new-state})))
 
@@ -71,7 +71,7 @@
   [{:keys [current-state msg-type msg-meta msg-payload]}]
   (when-let [web-contents (web-contents current-state)]
     (let [serializable [msg-type {:msg-payload msg-payload :msg-meta msg-meta}]]
-      (log/info "WM Relaying" (str msg-type) (str msg-payload))
+      (debug "WM Relaying" (str msg-type) (str msg-payload))
       (.send web-contents "relay" (pr-str serializable))))
   {})
 
@@ -84,13 +84,13 @@
 (defn close-window
   [{:keys [current-state]}]
   (when-let [active-window (active-window current-state)]
-    (log/info "Closing:" (:active current-state))
+    (info "Closing:" (:active current-state))
     (.close active-window))
   {})
 
 (defn activate
   [{:keys [current-state]}]
-  (log/info "Activate APP")
+  (info "Activate APP")
   (when (empty? (:windows current-state))
     {:send-to-self [:window/new]}))
 
@@ -101,7 +101,7 @@
                       msg-type (first parsed)
                       {:keys [msg-payload msg-meta]} (second parsed)
                       msg (with-meta [msg-type msg-payload] msg-meta)]
-                  (log/info "IPC relay:" (with-out-str (pp/pprint msg)))
+                  (debug "IPC relay:" (with-out-str (pp/pprint msg)))
                   (put-fn msg)))]
     (.on ipcMain "relay" relay)
     {:state (atom {})}))

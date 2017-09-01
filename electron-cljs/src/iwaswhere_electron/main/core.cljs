@@ -1,5 +1,6 @@
 (ns iwaswhere-electron.main.core
-  (:require [iwaswhere-electron.main.log :as log]
+  (:require [iwaswhere-electron.main.log]
+            [taoensso.timbre :as timbre :refer-macros [info]]
             [iwaswhere-electron.main.menu :as menu]
             [iwaswhere-electron.main.update :as upd]
             [iwaswhere-electron.main.startup :as st]
@@ -15,7 +16,7 @@
 (defonce switchboard (sb/component :electron/switchboard))
 
 (defn start []
-  (log/info "Starting CORE:" (.-resourcesPath process))
+  (info "Starting CORE:" (.-resourcesPath process))
   (sb/send-mult-cmd
     switchboard
     [[:cmd/init-comp #{(wm/cmp-map :electron/wm-cmp #{:exec/js :import/listen})
