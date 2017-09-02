@@ -1,4 +1,4 @@
-(defproject matthiasn/iwaswhere-electron "0.2.106"
+(defproject matthiasn/iwaswhere-electron "0.2.108"
   :dependencies [[org.clojure/clojure "1.9.0-alpha19"]
                  [org.clojure/clojurescript "1.9.908"]
                  [re-frame "0.10.1"]

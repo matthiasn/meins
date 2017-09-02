@@ -3,8 +3,11 @@
             [taoensso.timbre :as timbre :refer-macros [info debug]]
             [iwaswhere-electron.renderer.ipc :as ipc]
             [iwaswhere-electron.renderer.exec :as exec]
-            [electron :refer [ipcRenderer]]
-            [matthiasn.systems-toolbox.switchboard :as sb]))
+            [electron :refer [ipcRenderer shell]]
+            [matthiasn.systems-toolbox.switchboard :as sb]
+            [clojure.string :as s]
+            [clojure.string :as s]
+            [clojure.string :as s]))
 
 (defonce switchboard (sb/component :renderer/switchboard))
 
@@ -30,9 +33,17 @@
 
 (defn load-handler [ev]
   (info "RENDERER loaded")
-  (let [webview (.querySelector js/document "webview")]
-    (.addEventListener webview "console-message" console-msg-handler)
-    (start)))
+  (let [webview (.querySelector js/document "webview")
 
+        handleRedirect  (fn [e callback]
+                            (let [url (.-url e)]
+                                 (when-not (s/includes? url "localhost:7788")
+                                   (.openExternal shell url)
+                                   (.preventDefault e)
+                                   (.stopPropagation e))))]
+    (.addEventListener webview "console-message" console-msg-handler)
+    (.addEventListener webview "will-navigate" handleRedirect)
+    (.addEventListener webview "new-window" handleRedirect)
+    (start)))
 
 (.addEventListener js/window "load" load-handler)

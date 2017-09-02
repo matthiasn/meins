@@ -37,6 +37,9 @@ electron.session = {};
 electron.session.defaultSession = {};
 electron.session.clearCache = function() {};
 
+electron.shell = {};
+electron.shell.openExternal = function() {};
+
 /**
  * @constructor
  * @extends events.EventEmitter
