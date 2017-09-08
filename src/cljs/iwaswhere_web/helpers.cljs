@@ -79,3 +79,9 @@
   [m]
   (let [t (js/moment (* m 60 1000))]
     (.format (.utc t) "HH:mm")))
+
+(defn hh-mm [m]
+  (.format (js/moment m) "HH:mm"))
+
+(defn ymd [m]
+  (.format (js/moment m) "YYYY-MM-DD"))

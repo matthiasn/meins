@@ -3,7 +3,8 @@
             [re-frame.core :refer [subscribe]]
             [iwaswhere-web.ui.questionnaires :as q]
             [iwaswhere-web.helpers :as h]
-            [reagent.ratom :refer-macros [reaction]]))
+            [reagent.ratom :refer-macros [reaction]]
+            [matthiasn.systems-toolbox.component :as st]))
 
 (defn select-elem
   "Render select element for the given options. On change, dispatch message
@@ -35,6 +36,9 @@
                              updated (assoc-in entry [:for-day] day)]
                          (put-fn [:entry/update-local updated]))))
           for-day (:for-day entry)]
+      (when-not for-day
+        (put-fn [:entry/update-local
+                 (assoc-in entry [:for-day] (h/format-time (st/now)))]))
       [:fieldset
        [:legend "#for-day"]
        (if edit-mode?

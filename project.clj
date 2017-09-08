@@ -23,7 +23,7 @@
                  [factual/geo "1.1.0"]
                  [camel-snake-kebab "0.4.0"]
                  [matthiasn/systems-toolbox-kafka "0.6.13"]
-                 [matthiasn/systems-toolbox "0.6.12"]
+                 [matthiasn/systems-toolbox "0.6.14"]
                  [matthiasn/systems-toolbox-sente "0.6.16"]
                  [matthiasn/systems-toolbox-zipkin "0.6.3"]
                  [reagent "0.7.0" :exclusions [cljsjs/react cljsjs/react-dom]]
@@ -53,7 +53,7 @@
   :jvm-opts ["-XX:-OmitStackTraceInFastThrow" "-XX:+AggressiveOpts"]
 
   :profiles {:uberjar {:aot :all}
-             :dev     {:dependencies [[re-frisk "0.4.5"]]}}
+             :dev     {:dependencies [[re-frisk "0.5.0"]]}}
 
   :plugins [[lein-cljsbuild "1.1.7"
              :exclusions [org.apache.commons/commons-compress]]

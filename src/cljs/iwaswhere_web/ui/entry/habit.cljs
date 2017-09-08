@@ -3,24 +3,18 @@
             [clojure.string :as s]
             [iwaswhere-web.helpers :as h]))
 
-(defn hh-mm [m]
-  (.format (js/moment m) "HH:mm"))
-
-(defn ymd [m]
-  (.format (js/moment m) "YYYY-MM-DD"))
-
 (defn next-habit-entry
   "Generate next habit entry, as appropriate at the time of calling.
    Store this to actually create entry."
   [entry]
-  (let [next-hh-mm (-> entry :habit :active-from (js/moment) (hh-mm))
+  (let [next-hh-mm (-> entry :habit :active-from (js/moment) (h/hh-mm))
         active-days (filter identity (map (fn [[k v]] (when v k))
                                           (get-in entry [:habit :days])))
         active-days (concat active-days (map #(+ % 7) active-days))
         active-days (filter number? active-days)
         current-day (.day (js/moment))
         next-day-int (first (drop-while #(>= current-day %) active-days))
-        next-day (ymd (.add (js/moment) (- next-day-int current-day) "d"))
+        next-day (h/ymd (.add (js/moment) (- next-day-int current-day) "d"))
         next-active (str next-day "T" next-hh-mm)]
     (-> entry
         (assoc-in [:timestamp] (st/now))
