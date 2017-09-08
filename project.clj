@@ -56,6 +56,8 @@
              :cljs-doo {:dependencies [[cljsjs/react "15.6.1-2"]
                                        [cljsjs/react-dom "15.6.1-2"]]}}
 
+  :doo {:paths {:karma "./node_modules/karma/bin/karma"}}
+
   :plugins [[lein-cljsbuild "1.1.7"
              :exclusions [org.apache.commons/commons-compress]]
             [lein-figwheel "0.5.13"]
@@ -135,4 +137,5 @@
      :compiler     {:output-to     "out/testable.js"
                     :output-dir    "out/"
                     :main          iwaswhere-web.runner
+                    :process-shim  false
                     :optimizations :whitespace}}]})
