@@ -4,13 +4,11 @@
             [iwaswhere-web.ui.re-frame :as rf]
             [iwaswhere-web.router :as router]
             [iwaswhere-web.keepalive :as ka]
-            [re-frisk.core :as frisk]
             [matthiasn.systems-toolbox.switchboard :as sb]
             [matthiasn.systems-toolbox-sente.client :as sente]
             [matthiasn.systems-toolbox.scheduler :as sched]))
 
 (enable-console-print!)
-;(frisk/enable-re-frisk!)
 
 (defonce switchboard (sb/component :client/switchboard))
 

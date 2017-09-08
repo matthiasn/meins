@@ -1,4 +1,4 @@
 language: clojure
-script: lein doo phantom cljs-test once
+script: lein with-profile +cljs-doo doo firefox cljs-test once
 jdk:
   - oraclejdk8

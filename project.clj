@@ -52,8 +52,9 @@
   :main iwaswhere-web.core
   :jvm-opts ["-XX:-OmitStackTraceInFastThrow" "-XX:+AggressiveOpts"]
 
-  :profiles {:uberjar {:aot :all}
-             :dev     {:dependencies [[re-frisk "0.5.0"]]}}
+  :profiles {:uberjar  {:aot :all}
+             :cljs-doo {:dependencies [[cljsjs/react "15.6.1-2"]
+                                       [cljsjs/react-dom "15.6.1-2"]]}}
 
   :plugins [[lein-cljsbuild "1.1.7"
              :exclusions [org.apache.commons/commons-compress]]
