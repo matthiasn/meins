@@ -73,10 +73,13 @@
    otherwise recreate it from then append log. Should be deleted or renamed
    whenever there is an application update to avoid inconsistencies."
   [put-fn]
-  (if (and (System/getenv "CACHED_APPSTATE")
-           (fs/exists? (:app-cache (fu/paths))))
-    (f/state-from-file)
-    (recreate-state put-fn)))
+  (try
+    (if (and (System/getenv "CACHED_APPSTATE")
+             (fs/exists? (:app-cache (fu/paths))))
+      (f/state-from-file)
+      (recreate-state put-fn))
+    (catch Exception ex (do (log/error "Error reading cache" ex)
+                            (recreate-state put-fn)))))
 
 (defn refresh-cfg
   "Refresh configuration by reloading the config file."

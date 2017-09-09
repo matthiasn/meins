@@ -62,12 +62,14 @@
      :emit-msg  [[:ft/add entry]]}))
 
 (defn persist-state! [state]
-  (log/info "Persisting application state")
-  (let [file-path (:app-cache (fu/paths))
-        serializable (update-in state [:graph] uc/ubergraph->edn)]
-    (with-open [writer (io/output-stream file-path)]
-      (nippy/freeze-to-out! (DataOutputStream. writer) serializable))
-    (log/info "Application state saved to" file-path)))
+  (try
+    (log/info "Persisting application state")
+    (let [file-path (:app-cache (fu/paths))
+          serializable (update-in state [:graph] uc/ubergraph->edn)]
+      (with-open [writer (io/output-stream file-path)]
+        (nippy/freeze-to-out! (DataOutputStream. writer) serializable))
+      (log/info "Application state saved to" file-path))
+    (catch Exception ex (log/error "Error persisting cache" ex))))
 
 (defn state-from-file []
   (let [file-path (:app-cache (fu/paths))
