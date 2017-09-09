@@ -96,7 +96,7 @@
               (update-local-storage new-state)
               {:new-state new-state
                :emit-msg  (when (not done?)
-                            [[:blink/busy]
+                            [[:blink/busy {:pomodoro-completed done?}]
                              [:cmd/schedule-new
                               {:timeout 1000
                                :message [:cmd/pomodoro-inc {:timestamp ts}]}]])})

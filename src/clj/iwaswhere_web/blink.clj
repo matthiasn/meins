@@ -9,7 +9,8 @@
             [clj-time.local :as ctl]
             [clojure.tools.logging :as log]))
 
-(def red {:day "--hsb=265,255,255" :night "--hsb=265,255,100"})
+(def red {:day "--hsb=10,255,255" :night "--hsb=10,255,100"})
+(def yellow {:day "--hsb=32,255,255" :night "--hsb=32,255,100"})
 (def green {:day "--hsb=65,255,255" :night "--hsb=65,255,100"})
 
 (defn blink
@@ -49,11 +50,12 @@
 
 (defn blink-busy
   "Set light to red when busy and save last busy timestamp."
-  [{:keys [current-state]}]
+  [{:keys [current-state msg-payload]}]
   (let [ts (st/now)
+        pomodoro-completed (:pomodoro-completed msg-payload)
         k (day-night?)]
     (log/debug "blink red")
-    (blink (k red))
+    (blink (k (if pomodoro-completed yellow red)))
     {:new-state (assoc-in current-state [:last-busy] ts)}))
 
 (defn cmp-map
