@@ -42,20 +42,24 @@
 (defn main-page
   "Main view component"
   [put-fn]
-  [:div.flex-container
-   [:div.grid
-    [:div.wrapper
-     [:div.menu
-      [menu/menu-view put-fn]]
-     [:div.briefing
-      [g/tabs-view :briefing put-fn]]
-     [:div.left
-      [g/tabs-view :left put-fn]]
-     [:div.right
-      [g/tabs-view :right put-fn]]
-     [:div.footer
-      [stats/stats-text]]]]
-   [n/new-entries-view put-fn]])
+  (let [cfg (subscribe [:cfg])
+        single-column (reaction (:single-column @cfg))]
+    (fn [put-fn]
+      [:div.flex-container
+       [:div.grid
+        [:div.wrapper
+         [:div.menu
+          [menu/menu-view put-fn]]
+         [:div.briefing
+          [g/tabs-view :briefing put-fn]]
+         [:div {:class (if @single-column "single" "left")}
+          [g/tabs-view :left put-fn]]
+         (when-not @single-column
+           [:div.right
+            [g/tabs-view :right put-fn]])
+         [:div.footer
+          [stats/stats-text]]]]
+       [n/new-entries-view put-fn]])))
 
 (defn charts-page
   "Main view component"

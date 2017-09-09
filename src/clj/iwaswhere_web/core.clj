@@ -25,7 +25,7 @@
   (if (System/getenv "OBSERVER")
     (let [cfg {:cfg         {:bootstrap-servers "localhost:9092"
                              :auto-offset-reset "latest"
-                             :topic             "iww-firehose"}
+                             :topic             "firehose"}
                :relay-types #{:firehose/cmp-put
                               :firehose/cmp-recv}}
           mapper #(assoc-in % [:opts :msgs-on-firehose] true)

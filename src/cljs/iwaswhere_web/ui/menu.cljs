@@ -24,6 +24,7 @@
    {:option :comments-standalone :cls "fa-comments"}
    {:option :mute :cls "fa-volume-off"}
    {:option :hide-hashtags :cls "fa-hashtag"}
+   {:option :single-column :cls "fa-columns"}
    {:option :sort-asc :cls " fa-sort-asc"}])
 
 (defn new-import-view
