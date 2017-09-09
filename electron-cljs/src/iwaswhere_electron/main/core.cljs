@@ -19,7 +19,9 @@
   (info "Starting CORE:" (.-resourcesPath process))
   (sb/send-mult-cmd
     switchboard
-    [[:cmd/init-comp #{(wm/cmp-map :electron/wm-cmp #{:exec/js :import/listen})
+    [[:cmd/init-comp #{(wm/cmp-map :electron/wm-cmp #{:exec/js
+                                                      :cmd/toggle-key
+                                                      :import/listen})
                        (st/cmp-map :electron/startup-cmp)
                        (upd/cmp-map :electron/update-cmp)
                        (sched/cmp-map :electron/scheduler-cmp)
