@@ -10,6 +10,7 @@
     "dashboards" :dashboards
     "charts1" :charts-1
     "countries" :countries
+    "empty" :empty
     :main))
 
 (defn state-fn

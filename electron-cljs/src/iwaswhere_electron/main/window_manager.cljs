@@ -9,15 +9,25 @@
             [cljs.reader :refer [read-string]]
             [clojure.pprint :as pp]))
 
+(defn load-new [url]
+  (let [window (BrowserWindow. (clj->js {:width 1200 :height 800 :show false}))]
+    (info "WM load-new" url)
+    (.loadURL window url)
+    window))
+
 (defn new-window
   [{:keys [current-state cmp-state]}]
-  (let [window (BrowserWindow. (clj->js {:width 1200 :height 800 :show false}))
+  (let [url (str "file://" (:app-path rt/runtime-info) "/index.html")
+        spare (:spare current-state)
+        new-spare (load-new url)
+        new-spare-wc (.-webContents new-spare)
+        new-spare-init #(.send new-spare-wc "cmd" "window.location = '/#/empty'")
+        window (or spare (load-new url))
         show #(.show window)
         window-id (stc/make-uuid)
-        url (str "file://" (:app-path rt/runtime-info) "/index.html")
         new-state (-> current-state
-                      (assoc-in [:main-window] window)
                       (assoc-in [:windows window-id] window)
+                      (assoc-in [:spare] new-spare)
                       (assoc-in [:active] window-id))
         new-state (if-let [loading (:loading new-state)]
                     (do (.close loading)
@@ -34,9 +44,11 @@
                 (swap! cmp-state assoc-in [:active] nil)
                 (swap! cmp-state update-in [:windows] dissoc window-id))]
     (info "Opening new window" url)
-    (.loadURL window url)
     (.on window "focus" #(js/setTimeout focus 10))
-    (.on (.-webContents window) "did-finish-load" #(js/setTimeout show 10))
+    (.on new-spare-wc "did-finish-load" new-spare-init)
+    (if spare
+      (do (info "WM using spare") (show))
+      (.on (.-webContents window) "did-finish-load" #(js/setTimeout show 10)))
     (.on window "blur" blur)
     (.on window "close" close)
     {:new-state new-state}))
@@ -57,10 +69,9 @@
   (let [active (:active current-state)]
     (get-in current-state [:windows active])))
 
-(defn web-contents
-  [current-state]
-  (when-let [active-window (active-window current-state)]
-    (.-webContents active-window)))
+(defn web-contents [current-state]
+  (when-let [window (active-window current-state)]
+    (.-webContents window)))
 
 (defn send-cmd
   [{:keys [current-state msg-payload]}]

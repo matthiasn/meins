@@ -99,6 +99,7 @@
           :dashboards [dashboards put-fn]
           :charts-1 [charts-page put-fn]
           :countries [countries-page put-fn]
+          :empty [:div.flex-container]
           [main-page put-fn])))))
 
 (defn state-fn
