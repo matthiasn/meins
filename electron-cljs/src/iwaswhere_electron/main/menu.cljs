@@ -32,17 +32,17 @@
                                {:label "Clear iWasWhere Snapshot"
                                 :click #(put-fn [:app/clear-iww-cache])}]}
                     {:label       "Close Window"
-                     :accelerator "Cmd+W"
+                     :accelerator "CmdOrCtrl+W"
                      :click       #(put-fn [:window/close])}
                     {:label "Quit Background Service"
                      :click #(do (put-fn [:app/shutdown-jvm])
                                  (put-fn [:app/shutdown]))}
                     {:label       "Quit"
-                     :accelerator "Cmd+Q"
+                     :accelerator "CmdOrCtrl+Q"
                      :click       #(put-fn [:app/shutdown])}]}
          {:label   "File"
           :submenu [{:label       "New Entry"
-                     :accelerator "Cmd+N"
+                     :accelerator "CmdOrCtrl+N"
                      :click       #(put-fn [:exec/js "iwaswhere_web.ui.menu.new_entry()"])}
                     {:label "New Story"
                      :click #(put-fn
@@ -55,7 +55,7 @@
                                 {:cmd      "iwaswhere_web.ui.menu.new_saga()"
                                  :cmd-type "cmd"}])}
                     {:label       "Upload"
-                     :accelerator "Cmd+U"
+                     :accelerator "CmdOrCtrl+U"
                      :click       #(put-fn [:import/listen])}]}
          {:label   "Edit"
           :submenu [{:label       "Undo"
@@ -86,6 +86,7 @@
                                {:label "none" :click no-spellcheck}]}]}
          {:label   "View"
           :submenu [{:label "New Window"
+                     :accelerator "CmdOrCtrl+Alt+N"
                      :click (open-window "/#/")}
                     {:label "Charts"
                      :click (open-window "/#/charts1")}
@@ -94,6 +95,7 @@
                     {:label "Dashboards"
                      :click (open-window "/#/dashboards/dashboard-1")}
                     {:label "Open Dev Tools"
+                     :accelerator "CmdOrCtrl+Alt+I"
                      :click #(put-fn [:window/dev-tools])}]}]
         menu (.buildFromTemplate Menu (clj->js menu-tpl))
         activate #(put-fn [:window/activate])]
