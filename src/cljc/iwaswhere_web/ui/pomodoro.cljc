@@ -4,17 +4,13 @@
    content and the edit-mode view, with autosuggestions for tags and mentions."
   (:require [iwaswhere-web.utils.misc :as u]))
 
-(defn pomodoro-defaults
-  [ts]
+(defn pomodoro-defaults [ts]
   {:comment-for    ts
    :entry-type     :pomodoro
-   ;:planned-dur    1500  ; 25 min
-   :planned-dur    -1  ; open end for better tracking
+   :planned-dur    1500  ; 25 min
    :completed-time 0})
 
-(defn pomodoro-header
-  "Header showing time done, plus controls when not completed."
-  [entry start-fn edit-mode?]
+(defn pomodoro-header [entry start-fn edit-mode?]
   (let [running? (:pomodoro-running entry)
         completed-time (:completed-time entry)]
     (when (= (:entry-type entry) :pomodoro)
@@ -29,9 +25,7 @@
            {:class (if running? "fa-pause-circle-o" "fa-play-circle-o")}]
           (if running? "pause" "start")])])))
 
-(defn pomodoro-stats
-  "Create some stats about the provided entries."
-  [entries]
+(defn pomodoro-stats [entries]
   (let [pomodoros (filter #(= :pomodoro (:entry-type %)) entries)
         completed (filter #(= (:planned-dur %) (:completed-time %)) pomodoros)]
     {:pomodoros           (count pomodoros)

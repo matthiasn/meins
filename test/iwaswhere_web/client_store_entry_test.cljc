@@ -147,6 +147,7 @@
                   cse/play-audio (fn [id] (swap! play-counter update-in [id] inc))]
       (let [current-state @(:state (store/initial-state-fn (fn [_put-fn])))
             current-state (assoc-in current-state [:cfg :mute] false)
+            current-state (assoc-in current-state [:cfg :ticking-clock] true)
             new-state (:new-state (cse/update-local-fn
                                     {:current-state current-state
                                      :msg-payload test-entry}))

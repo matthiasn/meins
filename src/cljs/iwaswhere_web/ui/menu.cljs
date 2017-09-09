@@ -23,6 +23,7 @@
   [{:option :show-pvt :cls "fa-user-secret"}
    {:option :comments-standalone :cls "fa-comments"}
    {:option :mute :cls "fa-volume-off"}
+   {:option :ticking-clock :cls "fa-clock-o"}
    {:option :hide-hashtags :cls "fa-hashtag"}
    {:option :single-column :cls "fa-columns"}
    {:option :sort-asc :cls " fa-sort-asc"}])

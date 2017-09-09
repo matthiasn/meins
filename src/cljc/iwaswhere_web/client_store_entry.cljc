@@ -81,13 +81,18 @@
     (when (get-in current-state [:new-entries ts])
       (let [new-entry (get-in new-state [:new-entries ts])
             done? (= (:planned-dur new-entry) (:completed-time new-entry))
+            cfg (:cfg current-state)
             new-state (-> new-state
                           (assoc-in [:busy] true)
-                          (assoc-in [:last-busy] (st/now)))]
+                          (assoc-in [:last-busy] (st/now)))
+            new-state (if done?
+                         (update-in new-state [:new-entries ts :pomodoro-running] not)
+                         new-state)]
         (if (:pomodoro-running new-entry)
-          (do (when-not (:mute (:cfg current-state))
+          (do (when-not (:mute cfg)
                 (if done? (play-audio "ringer")
-                          (play-audio "ticking-clock")))
+                          (when (:ticking-clock cfg)
+                            (play-audio "ticking-clock"))))
               (update-local-storage new-state)
               {:new-state new-state
                :emit-msg  (when (not done?)
