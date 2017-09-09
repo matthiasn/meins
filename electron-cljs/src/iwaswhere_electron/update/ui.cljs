@@ -38,6 +38,9 @@
   (let [download (fn [_]
                    (info "Download button clicked")
                    (put-fn [:update/download]))
+        check-beta (fn [_]
+                     (info "Check beta versions")
+                     (put-fn [:update/check-beta]))
         {:keys [version releaseDate]} (:info status-msg)]
     [:div.updater
      [:h1 "New version of iWasWhere available."]
@@ -46,7 +49,9 @@
       [:div [:strong "Release date: "] (subs releaseDate 0 10)]]
      [cancel-btn put-fn]
      " "
-     [:button {:on-click download} "download"]]))
+     [:button {:on-click download} "download"]
+     " "
+     [:button {:on-click check-beta} "check for beta version"]]))
 
 (defn downloading [status-msg put-fn]
   (let [{:keys [total percent bytesPerSecond transferred]} (:info status-msg)
