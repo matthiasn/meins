@@ -1,7 +1,7 @@
-$font-color: #576364;
+$font-color: #EEE;
 $font-family: "Lato", sans-serif;
 $header-font-family: "Oswald", "Lato", sans-serif;
-$green: #4CAF50;
+$green: desaturate(darken(#4CAF50, 5), 5);
 $red: rgb(202, 60, 60);
 $hashtag-blue: rgb(66, 184, 221);
 $info-border-radius: 0.3em;
@@ -17,4 +17,4 @@ $toggle-btn: #576364;
 $link-color: #006c91;
 $menu-new-btn: #0078e7;
 $mention-link: #007d4e;
-$tab-bg: desaturate(lighten($menu-bg, 40), 10);
+$tab-bg: rgb(50, 50, 50);

@@ -11,7 +11,8 @@
 
 (defn new-window
   [{:keys [current-state cmp-state]}]
-  (let [window (BrowserWindow. (clj->js {:width 1200 :height 800}))
+  (let [window (BrowserWindow. (clj->js {:width 1200 :height 800 :show false}))
+        show #(.show window)
         window-id (stc/make-uuid)
         url (str "file://" (:app-path rt/runtime-info) "/index.html")
         new-state (-> current-state
@@ -35,6 +36,7 @@
     (info "Opening new window" url)
     (.loadURL window url)
     (.on window "focus" #(js/setTimeout focus 10))
+    (.on (.-webContents window) "did-finish-load" #(js/setTimeout show 10))
     (.on window "blur" blur)
     (.on window "close" close)
     {:new-state new-state}))

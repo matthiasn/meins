@@ -13,7 +13,8 @@
   [{:keys [current-state cmp-state put-fn]}]
   (when-let [existing (:updater-window current-state)]
     (.close existing))
-  (let [window (BrowserWindow. (clj->js {:width 600 :height 300}))
+  (let [window (BrowserWindow. (clj->js {:width 600 :height 300 :show false}))
+        show #(.show window)
         url (str "file://" (:app-path rt/runtime-info) "/updater.html")
         new-state (-> current-state
                       (assoc-in [:updater-window] window)
@@ -28,6 +29,7 @@
                 (info "Blurred updater-window")
                 (swap! cmp-state assoc-in [:active] false))]
     (info "Opening new updater window" url)
+    (.on (.-webContents window) "did-finish-load" #(js/setTimeout show 10))
     (.loadURL window url)
     (.on window "focus" focus)
     (.on window "blur" blur)

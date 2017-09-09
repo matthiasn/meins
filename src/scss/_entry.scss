@@ -2,7 +2,7 @@
 
 .entry-with-comments {
   margin: 0.15em 0 0.15em 0;
-  background: white;
+  background: $entry-bg;
   height: inherit;
   flex-shrink: 0;
 
@@ -559,7 +559,7 @@ u {
 
 
 .edit-menu {
-  background-color: #EEE;
+  background-color: $edit-menu-bg;
   padding: 0 4px;
   margin: 0 -10px 3px -10px;
 

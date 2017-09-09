@@ -212,8 +212,8 @@ $backlog-weekend: lighten($backlog, 30);
 
 .stats-string {
   background-color: $stats-bg-color;
-  color: $tab-bg;
-  padding: 2px;
+  color: $stats-color;
+  padding: 2px 4px;
 }
 
 .story-time {
