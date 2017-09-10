@@ -3,7 +3,6 @@
             [iwaswhere-web.client-store :as store]
             [iwaswhere-web.ui.re-frame :as rf]
             [iwaswhere-web.router :as router]
-            [iwaswhere-web.keepalive :as ka]
             [matthiasn.systems-toolbox.switchboard :as sb]
             [matthiasn.systems-toolbox-sente.client :as sente]
             [matthiasn.systems-toolbox.scheduler :as sched]))
@@ -15,7 +14,7 @@
 (def sente-cfg {:relay-types #{:entry/update :entry/find :entry/trash
                                :import/geo :import/photos :import/phone
                                :import/spotify :import/flight :export/pdf
-                               :cmd/keep-alive :stats/pomo-day-get
+                               :stats/pomo-day-get
                                :stats/get :stats/get2 :import/movie :blink/busy
                                :state/stats-tags-get :import/weight :import/listen
                                :state/search :cfg/refresh}})
@@ -52,8 +51,7 @@
 
      [:cmd/route {:from :client/scheduler-cmp
                   :to   #{:client/store-cmp
-                          :client/ws-cmp}}]])
-  (ka/init-keepalive! switchboard))
+                          :client/ws-cmp}}]]))
 
 (init!)
 

@@ -160,39 +160,3 @@
     (testing
       "timestamp removed from set after subsequent toggle"
       (is (not (contains? (:show-maps-for (:cfg new-state1)) 1465059139281))))))
-
-(deftest cmp-map-test
-  (testing "cmp-map contains required keys"
-    (let [cmp-id :server/store-cmp
-          cmp-map (store/cmp-map cmp-id)
-          handler-map (:handler-map cmp-map)]
-      (is (= (:cmp-id cmp-map) cmp-id))
-      (is (fn? (:state-fn cmp-map)))
-      (is (fn? (:state/new handler-map)))
-      (is (fn? (:stats/result handler-map)))
-      (is (fn? (:state/stats-tags  handler-map)))
-      (is (fn? (:cfg/save    handler-map)))
-      (is (fn? (:cmd/toggle handler-map)))
-      (is (fn? (:cmd/toggle-key handler-map)))
-      (is (fn? (:cmd/set-opt handler-map)))
-      (is (fn? (:cmd/set-dragged handler-map)))
-      (is (fn? (:cmd/assoc-in handler-map)))
-      (is (fn? (:cmd/keep-alive handler-map)))
-      (is (fn? (:cmd/keep-alive-res handler-map)))
-      (is (fn? (:search/update handler-map)))
-      (is (fn? (:search/set-active handler-map)))
-      (is (fn? (:search/add handler-map)))
-      (is (fn? (:search/remove handler-map)))
-      (is (fn? (:search/refresh handler-map)))
-      (is (fn? (:search/set-dragged handler-map)))
-      (is (fn? (:search/move-tab handler-map)))
-      (is (fn? (:show/more handler-map)))
-      (is (fn? (:linked-filter/set handler-map)))
-      (is (fn? (:entry/new handler-map)))
-      (is (fn? (:entry/found handler-map)))
-      (is (fn? (:entry/geo-enrich handler-map)))
-      (is (fn? (:entry/update-local handler-map)))
-      (is (fn? (:entry/remove-local handler-map)))
-      (is (fn? (:entry/saved handler-map)))
-      (is (fn? (:cmd/pomodoro-inc handler-map)))
-      (is (fn? (:cmd/pomodoro-start handler-map))))))

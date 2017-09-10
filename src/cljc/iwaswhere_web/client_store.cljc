@@ -3,7 +3,6 @@
     #?(:cljs [reagent.core :refer [atom]])
     #?(:cljs [iwaswhere-web.ui.stats :as stats])
     [matthiasn.systems-toolbox.component :as st]
-    [iwaswhere-web.keepalive :as ka]
     [re-frame.db :as rdb]
     [iwaswhere-web.client-store-entry :as cse]
     [iwaswhere-web.client-store-search :as s]
@@ -117,18 +116,16 @@
    :state-spec        :state/client-store-spec
    :handler-map       (merge cse/entry-handler-map
                              s/search-handler-map
-                             {:state/new          new-state-fn
-                              :stats/result       save-stats-fn
-                              :stats/result2      save-stats-fn2
-                              :state/stats-tags   stats-tags-fn
-                              :state/stats-tags2  stats-tags-fn2
-                              :cfg/save           c/save-cfg
-                              :nav/to             nav-handler
-                              :cfg/show-qr        c/show-qr-code
-                              :cmd/toggle         c/toggle-set-fn
-                              :cmd/set-opt        c/set-conj-fn
-                              :cmd/set-dragged    c/set-currently-dragged
-                              :cmd/toggle-key     c/toggle-key-fn
-                              :cmd/assoc-in       c/assoc-in-state
-                              :cmd/keep-alive     ka/reset-fn
-                              :cmd/keep-alive-res ka/set-alive-fn})})
+                             {:state/new         new-state-fn
+                              :stats/result      save-stats-fn
+                              :stats/result2     save-stats-fn2
+                              :state/stats-tags  stats-tags-fn
+                              :state/stats-tags2 stats-tags-fn2
+                              :cfg/save          c/save-cfg
+                              :nav/to            nav-handler
+                              :cfg/show-qr       c/show-qr-code
+                              :cmd/toggle        c/toggle-set-fn
+                              :cmd/set-opt       c/set-conj-fn
+                              :cmd/set-dragged   c/set-currently-dragged
+                              :cmd/toggle-key    c/toggle-key-fn
+                              :cmd/assoc-in      c/assoc-in-state})})

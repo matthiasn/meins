@@ -8,7 +8,6 @@
             [iwaswhere-web.graph.add :as ga]
             [iwaswhere-web.specs]
             [ubergraph.core :as uber]
-            [iwaswhere-web.keepalive :as ka]
             [clojure.tools.logging :as log]
             [me.raynes.fs :as fs]
             [iwaswhere-web.fulltext-search :as ft]
@@ -99,5 +98,4 @@
                    :entry/update   f/geo-entry-persist-fn
                    :entry/trash    f/trash-entry-fn
                    :state/search   gq/query-fn
-                   :cfg/refresh    refresh-cfg
-                   :cmd/keep-alive ka/keepalive-fn})})
+                   :cfg/refresh    refresh-cfg})})

@@ -57,6 +57,7 @@
             [:option {:value :C} "C"]
             [:option {:value :D} "D"]
             [:option {:value :E} "E"]]
+           #_#_
            [:span " Due: "]
            (if edit-mode?
              [:input {:type     :datetime-local
@@ -83,6 +84,7 @@
            [:input {:type      :checkbox
                     :checked   (get-in entry [:task :on-hold])
                     :on-change (hold entry)}]]
+          #_
           (let [active-from (get-in entry [:task :active-from])]
             (when (or edit-mode? active-from)
               [:div
