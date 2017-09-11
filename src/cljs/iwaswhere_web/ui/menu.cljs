@@ -61,6 +61,7 @@
           msg-type (first parsed)
           {:keys [msg-payload msg-meta]} (second parsed)
           msg (with-meta [msg-type msg-payload] msg-meta)]
+      (prn "relaying" msg)
       (put-fn msg))))
 
 (defn cfg-view

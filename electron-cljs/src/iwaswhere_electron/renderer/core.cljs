@@ -21,6 +21,8 @@
     switchboard
     [[:cmd/init-comp #{(ipc/cmp-map :renderer/ipc-cmp)
                        (exec/cmp-map :renderer/exec-cmp #{:import/listen
+                                                          :firehose/cmp-put
+                                                          :firehose/cmp-recv
                                                           :cmd/toggle-key})}]
 
      [:cmd/route {:from :renderer/ipc-cmp

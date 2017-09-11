@@ -68,6 +68,7 @@
                             :server/blink-cmp
                             :server/export-cmp
                             :server/upload-cmp
+                            :server/kafka-firehose
                             :server/imports-cmp}}]
 
        [:cmd/route {:from :server/imports-cmp
