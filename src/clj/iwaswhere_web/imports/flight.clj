@@ -1,5 +1,4 @@
-(ns iwaswhere-web.flight
-  "This namespace does imports, for example of photos."
+(ns iwaswhere-web.imports.flight
   (:require [clojure.pprint :as pp]
             [iwaswhere-web.files :as f]
             [iwaswhere-web.migrations :as m]

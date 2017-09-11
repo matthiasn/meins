@@ -1,10 +1,12 @@
 (ns iwaswhere-web.imports
   "This namespace does imports, for example of photos."
   (:require [clojure.pprint :as pp]
+            [clojure.java.shell :refer [sh]]
             [iwaswhere-web.files :as f]
             [iwaswhere-web.migrations :as m]
+            [iwaswhere-web.imports.screenshot :as is]
             [iwaswhere-web.specs :as specs]
-            [iwaswhere-web.flight :as fl]
+            [iwaswhere-web.imports.flight :as fl]
             [clj-time.coerce :as c]
             [clj-time.core :as t]
             [net.cgrand.enlive-html :as eh]
@@ -308,9 +310,10 @@
   "Generates component map for imports-cmp."
   [cmp-id]
   {:cmp-id      cmp-id
-   :handler-map {:import/photos  import-media
-                 :import/geo     import-geo
-                 :import/movie   import-movie
-                 :import/spotify import-spotify
-                 :import/flight  fl/import-flight
-                 :import/phone   import-text-entries}})
+   :handler-map {:import/photos     import-media
+                 :import/screenshot is/import-screenshot
+                 :import/geo        import-geo
+                 :import/movie      import-movie
+                 :import/spotify    import-spotify
+                 :import/flight     fl/import-flight
+                 :import/phone      import-text-entries}})

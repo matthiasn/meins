@@ -6,7 +6,8 @@
             [cljs.reader :refer [read-string]]
             [iwaswhere-web.utils.parse :as up]
             [iwaswhere-web.utils.parse :as p]
-            [clojure.pprint :as pp]))
+            [clojure.pprint :as pp]
+            [matthiasn.systems-toolbox.component :as st]))
 
 (defn toggle-option-view
   "Render button for toggle option."
@@ -71,13 +72,24 @@
    all (unless set in default-config)."
   [put-fn]
   (let [cfg (subscribe [:cfg])
-        toggle-qr-code #(put-fn [:import/listen])]
+        toggle-qr-code #(put-fn [:import/listen])
+        screenshot #(let [screenshot-ts (st/now)
+                          filename (str screenshot-ts ".png")
+                          new-fn (h/new-entry-fn put-fn {:img-file filename} nil)]
+                      (js/setTimeout new-fn 4000)
+                      (put-fn
+                        [:cmd/schedule-new
+                         {:message [:import/screenshot {:filename filename}]
+                          :timeout 3000}]))]
     (def relay (relay-msg-fn put-fn))
+    (def capture-screen screenshot)
     (fn [put-fn]
       [:div
        (for [option toggle-options]
          ^{:key (str "toggle" (:cls option))}
          [toggle-option-view option put-fn])
+       [:span.fa.fa-desktop.toggle.inactive
+        {:on-click screenshot}]
        [:span.fa.fa-qrcode.toggle
         {:on-click toggle-qr-code
          :class    (when-not (:qr-code @cfg) "inactive")}]])))

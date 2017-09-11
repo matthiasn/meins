@@ -54,6 +54,12 @@
                                [:window/send
                                 {:cmd      "iwaswhere_web.ui.menu.new_saga()"
                                  :cmd-type "cmd"}])}
+                    {:label "New Screenshot"
+                     :accelerator "CmdOrCtrl+P"
+                     :click #(put-fn
+                               [:window/send
+                                {:cmd      "iwaswhere_web.ui.menu.capture_screen()"
+                                 :cmd-type "cmd"}])}
                     {:label       "Upload"
                      :accelerator "CmdOrCtrl+U"
                      :click       #(put-fn [:import/listen])}]}

@@ -11,8 +11,7 @@
                               :acl      "public-read"
                               :channel  channel})))
 
-(defn state-fn
-  [put-fn]
+(defn state-fn [put-fn]
   (let [state (atom {:open-window false})
         no-update-available (fn [_]
                               (info "Update not available.")
