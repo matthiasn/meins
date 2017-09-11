@@ -7,7 +7,7 @@
             [image-resizer.resize :refer :all]
             [image-resizer.scale-methods :refer :all]
             [image-resizer.rotate :refer :all]
-            [iwaswhere-web.imports :as i]
+            [iwaswhere-web.imports.media :as im]
             [clojure.string :as s]
             [iwaswhere-web.file-utils :as fu]))
 
@@ -15,7 +15,7 @@
   (GET "/photos2/:filename" [filename :as r]
     (let [filename (str fu/data-path "/images/" filename)
           file (io/file filename)
-          exif (i/extract-exif file)
+          exif (im/extract-exif file)
           orientation (get exif "Orientation" "")
           rotate-fn (cond (s/includes? orientation "(Rotate 90 CW)")
                           (rotate-270-counter-clockwise-fn)

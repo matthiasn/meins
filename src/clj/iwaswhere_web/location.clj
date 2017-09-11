@@ -1,5 +1,4 @@
 (ns iwaswhere-web.location
-  "This namespace is used for migrating entries to new versions."
   (:require [clojure.pprint :as pp]
             [clojure.tools.logging :as log]
             [clj-uuid :as uuid]

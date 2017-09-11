@@ -3,7 +3,7 @@
   (:require [ring.adapter.jetty :as j]
             [compojure.core :refer [routes POST PUT]]
             [clojure.java.io :as io]
-            [iwaswhere-web.imports :as i]
+            [iwaswhere-web.imports.entries :as ie]
             [iwaswhere-web.files :as f]
             [image-resizer.util :refer :all]
             [clojure.string :as s]
@@ -34,9 +34,9 @@
   (let [post-fn (fn [filename req put-fn]
                   (with-open [rdr (io/reader (:body req))]
                     (case filename
-                      "text-entries.json" (i/import-text-entries-fn
+                      "text-entries.json" (ie/import-text-entries-fn
                                             rdr put-fn {} filename)
-                      "visits.json" (i/import-visits-fn rdr put-fn {} filename)
+                      "visits.json" (ie/import-visits-fn rdr put-fn {} filename)
                       (prn req))
                     "OK"))
         binary-post-fn (fn [dir filename req]

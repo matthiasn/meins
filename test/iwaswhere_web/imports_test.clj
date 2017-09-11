@@ -1,7 +1,8 @@
 (ns iwaswhere-web.imports-test
   "Here, we test the handler functions of the imports component."
   (:require [clojure.test :refer [deftest testing is]]
-            [iwaswhere-web.imports :as i]))
+            [iwaswhere-web.imports :as i]
+            [iwaswhere-web.imports.media :as im]))
 
 (def test-exif
   {"GPS Latitude Ref" "N"
@@ -9,7 +10,7 @@
 
 (deftest dms-to-dd-test
   (is (= (float 53.544777)
-         (i/dms-to-dd test-exif "GPS Latitude" "GPS Latitude Ref"))))
+         (im/dms-to-dd test-exif "GPS Latitude" "GPS Latitude Ref"))))
 
 (deftest cmp-map-test
   (testing "cmp-map contains required keys"
