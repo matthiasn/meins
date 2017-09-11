@@ -49,7 +49,7 @@
           [:div
            [:span " Priority: "]
            [:select {:value     (get-in entry [:task :priority] "")
-                     :disabled  (not edit-mode?)
+                     ;:disabled  (not edit-mode?)
                      :on-change (prio-select entry)}
             [:option ""]
             [:option {:value :A} "A"]
@@ -57,6 +57,15 @@
             [:option {:value :C} "C"]
             [:option {:value :D} "D"]
             [:option {:value :E} "E"]]
+           [:span
+            [:label "Done? "]
+            [:input {:type      :checkbox
+                     :checked   (get-in entry [:task :done])
+                     :on-change (done entry)}]
+            [:label "On hold? "]
+            [:input {:type      :checkbox
+                     :checked   (get-in entry [:task :on-hold])
+                     :on-change (hold entry)}]]
            #_#_
            [:span " Due: "]
            (if edit-mode?
@@ -64,7 +73,7 @@
                       :on-input (input-fn entry :due)
                       :value    (h/format-time (-> entry :task :due))}]
              [:time (format-time (-> entry :task :due))])]
-          [:div
+          [:span
            [:label "Reward points: "]
            [:input {:type      :number
                     :read-only (not edit-mode?)
@@ -75,15 +84,6 @@
                     :read-only (not edit-mode?)
                     :on-input  (h/update-numeric entry [:task :estimate-m] put-fn)
                     :value     (get-in entry [:task :estimate-m] 0)}]]
-          [:div
-           [:label "Done? "]
-           [:input {:type      :checkbox
-                    :checked   (get-in entry [:task :done])
-                    :on-change (done entry)}]
-           [:label "On hold? "]
-           [:input {:type      :checkbox
-                    :checked   (get-in entry [:task :on-hold])
-                    :on-change (hold entry)}]]
           #_
           (let [active-from (get-in entry [:task :active-from])]
             (when (or edit-mode? active-from)

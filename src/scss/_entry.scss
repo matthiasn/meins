@@ -370,7 +370,8 @@
 .custom-fields, .briefing-details, .task-details, .habit-details {
   fieldset {
     font-size: 0.9em;
-    margin-top: 0.5em;
+    margin: 0.5em 0;
+    border: 2px solid #DDD;
     legend {
       font-weight: 400;
     }
@@ -480,6 +481,10 @@
   div {
     margin: 3px 0;
   }
+  input[type="number"] {
+    width: 30px!important;
+    margin-right: 15px;
+  }
   span {
     white-space: nowrap;
   }
@@ -494,10 +499,6 @@
   }
   .penalty {
     color: $red;
-  }
-  input[type="number"] {
-    width: 50px!important;
-    margin-right: 15px;
   }
 }
 
