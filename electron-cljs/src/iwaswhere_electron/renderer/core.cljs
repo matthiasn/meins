@@ -38,7 +38,7 @@
 
         handleRedirect  (fn [e callback]
                             (let [url (.-url e)]
-                                 (when-not (s/includes? url "localhost:7788")
+                                 (when-not (s/includes? url "localhost:7788/#")
                                    (.openExternal shell url)
                                    (.preventDefault e)
                                    (.stopPropagation e))))]
