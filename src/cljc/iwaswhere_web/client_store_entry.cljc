@@ -61,6 +61,7 @@
         new-state (if (= (:md curr-local) (:md msg-payload))
                     (-> current-state
                         (update-in [:new-entries] dissoc ts)
+                        (assoc-in [:busy] false)
                         (assoc-in [:entries-map ts] msg-payload))
                     current-state)]
     (update-local-storage new-state)

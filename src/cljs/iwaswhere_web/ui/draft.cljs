@@ -125,7 +125,9 @@
                       (let [cleaned (u/clean-entry latest-entry)
                             entry (if (and (:new-entry entry)
                                            (not (:comment-for entry)))
-                                    (update-in cleaned [:tags] conj "#new")
+                                    (-> cleaned
+                                        (update-in [:tags] conj "#new")
+                                        (assoc-in [:pomodoro-running] false))
                                     cleaned)]
                         (put-fn [:entry/update entry])))
             md (or (:md @entry) "")]
