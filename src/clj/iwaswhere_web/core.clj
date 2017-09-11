@@ -93,17 +93,12 @@
        [:cmd/route {:from #{:server/store-cmp
                             :server/blink-cmp
                             :server/upload-cmp
+                            :server/backup-cmp
                             :server/imports-cmp}
                     :to   :server/scheduler-cmp}]
 
        (when (System/getenv "OBSERVER")
          [:cmd/attach-to-firehose :server/kafka-firehose])
-
-       [:cmd/send {:to  :server/scheduler-cmp
-                   :msg [:cmd/schedule-new {:timeout (* 60 60 1000)
-                                            :message [:backup/git]
-                                            :repeat  true
-                                            :initial true}]}]
 
        [:cmd/send {:to  :server/scheduler-cmp
                    :msg [:cmd/schedule-new {:timeout (* 5 60 1000)
