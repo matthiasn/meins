@@ -1,5 +1,5 @@
 (ns iwaswhere-electron.main.update
-  (:require [taoensso.timbre :as timbre :refer-macros [info]]
+  (:require [taoensso.timbre :as timbre :refer-macros [info error]]
             [electron-log :as electron-log]
             [electron-updater :refer [autoUpdater]]))
 
@@ -36,8 +36,8 @@
                         (put-fn [:update/status {:status :update/downloading
                                                  :info   info}])))
         error (fn [ev]
-                (info "Error in auto-updater" ev)
-                (put-fn [:update/status {:status :update/error}]))]
+                (error "ERROR in auto-updater" ev)
+                #_(put-fn [:update/status {:status :update/error}]))]
     (info "Starting UPDATE Component")
     (aset autoUpdater "autoDownload" false)
     (aset autoUpdater "logger" electron-log)
