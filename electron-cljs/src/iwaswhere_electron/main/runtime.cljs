@@ -8,9 +8,8 @@
   (let [user-data (.getPath app "userData")
         cwd (.cwd process)
         rp (.-resourcesPath process)
-        app-path (if (s/includes? rp "Electron.app")
-                   cwd
-                   (str rp "/app"))
+        repo-dir (s/includes? rp "Electron.app")
+        app-path (if repo-dir cwd (str rp "/app"))
         platform (.-platform process)
         jdk (case platform
               "darwin" "/bin/zulu8.23.0.3-jdk8.0.144-mac_x64/bin/java"
@@ -27,4 +26,5 @@
               :pid-file       (str user-data "/iwaswhere.pid")
               :resources-path rp
               :app-path       app-path}]
-    (into {} (map (fn [[k v]] [k (normalize v)]) info))))
+    (into {:repo-dir repo-dir}
+          (map (fn [[k v]] [k (normalize v)]) info))))

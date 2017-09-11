@@ -38,7 +38,8 @@
 
 (defn start-jvm
   [{:keys [current-state]}]
-  (let [{:keys [user-data app-path jar blink data-path java cwd]} rt/runtime-info
+  (let [{:keys [user-data app-path jar blink data-path java cwd
+                repo-dir]} rt/runtime-info
         service (spawn-process java
                                ["-Dapple.awt.UIElement=true"
                                 "-XX:+AggressiveOpts"
@@ -49,6 +50,7 @@
                                 :env      {:PORT            PORT
                                            :DATA_PATH       data-path
                                            :BLINK_PATH      blink
+                                           :GIT_COMMITS     (not repo-dir)
                                            :CACHED_APPSTATE true}})
         std-out (.-stdout service)
         std-err (.-stderr service)

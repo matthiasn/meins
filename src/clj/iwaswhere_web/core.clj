@@ -13,6 +13,7 @@
             [iwaswhere-web.fulltext-search :as ft]
             [iwaswhere-web.upload :as up]
             [iwaswhere-web.blink :as bl]
+            [iwaswhere-web.backup :as bak]
             [iwaswhere-web.imports :as i]
             [iwaswhere-web.export :as e]
             [matthiasn.systems-toolbox.scheduler :as sched]
@@ -48,6 +49,7 @@
                      (i/cmp-map :server/imports-cmp)
                      (e/cmp-map :server/export-cmp)
                      (st/cmp-map :server/store-cmp)
+                     (bak/cmp-map :server/backup-cmp)
                      (up/cmp-map :server/upload-cmp)
                      (bl/cmp-map :server/blink-cmp)
                      (ft/cmp-map :server/ft-cmp)}
@@ -82,6 +84,7 @@
        [:cmd/route {:from :server/scheduler-cmp
                     :to   #{:server/store-cmp
                             :server/blink-cmp
+                            :server/backup-cmp
                             :server/imports-cmp
                             :server/upload-cmp
                             :server/ws-cmp}}]
@@ -94,6 +97,12 @@
 
        (when (System/getenv "OBSERVER")
          [:cmd/attach-to-firehose :server/kafka-firehose])
+
+       [:cmd/send {:to  :server/scheduler-cmp
+                   :msg [:cmd/schedule-new {:timeout (* 60 60 1000)
+                                            :message [:backup/git]
+                                            :repeat  true
+                                            :initial true}]}]
 
        [:cmd/send {:to  :server/scheduler-cmp
                    :msg [:cmd/schedule-new {:timeout (* 5 60 1000)
