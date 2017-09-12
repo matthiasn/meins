@@ -39,6 +39,7 @@ electron.session.clearCache = function() {};
 
 electron.shell = {};
 electron.shell.openExternal = function() {};
+electron.shell.openItem = function() {};
 
 /**
  * @constructor

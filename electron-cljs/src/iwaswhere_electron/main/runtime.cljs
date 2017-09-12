@@ -1,5 +1,5 @@
 (ns iwaswhere-electron.main.runtime
-  (:require [path :refer [normalize]]
+  (:require [path :refer [normalize join]]
             [electron :refer [app]]
             [cljs.nodejs :as nodejs :refer [process]]
             [clojure.string :as s]))
@@ -11,13 +11,15 @@
         repo-dir (s/includes? rp "Electron.app")
         app-path (if repo-dir cwd (str rp "/app"))
         platform (.-platform process)
+        data-path (str user-data "/data")
         jdk (case platform
               "darwin" "/bin/zulu8.23.0.3-jdk8.0.144-mac_x64/bin/java"
               "win32" "/bin/zulu8.23.0.3-jdk8.0.144-win_x64/bin/java"
               "/bin/zulu8.23.0.3-jdk8.0.144-linux_x64/bin/java")
         info {:platform       (.-platform process)
               :java           (str app-path jdk)
-              :data-path      (str user-data "/data")
+              :data-path      data-path
+              :img-path       (str data-path "/images")
               :cache          (str user-data "/data/cache.dat")
               :jar            (str app-path "/bin/iwaswhere.jar")
               :blink          (str app-path "/bin/blink1-mac-cli")

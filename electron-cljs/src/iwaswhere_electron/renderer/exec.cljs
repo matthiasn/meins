@@ -1,13 +1,21 @@
 (ns iwaswhere-electron.renderer.exec
   (:require [taoensso.timbre :as timbre :refer-macros [info]]
             [electron :refer [ipcRenderer]]
-            [cljs.spec.alpha :as s]))
+            [cljs.spec.alpha :as s]
+            [clojure.string :as str]))
 
 (s/def :exec/js string?)
 
 (defn state-fn [put-fn]
   (let [webview (.querySelector js/document "webview")
-        web-contents (.getWebContents webview)]
+        web-contents (.getWebContents webview)
+        redirect (fn [e callback]
+                   (let [url (.-url e)]
+                     (put-fn [:app/open-external url])
+                     (.preventDefault e)
+                     (.stopPropagation e)))]
+    (.addEventListener webview "will-navigate" redirect)
+    (.addEventListener webview "new-window" redirect)
     (info "Starting EXEC Component")
     {:state (atom {:web-contents web-contents})}))
 

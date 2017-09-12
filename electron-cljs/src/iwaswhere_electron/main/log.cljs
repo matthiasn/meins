@@ -17,6 +17,10 @@
   [fltr]
   (-> fltr enc/compile-ns-filter taoensso.encore/memoize_))
 
+(def namespace-log-levels
+  {;"iwaswhere-electron.main.window-manager" :debug
+   :all                                     :info})
+
 (defn middleware
   "From: https://github.com/yonatane/timbre-ns-pattern-level"
   [ns-patterns]
@@ -37,10 +41,7 @@
 (def timbre-config
   {:ns-whitelist [] #_["my-app.foo-ns"]
    :ns-blacklist [] #_["taoensso.*"]
-
-   :middleware   [(middleware {"iwaswhere-electron.main.window-manager" :debug
-                               :all                                     :info})]
-
+   :middleware   [(middleware namespace-log-levels)]
    :appenders    {:console {:enabled? true
                             :fn       (fn [data]
                                         (let [{:keys [output_]} data

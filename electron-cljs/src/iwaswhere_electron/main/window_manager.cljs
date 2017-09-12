@@ -114,7 +114,7 @@
                       msg-type (first parsed)
                       {:keys [msg-payload msg-meta]} (second parsed)
                       msg (with-meta [msg-type msg-payload] msg-meta)]
-                  (debug "IPC relay:" (with-out-str (pp/pprint msg)))
+                  (info "IPC relay:" (with-out-str (pp/pprint msg)))
                   (put-fn msg)))]
     (.on ipcMain "relay" relay)
     {:state (atom {})}))

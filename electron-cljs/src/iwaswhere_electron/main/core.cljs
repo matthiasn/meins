@@ -52,6 +52,9 @@
                     :to   #{:electron/update-cmp
                             :electron/startup-cmp}}]
 
+       [:cmd/route {:from :electron/wm-cmp
+                    :to   :electron/startup-cmp}]
+
        [:cmd/route {:from :electron/update-cmp
                     :to   #{:electron/update-win-cmp
                             :electron/scheduler-cmp}}]

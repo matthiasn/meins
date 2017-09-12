@@ -20,8 +20,15 @@
     (info "Starting IPC Component")
     {:state (atom {})}))
 
+(defn relay-msg
+  [{:keys [current-state msg-type msg-meta msg-payload]}]
+  (let [serializable [msg-type {:msg-payload msg-payload :msg-meta msg-meta}]]
+    (debug "Relay to MAIN:" (str msg-type) (str msg-payload))
+    (.send ipcRenderer "relay" (pr-str serializable)))
+  {})
 
 (defn cmp-map
-  [cmp-id]
-  {:cmp-id   cmp-id
-   :state-fn state-fn})
+  [cmp-id relay-types]
+  {:cmp-id      cmp-id
+   :state-fn    state-fn
+   :handler-map (zipmap relay-types (repeat relay-msg))})

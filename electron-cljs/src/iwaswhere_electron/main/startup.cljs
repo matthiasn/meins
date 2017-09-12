@@ -1,13 +1,15 @@
 (ns iwaswhere-electron.main.startup
   (:require [taoensso.timbre :as timbre :refer-macros [info error]]
             [child_process :refer [spawn fork]]
-            [electron :refer [app session]]
+            [electron :refer [app session shell]]
             [http :as http]
+            [path :refer [join normalize]]
             [iwaswhere-electron.main.runtime :as rt]
             [fs :refer [existsSync renameSync readFileSync]]
             [cljs.nodejs :as nodejs :refer [process]]
             [clojure.pprint :as pp]
-            [clojure.string :as s]))
+            [clojure.string :as s]
+            [clojure.string :as str]))
 
 
 (def PORT 7788)
@@ -73,6 +75,22 @@
   (.quit app)
   {})
 
+(defn open-external
+  [{:keys [msg-payload]}]
+  (let [url msg-payload
+        img-path (:img-path rt/runtime-info)]
+    (when-not (str/includes? url "localhost:7788/#")
+      (info "Opening" url)
+      (.openExternal shell url))
+    ; not working with blank spaces, e.g. Library/Application Support/
+    #_
+    (when (str/includes? url "localhost:7788/photos")
+      (let [img (str/replace url "http://localhost:7788/photos/" "")
+            path (str "'" (join img-path img) "'")]
+        (info "Opening item" path
+              (.openItem shell path)))))
+  {})
+
 (defn shutdown-jvm
   [{:keys [current-state]}]
   (let [pid (readFileSync (:pid-file rt/runtime-info) "utf-8")]
@@ -105,6 +123,7 @@
    :handler-map {:jvm/start           start-jvm
                  :jvm/loaded?         jvm-up?
                  :app/shutdown        shutdown
+                 :app/open-external   open-external
                  :app/shutdown-jvm    shutdown-jvm
                  :app/clear-iww-cache clear-iww-cache
                  :app/clear-cache     clear-cache}})

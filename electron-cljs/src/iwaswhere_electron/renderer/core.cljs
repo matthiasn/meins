@@ -6,7 +6,6 @@
             [electron :refer [ipcRenderer shell]]
             [matthiasn.systems-toolbox.switchboard :as sb]
             [clojure.string :as s]
-            [clojure.string :as s]
             [clojure.string :as s]))
 
 (defonce switchboard (sb/component :renderer/switchboard))
@@ -14,17 +13,15 @@
 (defn console-msg-handler [ev]
   (info "GUEST:" (.-message ev)))
 
-
 (defn start []
   (info "Starting SYSTEM")
   (sb/send-mult-cmd
     switchboard
-    [[:cmd/init-comp #{(ipc/cmp-map :renderer/ipc-cmp)
+    [[:cmd/init-comp #{(ipc/cmp-map :renderer/ipc-cmp #{:app/open-external})
                        (exec/cmp-map :renderer/exec-cmp #{:import/listen
                                                           :firehose/cmp-put
                                                           :firehose/cmp-recv
                                                           :cmd/toggle-key})}]
-
      [:cmd/route {:from :renderer/ipc-cmp
                   :to   #{:renderer/exec-cmp}}]
 
@@ -36,17 +33,8 @@
 
 (defn load-handler [ev]
   (info "RENDERER loaded")
-  (let [webview (.querySelector js/document "webview")
-
-        handleRedirect  (fn [e callback]
-                            (let [url (.-url e)]
-                                 (when-not (s/includes? url "localhost:7788/#")
-                                   (.openExternal shell url)
-                                   (.preventDefault e)
-                                   (.stopPropagation e))))]
+  (let [webview (.querySelector js/document "webview")]
     (.addEventListener webview "console-message" console-msg-handler)
-    (.addEventListener webview "will-navigate" handleRedirect)
-    (.addEventListener webview "new-window" handleRedirect)
     (start)))
 
 (.addEventListener js/window "load" load-handler)
