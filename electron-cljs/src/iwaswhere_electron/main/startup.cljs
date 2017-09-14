@@ -14,8 +14,7 @@
 
 (def PORT 7788)
 
-(defn jvm-up?
-  [{:keys [put-fn current-state cmp-state]}]
+(defn jvm-up? [{:keys [put-fn current-state cmp-state]}]
   (info "JVM up?" (:attempt current-state))
   (let [try-again
         (fn [_]
@@ -38,8 +37,7 @@
 (defn spawn-process [cmd args opts]
   (spawn cmd (clj->js args) (clj->js opts)))
 
-(defn start-jvm
-  [{:keys [current-state]}]
+(defn start-jvm [{:keys [current-state]}]
   (let [{:keys [user-data app-path jar blink data-path java cwd
                 repo-dir]} rt/runtime-info
         service (spawn-process java
@@ -55,7 +53,15 @@
                                            :GIT_COMMITS     (not repo-dir)
                                            :CACHED_APPSTATE true}})
         std-out (.-stdout service)
-        std-err (.-stderr service)
+        std-err (.-stderr service)]
+    (info "JVM: startup" (with-out-str (pp/pprint rt/runtime-info)))
+    (.on std-out "data" #(info "JVM " (.toString % "utf8")))
+    (.on std-err "data" #(error "JVM " (.toString % "utf8")))
+    {:new-state (assoc-in current-state [:service] service)}))
+
+(defn state-fn [{:keys [current-state]}]
+  (let [state (atom {})
+        {:keys [user-data app-path cwd]} rt/runtime-info
         geocoder (fork (str app-path "/geocoder.js")
                        (clj->js [])
                        (clj->js {:detached true
@@ -64,35 +70,30 @@
                       (clj->js [])
                       (clj->js {:cwd cwd
                                 :env {:USER_DATA user-data}}))]
-    (info "JVM: startup" (with-out-str (pp/pprint rt/runtime-info)))
-    (.on std-out "data" #(info "JVM " (.toString % "utf8")))
-    (.on std-err "data" #(error "JVM " (.toString % "utf8")))
-    {:new-state (assoc-in current-state [:service] service)}))
+    (info "GEOCODER" geocoder)
+    (info "SPOTIFY" spotify)
+    {:state state}))
 
-(defn shutdown
-  [{:keys []}]
+(defn shutdown [{:keys []}]
   (info "Shutting down")
   (.quit app)
   {})
 
-(defn open-external
-  [{:keys [msg-payload]}]
+(defn open-external [{:keys [msg-payload]}]
   (let [url msg-payload
         img-path (:img-path rt/runtime-info)]
     (when-not (str/includes? url "localhost:7788/#")
       (info "Opening" url)
       (.openExternal shell url))
     ; not working with blank spaces, e.g. Library/Application Support/
-    #_
-    (when (str/includes? url "localhost:7788/photos")
-      (let [img (str/replace url "http://localhost:7788/photos/" "")
-            path (str "'" (join img-path img) "'")]
-        (info "Opening item" path
-              (.openItem shell path)))))
+    #_(when (str/includes? url "localhost:7788/photos")
+        (let [img (str/replace url "http://localhost:7788/photos/" "")
+              path (str "'" (join img-path img) "'")]
+          (info "Opening item" path
+                (.openItem shell path)))))
   {})
 
-(defn shutdown-jvm
-  [{:keys [current-state]}]
+(defn shutdown-jvm [{:keys [current-state]}]
   (let [pid (readFileSync (:pid-file rt/runtime-info) "utf-8")]
     (info "Shutting down JVM service" pid)
     (when pid
@@ -101,15 +102,13 @@
         (spawn-process "/bin/kill" ["-KILL" pid] {}))))
   {})
 
-(defn clear-cache
-  [{:keys []}]
+(defn clear-cache [{:keys []}]
   (info "Clearing Electron Cache")
   (let [session (.-defaultSession session)]
     (.clearCache session #(info "Electron Cache Cleared")))
   {})
 
-(defn clear-iww-cache
-  [{:keys []}]
+(defn clear-iww-cache [{:keys []}]
   (info "Clearing iWasWhere Cache")
   (let [cache-file (:cache rt/runtime-info)
         cache-exists? (.existsSync fs cache-file)]
@@ -117,9 +116,9 @@
       (.renameSync fs cache-file (str cache-file ".bak"))))
   {})
 
-(defn cmp-map
-  [cmp-id]
+(defn cmp-map [cmp-id]
   {:cmp-id      cmp-id
+   :state-fn    state-fn
    :handler-map {:jvm/start           start-jvm
                  :jvm/loaded?         jvm-up?
                  :app/shutdown        shutdown

@@ -83,6 +83,7 @@ log.info("GEOCODER: check PORT", PORT, "PID", pid);
 
 tcpPortUsed.check(PORT)
     .then(function (inUse) {
+        log.info("GEOCODER: in use", inUse);
         if (inUse) {
             log.info("GEOCODER: Port already in use:", PORT);
             process.exit(1);
