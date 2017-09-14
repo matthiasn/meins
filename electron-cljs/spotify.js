@@ -9,7 +9,6 @@
  * ADAPTED from https://github.com/spotify/web-api-auth-examples
  */
 
-const {app} = require('electron');
 const express = require('express');
 const request = require('request');
 const querystring = require('querystring');

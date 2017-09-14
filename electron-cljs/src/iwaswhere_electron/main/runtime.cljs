@@ -19,6 +19,7 @@
         info {:platform       (.-platform process)
               :java           (str app-path jdk)
               :electron-path  (first (.-argv process))
+              :node-path      "/usr/local/bin/node"
               :data-path      data-path
               :img-path       (str data-path "/images")
               :cache          (str user-data "/data/cache.dat")

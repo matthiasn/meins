@@ -60,31 +60,29 @@
     (.on std-err "data" #(error "JVM " (.toString % "utf8")))
     {:new-state (assoc-in current-state [:service] service)}))
 
-(defn start-geocoder []
-  (let [{:keys [user-data app-path cwd electron-path]} rt/runtime-info
-        geocoder (spawn-process electron-path
+(defn start-geocoder [_]
+  (info "STARTUP: start geocoder")
+  (let [{:keys [user-data app-path cwd node-path]} rt/runtime-info
+        geocoder (spawn-process node-path
                                 [(str app-path "/geocoder.js")]
                                 {:detached true
                                  :stdio    "ignore"
-                                 :cwd      cwd})]
-    (info "GEOCODER spawned" geocoder)))
+                                 :cwd      app-path})]
+    (info "GEOCODER spawned" geocoder)
+    {}))
 
-(defn start-spotify []
-  (let [{:keys [user-data app-path cwd electron-path]} rt/runtime-info
-        spotify (spawn-process electron-path
+(defn start-spotify [_]
+  (info "STARTUP: start spotify")
+  (let [{:keys [user-data app-path cwd node-path]} rt/runtime-info
+        spotify (spawn-process node-path
                                [(str app-path "/spotify.js")]
                                {:detached true
                                 :stdio    "ignore"
-                                :cwd      cwd
+                                :cwd      app-path
                                 :env      {:USER_DATA user-data
                                            :APP_PATH  app-path}})]
-    (info "SPOTIFY spawned" spotify)))
-
-(defn state-fn [{:keys [current-state]}]
-  (let [state (atom {})]
-    (start-geocoder)
-    (start-spotify)
-    {:state state}))
+    (info "SPOTIFY spawned" spotify)
+    {}))
 
 (defn shutdown [{:keys []}]
   (info "Shutting down")
@@ -130,9 +128,10 @@
 
 (defn cmp-map [cmp-id]
   {:cmp-id      cmp-id
-   :state-fn    state-fn
    :handler-map {:jvm/start           start-jvm
                  :jvm/loaded?         jvm-up?
+                 :spotify/start       start-spotify
+                 :geocoder/start      start-geocoder
                  :app/shutdown        shutdown
                  :app/open-external   open-external
                  :app/shutdown-jvm    shutdown-jvm

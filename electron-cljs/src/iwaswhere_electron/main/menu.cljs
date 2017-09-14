@@ -34,6 +34,10 @@
                     {:label       "Close Window"
                      :accelerator "CmdOrCtrl+W"
                      :click       #(put-fn [:window/close])}
+                    {:label       "Start Spotify Service"
+                     :click       #(put-fn [:spotify/start])}
+                    {:label       "Start Geocoder Service"
+                     :click       #(put-fn [:geocoder/start])}
                     {:label "Quit Background Service"
                      :click #(do (put-fn [:app/shutdown-jvm])
                                  (put-fn [:app/shutdown]))}
