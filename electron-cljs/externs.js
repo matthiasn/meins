@@ -46,6 +46,7 @@ electron.shell.openItem = function() {};
  * @extends events.EventEmitter
  */
 var process = function() {};
+process.argv =[];
 
 /**
  * @type {string}

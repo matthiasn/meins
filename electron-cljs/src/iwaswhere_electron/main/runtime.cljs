@@ -18,6 +18,7 @@
               "/bin/zulu8.23.0.3-jdk8.0.144-linux_x64/bin/java")
         info {:platform       (.-platform process)
               :java           (str app-path jdk)
+              :electron-path  (first (.-argv process))
               :data-path      data-path
               :img-path       (str data-path "/images")
               :cache          (str user-data "/data/cache.dat")

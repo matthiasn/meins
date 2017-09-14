@@ -25,6 +25,7 @@ const client_id = '30912a450a164a18b42ecdcba0097703'; // Your client id
 const redirect_uri = 'http://localhost:8888/callback'; // Your redirect uri
 let client_secret;
 const win32 = process.platform === "win32";
+const pid = process.pid;
 
 
 log.transports.file.level = 'info';
@@ -173,14 +174,23 @@ expressApp.get('/refresh_token', function (req, res) {
     });
 });
 
+log.info("SPOTIFY: check PORT", PORT, "PID", pid);
+
+function listen () {
+    log.info('SPOTIFY: service starting on 8888');
+    expressApp.listen(PORT, "localhost");
+}
+
 tcpPortUsed.check(PORT)
     .then(function (inUse) {
+        log.info("SPOTIFY: in use", inUse);
         if (inUse) {
             log.error("SPOTIFY: Port already in use:", PORT)
+            process.exit(1);
         } else {
-            log.info('SPOTIFY: service starting on 8888');
-            expressApp.listen(PORT, "localhost");
+            setTimeout(listen, 1000);
         }
     }, function (err) {
         log.error('SPOTIFY: Error on check:', err.message);
+        process.exit(1);
     });

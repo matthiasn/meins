@@ -35,6 +35,7 @@
     {:new-state (update-in current-state [:attempt] #(inc (or % 0)))}))
 
 (defn spawn-process [cmd args opts]
+  (info "STARTUP: spawning" cmd args opts)
   (spawn cmd (clj->js args) (clj->js opts)))
 
 (defn start-jvm [{:keys [current-state]}]
@@ -59,20 +60,30 @@
     (.on std-err "data" #(error "JVM " (.toString % "utf8")))
     {:new-state (assoc-in current-state [:service] service)}))
 
+(defn start-geocoder []
+  (let [{:keys [user-data app-path cwd electron-path]} rt/runtime-info
+        geocoder (spawn-process electron-path
+                                [(str app-path "/geocoder.js")]
+                                {:detached true
+                                 :stdio    "ignore"
+                                 :cwd      cwd})]
+    (info "GEOCODER spawned" geocoder)))
+
+(defn start-spotify []
+  (let [{:keys [user-data app-path cwd electron-path]} rt/runtime-info
+        spotify (spawn-process electron-path
+                               [(str app-path "/spotify.js")]
+                               {:detached true
+                                :stdio    "ignore"
+                                :cwd      cwd
+                                :env      {:USER_DATA user-data
+                                           :APP_PATH  app-path}})]
+    (info "SPOTIFY spawned" spotify)))
+
 (defn state-fn [{:keys [current-state]}]
-  (let [state (atom {})
-        {:keys [user-data app-path cwd]} rt/runtime-info
-        geocoder (fork (str app-path "/geocoder.js")
-                       (clj->js [])
-                       (clj->js {:detached true
-                                 :cwd      cwd}))
-        spotify (fork (str app-path "/spotify.js")
-                      (clj->js [])
-                      (clj->js {:cwd cwd
-                                :env {:USER_DATA user-data
-                                      :APP_PATH  app-path}}))]
-    (info "GEOCODER" geocoder)
-    (info "SPOTIFY" spotify)
+  (let [state (atom {})]
+    (start-geocoder)
+    (start-spotify)
     {:state state}))
 
 (defn shutdown [{:keys []}]
