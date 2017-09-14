@@ -69,7 +69,8 @@
         spotify (fork (str app-path "/spotify.js")
                       (clj->js [])
                       (clj->js {:cwd cwd
-                                :env {:USER_DATA user-data}}))]
+                                :env {:USER_DATA user-data
+                                      :APP_PATH  app-path}}))]
     (info "GEOCODER" geocoder)
     (info "SPOTIFY" spotify)
     {:state state}))

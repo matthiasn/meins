@@ -19,6 +19,7 @@ const log = require('electron-log');
 const tcpPortUsed = require('tcp-port-used');
 
 const PORT = Number(process.env.SPOTIFY_PORT || 8888);
+const appPath = process.env.APP_PATH;
 const userData = process.env.USER_DATA;
 const client_id = '30912a450a164a18b42ecdcba0097703'; // Your client id
 const redirect_uri = 'http://localhost:8888/callback'; // Your redirect uri
@@ -62,8 +63,9 @@ const generateRandomString = function (length) {
 const stateKey = 'spotify_auth_state';
 const expressApp = express();
 
-expressApp.use(express.static(__dirname + '/public'))
-    .use(cookieParser());
+const htmlPath = appPath + "/resources/public/spotify";
+log.info("SPOTIFY: static path", htmlPath);
+expressApp.use(express.static(htmlPath)).use(cookieParser());
 
 expressApp.get('/login', function (req, res) {
 
@@ -176,7 +178,7 @@ tcpPortUsed.check(PORT)
         if (inUse) {
             log.error("SPOTIFY: Port already in use:", PORT)
         } else {
-            log.info('SPOTIFY: service listening on 8888');
+            log.info('SPOTIFY: service starting on 8888');
             expressApp.listen(PORT, "localhost");
         }
     }, function (err) {
