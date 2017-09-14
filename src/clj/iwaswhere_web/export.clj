@@ -58,16 +58,17 @@
            (fn [n] (prn :n n) (if (:tag n) (transform-node n) n))))
     out))
 
-
 (defn export-pdf
   "Export entry to PDF."
   [{:keys [put-fn msg-payload]}]
   (let [{:keys [md timestamp]} msg-payload
-        filename (str fu/export-path timestamp ".pdf")]
-    (md-to-pdf md filename)
-    (log/info "exporting pdf" filename)
+        filename (str fu/export-path timestamp)
+        pdf-filename (str filename ".pdf")
+        md-filename (str filename ".md")]
+    (spit md-filename md)
+    ;    (md-to-pdf md pdf-filename)
+    (log/info "exporting" pdf-filename md-filename)
     {:emit-msg [:search/refresh]}))
-
 
 (defn cmp-map
   "Generates component map for imports-cmp."

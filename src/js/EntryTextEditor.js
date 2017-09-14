@@ -1,12 +1,9 @@
 import React, {Component} from 'react';
 import {mdToDraftjs, draftjsToMd} from 'draftjs-md-converter';
-import {
-    RichUtils,
-    EditorState,
-    ContentState,
-    convertToRaw,
-    convertFromRaw
-} from 'draft-js';
+import {stateToMarkdown} from 'draft-js-export-markdown';
+import {stateToHTML} from 'draft-js-export-html';
+
+import {RichUtils, EditorState, ContentState, convertToRaw, convertFromRaw} from 'draft-js';
 import {getDefaultKeyBinding, KeyBindingUtil} from 'draft-js';
 import Editor, {createEditorStateWithText} from 'draft-js-plugins-editor'; // eslint-disable-line import/no-unresolved
 import createMentionPlugin, {defaultSuggestionsFilter} from 'draft-js-mention-plugin'; // eslint-disable-line import/no-unresolved
@@ -16,6 +13,9 @@ import {fromJS} from 'immutable';
 import editorStyles from './editorStyles.css';
 import StyleControls from './style-controls';
 import throttle from 'lodash.throttle';
+
+console.log("stateToMarkdown", stateToMarkdown);
+console.log("stateToHTML", stateToHTML);
 
 const {hasCommandModifier} = KeyBindingUtil;
 
@@ -173,7 +173,11 @@ export default class EntryTextEditor extends Component {
             const rawContent = convertToRaw(content);
             const rawContent2 = JSON.parse(JSON.stringify(rawContent));
             const md = draftjsToMd(rawContent, myMdDict);
-            const now = Date.now();
+            //const md2 = stateToMarkdown(content);
+            //const html = stateToHTML(content);
+            //console.log(md);
+            //console.log(html);
+            //console.log(md2);
             props.onChange(md, plain, rawContent2);
         };
 
