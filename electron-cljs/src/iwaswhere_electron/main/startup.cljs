@@ -28,7 +28,7 @@
           (let [status-code (.-statusCode res)]
             (info "HTTP response: " status-code (= status-code 200))
             (if (= status-code 200)
-              (put-fn [:window/new "main"])
+              (put-fn [:window/new {:url "index.html"}])
               (try-again res))))
         req (http/get (clj->js {:host "localhost" :port PORT}) res-handler)]
     (.on req "error" try-again)

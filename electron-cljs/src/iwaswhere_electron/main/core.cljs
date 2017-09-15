@@ -1,15 +1,16 @@
 (ns iwaswhere-electron.main.core
   (:require [iwaswhere-electron.main.log]
             [taoensso.timbre :as timbre :refer-macros [info]]
+            [matthiasn.systems-toolbox-electron.ipc-main :as ipc]
+            [matthiasn.systems-toolbox-electron.window-manager :as wm]
             [iwaswhere-electron.main.menu :as menu]
             [iwaswhere-electron.main.update :as upd]
             [iwaswhere-electron.main.startup :as st]
-            [iwaswhere-electron.main.window-manager :as wm]
-            [iwaswhere-electron.main.update-window :as um]
             [electron :refer [app]]
             [matthiasn.systems-toolbox.scheduler :as sched]
             [matthiasn.systems-toolbox.switchboard :as sb]
-            [cljs.nodejs :as nodejs :refer [process]]))
+            [cljs.nodejs :as nodejs :refer [process]]
+            [iwaswhere-electron.main.runtime :as rt]))
 
 (aset process "env" "GOOGLE_API_KEY" "AIzaSyD78NTnhgt--LCGBdIGPEg8GtBYzQl0gKU")
 
@@ -24,17 +25,21 @@
       (set (mapv mapper components)))
     components))
 
+(def wm-relay #{:exec/js
+                :cmd/toggle-key
+                :firehose/cmp-put
+                :firehose/cmp-recv
+                :import/listen})
+
+(def app-path (:app-path rt/runtime-info))
+
 (defn start []
   (info "Starting CORE:" (.-resourcesPath process))
-  (let [components #{(wm/cmp-map :electron/wm-cmp #{:exec/js
-                                                    :cmd/toggle-key
-                                                    :firehose/cmp-put
-                                                    :firehose/cmp-recv
-                                                    :import/listen})
+  (let [components #{(wm/cmp-map :electron/window-manager wm-relay app-path)
                      (st/cmp-map :electron/startup-cmp)
+                     (ipc/cmp-map :electron/ipc-cmp)
                      (upd/cmp-map :electron/update-cmp)
                      (sched/cmp-map :electron/scheduler-cmp)
-                     (um/cmp-map :electron/update-win-cmp)
                      (menu/cmp-map :electron/menu-cmp)}
         components (make-observable components)]
     (sb/send-mult-cmd
@@ -42,22 +47,24 @@
       [[:cmd/init-comp components]
 
        [:cmd/route {:from :electron/menu-cmp
-                    :to   #{:electron/wm-cmp
-                            :electron/update-win-cmp
+                    :to   #{:electron/window-manager
                             :electron/startup-cmp
                             :electron/update-cmp}}]
 
-       [:cmd/route {:from #{:electron/update-win-cmp
-                            :electron/scheduler-cmp}
+       [:cmd/route {:from #{:electron/scheduler-cmp}
                     :to   #{:electron/update-cmp
                             :electron/startup-cmp}}]
 
-       [:cmd/route {:from :electron/wm-cmp
+       [:cmd/route {:from :electron/ipc-cmp
+                    :to   #{:electron/startup-cmp
+                            :electron/update-cmp
+                            :electron/window-manager}}]
+
+       [:cmd/route {:from :electron/window-manager
                     :to   :electron/startup-cmp}]
 
        [:cmd/route {:from :electron/update-cmp
-                    :to   #{:electron/update-win-cmp
-                            :electron/scheduler-cmp}}]
+                    :to   #{:electron/scheduler-cmp}}]
 
        [:cmd/route {:from #{:electron/update-cmp
                             :electron/scheduler-cmp}
@@ -65,10 +72,10 @@
 
        [:cmd/route {:from :electron/startup-cmp
                     :to   #{:electron/scheduler-cmp
-                            :electron/wm-cmp}}]
+                            :electron/window-manager}}]
 
        (when OBSERVER
-         [:cmd/attach-to-firehose :electron/wm-cmp])
+         [:cmd/attach-to-firehose :electron/window-manager])
 
        [:cmd/send {:to  :electron/startup-cmp
                    :msg [:jvm/loaded?]}]

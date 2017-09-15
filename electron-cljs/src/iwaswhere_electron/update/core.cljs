@@ -1,7 +1,7 @@
 (ns iwaswhere-electron.update.core
   (:require [iwaswhere-electron.update.log]
             [taoensso.timbre :as timbre :refer-macros [info debug]]
-            [iwaswhere-electron.update.ipc :as ipc]
+            [matthiasn.systems-toolbox-electron.ipc-renderer :as ipc]
             [iwaswhere-electron.update.ui :as ui]
             [electron :refer [ipcRenderer]]
             [matthiasn.systems-toolbox.switchboard :as sb]))
@@ -26,9 +26,4 @@
      [:cmd/route {:from :updater/ui-cmp
                   :to   #{:updater/ipc-cmp}}]]))
 
-
-(defn load-handler [ev]
-  (start))
-
-
-(.addEventListener js/window "load" load-handler)
+(.addEventListener js/window "load" #(start))

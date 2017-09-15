@@ -3,7 +3,8 @@
                  [org.clojure/clojurescript "1.9.908"]
                  [re-frame "0.10.1"]
                  [com.taoensso/timbre "4.10.0"]
-                 [matthiasn/systems-toolbox "0.6.14"]]
+                 [matthiasn/systems-toolbox "0.6.15"]
+                 [matthiasn/systems-toolbox-electron "0.6.2"]]
 
   :plugins [[lein-cljsbuild "1.1.7"]
             [lein-sassy "1.0.8"]]

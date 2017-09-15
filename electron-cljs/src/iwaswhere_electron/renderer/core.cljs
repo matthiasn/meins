@@ -1,7 +1,7 @@
 (ns iwaswhere-electron.renderer.core
   (:require [iwaswhere-electron.renderer.log]
             [taoensso.timbre :as timbre :refer-macros [info debug]]
-            [iwaswhere-electron.renderer.ipc :as ipc]
+            [matthiasn.systems-toolbox-electron.ipc-renderer :as ipc]
             [iwaswhere-electron.renderer.exec :as exec]
             [electron :refer [ipcRenderer shell]]
             [matthiasn.systems-toolbox.switchboard :as sb]
