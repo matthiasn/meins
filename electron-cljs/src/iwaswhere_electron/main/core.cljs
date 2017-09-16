@@ -29,6 +29,7 @@
                 :cmd/toggle-key
                 :firehose/cmp-put
                 :firehose/cmp-recv
+                :update/status
                 :import/listen})
 
 (def app-path (:app-path rt/runtime-info))
@@ -51,7 +52,7 @@
                             :electron/startup-cmp
                             :electron/update-cmp}}]
 
-       [:cmd/route {:from #{:electron/scheduler-cmp}
+       [:cmd/route {:from :electron/scheduler-cmp
                     :to   #{:electron/update-cmp
                             :electron/startup-cmp}}]
 
@@ -64,11 +65,9 @@
                     :to   :electron/startup-cmp}]
 
        [:cmd/route {:from :electron/update-cmp
-                    :to   #{:electron/scheduler-cmp}}]
-
-       [:cmd/route {:from #{:electron/update-cmp
-                            :electron/scheduler-cmp}
-                    :to   :electron/startup-cmp}]
+                    :to   #{:electron/scheduler-cmp
+                            :electron/window-manager
+                            :electron/startup-cmp}}]
 
        [:cmd/route {:from :electron/startup-cmp
                     :to   #{:electron/scheduler-cmp

@@ -21,14 +21,18 @@
           (info "- Nope, trying again")
           (when-not (:service @cmp-state)
             (put-fn [:cmd/schedule-new {:timeout 10 :message [:jvm/start]}]))
-          (put-fn [:window/loading])
+          (put-fn [:window/new {:url       "loading.html"
+                                :width     400
+                                :height    300
+                                :window-id "loading"}])
           (put-fn [:cmd/schedule-new {:timeout 1000 :message [:jvm/loaded?]}]))
         res-handler
         (fn [res]
           (let [status-code (.-statusCode res)]
             (info "HTTP response: " status-code (= status-code 200))
             (if (= status-code 200)
-              (put-fn [:window/new {:url "index.html"}])
+              (do (put-fn [:window/new {:url "index.html"}])
+                  (put-fn (with-meta [:window/close] {:window-id "loading"})))
               (try-again res))))
         req (http/get (clj->js {:host "localhost" :port PORT}) res-handler)]
     (.on req "error" try-again)

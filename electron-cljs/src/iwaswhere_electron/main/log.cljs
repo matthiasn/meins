@@ -18,8 +18,8 @@
   (-> fltr enc/compile-ns-filter taoensso.encore/memoize_))
 
 (def namespace-log-levels
-  {;"iwaswhere-electron.main.window-manager" :debug
-   :all                                     :info})
+  {;"matthiasn.systems-toolbox-electron.window-manager" :debug
+   :all                                                :info})
 
 (defn middleware
   "From: https://github.com/yonatane/timbre-ns-pattern-level"

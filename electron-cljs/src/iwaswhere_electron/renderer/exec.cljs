@@ -27,8 +27,7 @@
       (.executeJavaScript web-contents msg-payload))
     {}))
 
-(defn relay-msg
-  [{:keys [current-state msg-type msg-meta msg-payload]}]
+(defn relay-msg [{:keys [current-state msg-type msg-meta msg-payload]}]
   (let [webview (.querySelector js/document "webview")
         web-contents (.getWebContents webview)
         serialized (pr-str [msg-type {:msg-payload msg-payload :msg-meta msg-meta}])
@@ -42,6 +41,4 @@
   (let [relay-map (zipmap relay-types (repeat relay-msg))]
     {:cmp-id      cmp-id
      :state-fn    state-fn
-     :handler-map (merge
-                    relay-map
-                    {:exec/js exec-js})}))
+     :handler-map (merge relay-map {:exec/js exec-js})}))
