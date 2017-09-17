@@ -50,10 +50,12 @@
        [:cmd/route {:from :electron/menu-cmp
                     :to   #{:electron/window-manager
                             :electron/startup-cmp
+                            :electron/scheduler-cmp
                             :electron/update-cmp}}]
 
        [:cmd/route {:from :electron/scheduler-cmp
                     :to   #{:electron/update-cmp
+                            :electron/window-manager
                             :electron/startup-cmp}}]
 
        [:cmd/route {:from :electron/ipc-cmp

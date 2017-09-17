@@ -49,15 +49,15 @@
                 :accelerator "CmdOrCtrl+U"
                 :click       #(put-fn [:import/listen])}]}))
 
+(defn broadcast [msg] (with-meta msg {:window-id :broadcast}))
+
 (defn edit-menu [put-fn]
   (let [lang (fn [cc label]
-               (let [cmd (str "window.spellCheckHandler.switchLanguage('" cc "');")]
-                 {:label label
-                  :click #(put-fn [:window/send {:cmd cmd :cmd-type "cmd"}])}))
-        no-spellcheck #(put-fn
-                         [:window/send
-                          {:cmd      "window.spellCheckHandler.currentSpellchecker=null;;"
-                           :cmd-type "cmd"}])]
+               (let [js (str "window.spellCheckHandler.switchLanguage('" cc "');")
+                     click #(put-fn (broadcast [:exec/js js]))]
+                 {:label label :click click}))
+        no-spellcheck "window.spellCheckHandler.currentSpellchecker=null;;"
+        no-spellcheck #(put-fn (broadcast [:exec/js no-spellcheck]))]
     {:label   "Edit"
      :submenu [{:label       "Undo"
                 :accelerator "CmdOrCtrl+Z"
@@ -87,18 +87,21 @@
                           {:label "none" :click no-spellcheck}]}]}))
 
 (defn view-menu [put-fn]
-  (let [open (fn [loc]
+  (let [new-window #(put-fn [:window/new {:url "index.html"}])
+        open (fn [loc]
                (fn [_]
                  (let [js (str "window.location = '" loc "'")
                        window-id (stc/make-uuid)]
                    (put-fn [:window/new {:url "index.html" :window-id window-id}])
-                   (put-fn (with-meta [:exec/js js] {:window-id window-id}))
-                   ;(put-fn [:exec/js js])
-                   )))]
+                   (put-fn [:cmd/schedule-new
+                            {:timeout 1000
+                             :message (with-meta
+                                        [:exec/js js]
+                                        {:window-id window-id})}]))))]
     {:label   "View"
      :submenu [{:label       "New Window"
                 :accelerator "CmdOrCtrl+Alt+N"
-                :click       (open "/#/")}
+                :click       new-window}
                {:label "Charts"
                 :click (open "/#/charts1")}
                {:label "Countries"
