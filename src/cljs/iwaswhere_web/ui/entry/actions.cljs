@@ -5,7 +5,8 @@
             [reagent.core :as r]
             [iwaswhere-web.ui.entry.utils :as eu]
             [iwaswhere-web.utils.misc :as u]
-            [clojure.set :as set]))
+            [clojure.set :as set]
+            [matthiasn.systems-toolbox.component :as st]))
 
 (defn trash-icon
   "Renders a trash icon, which transforms into a warning button that needs to be
@@ -125,6 +126,15 @@
                                       :value %}])
         show-comments #(show-hide-comments query-id)
         create-comment (h/new-entry-fn put-fn {:comment-for ts} show-comments)
+        screenshot #(let [screenshot-ts (st/now)
+                          filename (str screenshot-ts ".png")
+                          new-fn (h/new-entry-fn put-fn {:img-file    filename
+                                                         :comment-for ts} nil)]
+                      (js/setTimeout new-fn 4000)
+                      (put-fn
+                        [:cmd/schedule-new
+                         {:message [:import/screenshot {:filename filename}]
+                          :timeout 3000}]))
         story (:primary-story entry)
         create-linked-entry (h/new-entry-fn put-fn {:linked-entries [ts]
                                                     :primary-story  story
@@ -151,10 +161,12 @@
           (when-not comment? [:span.fa.fa-clock-o.toggle {:on-click new-pomodoro}])
           (when-not comment?
             [:span.fa.fa-comment-o.toggle {:on-click create-comment}])
+          (when-not comment?
+            [:span.fa.fa-desktop.toggle {:on-click screenshot}])
           (when (and (not comment?) prev-saved?)
             [:span.fa.fa-external-link.toggle {:on-click open-external}])
           (when-not comment? [new-link @entry put-fn create-linked-entry])
-          [add-location @entry put-fn]
+          ; [add-location @entry put-fn]
           [:span.fa.fa-file-pdf-o.toggle {:on-click export-pdf}]
           [trash-icon trash-entry]]
          [:span.fa.toggle
