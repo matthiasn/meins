@@ -32,10 +32,10 @@
                 :click       #(put-fn [:app/shutdown])}]}))
 
 (defn file-menu [put-fn]
-  (let [new-entry #(put-fn [:exec/js "iwaswhere_web.ui.menu.new_entry()"])
-        new-story #(put-fn [:exec/js "iwaswhere_web.ui.menu.new_story()"])
-        new-saga #(put-fn [:exec/js "iwaswhere_web.ui.menu.new_saga()"])
-        screenshot #(put-fn [:exec/js "iwaswhere_web.ui.menu.capture_screen()"])]
+  (let [new-entry #(put-fn [:exec/js {:js "iwaswhere_web.ui.menu.new_entry()"}])
+        new-story #(put-fn [:exec/js {:js "iwaswhere_web.ui.menu.new_story()"}])
+        new-saga #(put-fn [:exec/js {:js "iwaswhere_web.ui.menu.new_saga()"}])
+        screenshot #(put-fn [:exec/js {:js "iwaswhere_web.ui.menu.capture_screen()"}])]
     {:label   "File"
      :submenu [{:label       "New Entry"
                 :accelerator "CmdOrCtrl+N"
@@ -54,10 +54,12 @@
 (defn edit-menu [put-fn]
   (let [lang (fn [cc label]
                (let [js (str "window.spellCheckHandler.switchLanguage('" cc "');")
-                     click #(put-fn (broadcast [:exec/js js]))]
+                     click #(do
+                              (info "click" cc)
+                              (put-fn (broadcast [:exec/js {:js js}])))]
                  {:label label :click click}))
         no-spellcheck "window.spellCheckHandler.currentSpellchecker=null;;"
-        no-spellcheck #(put-fn (broadcast [:exec/js no-spellcheck]))]
+        no-spellcheck #(put-fn (broadcast [:exec/js {:js no-spellcheck}]))]
     {:label   "Edit"
      :submenu [{:label       "Undo"
                 :accelerator "CmdOrCtrl+Z"

@@ -1,10 +1,11 @@
 {
   "name": "iWasWhere",
-  "version": "0.2.173",
+  "version": "0.2.174",
   "description": "",
   "main": "prod/main/main.js",
   "scripts": {
     "start": "electron .",
+    "electron-rebuild": "electron-rebuild",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -38,8 +39,10 @@
   "devDependencies": {
     "browser-resolve": "^1.11.2",
     "electron": "^1.7.6",
-    "electron-builder": "^19.24.1",
-    "electron-publisher-s3": "^19.28.0",
+    "electron-builder": "^19.27.7",
+    "electron-prebuilt": "^1.4.13",
+    "electron-publisher-s3": "^19.28.3",
+    "electron-rebuild": "^1.6.0",
     "module-deps": "4.1.1",
     "resolve": "^1.4.0"
   }

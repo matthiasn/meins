@@ -84,7 +84,7 @@
             done? (= (:planned-dur new-entry) (:completed-time new-entry))
             cfg (:cfg current-state)
             new-state (-> new-state
-                          (assoc-in [:busy] true)
+                          (assoc-in [:busy] (not done?))
                           (assoc-in [:last-busy] (st/now)))
             new-state (if done?
                          (update-in new-state [:new-entries ts :pomodoro-running] not)

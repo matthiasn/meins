@@ -29,7 +29,7 @@
                   :to   #{:renderer/ipc-cmp}}]
 
      [:cmd/send {:to  :renderer/exec-cmp
-                 :msg [:exec/js "iwaswhere_web.ui.menu.hide()"]}]]))
+                 :msg [:exec/js {:js "iwaswhere_web.ui.menu.hide()"}]}]]))
 
 (defn load-handler [ev]
   (info "RENDERER loaded")

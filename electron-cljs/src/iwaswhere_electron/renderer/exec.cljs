@@ -4,7 +4,7 @@
             [cljs.spec.alpha :as s]
             [clojure.string :as str]))
 
-(s/def :exec/js string?)
+(s/def :exec/js map?)
 
 (defn state-fn [put-fn]
   (let [webview (.querySelector js/document "webview")
@@ -21,10 +21,12 @@
 
 (defn exec-js [{:keys [current-state msg-payload]}]
   (info "EXEC:" msg-payload)
-  (let [webview (.querySelector js/document "webview")
+  (let [js (:js msg-payload)
+        webview (.querySelector js/document "webview")
         web-contents (.getWebContents webview)]
+    (info "spellCheckHandler" (.-spellCheckHandler webview))
     (when web-contents
-      (.executeJavaScript web-contents msg-payload))
+      (.executeJavaScript web-contents js))
     {}))
 
 (defn relay-msg [{:keys [current-state msg-type msg-meta msg-payload]}]
