@@ -1,7 +1,8 @@
 (ns iwaswhere-electron.main.menu
   (:require [taoensso.timbre :as timbre :refer-macros [info]]
             [electron :refer [app Menu]]
-            [cljs.nodejs :as nodejs :refer [process]]))
+            [cljs.nodejs :as nodejs :refer [process]]
+            [matthiasn.systems-toolbox.component :as stc]))
 
 (defn app-menu [put-fn]
   (let [update-win {:url "updater.html" :width 600 :height 300}
@@ -86,23 +87,24 @@
                           {:label "none" :click no-spellcheck}]}]}))
 
 (defn view-menu [put-fn]
-  (let [open-window (fn [location]
-                      (fn []
-                        (put-fn [:window/new {:url "index.html"}])
-                        (put-fn
-                          [:window/send
-                           {:cmd      (str "window.location = '" location "'")
-                            :cmd-type "cmd"}])))]
+  (let [open (fn [loc]
+               (fn [_]
+                 (let [js (str "window.location = '" loc "'")
+                       window-id (stc/make-uuid)]
+                   (put-fn [:window/new {:url "index.html" :window-id window-id}])
+                   (put-fn (with-meta [:exec/js js] {:window-id window-id}))
+                   ;(put-fn [:exec/js js])
+                   )))]
     {:label   "View"
      :submenu [{:label       "New Window"
                 :accelerator "CmdOrCtrl+Alt+N"
-                :click       (open-window "/#/")}
+                :click       (open "/#/")}
                {:label "Charts"
-                :click (open-window "/#/charts1")}
+                :click (open "/#/charts1")}
                {:label "Countries"
-                :click (open-window "/#/countries")}
+                :click (open "/#/countries")}
                {:label "Dashboards"
-                :click (open-window "/#/dashboards/dashboard-1")}
+                :click (open "/#/dashboards/dashboard-1")}
                {:label       "Toggle Split View"
                 :accelerator "CmdOrCtrl+Alt+S"
                 :click       #(put-fn [:cmd/toggle-key {:path [:cfg :single-column]}])}

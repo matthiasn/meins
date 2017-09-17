@@ -45,18 +45,15 @@
 (defn start-jvm [{:keys [current-state]}]
   (let [{:keys [user-data app-path jar blink data-path java cwd
                 repo-dir]} rt/runtime-info
-        service (spawn-process java
-                               ["-Dapple.awt.UIElement=true"
-                                "-XX:+AggressiveOpts"
-                                "-jar"
-                                jar]
-                               {:detached false
-                                :cwd      user-data
-                                :env      {:PORT            PORT
-                                           :DATA_PATH       data-path
-                                           :BLINK_PATH      blink
-                                           :GIT_COMMITS     (not repo-dir)
-                                           :CACHED_APPSTATE true}})
+        args ["-Dapple.awt.UIElement=true" "-XX:+AggressiveOpts" "-jar" jar]
+        opts {:detached false
+              :cwd      user-data
+              :env      {:PORT            PORT
+                         :DATA_PATH       data-path
+                         :BLINK_PATH      blink
+                         :GIT_COMMITS     (not repo-dir)
+                         :CACHED_APPSTATE true}}
+        service (spawn-process java args opts)
         std-out (.-stdout service)
         std-err (.-stderr service)]
     (info "JVM: startup" (with-out-str (pp/pprint rt/runtime-info)))

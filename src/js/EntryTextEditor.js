@@ -14,9 +14,6 @@ import editorStyles from './editorStyles.css';
 import StyleControls from './style-controls';
 import throttle from 'lodash.throttle';
 
-console.log("stateToMarkdown", stateToMarkdown);
-console.log("stateToHTML", stateToHTML);
-
 const {hasCommandModifier} = KeyBindingUtil;
 
 function myKeyBindingFn(e) {
