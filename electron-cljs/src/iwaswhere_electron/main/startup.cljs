@@ -93,7 +93,7 @@
 (defn open-external [{:keys [msg-payload]}]
   (let [url msg-payload
         img-path (:img-path rt/runtime-info)]
-    (when-not (str/includes? url "localhost:7788/#")
+    (when-not (str/includes? url (str "localhost:" (:port rt/runtime-info) "/#"))
       (info "Opening" url)
       (.openExternal shell url))
     ; not working with blank spaces, e.g. Library/Application Support/
