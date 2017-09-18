@@ -94,9 +94,10 @@
         new-window #(put-fn [:window/new {:url index-page}])
         open (fn [loc]
                #(let [js (str "window.location = '" loc "'")
-                      window-id (stc/make-uuid)]
-                  (put-fn [:window/new {:url index-page :window-id window-id}])
-                  (put-fn (with-meta [:exec/js {:js js}] {:window-id window-id}))))]
+                      window-id {:window-id (stc/make-uuid)}]
+                  (put-fn [:window/new
+                           (merge window-id {:url index-page :cached true})])
+                  (put-fn (with-meta [:exec/js {:js js}] window-id))))]
     {:label   "View"
      :submenu [{:label       "New Window"
                 :accelerator "CmdOrCtrl+Alt+N"
