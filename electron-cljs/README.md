@@ -1,6 +1,10 @@
 # iWasWhere desktop app
 
-    $ lein dist
+    $ npm install -g electron-builder@19.28.4
+    $ npm install -g electron-publisher-s3@19.28.3
+    
+    $ yarn install
+    $ lein build
     $ npm start
 
 

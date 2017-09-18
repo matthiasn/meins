@@ -31,9 +31,18 @@ First, you need to compile the **ClojureScript**:
 
 This will compile the ClojureScript into JavaScript using `:advanced` optimization.
 
-The styling is maintained via **SASS** in a bunch of `.scss` files. These need to be converted to CSS:
+The styling is maintained via **SASS** in a bunch of `.scss` files. For that, you first need to install the sass gem:
 
-    $ lein sass once
+    $ sudo gem install sass
+
+These need to be converted to CSS:
+    
+    $ lein sass
+
+You can also have the CSS automatically recompiled when there are changes:
+
+    $ sass --watch src/scss/iwaswhere.scss:resources/public/css/iwaswhere.css
+    
 
 There is no **CSS** framework involved here. Rather, the styling is self-contained, which is possible thanks to **[CSS Flexible Box Layout](https://www.w3.org/TR/css-flexbox-1/)**. It's great for layout. You should learn it.
 
@@ -41,7 +50,13 @@ You can also use the following task bundle instead of the previous two:
 
     $ lein build
 
-There are also some JS dependencies to be assembled. First, install with:
+There are also some JS dependencies to be assembled. For that, you need **[npm](https://www.npmjs.com/get-npm)**. 
+
+Then you need to install webpack:
+
+    $ npm install -g webpack
+
+Then, install project dependencies with:
 
     $ npm install
 

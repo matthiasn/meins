@@ -2,8 +2,8 @@
 
 cd electron-cljs
 
-npm version patch
-lein dist
+#npm version patch
+lein build
 
 export ELECTRON_BUILDER_COMPRESSION_LEVEL=3
 

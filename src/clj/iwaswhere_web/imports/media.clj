@@ -103,7 +103,7 @@
                     (extract-ts (str (get exif "Date/Time Original")) filename)
                     (.lastModified file))
         target-filename (str timestamp "-" filename)]
-    (fs/rename rel-path (str fu/data-path "/images/" target-filename))
+    (fs/rename rel-path (str fu/img-path target-filename))
     {:timestamp timestamp
      :latitude  (dms-to-dd exif "GPS Latitude" "GPS Latitude Ref")
      :longitude (dms-to-dd exif "GPS Longitude" "GPS Longitude Ref")

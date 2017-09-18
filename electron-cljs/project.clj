@@ -7,19 +7,19 @@
                  [matthiasn/systems-toolbox-electron "0.6.3"]]
 
   :plugins [[lein-cljsbuild "1.1.7"]
-            [lein-sassy "1.0.8"]]
+            [lein-shell "0.5.0"]]
 
-  :sass {:src "src/scss/"
-         :dst "resources/public/css/"}
+  :clean-targets ^{:protect false} ["target/" "prod/"]
 
-  :clean-targets ^{:protect false} ["resources/public/css/" "target/" "prod/"]
-
-  :aliases {"dist" ["do"
-                    ["clean"]
-                    ["cljsbuild" "once" "main"]
-                    ["cljsbuild" "once" "renderer"]
-                    ["cljsbuild" "once" "updater"]
-                    ["sass" "once"]]}
+  :aliases {"sass"  ["do"
+                     ["shell" "sass" "src/scss/updater.scss" "resources/public/css/updater.css"]
+                     ["shell" "sass" "src/scss/loader.scss" "resources/public/css/loader.css"]]
+            "build" ["do"
+                     ["clean"]
+                     ["cljsbuild" "once" "main"]
+                     ["cljsbuild" "once" "renderer"]
+                     ["cljsbuild" "once" "updater"]
+                     ["sass"]]}
 
   :cljsbuild {:builds [{:id           "main"
                         :source-paths ["src/iwaswhere_electron/main"]
@@ -31,7 +31,7 @@
                                        :npm-deps       {:electron-log      "2.2.7"
                                                         :moment            "2.18.1"
                                                         :electron-updater  "2.8.7"
-                                                        :electron          "1.7.6"}
+                                                        :electron          "1.8.0"}
                                        :install-deps   true
                                        :optimizations  :advanced
                                        :parallel-build true}}
@@ -46,7 +46,7 @@
                                                         :moment       "2.18.1"
                                                         :react        "15.6.1"
                                                         :react-dom    "15.6.1"
-                                                        :electron     "1.7.6"}
+                                                        :electron     "1.8.0"}
                                        :install-deps   true
                                        :optimizations  :advanced
                                        :parallel-build true}}
@@ -61,7 +61,7 @@
                                                         :moment       "2.18.1"
                                                         :react        "15.6.1"
                                                         :react-dom    "15.6.1"
-                                                        :electron     "1.7.6"}
+                                                        :electron     "1.8.0"}
                                        :install-deps   true
                                        :optimizations  :advanced
                                        :parallel-build true}}]})

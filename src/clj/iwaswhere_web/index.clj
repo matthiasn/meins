@@ -48,7 +48,7 @@
    put-fn of the ws-cmp, which is not used here but can be useful in scenarios
    when requests are supposed to be handled by a another component."
   [_put-fn]
-  [(r/files "/photos" {:root (str fu/data-path "/images/")})
+  [(r/files "/photos" {:root fu/img-path})
    (r/files "/audio" {:root (str fu/data-path "/audio/")})
    (r/files "/videos" {:root (str fu/data-path "/videos/")})
    qr/address-qr-route

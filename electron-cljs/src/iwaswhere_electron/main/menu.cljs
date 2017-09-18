@@ -54,7 +54,7 @@
 
 (defn edit-menu [put-fn]
   (let [lang (fn [cc label]
-               (let [js (str "window.spellCheckHandler.switchLanguage('" cc "');")
+               (let [js (str "iwaswhere_web.ui.menu.change_language(\"" cc "\")")
                      click #(do
                               (info "click" cc)
                               (put-fn (broadcast [:exec/js {:js js}])))]

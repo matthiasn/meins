@@ -15,6 +15,7 @@
 (def app-cache-file (str data-path "/cache.dat"))
 (def clucy-path (str data-path "/clucy/"))
 (def export-path (str data-path "/export/"))
+(def img-path (str data-path "/images/"))
 
 (defn paths []
   (let [trash-path (str data-path "/trash/")]
@@ -22,10 +23,12 @@
     (fs/mkdirs clucy-path)
     (fs/mkdirs export-path)
     (fs/mkdirs trash-path)
+    (fs/mkdirs img-path)
     {:data-path       data-path
      :app-cache       app-cache-file
      :daily-logs-path daily-logs-path
      :clucy-path      clucy-path
+     :img-path        img-path
      :export-path     export-path
      :trash-path      trash-path}))
 

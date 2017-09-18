@@ -7,7 +7,7 @@
 
 
 (defn import-screenshot [{:keys [put-fn msg-meta msg-payload]}]
-  (let [filename (str fu/data-path "/images/" (:filename msg-payload))]
+  (let [filename (str fu/img-path (:filename msg-payload))]
     (log/info "importing screenshot" filename)
     (sh "/usr/sbin/screencapture" filename))
   {:emit-msg [:cmd/schedule-new

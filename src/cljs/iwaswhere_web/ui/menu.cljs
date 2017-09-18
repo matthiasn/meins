@@ -29,6 +29,10 @@
    {:option :single-column :cls "fa-columns"}
    {:option :sort-asc :cls " fa-sort-asc"}])
 
+(defn change-language [cc]
+  (let [spellcheck-handler (.-spellCheckHandler js/window)]
+    (.switchLanguage spellcheck-handler cc)))
+
 (defn new-import-view
   "Renders new and import buttons."
   [put-fn]

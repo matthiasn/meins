@@ -13,7 +13,7 @@
 
 (def img-resized-route
   (GET "/photos2/:filename" [filename :as r]
-    (let [filename (str fu/data-path "/images/" filename)
+    (let [filename (str fu/img-path filename)
           file (io/file filename)
           exif (im/extract-exif file)
           orientation (get exif "Orientation" "")

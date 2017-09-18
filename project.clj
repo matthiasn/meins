@@ -1,5 +1,5 @@
 (defproject matthiasn/iwaswhere-web "0.0-SNAPSHOT"
-  :description "Sample application built with systems-toolbox library"
+  :description "iWasWhere - a personal information manager"
   :url "https://github.com/matthiasn/systems-toolbox"
   :license {:name "GNU AFFERO GENERAL PUBLIC LICENSE"
             :url  "https://www.gnu.org/licenses/agpl-3.0.en.html"}
@@ -61,17 +61,12 @@
   :plugins [[lein-cljsbuild "1.1.7"
              :exclusions [org.apache.commons/commons-compress]]
             [lein-figwheel "0.5.13"]
-            [lein-sassy "1.0.8"
-             :exclusions [org.clojure/clojure org.codehaus.plexus/plexus-utils]]
             [com.jakemccrary/lein-test-refresh "0.21.1"]
             [test2junit "1.3.3"]
             [lein-doo "0.1.7"]
             [lein-shell "0.5.0"]
             [lein-ancient "0.6.10"]
             [lein-codox "0.10.3"]]
-
-  :sass {:src "src/scss/"
-         :dst "resources/public/css/"}
 
   ;:global-vars {*assert* false}
 
@@ -84,27 +79,21 @@
 
   :test2junit-run-ant true
 
-  :aliases {"build" ["do" "clean" ["cljsbuild" "once" "release"]
-                     ["sass" "once"] "uberjar"]
-            "dist"  ["do"
+  :aliases {"sass" ["shell" "sass" "src/scss/iwaswhere.scss" "resources/public/css/iwaswhere.css"]
+            "build" ["do"
                      ["clean"]
-                     ["test2junit"]
+                     ["test"]
                      ["cljsbuild" "once" "release"]
-                     ["sass" "once"]
+                     ["sass"]
                      ["shell" "npm" "install"]
                      ["shell" "webpack" "-p"]
                      ["uberjar"]
-                     ["shell" "cp" "target/iwaswhere.jar" "electron-cljs/bin/"]
+                     ["shell" "cp" "target/iwaswhere.jar" "electron-cljs/bin/"]]
+            "dist"  ["do"
+                     ["build"]
                      ["shell" "./publish.sh"]]
             "beta"  ["do"
-                     ["clean"]
-                     ["test2junit"]
-                     ["cljsbuild" "once" "release"]
-                     ["sass" "once"]
-                     ["shell" "npm" "install"]
-                     ["shell" "webpack" "-p"]
-                     ["uberjar"]
-                     ["shell" "cp" "target/iwaswhere.jar" "electron-cljs/bin/"]
+                     ["build"]
                      ["shell" "./publish_beta.sh"]]}
 
   :codox {:output-path "codox"
