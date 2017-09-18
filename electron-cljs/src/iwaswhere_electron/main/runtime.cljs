@@ -30,5 +30,7 @@
               :pid-file       (str user-data "/iwaswhere.pid")
               :resources-path rp
               :app-path       app-path}]
-    (into {:repo-dir repo-dir}
+    (into {:repo-dir   repo-dir
+           :index-page (if repo-dir "index-dev.html" "index.html")
+           :port       (if repo-dir 8765 7788)}
           (map (fn [[k v]] [k (normalize v)]) info))))

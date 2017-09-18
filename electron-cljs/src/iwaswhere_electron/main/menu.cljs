@@ -2,7 +2,8 @@
   (:require [taoensso.timbre :as timbre :refer-macros [info]]
             [electron :refer [app Menu]]
             [cljs.nodejs :as nodejs :refer [process]]
-            [matthiasn.systems-toolbox.component :as stc]))
+            [matthiasn.systems-toolbox.component :as stc]
+            [iwaswhere-electron.main.runtime :as rt]))
 
 (defn app-menu [put-fn]
   (let [update-win {:url "updater.html" :width 600 :height 300}
@@ -89,12 +90,13 @@
                           {:label "none" :click no-spellcheck}]}]}))
 
 (defn view-menu [put-fn]
-  (let [new-window #(put-fn [:window/new {:url "index.html"}])
+  (let [index-page (:index-page rt/runtime-info)
+        new-window #(put-fn [:window/new {:url index-page}])
         open (fn [loc]
                (fn [_]
                  (let [js (str "window.location = '" loc "'")
                        window-id (stc/make-uuid)]
-                   (put-fn [:window/new {:url "index.html" :window-id window-id}])
+                   (put-fn [:window/new {:url index-page :window-id window-id}])
                    (put-fn [:cmd/schedule-new
                             {:timeout 1000
                              :message (with-meta

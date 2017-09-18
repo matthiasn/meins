@@ -12,7 +12,7 @@
             [clojure.string :as str]))
 
 
-(def PORT 7788)
+(def PORT (:port rt/runtime-info))
 
 (defn jvm-up? [{:keys [put-fn current-state cmp-state]}]
   (info "JVM up?" (:attempt current-state))
@@ -31,7 +31,7 @@
           (let [status-code (.-statusCode res)]
             (info "HTTP response: " status-code (= status-code 200))
             (if (= status-code 200)
-              (do (put-fn [:window/new {:url "index.html"}])
+              (do (put-fn [:window/new {:url (:index-page rt/runtime-info)}])
                   (put-fn (with-meta [:window/close] {:window-id "loading"})))
               (try-again res))))
         req (http/get (clj->js {:host "localhost" :port PORT}) res-handler)]

@@ -3,7 +3,6 @@
     [iwaswhere-web.client-store-cfg :as c]
     [matthiasn.systems-toolbox.component :as st]
     [iwaswhere-web.utils.parse :as p]
-    [clojure.pprint :as pp]
     [clojure.set :as set]))
 
 (def initial-query-cfg
