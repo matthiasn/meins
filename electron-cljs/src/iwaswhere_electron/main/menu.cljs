@@ -100,7 +100,7 @@
                    (put-fn [:cmd/schedule-new
                             {:timeout 1000
                              :message (with-meta
-                                        [:exec/js js]
+                                        [:exec/js {:js js}]
                                         {:window-id window-id})}]))))]
     {:label   "View"
      :submenu [{:label       "New Window"
