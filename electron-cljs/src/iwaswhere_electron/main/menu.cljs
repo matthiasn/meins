@@ -18,9 +18,6 @@
                            :click #(put-fn [:app/clear-cache])}
                           {:label "Clear iWasWhere Snapshot"
                            :click #(put-fn [:app/clear-iww-cache])}]}
-               {:label       "Close Window"
-                :accelerator "CmdOrCtrl+W"
-                :click       #(put-fn [:window/close])}
                {:label "Start Spotify Service"
                 :click #(put-fn [:spotify/start])}
                {:label "Start Geocoder Service"
@@ -99,7 +96,10 @@
                            (merge window-id {:url index-page :cached true})])
                   (put-fn (with-meta [:exec/js {:js js}] window-id))))]
     {:label   "View"
-     :submenu [{:label       "New Window"
+     :submenu [{:label       "Close Window"
+                :accelerator "CmdOrCtrl+W"
+                :click       #(put-fn [:window/close])}
+               {:label       "New Window"
                 :accelerator "CmdOrCtrl+Alt+N"
                 :click       new-window}
                {:label "Charts"

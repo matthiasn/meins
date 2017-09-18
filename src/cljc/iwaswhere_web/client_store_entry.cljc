@@ -129,6 +129,9 @@
             entry (u/deep-merge saved new-entry msg-payload)
             parsed (p/parse-entry (:md entry))
             updated (merge entry parsed)
+            updated (if (-> updated :questionnaires :pomo1)
+                      (update-in updated [:tags] conj "#PSS")
+                      updated)
             new-state (assoc-in current-state [:new-entries ts] updated)]
         (update-local-storage new-state)
         {:new-state new-state})

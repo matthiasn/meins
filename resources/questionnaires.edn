@@ -1,4 +1,5 @@
 {:mapping    {"#PANAS"         :panas
+              "#PSS"           :pomo1
               "#FSS"           :fss
               "#JSS"           :jss
               "#fatigue-scale" :fs
@@ -433,6 +434,27 @@
                                        :open-mind         {:type  :sum
                                                            :label "Open-Mindedness:"
                                                            :items #{5 10 15 20 25 30}}}}
+              :pomo1   {:header       "Pomodoro Satisfaction Survey"
+                        :desc         [:div
+                                       [:p "You just finished a pomodoro. Please rate how well the following
+                                            statements apply, on a five item scale, between 1) disagree strongly
+                                            and 5) agree strongly."]]
+                        :reference    [:div ""]
+                        :fields       [{:type  :likert5
+                                        :path  [1]
+                                        :label "I achieved what I could achieve, and I'm proud of the result."}
+                                       {:type  :likert5-r
+                                        :path  [2]
+                                        :label "I was distracted, and I am unhappy with the result."}
+                                       {:type  :likert5
+                                        :path  [3]
+                                        :label "There was a clear goal which was easy to follow and move towards."}
+                                       {:type  :likert5-r
+                                        :path  [4]
+                                        :label "I felt dumb or helpless."}]
+                        :aggregations {:total {:type  :sum
+                                               :label "Total:"
+                                               :items #{1 2 3 4}}}}
               :gse     {:header       "The General Self-Efficacy Scale (GSE)"
                         :desc         [:div
                                        [:p "The construct of Perceived Self-Efficacy reflects an optimistic self-belief (Schwarzer, 1992). This is the belief that one can perform a novel or difficult tasks, or cope with adversity -- in various domains of human functioning.  Perceived self-efficacy facilitates goal-setting, effort investment,  persistence in face of barriers and recovery from setbacks. It can be regarded as a positive resistance resource factor. Ten items are designed to tap this construct. Each item refers to successful coping and implies an internal-stable attribution of success. Perceived self-efficacy is an operative construct, i.e., it is related to subsequent behavior and, therefore, is relevant for clinical practice and behavior change."]
@@ -630,6 +652,14 @@
                              :mn      10
                              :mx      50
                              :color   :red}
+                            {:type    :scores-chart
+                             :h       40
+                             :k       :pomo1
+                             :score-k :total
+                             :label   "Pomodoro Satisfaction Survey"
+                             :mn      4
+                             :mx      20
+                             :color   :green}
                             {:type    :scores-chart
                              :h       40
                              :k       :cfq11

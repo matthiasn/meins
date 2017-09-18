@@ -123,7 +123,14 @@
               questionnaire-tags (:mapping questionnaires)
               q-tags (select-keys questionnaire-tags (:tags entry))
               q-mapper (fn [[t k]] [k (get-in questionnaires [:items k])])
-              entry-questionnaires (map q-mapper q-tags)]
+              pomo-q [:pomo1 (get-in questionnaires [:items :pomo1])]
+              entry-questionnaires (map q-mapper q-tags)
+              completed-pomodoro (and (>= (:completed-time entry)
+                                          (:planned-dur entry))
+                                      (= (:entry-type entry) :pomodoro))
+              entry-questionnaires (if completed-pomodoro
+                                     (conj entry-questionnaires pomo-q)
+                                     entry-questionnaires)]
           [:div
            (for [[k conf] entry-questionnaires]
              (let [q-path [:questionnaires k]
