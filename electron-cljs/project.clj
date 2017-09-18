@@ -4,7 +4,7 @@
                  [re-frame "0.10.1"]
                  [com.taoensso/timbre "4.10.0"]
                  [matthiasn/systems-toolbox "0.6.15"]
-                 [matthiasn/systems-toolbox-electron "0.6.3"]]
+                 [matthiasn/systems-toolbox-electron "0.6.4"]]
 
   :plugins [[lein-cljsbuild "1.1.7"]
             [lein-shell "0.5.0"]]

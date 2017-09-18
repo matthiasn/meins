@@ -93,15 +93,10 @@
   (let [index-page (:index-page rt/runtime-info)
         new-window #(put-fn [:window/new {:url index-page}])
         open (fn [loc]
-               (fn [_]
-                 (let [js (str "window.location = '" loc "'")
-                       window-id (stc/make-uuid)]
-                   (put-fn [:window/new {:url index-page :window-id window-id}])
-                   (put-fn [:cmd/schedule-new
-                            {:timeout 1000
-                             :message (with-meta
-                                        [:exec/js {:js js}]
-                                        {:window-id window-id})}]))))]
+               #(let [js (str "window.location = '" loc "'")
+                      window-id (stc/make-uuid)]
+                  (put-fn [:window/new {:url index-page :window-id window-id}])
+                  (put-fn (with-meta [:exec/js {:js js}] {:window-id window-id}))))]
     {:label   "View"
      :submenu [{:label       "New Window"
                 :accelerator "CmdOrCtrl+Alt+N"
