@@ -1,7 +1,5 @@
 language: clojure
 install: npm install
-#script: lein with-profile +cljs-doo doo firefox cljs-test once
-script: lein with-profile +cljs-doo doo phantom cljs-test once
-#script: lein test2junit
+script: lein with-profile +test-reagent cljsbuild test
 jdk:
   - oraclejdk8

@@ -52,34 +52,25 @@
   :main iwaswhere-web.core
   :jvm-opts ["-XX:-OmitStackTraceInFastThrow" "-XX:+AggressiveOpts"]
 
-  :profiles {:uberjar  {:aot :all}
-             :cljs-doo {:dependencies [[cljsjs/react "15.6.1-2"]
-                                       [cljsjs/react-dom "15.6.1-2"]]}}
+  :profiles {:uberjar      {:aot :all}
+             :test-reagent {:dependencies [[cljsjs/react "15.6.1-2"]
+                                           [cljsjs/react-dom "15.6.1-2"]
+                                           [cljsjs/create-react-class "15.6.0-2"]]}}
 
   :doo {:paths {:karma "./node_modules/karma/bin/karma"}}
 
   :plugins [[lein-cljsbuild "1.1.7"
              :exclusions [org.apache.commons/commons-compress]]
             [lein-figwheel "0.5.13"]
-            [com.jakemccrary/lein-test-refresh "0.21.1"]
             [test2junit "1.3.3"]
-            [lein-doo "0.1.7"]
             [lein-shell "0.5.0"]
-            [lein-ancient "0.6.12"]
-            [lein-codox "0.10.3"]]
+            [lein-ancient "0.6.12"]]
 
   ;:global-vars {*assert* false}
 
-  :figwheel {:server-port 3450
-             :css-dirs    ["resources/public/css"]}
-
-  :test-refresh {:notify-on-success false
-                 :changes-only      false
-                 :watch-dirs        ["src" "test"]}
-
   :test2junit-run-ant true
 
-  :aliases {"sass" ["shell" "sass" "src/scss/iwaswhere.scss" "resources/public/css/iwaswhere.css"]
+  :aliases {"sass"  ["shell" "sass" "src/scss/iwaswhere.scss" "resources/public/css/iwaswhere.css"]
             "build" ["do"
                      ["clean"]
                      ["test"]
@@ -96,35 +87,22 @@
                      ["build"]
                      ["shell" "./publish_beta.sh"]]}
 
-  :codox {:output-path "codox"
-          :source-uri  "https://github.com/matthiasn/iWasWhere/blob/master/iwaswhere-web/{filepath}#L{line}"}
-
-  :cljsbuild
-  {:builds
-   [{:id           "dev"
-     :source-paths ["src/cljc" "src/cljs" "env/dev/cljs"]
-     :figwheel     true
-     :compiler     {:main          "iwaswhere-web.dev"
-                    :asset-path    "js/build"
-                    :optimizations :none
-                    ;:output-dir    "resources/public/js/build/"
-                    ;:output-to     "resources/public/js/build/iwaswhere.js"
-                    :source-map    true}}
-    {:id           "release"
-     :source-paths ["src/cljc" "src/cljs"]
-     :compiler     {:main          "iwaswhere-web.core"
-                    :asset-path    "js/build"
-                    :elide-asserts true
-                    :externs       ["externs/misc.js"
-                                    "externs/leaflet.ext.js"]
-                    :output-dir    "resources/public/js/build/"
-                    :output-to     "resources/public/js/build/iwaswhere.js"
-                    ;:source-map    "resources/public/js/build/iwaswhere.js.map"
-                    :optimizations :whitespace}}
-    {:id           "cljs-test"
-     :source-paths ["src/cljs" "src/cljc" "test"]
-     :compiler     {:output-to     "out/testable.js"
-                    :output-dir    "out/"
-                    :main          iwaswhere-web.runner
-                    :process-shim  false
-                    :optimizations :whitespace}}]})
+  :cljsbuild {:test-commands {"cljs-test" ["phantomjs" "test/phantom/test.js" "test/phantom/test.html"]}
+              :builds        [{:id           "release"
+                               :source-paths ["src/cljc" "src/cljs"]
+                               :compiler     {:main          "iwaswhere-web.core"
+                                              :asset-path    "js/build"
+                                              :elide-asserts true
+                                              :externs       ["externs/misc.js"
+                                                              "externs/leaflet.ext.js"]
+                                              :output-dir    "resources/public/js/build/"
+                                              :output-to     "resources/public/js/build/iwaswhere.js"
+                                              ;:source-map    "resources/public/js/build/iwaswhere.js.map"
+                                              :optimizations :whitespace}}
+                              {:id           "cljs-test"
+                               :source-paths ["src/cljs" "src/cljc" "test"]
+                               :compiler     {:output-to     "out/testable.js"
+                                              :output-dir    "out/"
+                                              :main          iwaswhere-web.runner
+                                              :process-shim  false
+                                              :optimizations :whitespace}}]})
