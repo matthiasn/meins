@@ -1,7 +1,6 @@
 (ns iwaswhere-electron.main.menu
   (:require [taoensso.timbre :as timbre :refer-macros [info]]
             [electron :refer [app Menu]]
-            [cljs.nodejs :as nodejs :refer [process]]
             [matthiasn.systems-toolbox.component :as stc]
             [iwaswhere-electron.main.runtime :as rt]))
 

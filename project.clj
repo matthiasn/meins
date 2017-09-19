@@ -65,7 +65,7 @@
             [test2junit "1.3.3"]
             [lein-doo "0.1.7"]
             [lein-shell "0.5.0"]
-            [lein-ancient "0.6.10"]
+            [lein-ancient "0.6.12"]
             [lein-codox "0.10.3"]]
 
   ;:global-vars {*assert* false}

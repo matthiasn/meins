@@ -3,10 +3,7 @@
             [taoensso.timbre :as timbre :refer-macros [info debug]]
             [matthiasn.systems-toolbox-electron.ipc-renderer :as ipc]
             [iwaswhere-electron.renderer.exec :as exec]
-            [electron :refer [ipcRenderer shell]]
-            [matthiasn.systems-toolbox.switchboard :as sb]
-            [clojure.string :as s]
-            [clojure.string :as s]))
+            [matthiasn.systems-toolbox.switchboard :as sb]))
 
 (defonce switchboard (sb/component :renderer/switchboard))
 

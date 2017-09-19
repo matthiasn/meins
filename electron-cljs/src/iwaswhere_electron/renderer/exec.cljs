@@ -1,8 +1,7 @@
 (ns iwaswhere-electron.renderer.exec
   (:require [taoensso.timbre :as timbre :refer-macros [info]]
             [electron :refer [ipcRenderer]]
-            [cljs.spec.alpha :as s]
-            [clojure.string :as str]))
+            [cljs.spec.alpha :as s]))
 
 (s/def :exec/js map?)
 
