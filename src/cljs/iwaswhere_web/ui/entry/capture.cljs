@@ -127,7 +127,8 @@
               entry-questionnaires (map q-mapper q-tags)
               completed-pomodoro (and (>= (:completed-time entry)
                                           (:planned-dur entry))
-                                      (= (:entry-type entry) :pomodoro))
+                                      (= (:entry-type entry) :pomodoro)
+                                      (> ts 1505770346000))
               entry-questionnaires (if completed-pomodoro
                                      (conj entry-questionnaires pomo-q)
                                      entry-questionnaires)]
