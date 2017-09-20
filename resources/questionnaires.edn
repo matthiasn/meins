@@ -657,6 +657,7 @@
                              :k       :pomo1
                              :score-k :total
                              :label   "Pomodoro Satisfaction Survey"
+                             :scatter true
                              :mn      4
                              :mx      20
                              :color   :green}

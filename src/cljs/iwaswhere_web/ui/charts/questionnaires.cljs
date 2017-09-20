@@ -48,9 +48,21 @@
         ^{:key (str p)}
         [:circle {:cx    (:x p)
                   :cy    (:y p)
-                  :r     2
+                  :r     1.6
                   :fill  :none
                   :style {:stroke color}}])]]))
+
+(defn scatter-chart [scores point-mapper color]
+  (let [points (map-indexed point-mapper scores)]
+    [:g
+     (for [p points]
+       ^{:key (str p)}
+       [:circle {:cx    (:x p)
+                 :cy    (:y p)
+                 :r     1.6
+                 :style {:stroke  color
+                         :fill    color
+                         :opacity 0.6}}])]))
 
 (defn line [y s w]
   [:line {:x1           200
@@ -244,7 +256,7 @@
        (map (fn [[ts m]] (assoc-in m [:timestamp] ts)))))
 
 (defn scores-chart
-  [{:keys [y k w h score-k start end mn mx color x-offset label]}]
+  [{:keys [y k w h score-k start end mn mx color x-offset label scatter]}]
   (let [stats (subscribe [:stats])
         scores (reaction (filter score-k (scores-fn @stats k)))
         span (- end start)
@@ -267,7 +279,9 @@
        (for [n lines]
          ^{:key (str k score-k n)}
          [line (- btm-y (* n scale)) "#888" 1])
-       [chart-line @scores mapper color]
+       (if scatter
+         [scatter-chart @scores mapper color]
+         [chart-line @scores mapper color])
        [line y "#000" 2]
        [line (+ y h) "#000" 2]
        [:rect {:fill :white :x 0 :y y :height (+ h 5) :width 200}]
