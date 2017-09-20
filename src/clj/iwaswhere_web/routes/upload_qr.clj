@@ -3,13 +3,15 @@
   (:require [compojure.core :refer [GET]]
             [clj.qrgen :as qr]
             [iwaswhere-web.upload :as up]
-            [clojure.tools.logging :as log])
+            [clojure.tools.logging :as log]
+            [clojure.string :as s])
   (:import (java.net NetworkInterface Inet4Address)))
 
 ; ip-filter, ip-extract, and ips functions borrowed from:
 ; http://software-ninja-ninja.blogspot.de/2013/05/clojure-what-is-my-ip-address.html
 (defn ip-filter [inet]
   (and (.isUp inet)
+       (not (s/includes? (.getName inet) "vmnet"))
        (not (.isVirtual inet))
        (not (.isLoopback inet))))
 
@@ -28,5 +30,5 @@
     (qr/as-input-stream
       (let [ip (ffirst (ips))
             url (str "http://" ip ":" @up/upload-port "/upload/")]
-        (log/info "QR Code for:")
+        (log/info "QR Code for:" url)
         (qr/from url :size [300 300])))))
