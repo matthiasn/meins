@@ -1,6 +1,7 @@
 const express = require('express');
 const svc = express();
 const os = require('os');
+const fs = require('fs');
 const geocoder = require('local-reverse-geocoder');
 const log = require('electron-log');
 const tcpPortUsed = require('tcp-port-used');
@@ -52,6 +53,7 @@ const pid = process.pid;
 function initGeocoderSvc() {
     const tmpDir = win32 ? os.tmpdir() : "/tmp";
     const dumpDir = tmpDir + "/geonames";
+    fs.mkdirSync(dumpDir);
     const pidFile = dumpDir + '/geocoder.pid';
     log.info("GEOCODER: starting on port", PORT, "PID", pid);
     npid.remove(pidFile);
