@@ -659,7 +659,7 @@
                              :label   "Pomodoro Satisfaction Survey"
                              :scatter true
                              :mn      4
-                             :mx      20
+                             :mx      22
                              :color   :green}
                             {:type    :scores-chart
                              :h       40

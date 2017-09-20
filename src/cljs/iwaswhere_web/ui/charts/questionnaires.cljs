@@ -15,6 +15,11 @@
 (def weekday "ddd")
 (defn df [ts format] (.format (js/moment ts) format))
 
+(def tz-offset
+  (-> (js/Date.)
+      (.getTimezoneOffset)
+      (* 60 1000)))
+
 (defn tick
   "Renders individual timeline tick."
   [pos color w y1 y2]
@@ -65,7 +70,7 @@
                          :opacity 0.6}}])]))
 
 (defn line [y s w]
-  [:line {:x1           200
+  [:line {:x1           195
           :x2           1100
           :y1           y
           :y2           y
@@ -284,7 +289,7 @@
          [chart-line @scores mapper color])
        [line y "#000" 2]
        [line (+ y h) "#000" 2]
-       [:rect {:fill :white :x 0 :y y :height (+ h 5) :width 200}]
+       [:rect {:fill :white :x 0 :y y :height (+ h 5) :width 190}]
        [row-label label y h]])))
 
 (defn charts-y-pos
@@ -318,8 +323,8 @@
             now (st/now)
             d (* 24 60 60 1000)
             within-day (mod now d)
-            start (- now within-day (* days d))
-            end (+ (- now within-day) d)
+            start (+ tz-offset (- now within-day (* days d)))
+            end (+ (- now within-day) d tz-offset)
             span (- end start)
             custom-field-stats @custom-field-stats
             common {:start      start :end end :w 900 :x-offset 200
@@ -335,7 +340,7 @@
            [:feGaussianBlur {:stdDeviation 3}]]
           [:g
            (for [n (range (+ 2 days))]
-             (let [offset (* n d)
+             (let [offset (+ (* n d) tz-offset)
                    scaled (* 900 (/ offset span))
                    x (+ 200 scaled)]
                ^{:key n}
@@ -350,7 +355,7 @@
               ^{:key (str (:label chart-cfg) (:tag chart-cfg))}
               [chart-fn (merge common chart-cfg)]))
           (for [n (range (inc days))]
-            (let [offset (* (+ n 0.5) d)
+            (let [offset (+ (* (+ n 0.5) d) tz-offset)
                   scaled (* 900 (/ offset span))
                   x (+ 200 scaled)
                   ts (+ start offset)
