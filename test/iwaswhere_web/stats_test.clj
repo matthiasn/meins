@@ -126,30 +126,22 @@
                      :time-by-ts    {1450999000001 {:completed  699
                                                     :manual     0
                                                     :saga       nil
-                                                    :saga-name  nil
                                                     :story      1484076392372
-                                                    :story-name nil
                                                     :summed     699}
                                      1450999200001 {:completed  291
                                                     :manual     0
                                                     :saga       nil
-                                                    :saga-name  nil
                                                     :story      1484076392371
-                                                    :story-name nil
                                                     :summed     291}
                                      1450999300002 {:completed  200
                                                     :manual     0
                                                     :saga       nil
-                                                    :saga-name  nil
                                                     :story      1484076392372
-                                                    :story-name nil
                                                     :summed     200}
                                      1450999300011 {:completed  111
                                                     :manual     0
                                                     :saga       nil
-                                                    :saga-name  nil
                                                     :story      :no-story
-                                                    :story-name nil
                                                     :summed     111}}
                      :total-time    1301}]
                    stats))))))))

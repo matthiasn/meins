@@ -33,7 +33,7 @@
         options (subscribe [:options])
         entries-map (subscribe [:entries-map])
         options (subscribe [:options])
-        stories (reaction (:stories @options))
+        stories (subscribe [:stories])
         not-on-hold #(not (:on-hold (:task %)))
         on-hold-filter (fn [entry]
                          (let [on-hold (:on-hold (:task entry))]
@@ -102,7 +102,7 @@
         query-cfg (subscribe [:query-cfg])
         results (subscribe [:results])
         options (subscribe [:options])
-        stories (reaction (:stories @options))
+        stories (subscribe [:stories])
         started-tasks (subscribe [:started-tasks])
         entries-map (subscribe [:entries-map])
         update-search (fn [ts]

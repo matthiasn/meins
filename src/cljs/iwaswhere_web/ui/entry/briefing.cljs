@@ -18,8 +18,7 @@
   [entry]
   (let [stats (subscribe [:stats])
         chart-data (subscribe [:chart-data])
-        options (subscribe [:options])
-        sagas (reaction (:sagas @options))
+        sagas (subscribe [:sagas])
         y-scale 0.0045]
     (fn [entry]
       (let [{:keys [pomodoro-stats]} @chart-data
@@ -104,9 +103,9 @@
                   updated (assoc-in entry [:briefing :time-allocation saga] s)]
               (put-fn [:entry/update-local updated]))))]
     (fn briefing-render [entry put-fn edit-mode? local-cfg]
-      (h/keep-updated :stats/wordcount 60 local @last-update put-fn)
-      (h/keep-updated :stats/pomodoro 60 local @last-update put-fn)
-      (h/keep-updated :stats/tasks 60 local @last-update put-fn)
+      (h/keep-updated2 :stats/wordcount day local @last-update put-fn)
+      (h/keep-updated2 :stats/pomodoro day local @last-update put-fn)
+      (h/keep-updated2 :stats/tasks day local @last-update put-fn)
       (let [ts (:timestamp entry)
             {:keys [pomodoro-stats task-stats wordcount-stats]} @chart-data
             day (-> entry :briefing :day)

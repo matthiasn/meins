@@ -10,9 +10,8 @@
 (defn ts-bars
   "Renders group with rects for all stories of the particular day."
   [day-stats local item-name-k idx chart-h y-scale put-fn]
-  (let [options (subscribe [:options])
-        stories (reaction (:stories @options))
-        sagas (reaction (:sagas @options))
+  (let [stories (subscribe [:stories])
+        sagas (subscribe [:sagas])
         stacked-reducer (fn [acc [k v]]
                           (let [total (get acc :total 0)]
                             (-> acc
@@ -24,7 +23,6 @@
             day-millis (.valueOf day)
             mouse-enter-fn (cc/mouse-enter-fn local day-stats)
             mouse-leave-fn (cc/mouse-leave-fn local day-stats)
-            stories @stories
             w 9
             x-step 10
             midnight (* 26 60 60 y-scale)
@@ -36,7 +34,9 @@
         [:g {:on-mouse-enter mouse-enter-fn
              :on-mouse-leave mouse-leave-fn}
          (for [[hh {:keys [summed manual] :as data}] time-by-h]
-           (let [item-name (item-name-k data)
+           (let [item-name (if (= item-name-k :story-name)
+                             (get-in @stories [(:story data) :story-name])
+                             (get-in @sagas [(:saga data) :saga-name]))
                  h (* y-scale summed)
                  y (* y-scale (+ hh 2) 60 60)
                  y (if (pos? manual) (- y h) y)]

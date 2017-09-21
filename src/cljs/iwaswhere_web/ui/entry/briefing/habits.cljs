@@ -23,7 +23,7 @@
         waiting-habits (subscribe [:waiting-habits])
         options (subscribe [:options])
         expand-fn #(swap! local update-in [:expanded-habits] not)
-        stories (reaction (:stories @options))
+        stories (subscribe [:stories])
         saga-filter (fn [entry]
                       (if-let [selected (:selected @local)]
                         (let [story (get @stories (:primary-story entry))]

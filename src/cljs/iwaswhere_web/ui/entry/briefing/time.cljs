@@ -10,7 +10,6 @@
   "Render list of times spent on individual stories, plus the total."
   [day-stats local put-fn]
   (let [stories (subscribe [:stories])
-        sagas (subscribe [:sagas])
         saga-filter (fn [[k v]]
                       (if-let [selected (:selected @local)]
                         (let [story (get @stories k)]
@@ -49,8 +48,7 @@
 
 (defn time-by-sagas
   [entry day-stats local edit-mode? put-fn]
-  (let [options (subscribe [:options])
-        sagas (reaction (:sagas @options))
+  (let [sagas (subscribe [:sagas])
         time-alloc-input-fn
         (fn [entry saga]
           (fn [ev]

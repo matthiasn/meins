@@ -14,7 +14,7 @@
   "Renders group with rects for all stories of the particular day."
   [day-stats local idx chart-h y-scale put-fn]
   (let [options (subscribe [:options])
-        stories (reaction (:stories @options))
+        stories (subscribe [:stories])
         stacked-reducer (fn [acc [k v]]
                           (let [total (get acc :total 0)]
                             (-> acc
@@ -71,7 +71,7 @@
   "Renders group with rects for all stories of the particular day."
   [day-stats local idx chart-h y-scale put-fn]
   (let [options (subscribe [:options])
-        sagas (reaction (:sagas @options))
+        sagas (subscribe [:sagas])
         stacked-reducer (fn [acc [k v]]
                           (let [total (get acc :total 0)]
                             (-> acc
@@ -127,9 +127,8 @@
 (defn time-by-stories-list
   "Render list of times spent on individual stories, plus the total."
   [day-stats]
-  (let [options (subscribe [:options])
-        stories (reaction (:stories @options))
-        sagas (reaction (:sagas @options))]
+  (let [stories (subscribe [:stories])
+        sagas (subscribe [:sagas])]
     (fn [day-stats]
       (let [stories @stories
             sagas @sagas

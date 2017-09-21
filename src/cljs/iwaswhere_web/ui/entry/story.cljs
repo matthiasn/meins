@@ -65,7 +65,7 @@
   "Shows story name."
   [entry tab-group put-fn]
   (let [options (subscribe [:options])
-        stories (reaction (:stories @options))
+        stories (subscribe [:stories])
         linked-story (reaction (:primary-story @entry))
         story-name (reaction (:story-name (get @stories @linked-story)))
         local (r/atom {})
@@ -91,7 +91,7 @@
   "In edit mode, allow editing of story, otherwise show story name."
   [entry put-fn edit-mode?]
   (let [options (subscribe [:options])
-        sagas (reaction (:sagas @options))
+        sagas (subscribe [:sagas])
         sorted-sagas (reaction (:sorted-sagas @options))
         ts (:timestamp entry)
         new-entries (subscribe [:new-entries])
