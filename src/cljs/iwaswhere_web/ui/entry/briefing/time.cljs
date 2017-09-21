@@ -20,9 +20,7 @@
                             (let [s (or (:story-name (get @stories k)) "none")]
                               [k s v]))]
     (fn [day-stats local put-fn]
-      (let [stories @stories
-            sagas @sagas
-            dur (u/duration-string (:total-time day-stats))
+      (let [dur (u/duration-string (:total-time day-stats))
             date (:date-string day-stats)
             time-by-story (:time-by-story day-stats)
             time-by-story2 (->> day-stats
