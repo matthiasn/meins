@@ -38,7 +38,7 @@
   },
   "devDependencies": {
     "browser-resolve": "^1.11.2",
-    "electron": "^1.8.0",
+    "electron": "^1.7.6",
     "electron-builder": "^19.27.7",
     "electron-publisher-s3": "^19.28.3",
     "module-deps": "4.1.1",

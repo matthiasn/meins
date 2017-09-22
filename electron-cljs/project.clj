@@ -30,8 +30,8 @@
                                        :externs        ["externs.js"]
                                        :npm-deps       {:electron-log      "2.2.7"
                                                         :electron-updater  "2.8.7"
-                                                        :electron          "1.8.0"}
-                                       :install-deps   true
+                                                        :electron          "1.7.6"}
+                                       ;:install-deps   true
                                        :optimizations  :advanced
                                        :parallel-build true}}
                        {:id           "renderer"
@@ -42,8 +42,8 @@
                                        :output-dir     "prod/renderer"
                                        :externs        ["externs.js"]
                                        :npm-deps       {:electron-log "2.2.7"
-                                                        :electron     "1.8.0"}
-                                       :install-deps   true
+                                                        :electron     "1.7.6"}
+                                       ;:install-deps   true
                                        :optimizations  :advanced
                                        :parallel-build true}}
                        {:id           "updater"
@@ -54,7 +54,7 @@
                                        :output-dir     "prod/updater"
                                        :externs        ["externs.js"]
                                        :npm-deps       {:electron-log "2.2.7"
-                                                        :electron     "1.8.0"}
-                                       :install-deps   true
+                                                        :electron     "1.7.6"}
+                                       ;:install-deps   true
                                        :optimizations  :advanced
                                        :parallel-build true}}]})
