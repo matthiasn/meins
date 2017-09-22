@@ -16,8 +16,7 @@
             [iwaswhere-web.backup :as bak]
             [iwaswhere-web.imports :as i]
             [iwaswhere-web.export :as e]
-            [matthiasn.systems-toolbox.scheduler :as sched]
-            [matthiasn.systems-toolbox-zipkin.core :as z]))
+            [matthiasn.systems-toolbox.scheduler :as sched]))
 
 (defonce switchboard (sb/component :server/switchboard))
 
@@ -53,11 +52,6 @@
                      (up/cmp-map :server/upload-cmp)
                      (bl/cmp-map :server/blink-cmp)
                      (ft/cmp-map :server/ft-cmp)}
-        components (if (System/getenv "ZIPKIN")
-                     (let [reporter (z/mk-reporter "http://localhost:9411")
-                           trace-cmp (z/trace-cmp reporter)]
-                       (set (mapv trace-cmp components)))
-                     components)
         components (make-observable components)]
     (sb/send-mult-cmd
       switchboard
@@ -68,7 +62,6 @@
                             :server/blink-cmp
                             :server/export-cmp
                             :server/upload-cmp
-                            :server/kafka-firehose
                             :server/imports-cmp}}]
 
        [:cmd/route {:from :server/imports-cmp

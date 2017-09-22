@@ -25,7 +25,6 @@
                  [matthiasn/systems-toolbox-kafka "0.6.13"]
                  [matthiasn/systems-toolbox "0.6.17"]
                  [matthiasn/systems-toolbox-sente "0.6.17"]
-                 [matthiasn/systems-toolbox-zipkin "0.6.3"]
                  [reagent "0.7.0" :exclusions [cljsjs/react cljsjs/react-dom]]
                  [re-frame "0.10.1"]
                  [secretary "1.2.3"]

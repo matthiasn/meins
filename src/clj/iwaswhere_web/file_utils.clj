@@ -37,11 +37,12 @@
    default to data path."
   []
   (let [conf-path (str data-path "/conf.edn")
-        default (edn/read-string (slurp (io/resource "default-conf.edn")))
         questionnaires (edn/read-string (slurp (io/resource "questionnaires.edn")))
         conf (try (edn/read-string (slurp conf-path))
                   (catch Exception ex
-                    (do (log/warn "No config found -> copying from default.")
+                    (let [default (edn/read-string
+                                    (slurp (io/resource "default-conf.edn")))]
+                      (log/warn "No config found -> copying from default.")
                         (fs/mkdirs data-path)
                         (spit conf-path (with-out-str (pp/pprint default)))
                         default)))]

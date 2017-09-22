@@ -13,8 +13,7 @@
             [clojure.pprint :as pp]
             [matthiasn.systems-toolbox.component :as st]
             [clj-time.core :as t]
-            [clj-uuid :as uuid]
-            [matthiasn.systems-toolbox-zipkin.core :as z])
+            [clj-uuid :as uuid])
   (:import (org.joda.time DateTimeZone)))
 
 ;; TODO: migrate existing audio entries to use a different keyword
