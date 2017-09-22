@@ -109,8 +109,8 @@
                                       {:departure-timestamp 64092211200}))))))
 
 (deftest find-missing-test
-  (let [entries-map {1465059173965 test-entry
-                     1465059173966 test-entry2}]
+  (let [entries-map (atom {1465059173965 test-entry
+                           1465059173966 test-entry2})]
     (testing "properly maps existing entry"
       (is (= (let [mapper-fn (u/find-missing-entry entries-map (fn [_msg]))]
                (mapv mapper-fn [1465059173965 1465059173966]))

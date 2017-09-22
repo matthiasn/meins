@@ -166,11 +166,11 @@
           uid (:sente-uid msg-meta)]
       (put-fn (with-meta [:state/stats-tags stats-tags] {:sente-uid uid}))))
   (future
-    (let [stats {:started-tasks (:entries (gq/get-filtered current-state started-tasks))}
+    (let [stats {:started-tasks (gq/get-filtered current-state started-tasks)}
           uid (:sente-uid msg-meta)]
       (put-fn (with-meta [:state/stats-tags2 stats] {:sente-uid uid}))))
   (future
-    (let [stats {:waiting-habits (:entries (gq/get-filtered current-state waiting-habits))}
+    (let [stats {:waiting-habits (gq/get-filtered current-state waiting-habits)}
           uid (:sente-uid msg-meta)]
       (put-fn (with-meta [:state/stats-tags2 stats] {:sente-uid uid}))))
   (future

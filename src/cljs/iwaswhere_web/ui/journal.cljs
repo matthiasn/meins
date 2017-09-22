@@ -34,8 +34,7 @@
             with-comments? (fn [entry] (and (or (and comments-w-entries?
                                                      (not (:comment-for entry)))
                                                 (not comments-w-entries?))
-                                            (or (:new-entry entry) show-context?)))
-            find-missing (u/find-missing-entry @entries-map put-fn)]
+                                            (or (:new-entry entry) show-context?)))]
         [:div.journal
          [:div.journal-entries
           (when-let [story (:story local-cfg)]

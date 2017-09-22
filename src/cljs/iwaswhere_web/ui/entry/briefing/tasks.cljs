@@ -32,6 +32,7 @@
         started-tasks (subscribe [:started-tasks])
         options (subscribe [:options])
         entries-map (subscribe [:entries-map])
+        entries-map (reaction (merge @entries-map (:entries-map @started-tasks)))
         options (subscribe [:options])
         stories (subscribe [:stories])
         not-on-hold #(not (:on-hold (:task %)))
@@ -50,10 +51,9 @@
                      [:span.filter {:class    (when (:on-hold @local) "current")
                                     :on-click #(swap! local update-in [:on-hold] not)}
                       (name fk)])
+        find-missing (u/find-missing-entry entries-map put-fn)
         entries-list (reaction
-                       (let [entries-map @entries-map
-                             find-missing (u/find-missing-entry entries-map put-fn)
-                             entries (->> @started-tasks
+                       (let [entries (->> (:entries @started-tasks)
                                           (map (fn [ts] (find-missing ts)))
                                           (filter on-hold-filter)
                                           (filter saga-filter)
@@ -62,7 +62,7 @@
                              conf (merge @cfg @options)]
                          (if (:show-pvt @cfg)
                            entries
-                           (filter (u/pvt-filter conf entries-map) entries))))]
+                           (filter (u/pvt-filter conf @entries-map) entries))))]
     (fn started-tasks-list-render [local local-cfg put-fn]
       (let [entries-list @entries-list
             tab-group (:tab-group local-cfg)]
@@ -119,16 +119,17 @@
         filter-btn (fn [fk text]
                      [:span.filter {:class    (when (= fk (:filter @local)) "current")
                                     :on-click #(swap! local assoc-in [:filter] fk)}
-                      (name fk) (when (= fk (:filter @local)) text)])]
+                      (name fk) (when (= fk (:filter @local)) text)])
+        entries-w-done (reaction
+                         (into {} (map (fn [[k v]]
+                                         [k (if (-> v :task :done)
+                                              (update-in v [:tags] conj "#done")
+                                              v)])
+                                       @entries-map)))
+        linked-mapper (u/find-missing-entry entries-w-done put-fn)]
     (fn open-linked-tasks-render [ts local local-cfg put-fn]
       (let [{:keys [tab-group query-id]} local-cfg
             linked-entries-set (into (sorted-set) (:linked-entries-list @entry))
-            entries-w-done (into {} (map (fn [[k v]]
-                                           [k (if (-> v :task :done)
-                                                (update-in v [:tags] conj "#done")
-                                                v)])
-                                         @entries-map))
-            linked-mapper (u/find-missing-entry entries-w-done put-fn)
             linked-entries (mapv linked-mapper linked-entries-set)
             conf (merge @cfg @options)
             linked-entries (if (:show-pvt conf)

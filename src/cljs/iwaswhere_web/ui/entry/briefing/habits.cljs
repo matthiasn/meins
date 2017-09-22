@@ -30,18 +30,17 @@
                           (= selected (:linked-saga story)))
                         true))
         entries-map (subscribe [:entries-map])
-        habits
-        (reaction
-          (let [entries-map @entries-map
-                find-missing (u/find-missing-entry entries-map put-fn)
-                entries (->> @waiting-habits
-                             (map (fn [ts] (find-missing ts)))
-                             (filter saga-filter)
-                             (sort habit-sorter))
-                conf (merge @cfg @options)]
-            (if (:show-pvt @cfg)
-              entries
-              (filter (u/pvt-filter conf entries-map) entries))))]
+        entries-map (reaction (merge @entries-map (:entries-map @waiting-habits)))
+        habits (reaction
+                 (let [find-missing (u/find-missing-entry entries-map put-fn)
+                       entries (->> (:entries @waiting-habits)
+                                    (map (fn [ts] (find-missing ts)))
+                                    (filter saga-filter)
+                                    (sort habit-sorter))
+                       conf (merge @cfg @options)]
+                   (if (:show-pvt @cfg)
+                     entries
+                     (filter (u/pvt-filter conf @entries-map) entries))))]
     (fn waiting-habits-list-render [entry local local-cfg put-fn]
       (let [habits (if (:expanded-habits @local) @habits (take 12 @habits))
             tab-group (:tab-group local-cfg)

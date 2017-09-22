@@ -41,12 +41,12 @@
         cfg (subscribe [:cfg])
         options (subscribe [:options])
         active (reaction (:active @cfg))
-        show-pvt? (reaction (:show-pvt @cfg))]
+        show-pvt? (reaction (:show-pvt @cfg))
+        get-or-retrieve (u/find-missing-entry entries-map put-fn)]
     (fn thumbnail-render [entry local-cfg put-fn]
       (let [ts (:timestamp entry)
             entry-active? (contains? (set (vals @active)) (:timestamp entry))
             linked-entries-set (set (:linked-entries-list entry))
-            get-or-retrieve (u/find-missing-entry @entries-map put-fn)
             with-imgs (filter :img-file (map get-or-retrieve linked-entries-set))
             filtered (if @show-pvt?
                        with-imgs
