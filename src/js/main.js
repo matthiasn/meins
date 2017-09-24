@@ -8,6 +8,7 @@ window.deps = {
     'SearchFieldEditor' : require ('./SearchFieldEditor'),
     'EntryTextEditor' : require ('./EntryTextEditor'),
     'Calendar' : require ('./calendar'),
+    'BigCalendar' : require ('./bigCalendar'),
     'emojiFlags' : require('emoji-flags')
 };
 

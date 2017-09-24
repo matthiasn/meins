@@ -70,11 +70,13 @@
                               manual (manually-logged entry date-string)
                               summed (+ acc-time completed manual)]
                           (if (pos? summed)
-                            (assoc-in acc [ts] {:story     story-id
-                                                :saga      saga-id
-                                                :summed    summed
-                                                :completed completed
-                                                :manual    manual})
+                            (assoc-in acc [ts] {:story       story-id
+                                                :timestamp   ts
+                                                :comment-for comment-for
+                                                :saga        saga-id
+                                                :summed      summed
+                                                :completed   completed
+                                                :manual      manual})
                             acc)))
         by-story (reduce story-reducer {} nodes)
         by-ts (reduce by-ts-reducer {} nodes)]

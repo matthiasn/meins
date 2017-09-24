@@ -20,8 +20,7 @@
 
 (defonce switchboard (sb/component :server/switchboard))
 
-(defn make-observable
-  [components]
+(defn make-observable [components]
   (if (System/getenv "OBSERVER")
     (let [cfg {:cfg         {:bootstrap-servers "localhost:9092"
                              :auto-offset-reset "latest"

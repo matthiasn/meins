@@ -8,6 +8,7 @@
             [iwaswhere-web.ui.entry.briefing.tasks :as tasks]
             [iwaswhere-web.ui.entry.briefing.habits :as habits]
             [iwaswhere-web.ui.entry.briefing.time :as time]
+            [iwaswhere-web.ui.entry.briefing.calendar :as cal]
             [iwaswhere-web.utils.parse :as up]
             [clojure.string :as s]
             [reagent.core :as r]
@@ -143,4 +144,5 @@
            [:div
             [tasks/started-tasks local local-cfg put-fn]
             [tasks/open-linked-tasks ts local local-cfg put-fn]
-            [habits/waiting-habits entry local local-cfg put-fn]]]]]))))
+            [habits/waiting-habits entry local local-cfg put-fn]
+            [cal/calendar-view day put-fn]]]]]))))

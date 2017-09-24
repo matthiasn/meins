@@ -5,7 +5,7 @@ import {fromJS} from 'immutable';
 import editorStyles from './editorStyles.css';
 import {RichUtils} from 'draft-js';
 
-class StyleButton extends React.Component {
+class StyleButton extends Component {
     constructor() {
         super();
         this.onToggle = (e) => {

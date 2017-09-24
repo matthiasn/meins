@@ -10,6 +10,7 @@
     "dashboards" :dashboards
     "charts1" :charts-1
     "countries" :countries
+    "calendar" :calendar
     "empty" :empty
     :main))
 

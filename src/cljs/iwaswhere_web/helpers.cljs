@@ -57,6 +57,11 @@
 (defn n-days-ago [n] (.subtract (js/moment.) n "d"))
 (defn n-days-ago-fmt [n] (.format (n-days-ago n) ymd-format))
 (defn format-time [m] (.format (js/moment m) "YYYY-MM-DDTHH:mm"))
+(defn hh-mm [m] (.format (js/moment m) "HH:mm"))
+(defn ymd [m] (.format (js/moment m) ymd-format))
+(defn m-to-hh-mm [m]
+  (let [t (js/moment (* m 60 1000))]
+    (.format (.utc t) "HH:mm")))
 
 (defn get-stats
   "Retrieves stats for the last n days."
@@ -83,13 +88,3 @@
       (swap! local assoc-in [:last-fetched stats-key] (st/now))
       (put-fn [:stats/get {:days [{:date-string day}] :type stats-key}]))))
 
-(defn m-to-hh-mm
-  [m]
-  (let [t (js/moment (* m 60 1000))]
-    (.format (.utc t) "HH:mm")))
-
-(defn hh-mm [m]
-  (.format (js/moment m) "HH:mm"))
-
-(defn ymd [m]
-  (.format (js/moment m) "YYYY-MM-DD"))

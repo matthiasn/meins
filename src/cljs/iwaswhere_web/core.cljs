@@ -21,11 +21,11 @@
                                :state/search :cfg/refresh :firehose/cmp-recv
                                :firehose/cmp-put}})
 
-(def OBSERVER (or (.-OBSERVER js/window)
-                  (s/includes? (aget js/window "location" "search") "OBSERVER=true")))
+(def OBSERVER
+  (or (.-OBSERVER js/window)
+      (s/includes? (aget js/window "location" "search") "OBSERVER=true")))
 
-(defn make-observable
-  [components]
+(defn make-observable [components]
   (if OBSERVER
     (let [mapper #(assoc-in % [:opts :msgs-on-firehose] true)]
       (prn "Attaching firehose")

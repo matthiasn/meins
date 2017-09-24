@@ -26,6 +26,7 @@
      (include-css "/webjars/fontawesome/4.7.0/css/font-awesome.css")
      (include-css "/webjars/leaflet/0.7.7/dist/leaflet.css")
      (include-css "/css/carousel.css")
+     (include-css "/css/react-big-calendar.css")
      (include-css "/css/iwaswhere.css")
      [:link {:rel "icon" :href "/favicon.png" :type "image/png"}]]
     [:body

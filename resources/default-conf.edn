@@ -1,12 +1,13 @@
 {:pvt-tags            #{}
  :pvt-displayed       #{"#pvt" "#nsfw"}
- :custom-fields       {"#duration" {:fields {:duration {:label "Minutes logged:" :cfg {:type :number :step 1}}}}
+ :custom-fields       {
+                       "#duration" {:fields {:duration {:label "Duration:" :cfg {:type :time}}}}
                        "#sit-ups"  {:fields {:cnt {:label "Completed:" :cfg {:type :number :step 1}} :comment {:label "Comment:" :agg :none}}}
                        "#pull-ups" {:fields {:cnt {:label "Completed:" :cfg {:type :number :step 1}}}}
                        "#push-ups" {:fields {:cnt {:label "Completed:" :cfg {:type :number :step 1}}}}
                        "#squats"   {:fields {:cnt {:label "Completed:" :cfg {:type :number :step 1}}}}
                        "#lunges"   {:fields {:cnt {:label "Completed:" :cfg {:type :number :step 1}}}}
-                       "#sleep"    {:fields {:duration      {:label "Duration/h:" :cfg {:type :number :step 0.25}}
+                       "#sleep"    {:fields {:duration      {:label "Duration:" :cfg {:type :time}}
                                              :interruptions {:label "Interruptions:" :cfg {:type :number :step 1}}
                                              :restedness    {:label "Feeling rested? (1 poor - 10 very):" :cfg {:type :number :step 1} :agg :mean}}}
                        "#running"  {:fields {:distance       {:label "Distance:" :cfg {:type :number :step 0.1}}

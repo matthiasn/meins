@@ -39,6 +39,12 @@ h1, h2, h3, h4, h5, h6 {
   -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
 }
 
+.big-calendar {
+  background-color: white;
+  padding: 0.5em 0;
+  height: 400px;
+}
+
 @import "buttons.scss";
 @import "journal.scss";
 @import "entry.scss";

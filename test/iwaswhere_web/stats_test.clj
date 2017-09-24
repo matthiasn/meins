@@ -123,25 +123,33 @@
                      :time-by-story {1484076392371 291
                                      1484076392372 899
                                      :no-story     111}
-                     :time-by-ts    {1450999000001 {:completed  699
-                                                    :manual     0
-                                                    :saga       nil
-                                                    :story      1484076392372
-                                                    :summed     699}
-                                     1450999200001 {:completed  291
-                                                    :manual     0
-                                                    :saga       nil
-                                                    :story      1484076392371
-                                                    :summed     291}
-                                     1450999300002 {:completed  200
-                                                    :manual     0
-                                                    :saga       nil
-                                                    :story      1484076392372
-                                                    :summed     200}
-                                     1450999300011 {:completed  111
-                                                    :manual     0
-                                                    :saga       nil
-                                                    :story      :no-story
-                                                    :summed     111}}
+                     :time-by-ts    {1450999000001 {:comment-for 1450999000000
+                                                    :completed   699
+                                                    :manual      0
+                                                    :saga        nil
+                                                    :story       1484076392372
+                                                    :summed      699
+                                                    :timestamp   1450999000001}
+                                     1450999200001 {:comment-for 1450999200000
+                                                    :completed   291
+                                                    :manual      0
+                                                    :saga        nil
+                                                    :story       1484076392371
+                                                    :summed      291
+                                                    :timestamp   1450999200001}
+                                     1450999300002 {:comment-for 1450999300000
+                                                    :completed   200
+                                                    :manual      0
+                                                    :saga        nil
+                                                    :story       1484076392372
+                                                    :summed      200
+                                                    :timestamp   1450999300002}
+                                     1450999300011 {:comment-for 1450999300010
+                                                    :completed   111
+                                                    :manual      0
+                                                    :saga        nil
+                                                    :story       :no-story
+                                                    :summed      111
+                                                    :timestamp   1450999300011}}
                      :total-time    1301}]
                    stats))))))))
