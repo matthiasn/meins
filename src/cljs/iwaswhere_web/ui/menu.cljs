@@ -126,7 +126,7 @@
                                 new-entry-fn (h/new-entry-fn put-fn new-entry nil)]
                             (new-entry-fn)))
                         (put-fn [:search/add {:tab-group :briefing :query q}])
-                        (put-fn [:search/update q])))]
+                        (put-fn [:search/refresh])))]
     (fn stats-view-render [put-fn]
       (let [briefings (mapv #(js/moment %) (keys @briefings))]
         [:div.calendar

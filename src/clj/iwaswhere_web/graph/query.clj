@@ -466,23 +466,18 @@
         {:emit-msg (when entry [:entry/found entry])})
       (log/warn "cannot find node: " ts))))
 
-(defn run-query
-  [current-state msg-meta span mk-child-span]
+(defn run-query [current-state msg-meta]
   (fn [[query-id query]]
-    (let [child-span (when span
-                       (mk-child-span span (str "query: "
-                                                (pr-str (:search-text query)))))
-          res (get-filtered current-state query)]
-      (when child-span (.finish child-span))
+    (let [res (get-filtered current-state query)]
       [query-id res])))
 
 (defn query-fn
   "Runs all queries in request, sends back to client, with all entry maps
    for the individual queries merged into one."
-  [{:keys [current-state msg-payload msg-meta span mk-child-span]}]
+  [{:keys [current-state msg-payload msg-meta]}]
   (let [queries (:queries msg-payload)
         start-ts (System/nanoTime)
-        res-mapper (run-query current-state msg-meta span mk-child-span)
+        res-mapper (run-query current-state msg-meta)
         res (mapv res-mapper queries)
         res2 (reduce (fn [acc [k v]]
                        (-> acc

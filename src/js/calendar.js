@@ -14,7 +14,6 @@ export default class Calendar extends Component {
         const onDateChange = date => {
             this.setState({ date });
             this.props.selectDate(date);
-            console.log(date);
         };
         const highlighted = day1 => this.props.briefings.some(day2 => isSameDay(day1, day2));
 

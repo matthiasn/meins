@@ -6,7 +6,8 @@
     [re-frame.db :as rdb]
     [iwaswhere-web.client-store-entry :as cse]
     [iwaswhere-web.client-store-search :as s]
-    [iwaswhere-web.client-store-cfg :as c]))
+    [iwaswhere-web.client-store-cfg :as c]
+    [iwaswhere-web.utils.misc :as u]))
 
 (defn new-state-fn
   "Update client side state with list of journal entries received from backend."
@@ -81,7 +82,7 @@
     (put-fn [:state/stats-tags-get])
     (put-fn [:stats/get2])
     (put-fn [:cfg/refresh])
-    (put-fn [:state/search (:query-cfg @initial-state)])
+    (put-fn [:state/search (u/search-from-cfg @initial-state)])
     {:state initial-state}))
 
 (defn save-stats-fn

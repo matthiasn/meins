@@ -129,3 +129,5 @@
         (and (set/subset? (:tags linked-filter) combined-tags)
              (empty? (set/intersection (:not-tags linked-filter)
                                        combined-tags)))))))
+
+(defn search-from-cfg [state] (select-keys (:query-cfg state) #{:queries}))

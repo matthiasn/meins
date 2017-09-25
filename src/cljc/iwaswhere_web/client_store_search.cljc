@@ -3,7 +3,8 @@
     [iwaswhere-web.client-store-cfg :as c]
     [matthiasn.systems-toolbox.component :as st]
     [iwaswhere-web.utils.parse :as p]
-    [clojure.set :as set]))
+    [clojure.set :as set]
+    [iwaswhere-web.utils.misc :as u]))
 
 (def initial-query-cfg
   {:queries     {}
@@ -26,7 +27,7 @@
         new-state (assoc-in current-state query-path query-msg)]
     (swap! query-cfg assoc-in [:queries query-id] msg-payload)
     {:new-state new-state
-     :emit-msg  [:state/search (:query-cfg new-state)]}))
+     :emit-msg  [:state/search (u/search-from-cfg new-state)]}))
 
 ; TODO: linked filter belongs in query-cfg
 (defn set-linked-filter
@@ -44,7 +45,7 @@
         new-state (-> current-state
                       (assoc-in path query-id)
                       (update-in [:query-cfg :tab-groups tab-group :history]
-                                 #(conj (take 50 %1) %2)
+                                 #(conj (take 20 %1) %2)
                                  query-id))]
     (when (-> current-state :query-cfg :queries query-id)
       (reset! query-cfg (:query-cfg new-state))
@@ -186,13 +187,12 @@
   "Refreshes client-side state by sending all queries, plus
    the stats and tags."
   [{:keys [current-state msg-meta]}]
-  (let [query-cfg (:query-cfg current-state)
-        new-state (-> current-state
+  (let [new-state (-> current-state
                       (assoc-in [:query-cfg :last-update] {:last-update (st/now)
                                                            :meta        msg-meta})
                       (assoc-in [:query-cfg :last-update-meta] msg-meta))]
     {:new-state new-state
-     :emit-msg  [[:state/search query-cfg]
+     :emit-msg  [[:state/search (u/search-from-cfg current-state)]
                  [:stats/get2]
                  [:state/stats-tags-get]]}))
 
