@@ -17,16 +17,11 @@
     [:head
      [:meta {:name "viewport" :content "width=device-width, initial-scale=1"}]
      [:title "iWasWhere"]
-     ; Download from https://github.com/christiannaths/Redacted-Font
-     ; then uncomment in _entry.scss and recompile CSS for redacted fron
-     (include-css "/redacted-font/fonts/web/stylesheet.css")
      (include-css "/webjars/normalize-css/5.0.0/normalize.css")
      (include-css "/webjars/github-com-mrkelly-lato/0.3.0/css/lato.css")
      (include-css "https://fonts.googleapis.com/css?family=Oswald:300,400")
      (include-css "/webjars/fontawesome/4.7.0/css/font-awesome.css")
      (include-css "/webjars/leaflet/0.7.7/dist/leaflet.css")
-     (include-css "/css/carousel.css")
-     (include-css "/css/react-big-calendar.css")
      (include-css "/css/iwaswhere.css")
      [:link {:rel "icon" :href "/favicon.png" :type "image/png"}]]
     [:body

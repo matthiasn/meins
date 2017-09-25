@@ -26,6 +26,10 @@ let components = {
     event: MyEvent
 };
 
+let messages = {
+    allDay: ''
+};
+
 export default class Calendar extends Component {
     render() {
         return (
@@ -36,6 +40,7 @@ export default class Calendar extends Component {
                 defaultView='day'
                 toolbar={false}
                 components={components}
+                messages={messages}
                 eventPropGetter={eventPropGetter}
                 defaultDate={this.props.defaultDate}
                 scrollToTime={this.props.scrollToDate}
