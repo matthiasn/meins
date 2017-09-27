@@ -171,6 +171,7 @@
             comments @comments]
         [:div.entry-with-comments
          [journal-entry ts put-fn local-cfg]
+         (when @thumbnails? [t/thumbnails entry local-cfg put-fn])
          (when (seq comments)
            (if (= query-id @show-comments-for?)
              [:div.comments
@@ -185,5 +186,4 @@
              [:div.show-comments
               (let [n (count comments)]
                 [:span {:on-click toggle-comments}
-                 (str "show " n " comment" (when (> n 1) "s"))])]))
-         (when @thumbnails? [t/thumbnails entry local-cfg put-fn])]))))
+                 (str "show " n " comment" (when (> n 1) "s"))])]))]))))

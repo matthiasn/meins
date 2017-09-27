@@ -10,23 +10,37 @@
 (defn console-msg-handler [ev]
   (info "GUEST:" (.-message ev)))
 
+(def OBSERVER true)
+
+(defn make-observable
+      [components]
+      (if OBSERVER
+        (let [mapper #(assoc-in % [:opts :msgs-on-firehose] true)]
+             (set (mapv mapper components)))
+        components))
+
 (defn start []
   (info "Starting SYSTEM")
-  (sb/send-mult-cmd
-    switchboard
-    [[:cmd/init-comp #{(ipc/cmp-map :renderer/ipc-cmp #{:app/open-external})
-                       (exec/cmp-map :renderer/exec-cmp #{:import/listen
-                                                          :firehose/cmp-put
-                                                          :firehose/cmp-recv
-                                                          :cmd/toggle-key})}]
-     [:cmd/route {:from :renderer/ipc-cmp
-                  :to   #{:renderer/exec-cmp}}]
+  (let [components #{(ipc/cmp-map :renderer/ipc-cmp #{:app/open-external})
+                     (exec/cmp-map :renderer/exec-cmp #{:import/listen
+                                                        :firehose/cmp-put
+                                                        :firehose/cmp-recv
+                                                        :cmd/toggle-key})}
+        components (make-observable components)]
+    (sb/send-mult-cmd
+      switchboard
+      [[:cmd/init-comp components]
+       [:cmd/route {:from :renderer/ipc-cmp
+                    :to   #{:renderer/exec-cmp}}]
 
-     [:cmd/route {:from :renderer/exec-cmp
-                  :to   #{:renderer/ipc-cmp}}]
+       [:cmd/route {:from :renderer/exec-cmp
+                    :to   #{:renderer/ipc-cmp}}]
 
-     [:cmd/send {:to  :renderer/exec-cmp
-                 :msg [:exec/js {:js "iwaswhere_web.ui.menu.hide()"}]}]]))
+       (when OBSERVER
+         [:cmd/attach-to-firehose :renderer/exec-cmp])
+
+       [:cmd/send {:to  :renderer/exec-cmp
+                   :msg [:exec/js {:js "iwaswhere_web.ui.menu.hide()"}]}]])))
 
 (defn load-handler [ev]
   (info "RENDERER loaded")

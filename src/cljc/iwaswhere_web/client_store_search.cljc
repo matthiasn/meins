@@ -191,6 +191,7 @@
                       (assoc-in [:query-cfg :last-update] {:last-update (st/now)
                                                            :meta        msg-meta})
                       (assoc-in [:query-cfg :last-update-meta] msg-meta))]
+    (prn :search-refresh-fn)
     {:new-state new-state
      :emit-msg  [[:state/search (u/search-from-cfg current-state)]
                  [:stats/get2]

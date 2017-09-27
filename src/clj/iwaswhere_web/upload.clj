@@ -25,7 +25,7 @@
     - /upload/visits.json
 
    Then schedules shutdown."
-  [{:keys [put-fn cmp-state current-state]}]
+  [{:keys [put-fn cmp-state current-state msg-meta]}]
   (when-let [server (:server current-state)]
     (log/info "Stopping Upload Server")
     (.stop server))
@@ -51,12 +51,13 @@
                 (binary-post-fn dir file r))
               (POST "/upload/:filename" [filename :as r]
                 (post-fn filename r put-fn)))
-        server (j/run-jetty app {:port @upload-port :join? false})]
+        server (j/run-jetty app {:port @upload-port :join? false})
+        new-meta (assoc-in msg-meta [:sente-uid] :broadcast)]
     {:new-state (assoc-in current-state [:server] server)
      :emit-msg  [[:cmd/schedule-new
                   {:timeout 120000
                    :message [:import/stop-server]}]
-                 (with-meta [:cfg/show-qr] {:sente-uid :broadcast})]}))
+                 (with-meta [:cfg/show-qr] new-meta)]}))
 
 (defn stop-server
   [{:keys [current-state]}]

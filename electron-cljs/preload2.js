@@ -1,3 +1,5 @@
+window.OBSERVER = true;
+
 const {SpellCheckHandler, ContextMenuListener, ContextMenuBuilder} = require('electron-spellchecker');
 const log = require('electron-log');
 
@@ -13,5 +15,3 @@ window.contextMenuBuilder = new ContextMenuBuilder(window.spellCheckHandler);
 window.contextMenuListener = new ContextMenuListener((info) => {
     window.contextMenuBuilder.showPopupMenu(info);
 });
-
-window.OBSERVER = true;
