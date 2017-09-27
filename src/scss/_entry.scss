@@ -289,6 +289,11 @@
 .questionnaire {
   user-select: none;
 
+  .expand-toggle {
+    color: #aaa;
+    margin-left: 5px;
+  }
+
   ol {
     margin: 0.4em;
     padding-left: 20px;

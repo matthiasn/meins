@@ -4,7 +4,8 @@
             [iwaswhere-web.ui.questionnaires :as q]
             [iwaswhere-web.helpers :as h]
             [reagent.ratom :refer-macros [reaction]]
-            [matthiasn.systems-toolbox.component :as st]))
+            [matthiasn.systems-toolbox.component :as st]
+            [reagent.core :as r]))
 
 (defn select-elem
   "Render select element for the given options. On change, dispatch message
@@ -116,6 +117,7 @@
   "In edit mode, allow editing of questionnaire, otherwise show a summary."
   [entry put-fn edit-mode?]
   (let [options (subscribe [:options])
+        local (r/atom {:expanded false})
         questionnaires (reaction (:questionnaires @options))]
     (fn questionnaire-render [entry put-fn edit-mode?]
       (when-let [questionnaires @questionnaires]
@@ -131,7 +133,9 @@
                                       (> ts 1505770346000))
               entry-questionnaires (if completed-pomodoro
                                      (conj entry-questionnaires pomo-q)
-                                     entry-questionnaires)]
+                                     entry-questionnaires)
+              expanded (or edit-mode? (:expanded @local))
+              expand-toggle #(swap! local update-in [:expanded] not)]
           [:div
            (for [[k conf] entry-questionnaires]
              (let [q-path [:questionnaires k]
@@ -139,36 +143,43 @@
                    reference (:reference conf)]
                ^{:key (str "cf" ts k)}
                [:form.questionnaire
-                [:h3 (:header conf)]
-                (:desc conf)
-                [:ol
-                 (for [{:keys [type path label one-line]} (:fields conf)]
-                   (let [path (concat q-path path)
-                         value (get-in entry path)
-                         items (get-in questionnaires [:types type :items])]
-                     ^{:key (str "q" ts k path)}
-                     [:li
-                      [:label {:class (str (when-not value "missing ")
-                                           (when-not one-line "multi-line"))}
-                       [:strong label]]
-                      (when-not one-line [:br])
-                      [:span.range
-                       (for [item items]
-                         (let [v (:value item)
-                               item-label (or (:label item) v)
-                               click (fn [_ev]
-                                       (let [new-val (when-not (= value v) v)
-                                             updated (assoc-in entry path new-val)]
-                                         (put-fn [:entry/update-local updated])))]
-                           ^{:key (str "q" ts k path v)}
-                           [:span.opt.tooltip
-                            {:on-click click
-                             :class    (when (= value v) "sel")} item-label
-                            #_[:span.tooltiptext (:desc item)]]))]]))]
+                [:h3 (:header conf)
+                 (when-not edit-mode?
+                   [:span.fa.expand-toggle
+                    {:on-click expand-toggle
+                     :class (if expanded "fa-compress" "fa-expand")}])]
+                (when expanded
+                  (:desc conf))
+                (when expanded
+                  [:ol
+                   (for [{:keys [type path label one-line]} (:fields conf)]
+                     (let [path (concat q-path path)
+                           value (get-in entry path)
+                           items (get-in questionnaires [:types type :items])]
+                       ^{:key (str "q" ts k path)}
+                       [:li
+                        [:label {:class (str (when-not value "missing ")
+                                             (when-not one-line "multi-line"))}
+                         [:strong label]]
+                        (when-not one-line [:br])
+                        [:span.range
+                         (for [item items]
+                           (let [v (:value item)
+                                 item-label (or (:label item) v)
+                                 click (fn [_ev]
+                                         (let [new-val (when-not (= value v) v)
+                                               updated (assoc-in entry path new-val)]
+                                           (put-fn [:entry/update-local updated])))]
+                             ^{:key (str "q" ts k path v)}
+                             [:span.opt.tooltip
+                              {:on-click click
+                               :class    (when (= value v) "sel")} item-label
+                              #_[:span.tooltiptext (:desc item)]]))]]))])
                 [:div.agg
                  (for [[k res] scores]
                    ^{:key k}
                    [:div [:span (:label res)] [:span.res (:score res)]])]
-                (if (string? reference)
-                  [:cite reference]
-                  reference)]))])))))
+                (when expanded
+                  (if (string? reference)
+                    [:cite reference]
+                    reference))]))])))))
