@@ -10,6 +10,7 @@
             [iwaswhere-web.ui.charts.award :as aw]
             [iwaswhere-web.ui.charts.questionnaires :as cq]
             [iwaswhere-web.ui.charts.custom-fields :as cf2]
+            [iwaswhere-web.ui.charts.correlation :as corr]
             [iwaswhere-web.ui.charts.location :as loc]
             [iwaswhere-web.ui.charts.time.durations :as cd]
             [iwaswhere-web.ui.entry.briefing.calendar :as cal]))
@@ -106,6 +107,7 @@
           :charts-1 [charts-page put-fn]
           :countries [countries-page put-fn]
           :calendar [cal put-fn]
+          :correlation [corr/scatter-matrix put-fn]
           :empty [:div.flex-container]
           [main-page put-fn])))))
 

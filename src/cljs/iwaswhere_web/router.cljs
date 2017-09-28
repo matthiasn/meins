@@ -11,6 +11,7 @@
     "charts1" :charts-1
     "countries" :countries
     "calendar" :calendar
+    "correlation" :correlation
     "empty" :empty
     :main))
 

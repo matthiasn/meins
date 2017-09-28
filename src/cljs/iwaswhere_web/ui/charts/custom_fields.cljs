@@ -108,8 +108,7 @@
         stats (subscribe [:custom-field-stats])
         options (subscribe [:options])
         last-update (subscribe [:last-update])]
-    (fn custom-fields-chart-render
-      [put-fn]
+    (fn custom-fields-chart-render [put-fn]
       (let [charts-vec (:custom-field-charts @options)
             chart-map (cf/build-chart-map charts-vec 55)
             charts-h (:charts-h chart-map)

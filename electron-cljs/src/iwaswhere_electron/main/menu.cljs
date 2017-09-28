@@ -107,6 +107,8 @@
                 :click (open "/#/countries")}
                {:label "Dashboards"
                 :click (open "/#/dashboards/dashboard-1")}
+               {:label "Scatter Matrix"
+                :click (open "/#/correlation")}
                {:label       "Toggle Split View"
                 :accelerator "CmdOrCtrl+Alt+S"
                 :click       #(put-fn [:cmd/toggle-key {:path [:cfg :single-column]}])}

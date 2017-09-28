@@ -23,13 +23,12 @@
 (defn tick
   "Renders individual timeline tick."
   [pos color w y1 y2]
-  [:line
-   {:x1           pos
-    :y1           y1
-    :x2           pos
-    :y2           y2
-    :stroke       color
-    :stroke-width w}])
+  [:line {:x1           pos
+          :y1           y1
+          :x2           pos
+          :y2           y2
+          :stroke       color
+          :stroke-width w}])
 
 (defn chart-line [scores point-mapper color]
   (let [points (map-indexed point-mapper scores)
@@ -77,8 +76,7 @@
           :stroke-width w
           :stroke       s}])
 
-(defn rect
-  [v x y h cls n]
+(defn rect [v x y h cls n]
   (let [local (r/atom {})
         click (fn [_] (swap! local update-in [:show-label] not))]
     (fn [v x y h cls n]
@@ -97,8 +95,7 @@
                  :text-anchor "middle"}
           v])])))
 
-(defn indexed-days
-  [stats tag k start days]
+(defn indexed-days [stats tag k start days]
   (let [d (* 24 60 60 1000)
         rng (range (inc days))
         indexed (map-indexed (fn [n v]
@@ -113,8 +110,7 @@
                              rng)]
     indexed))
 
-(defn indexed-days2
-  [stats k start days]
+(defn indexed-days2 [stats k start days]
   (let [d (* 24 60 60 1000)
         rng (range (inc days))
         indexed (map-indexed (fn [n v]
@@ -129,8 +125,7 @@
                              rng)]
     indexed))
 
-(defn row-label
-  [label y h]
+(defn row-label [label y h]
   [:text {:x           180
           :y           (+ y (+ 5 (/ h 2)))
           :font-size   12
@@ -139,8 +134,7 @@
           :text-anchor "end"}
    label])
 
-(defn barchart-row
-  [{:keys [days span start stats tag k h y cls]}]
+(defn barchart-row [{:keys [days span start stats tag k h y cls]}]
   (let [btm-y (+ y h)
         indexed (indexed-days stats tag k start days)
         mx (apply max (map #(:v (second %)) indexed))
@@ -162,8 +156,7 @@
          [rect display-v x btm-y h cls n]))
      [line (+ y h) "#000" 2]]))
 
-(defn chart-data-row
-  [{:keys [days span start chart-data data-k label k h y cls]}]
+(defn chart-data-row [{:keys [days span start chart-data data-k label k h y cls]}]
   (let [btm-y (+ y h)
         stats (data-k chart-data)
         indexed (indexed-days2 stats k start days)
@@ -186,9 +179,7 @@
          [rect display-v x btm-y h cls n]))
      [line (+ y h) "#000" 2]]))
 
-(defn points-by-day-chart
-  "Renders bars."
-  [{:keys [y h label]}]
+(defn points-by-day-chart [{:keys [y h label]}]
   (let [stats (subscribe [:stats])
         btm-y (+ y h)]
     (fn points-by-day-render [{:keys [y h label]}]
@@ -224,9 +215,7 @@
          [line (+ y h) "#000" 2]
          [row-label label y h]]))))
 
-(defn points-lost-by-day-chart
-  "Renders bars."
-  [{:keys [y h label]}]
+(defn points-lost-by-day-chart [{:keys [y h label]}]
   (let [stats (subscribe [:stats])
         btm-y (+ y h)]
     (fn points-by-day-render [{:keys [y h label]}]
@@ -251,8 +240,7 @@
          [line (+ y h) "#000" 2]
          [row-label label y h]]))))
 
-(defn scores-fn
-  [stats k]
+(defn scores-fn [stats k]
   (->> stats
        :questionnaires
        k
@@ -292,8 +280,7 @@
        [:rect {:fill :white :x 0 :y y :height (+ h 5) :width 190}]
        [row-label label y h]])))
 
-(defn charts-y-pos
-  [cfg]
+(defn charts-y-pos [cfg]
   (reduce
     (fn [acc m]
       (let [{:keys [last-y last-h]} acc
@@ -305,9 +292,7 @@
      :last-h 0}
     cfg))
 
-(defn dashboard
-  "Simple view for questionnaire scores."
-  [put-fn]
+(defn dashboard [put-fn]
   (let [custom-field-stats (subscribe [:custom-field-stats])
         chart-data (subscribe [:chart-data])
         current-page (subscribe [:current-page])
