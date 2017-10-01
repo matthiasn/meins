@@ -5,6 +5,7 @@
               "#fatigue-scale" :fs
               "#GSE"           :gse
               "#GPS"           :gps
+              "#LAS"           :las
               "#BFI2S"         :bfi2s
               "#BIS-BAS"       :bis-bas
               "#CFQ11"         :cfq11}
@@ -86,7 +87,18 @@
                                           {:value 4 :desc "Neither agree or disagree"}
                                           {:value 5 :desc "Somewhat agree"}
                                           {:value 6 :desc "Agree"}
-                                          {:value 7 :desc "Strongly agree"}]}}
+                                          {:value 7 :desc "Strongly agree"}]}
+              :likert10          {:type  :range
+                                  :items [{:value 1 :desc "1/10"}
+                                          {:value 2 :desc "2/10"}
+                                          {:value 3 :desc "3/10"}
+                                          {:value 4 :desc "4/10"}
+                                          {:value 5 :desc "5/10"}
+                                          {:value 6 :desc "6/10"}
+                                          {:value 7 :desc "7/10"}
+                                          {:value 8 :desc "8/10"}
+                                          {:value 9 :desc "9/10"}
+                                          {:value 10 :desc "10/10"}]}}
  :items      {:jss     {:header       "JOB SATISFACTION SURVEY"
                         :desc         [:div
                                        [:p "Please select the one number for each question that comes closest to reflecting your opinion about it."]
@@ -455,6 +467,50 @@
                         :aggregations {:total {:type  :sum
                                                :label "Total:"
                                                :items #{1 2 3 4}}}}
+              :las     {:header       "Life Area Satisfaction"
+                        :desc         [:div
+                                       [:p "On a scale from 1 to 10, rate the following areas of your life, and how
+                                            satisfied you are with them overall."]]
+                        :reference    [:div "Inspired by 'Code of the Extraordinary Mind'"]
+                        :fields       [{:type  :likert10
+                                        :path  [1]
+                                        :label "Love Relationships"}
+                                       {:type  :likert10
+                                        :path  [2]
+                                        :label "Friendships"}
+                                       {:type  :likert10
+                                        :path  [3]
+                                        :label "Adventures"}
+                                       {:type  :likert10
+                                        :path  [4]
+                                        :label "Environment"}
+                                       {:type  :likert10
+                                        :path  [5]
+                                        :label "Health & Body"}
+                                       {:type  :likert10
+                                        :path  [6]
+                                        :label "Growing & Learning"}
+                                       {:type  :likert10
+                                        :path  [7]
+                                        :label "Skills"}
+                                       {:type  :likert10
+                                        :path  [8]
+                                        :label "Spiritual"}
+                                       {:type  :likert10
+                                        :path  [9]
+                                        :label "Career"}
+                                       {:type  :likert10
+                                        :path  [10]
+                                        :label "Creativity"}
+                                       {:type  :likert10
+                                        :path  [11]
+                                        :label "Family"}
+                                       {:type  :likert10
+                                        :path  [12]
+                                        :label "Community"}]
+                        :aggregations {:total {:type  :sum
+                                               :label "Total:"
+                                               :items #{1 2 3 4 5 6 7 8 9 10 11 12}}}}
               :gse     {:header       "The General Self-Efficacy Scale (GSE)"
                         :desc         [:div
                                        [:p "The construct of Perceived Self-Efficacy reflects an optimistic self-belief (Schwarzer, 1992). This is the belief that one can perform a novel or difficult tasks, or cope with adversity -- in various domains of human functioning.  Perceived self-efficacy facilitates goal-setting, effort investment,  persistence in face of barriers and recovery from setbacks. It can be regarded as a positive resistance resource factor. Ten items are designed to tap this construct. Each item refers to successful coping and implies an internal-stable attribution of success. Perceived self-efficacy is an operative construct, i.e., it is related to subsequent behavior and, therefore, is relevant for clinical practice and behavior change."]
