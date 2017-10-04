@@ -1,10 +1,10 @@
 (defproject matthiasn/iwaswhere-electron "0.0-SNAPSHOT"
-  :dependencies [[org.clojure/clojure "1.9.0-alpha19"]
-                 [org.clojure/clojurescript "1.9.908"]
+  :dependencies [[org.clojure/clojure "1.9.0-beta1"]
+                 [org.clojure/clojurescript "1.9.946"]
                  [re-frame "0.10.1"]
                  [com.taoensso/timbre "4.10.0"]
-                 [matthiasn/systems-toolbox "0.6.15"]
-                 [matthiasn/systems-toolbox-electron "0.6.7"]]
+                 [matthiasn/systems-toolbox "0.6.19"]
+                 [matthiasn/systems-toolbox-electron "0.6.8"]]
 
   :plugins [[lein-cljsbuild "1.1.7"]
             [lein-shell "0.5.0"]]

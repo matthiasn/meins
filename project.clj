@@ -3,8 +3,8 @@
   :url "https://github.com/matthiasn/systems-toolbox"
   :license {:name "GNU AFFERO GENERAL PUBLIC LICENSE"
             :url  "https://www.gnu.org/licenses/agpl-3.0.en.html"}
-  :dependencies [[org.clojure/clojure "1.9.0-alpha19"]
-                 [org.clojure/clojurescript "1.9.908"]
+  :dependencies [[org.clojure/clojure "1.9.0-beta1"]
+                 [org.clojure/clojurescript "1.9.946"]
                  [org.clojure/tools.logging "0.4.0"]
                  [ch.qos.logback/logback-classic "1.2.3"]
                  [hiccup "1.0.5"]
@@ -20,10 +20,10 @@
                  [cljsjs/moment "2.17.1-1"]
                  [com.drewnoakes/metadata-extractor "2.10.1"]
                  [ubergraph "0.4.0"]
-                 [factual/geo "1.1.0"]
+                 [factual/geo "1.2.0"]
                  [camel-snake-kebab "0.4.0"]
                  [matthiasn/systems-toolbox-kafka "0.6.13"]
-                 [matthiasn/systems-toolbox "0.6.17"]
+                 [matthiasn/systems-toolbox "0.6.19"]
                  [matthiasn/systems-toolbox-sente "0.6.17"]
                  [reagent "0.7.0" :exclusions [cljsjs/react cljsjs/react-dom]]
                  [re-frame "0.10.1"]
@@ -60,7 +60,7 @@
 
   :plugins [[lein-cljsbuild "1.1.7"
              :exclusions [org.apache.commons/commons-compress]]
-            [lein-figwheel "0.5.13"]
+            [lein-figwheel "0.5.14"]
             [test2junit "1.3.3"]
             [lein-shell "0.5.0"]
             [lein-ancient "0.6.12"]]
