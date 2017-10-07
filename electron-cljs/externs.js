@@ -27,6 +27,9 @@ electron.BrowserWindow = function () {};
 electron.BrowserWindow.on = function() {};
 electron.BrowserWindow.once = function() {};
 electron.BrowserWindow.loadURL = function() {};
+electron.BrowserWindow.show = function() {};
+electron.BrowserWindow.hide = function() {};
+electron.BrowserWindow.minimize = function() {};
 electron.BrowserWindow.webContents = {};
 electron.BrowserWindow.webContents.openDevTools = function() {};
 

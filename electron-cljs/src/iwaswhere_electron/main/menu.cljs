@@ -31,17 +31,13 @@
 (defn file-menu [put-fn]
   (let [new-entry #(put-fn [:exec/js {:js "iwaswhere_web.ui.menu.new_entry()"}])
         new-story #(put-fn [:exec/js {:js "iwaswhere_web.ui.menu.new_story()"}])
-        new-saga #(put-fn [:exec/js {:js "iwaswhere_web.ui.menu.new_saga()"}])
-        screenshot #(put-fn [:exec/js {:js "iwaswhere_web.ui.menu.capture_screen()"}])]
+        new-saga #(put-fn [:exec/js {:js "iwaswhere_web.ui.menu.new_saga()"}])]
     {:label   "File"
      :submenu [{:label       "New Entry"
                 :accelerator "CmdOrCtrl+N"
                 :click       new-entry}
                {:label "New Story" :click new-story}
                {:label "New Saga" :click new-saga}
-               {:label       "New Screenshot"
-                :accelerator "CmdOrCtrl+P"
-                :click       screenshot}
                {:label       "Upload"
                 :accelerator "CmdOrCtrl+U"
                 :click       #(put-fn [:import/listen])}]}))
@@ -98,6 +94,12 @@
      :submenu [{:label       "Close Window"
                 :accelerator "CmdOrCtrl+W"
                 :click       #(put-fn [:window/close])}
+               {:label       "Minimize Window"
+                :accelerator "CmdOrCtrl+H"
+                :click       #(put-fn [:window/minimize])}
+               {:label       "Restore Window"
+                :accelerator "CmdOrCtrl+H"
+                :click       #(put-fn [:window/restore])}
                {:label       "New Window"
                 :accelerator "CmdOrCtrl+Alt+N"
                 :click       new-window}
@@ -116,6 +118,21 @@
                 :accelerator "CmdOrCtrl+Alt+I"
                 :click       #(put-fn [:window/dev-tools])}]}))
 
+(defn capture-menu [put-fn]
+  (let [js "iwaswhere_web.ui.menu.capture_screen()"
+        screenshot (fn [_]
+                     (let [tag (stc/make-uuid)
+                           put-fn #(put-fn (with-meta % {:tag tag}))]
+                       (put-fn [:window/minimize])
+                       (put-fn [:exec/js {:js js}])
+                       (put-fn [:cmd/schedule-new
+                                {:message [:window/restore]
+                                 :timeout 1000}])))]
+    {:label   "Capture"
+     :submenu [{:label       "New Screenshot"
+                :accelerator "CmdOrCtrl+P"
+                :click       screenshot}]}))
+
 (defn state-fn [put-fn]
   (let [put-fn (fn [msg]
                  (let [msg-meta (merge {:window-id :active} (meta msg))]
@@ -123,7 +140,8 @@
         menu-tpl [(app-menu put-fn)
                   (file-menu put-fn)
                   (edit-menu put-fn)
-                  (view-menu put-fn)]
+                  (view-menu put-fn)
+                  (capture-menu put-fn)]
         menu (.buildFromTemplate Menu (clj->js menu-tpl))
         activate #(put-fn [:window/activate])]
     (info "Starting Menu Component")
