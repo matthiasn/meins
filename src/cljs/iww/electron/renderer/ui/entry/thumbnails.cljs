@@ -7,14 +7,16 @@
             [cljs.pprint :as pp]
             [iwaswhere-web.utils.parse :as up]))
 
+(def iww-host (.-iwwHOST js/window))
+
 (defn image-view
   "Renders image view. Used resized and properly rotated image endpoint
    when JPEG file requested."
   [entry query-params local-cfg put-fn]
   (when-let [file (:img-file entry)]
-    (let [path (str "/photos/" file)
+    (let [path (str "http://" iww-host "/photos/" file)
           resized (if (s/includes? (s/lower-case path) ".jpg")
-                    (str "/photos2/" file query-params)
+                    (str "http://" iww-host "/photos2/" file query-params)
                     path)
           tab-group (:tab-group local-cfg)
           add-search (up/add-search (str (:timestamp entry)) tab-group put-fn)]
