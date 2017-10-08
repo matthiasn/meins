@@ -128,11 +128,11 @@
         create-comment (h/new-entry-fn put-fn {:comment-for ts} show-comments)
         screenshot (fn [_]
                      (let [screenshot-ts (st/now)
-                           ;send #(.send js/window %)
                            filename (str screenshot-ts ".png")
+                           tag (st/make-uuid)
+                           put-fn #(put-fn (with-meta % {:tag tag}))
                            new-fn (h/new-entry-fn put-fn {:img-file    filename
                                                           :comment-for ts} nil)]
-                       ;                       (send "[:window/hide]")
                        (put-fn [:window/hide])
                        (js/setTimeout new-fn 200)
                        (js/setTimeout #(put-fn [:window/show]) 250)

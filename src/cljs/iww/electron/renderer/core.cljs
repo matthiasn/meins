@@ -35,7 +35,9 @@
 
 (defn start []
   (info "Starting SYSTEM")
-  (let [components #{(ipc/cmp-map :renderer/ipc-cmp #{:app/open-external})
+  (let [components #{(ipc/cmp-map :renderer/ipc-cmp #{:app/open-external
+                                                      :window/hide
+                                                      :window/show})
                      (sente/cmp-map :renderer/ws-cmp sente-cfg)
                      (store/cmp-map :renderer/store-cmp)
                      (router/cmp-map :renderer/router-cmp)
