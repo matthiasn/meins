@@ -18,7 +18,7 @@
           (info "- Nope, trying again")
           (when-not (:service @cmp-state)
             (put-fn [:cmd/schedule-new {:timeout 10 :message [:jvm/start]}]))
-          (put-fn [:window/new {:url       "loading.html"
+          (put-fn [:window/new {:url       "electron/loading.html"
                                 :width     400
                                 :height    300
                                 :window-id "loading"}])
