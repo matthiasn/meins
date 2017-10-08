@@ -82,7 +82,6 @@
                      ["cljsbuild" "once" "renderer"]
                      ["cljsbuild" "once" "updater"]
                      ["sass"]
-                     ["shell" "cp" "node_modules/oswald-fontface/fonts" "resources/public/css/"]
                      ["uberjar"]
                      ["shell" "cp" "target/iwaswhere.jar" "bin/"]]
             "dist"  ["do"
