@@ -305,7 +305,7 @@
                    :iww.client-state/query-cfg
                    :iww.client-state/cfg]))
 
-(s/def :state/search :iww.client-state/query-cfg)
+;(s/def :state/search :iww.client-state/query-cfg)
 
 (s/def :iww.widget-cfg/x int?)
 (s/def :iww.widget-cfg/y int?)

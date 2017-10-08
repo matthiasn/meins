@@ -1,5 +1,5 @@
 (ns iwaswhere-web.client-store-entry
-  (:require #?(:cljs [alandipert.storage-atom :as sa])
+  (:require #?(:cljs [iww.electron.renderer.localstorage :as sa])
     [matthiasn.systems-toolbox.component :as st]
     [iwaswhere-web.utils.misc :as u]
     [iwaswhere-web.utils.parse :as p]))
@@ -87,8 +87,8 @@
                           (assoc-in [:busy] (not done?))
                           (assoc-in [:last-busy] (st/now)))
             new-state (if done?
-                         (update-in new-state [:new-entries ts :pomodoro-running] not)
-                         new-state)]
+                        (update-in new-state [:new-entries ts :pomodoro-running] not)
+                        new-state)]
         (if (:pomodoro-running new-entry)
           (do (when-not (:mute cfg)
                 (if done? (play-audio "ringer")

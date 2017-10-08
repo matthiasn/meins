@@ -1,5 +1,5 @@
 (ns iwaswhere-web.client-store-search
-  (:require #?(:cljs [alandipert.storage-atom :as sa])
+  (:require #?(:cljs [iww.electron.renderer.localstorage :as sa])
     [iwaswhere-web.client-store-cfg :as c]
     [matthiasn.systems-toolbox.component :as st]
     [iwaswhere-web.utils.parse :as p]

@@ -56,6 +56,9 @@ Then, install project dependencies with:
 
 Then, assemble them into a single file:
 
+    $ cd bundle
+    $ webpack -d --watch
+
     $ npm run build
 
 
