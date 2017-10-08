@@ -59,10 +59,11 @@
         filter-click #(swap! local update-in [:outstanding-time-filter] not)]
     (fn [entry day-stats local edit-mode? put-fn]
       (let [actual-times (:time-by-saga day-stats)
-            filtered? (:outstanding-time-filter @local)
+            local @local
+            filtered? (:outstanding-time-filter local)
             filter-cls (when-not filtered? "inactive")
             sagas (sort-by #(-> % second :saga-name) @sagas)
-            selected (:selected @local)]
+            selected (:selected local)]
         [:table
          [:tbody
           [:tr
@@ -87,7 +88,7 @@
                            (or (not selected) (= selected k)))
                   ^{:key (str :time-allocation k)}
                   [:tr {:on-click click
-                        :class    (when (= k (:selected @local)) "selected")}
+                        :class    (when (= k (:selected local)) "selected")}
                    [:td [:div.legend {:style {:background-color color}}]]
                    [:td [:strong (:saga-name v)]]
                    [:td.time
