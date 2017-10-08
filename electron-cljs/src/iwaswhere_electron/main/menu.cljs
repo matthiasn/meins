@@ -123,11 +123,11 @@
         screenshot (fn [_]
                      (let [tag (stc/make-uuid)
                            put-fn #(put-fn (with-meta % {:tag tag}))]
-                       (put-fn [:window/minimize])
+                       (put-fn [:window/hide])
                        (put-fn [:exec/js {:js js}])
                        (put-fn [:cmd/schedule-new
-                                {:message [:window/restore]
-                                 :timeout 1000}])))]
+                                {:message [:window/show]
+                                 :timeout 500}])))]
     {:label   "Capture"
      :submenu [{:label       "New Screenshot"
                 :accelerator "CmdOrCtrl+P"

@@ -126,15 +126,19 @@
                                       :value %}])
         show-comments #(show-hide-comments query-id)
         create-comment (h/new-entry-fn put-fn {:comment-for ts} show-comments)
-        screenshot #(let [screenshot-ts (st/now)
-                          filename (str screenshot-ts ".png")
-                          new-fn (h/new-entry-fn put-fn {:img-file    filename
-                                                         :comment-for ts} nil)]
-                      (js/setTimeout new-fn 4000)
-                      (put-fn
-                        [:cmd/schedule-new
-                         {:message [:import/screenshot {:filename filename}]
-                          :timeout 3000}]))
+        screenshot (fn [_]
+                     (let [screenshot-ts (st/now)
+                           send #(.send js/window %)
+                           filename (str screenshot-ts ".png")
+                           new-fn (h/new-entry-fn put-fn {:img-file    filename
+                                                          :comment-for ts} nil)]
+                       (send "[:window/hide]")
+                       (js/setTimeout new-fn 200)
+                       (js/setTimeout #(send "[:window/show]") 250)
+                       (put-fn
+                         [:cmd/schedule-new
+                          {:message [:import/screenshot {:filename filename}]
+                           :timeout 20}])))
         story (:primary-story entry)
         create-linked-entry (h/new-entry-fn put-fn {:linked-entries [ts]
                                                     :primary-story  story

@@ -6,3 +6,6 @@ Inst.DateTimeFormat.resolvedOptions = function () {};
 Inst.DateTimeFormat.resolvedOptions.timeZone;
 
 var randomColor = function () {};
+
+var window = {};
+window.send = function () {};

@@ -30,6 +30,7 @@ electron.BrowserWindow.loadURL = function() {};
 electron.BrowserWindow.show = function() {};
 electron.BrowserWindow.hide = function() {};
 electron.BrowserWindow.minimize = function() {};
+electron.BrowserWindow.restore = function() {};
 electron.BrowserWindow.webContents = {};
 electron.BrowserWindow.webContents.openDevTools = function() {};
 

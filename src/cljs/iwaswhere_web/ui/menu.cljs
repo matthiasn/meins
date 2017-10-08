@@ -81,11 +81,11 @@
         screenshot #(let [screenshot-ts (st/now)
                           filename (str screenshot-ts ".png")
                           new-fn (h/new-entry-fn put-fn {:img-file filename} nil)]
-                      (js/setTimeout new-fn 500)
+                      (js/setTimeout new-fn 200)
                       (put-fn
                         [:cmd/schedule-new
                          {:message [:import/screenshot {:filename filename}]
-                          :timeout 200}]))]
+                          :timeout 100}]))]
     (def relay (relay-msg-fn put-fn))
     (def capture-screen screenshot)
     (fn [put-fn]
