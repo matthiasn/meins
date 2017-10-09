@@ -134,12 +134,12 @@
                            new-fn (h/new-entry-fn put-fn {:img-file    filename
                                                           :comment-for ts} nil)]
                        (put-fn [:window/hide])
-                       (js/setTimeout new-fn 200)
-                       (js/setTimeout #(put-fn [:window/show]) 250)
+                       (js/setTimeout new-fn 500)
+                       (js/setTimeout #(put-fn [:window/show]) 1000)
                        (put-fn
                          [:cmd/schedule-new
                           {:message [:import/screenshot {:filename filename}]
-                           :timeout 20}])))
+                           :timeout 100}])))
         story (:primary-story entry)
         create-linked-entry (h/new-entry-fn put-fn {:linked-entries [ts]
                                                     :primary-story  story

@@ -9,7 +9,7 @@
 (defn new-state-fn
   "Update client side state with list of journal entries received from backend."
   [{:keys [current-state msg-payload msg-meta]}]
-  (let [store-meta (:client/store-cmp msg-meta)
+  (let [store-meta (:renderer/store-cmp msg-meta)
         {:keys [entries entries-map]} msg-payload
         new-state (-> current-state
                       (assoc-in [:results] entries)

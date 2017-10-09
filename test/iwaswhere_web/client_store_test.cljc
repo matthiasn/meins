@@ -61,10 +61,10 @@
                        :client/store-cmp]
    :server/store-cmp  {:in-ts  1467748026835
                        :out-ts 1467748026845}
-   :client/store-cmp  {:out-ts 1467748026813
+   :renderer/store-cmp  {:out-ts 1467748026813
                        :in-ts  1467748026870}
-   :client/search-cmp {:out-ts 1467748026684}
-   :client/ws-cmp     {:in-ts  1467748026814
+   :renderer/search-cmp {:out-ts 1467748026684}
+   :renderer/ws-cmp     {:in-ts  1467748026814
                        :out-ts 1467748026869}
    :tag               "5a5183de-ee04-4b2f-9dbf-aa4fe2c245f7"
    :corr-id           "39476852-fdc1-474a-a933-76cc83a55b31"})
