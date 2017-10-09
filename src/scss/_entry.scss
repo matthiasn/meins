@@ -443,17 +443,16 @@
       margin-right: 4px;
       width: 90px;
       padding: 1px 2px;
+      font-size: 9px;
     }
     input[type="number"], input[type="time"] {
       width: 65px;
-      font-size: 0.9em;
       margin-left: 5px;
     }
     input[type="text"] {
       width: 120px;
       &.url {
         width: 330px;
-        font-size: 0.8em;
       }
     }
     input[type="checkbox"] {
@@ -551,7 +550,6 @@ u {
     width: 120px;
     &.url {
       width: 330px;
-      font-size: 0.8em;
     }
   }
 

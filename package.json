@@ -1,6 +1,6 @@
 {
   "name": "iWasWhere",
-  "version": "0.3.15",
+  "version": "0.3.16",
   "description": "iWasWhere - a personal information manager",
   "main": "prod/main/main.js",
   "scripts": {
@@ -33,6 +33,7 @@
     "leaflet": "0.7.7",
     "local-reverse-geocoder": "0.3.2",
     "moment": "2.18.1",
+    "normalize.css": "^7.0.0",
     "npid": "0.4.0",
     "npm": "^5.4.2",
     "randomcolor": "^0.5.3",
