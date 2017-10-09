@@ -148,7 +148,7 @@
                  (when-not edit-mode?
                    [:span.fa.expand-toggle
                     {:on-click expand-toggle
-                     :class (if expanded "fa-compress" "fa-expand")}])]
+                     :class    (if expanded "fa-compress" "fa-expand")}])]
                 (when expanded
                   (:desc conf))
                 (when expanded
@@ -179,7 +179,9 @@
                 [:div.agg
                  (for [[k res] scores]
                    ^{:key k}
-                   [:div [:span (:label res)] [:span.res (:score res)]])]
+                   [:div
+                    [:span (:label res)]
+                    [:span.res (.toFixed (:score res) 2)]])]
                 (when expanded
                   (if (string? reference)
                     [:cite reference]
