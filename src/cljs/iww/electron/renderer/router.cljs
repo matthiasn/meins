@@ -48,8 +48,7 @@
     (aset js/window "location" target-url)
     {}))
 
-(defn cmp-map
-  [cmp-id]
+(defn cmp-map [cmp-id]
   {:cmp-id      cmp-id
    :state-fn    state-fn
    :handler-map {:nav/route-to nav-handler}})

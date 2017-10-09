@@ -30,6 +30,7 @@
                 :firehose/cmp-put
                 :firehose/cmp-recv
                 :update/status
+                :screenshot/take
                 :import/listen})
 
 (def app-path (:app-path rt/runtime-info))

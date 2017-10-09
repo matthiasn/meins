@@ -122,15 +122,7 @@
                 :click       #(put-fn [:window/dev-tools])}]}))
 
 (defn capture-menu [put-fn]
-  (let [js "iww.electron.renderer.ui.menu.capture_screen()"
-        screenshot (fn [_]
-                     (let [tag (stc/make-uuid)
-                           put-fn #(put-fn (with-meta % {:tag tag}))]
-                       (put-fn [:window/hide])
-                       (put-fn [:exec/js {:js js}])
-                       (put-fn [:cmd/schedule-new
-                                {:message [:window/show]
-                                 :timeout 700}])))]
+  (let [screenshot #(put-fn [:screenshot/take])]
     {:label   "Capture"
      :submenu [{:label       "New Screenshot"
                 :accelerator "CmdOrCtrl+P"

@@ -10,9 +10,7 @@
             [clojure.pprint :as pp]
             [matthiasn.systems-toolbox.component :as st]))
 
-(defn toggle-option-view
-  "Render button for toggle option."
-  [{:keys [option cls]} put-fn]
+(defn toggle-option-view [{:keys [option cls]} put-fn]
   (let [cfg (subscribe [:cfg])]
     (fn toggle-option-render [{:keys [option cls]} put-fn]
       (let [show-option? (option @cfg)
@@ -28,15 +26,14 @@
    {:option :ticking-clock :cls "fa-clock-o"}
    {:option :hide-hashtags :cls "fa-hashtag"}
    {:option :single-column :cls "fa-columns"}
-   {:option :sort-asc :cls " fa-sort-asc"}])
+   {:option :sort-asc :cls " fa-sort-asc"}
+   {:option :app-screenshot :cls "fa-window-minimize"}])
 
 (defn change-language [cc]
   (let [spellcheck-handler (.-spellCheckHandler js/window)]
     (.switchLanguage spellcheck-handler cc)))
 
-(defn new-import-view
-  "Renders new and import buttons."
-  [put-fn]
+(defn new-import-view [put-fn]
   (let [local (r/atom {:show false})]
     (def ^:export new-entry (h/new-entry-fn put-fn {} nil))
     (def ^:export new-story (h/new-entry-fn put-fn {:entry-type :story} nil))
@@ -69,15 +66,7 @@
   [put-fn]
   (let [cfg (subscribe [:cfg])
         toggle-qr-code #(put-fn [:import/listen])
-        screenshot #(let [screenshot-ts (st/now)
-                          filename (str screenshot-ts ".png")
-                          new-fn (h/new-entry-fn put-fn {:img-file filename} nil)]
-                      (js/setTimeout new-fn 500)
-                      (put-fn
-                        [:cmd/schedule-new
-                         {:message [:import/screenshot {:filename filename}]
-                          :timeout 100}]))]
-    (def ^:export capture-screen screenshot)
+        screenshot #(put-fn [:screenshot/take])]
     (fn [put-fn]
       [:div
        (for [option toggle-options]
@@ -89,9 +78,7 @@
         {:on-click toggle-qr-code
          :class    (when-not (:qr-code @cfg) "inactive")}]])))
 
-(defn upload-view
-  "Renders QR-code with upload address."
-  []
+(defn upload-view []
   (let [cfg (subscribe [:cfg])
         iww-host (.-iwwHOST js/window)]
     (fn upload-view2-render []
@@ -99,9 +86,7 @@
         [:img {:src (str "http://" iww-host "/upload-address/"
                          (stc/make-uuid) "/qrcode.png")}]))))
 
-(defn calendar-view
-  "Renders calendar component."
-  [put-fn]
+(defn calendar-view [put-fn]
   (let [calendar (r/adapt-react-class (aget js/window "deps" "Calendar" "default"))
         briefings (subscribe [:briefings])
         cfg (subscribe [:cfg])
@@ -125,16 +110,12 @@
          [calendar {:select-date select-date
                     :briefings   briefings}]]))))
 
-(defn busy-status
-  "Renders busy status indicator."
-  []
+(defn busy-status []
   (let [busy (subscribe [:busy])]
     (fn busy-status-render []
       [:div.busy-status {:class (if @busy "red" "green")}])))
 
-(defn menu-view
-  "Renders component for rendering new and import buttons."
-  [put-fn]
+(defn menu-view [put-fn]
   [:div.menu-header
    [busy-status]
    [new-import-view put-fn]

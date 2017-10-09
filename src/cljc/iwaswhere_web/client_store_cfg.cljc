@@ -12,6 +12,7 @@
    :show-pvt          true
    :mute              true
    :thumbnails        true
+   :app-screenshot    false
    :lines-shortened   10})
 
 #?(:clj  (defonce app-cfg (atom default-config))

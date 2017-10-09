@@ -3,6 +3,7 @@
             [iwaswhere-web.client-store :as store]
             [iww.electron.renderer.ui.re-frame :as rf]
             [iww.electron.renderer.router :as router]
+            [iww.electron.renderer.screenshot :as screenshot]
             [taoensso.timbre :as timbre :refer-macros [info debug]]
             [matthiasn.systems-toolbox-electron.ipc-renderer :as ipc]
             [matthiasn.systems-toolbox-sente.client :as sente]
@@ -41,6 +42,7 @@
                      (sente/cmp-map :renderer/ws-cmp sente-cfg)
                      (store/cmp-map :renderer/store-cmp)
                      (router/cmp-map :renderer/router-cmp)
+                     (screenshot/cmp-map :renderer/screenshot-cmp)
                      (rf/cmp-map :renderer/ui-cmp)
                      (sched/cmp-map :renderer/scheduler-cmp)
                      (exec/cmp-map :renderer/exec-cmp #{})}
@@ -48,13 +50,18 @@
     (sb/send-mult-cmd
       switchboard
       [[:cmd/init-comp components]
+
        [:cmd/route {:from :renderer/ipc-cmp
                     :to   #{:renderer/exec-cmp
                             :renderer/store-cmp
+                            :renderer/screenshot-cmp
                             :renderer/ws-cmp}}]
 
-       [:cmd/route {:from :renderer/router-cmp :to :renderer/store-cmp}]
-       [:cmd/route {:from :renderer/store-cmp :to :renderer/router-cmp}]
+       [:cmd/route {:from :renderer/router-cmp
+                    :to   :renderer/store-cmp}]
+
+       [:cmd/route {:from :renderer/store-cmp
+                    :to   :renderer/router-cmp}]
 
        [:cmd/route {:from #{:renderer/ui-cmp
                             :renderer/store-cmp}
@@ -65,13 +72,24 @@
        [:cmd/route {:from #{:renderer/ui-cmp
                             :renderer/ws-cmp}
                     :to   #{:renderer/store-cmp
+                            :renderer/screenshot-cmp
                             :renderer/ipc-cmp}}]
-
-       [:cmd/observe-state {:from :renderer/store-cmp :to :renderer/ui-cmp}]
 
        [:cmd/route {:from :renderer/scheduler-cmp
                     :to   #{:renderer/store-cmp
+                            :renderer/ipc-cmp
                             :renderer/ws-cmp}}]
+
+       [:cmd/route {:from :renderer/screenshot-cmp
+                    :to   #{:renderer/ipc-cmp
+                            :renderer/store-cmp
+                            :renderer/scheduler-cmp}}]
+
+       [:cmd/observe-state {:from :renderer/store-cmp
+                            :to   :renderer/ui-cmp}]
+
+       [:cmd/observe-state {:from :renderer/store-cmp
+                            :to   :renderer/screenshot-cmp}]
 
        (when OBSERVER [:cmd/attach-to-firehose :renderer/ws-cmp])])))
 
