@@ -116,12 +116,13 @@
                                               :externs        ["externs/externs.js"
                                                                "externs/misc.js"
                                                                "externs/leaflet.ext.js"]
-                                              :npm-deps       {:electron-log "2.2.7"
-                                                               :react        "15.6.1"
-                                                               :react-dom    "15.6.1"
-                                                               :draft-js     "0.10.3"
-                                                               :moment       "2.18.1"
-                                                               :electron     "1.7.8"}
+                                              :npm-deps       {:electron-log          "2.2.7"
+                                                               :react                 "15.6.1"
+                                                               :react-dom             "15.6.1"
+                                                               :draft-js              "0.10.3"
+                                                               :moment                "2.18.1"
+                                                               :electron-spellchecker "1.1.2"
+                                                               :electron              "1.7.8"}
                                               ;:install-deps   true
                                               :optimizations  :simple
                                               :parallel-build true}}

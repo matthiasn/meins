@@ -46,13 +46,9 @@
 
 (defn edit-menu [put-fn]
   (let [lang (fn [cc label]
-               (let [js (str "iww.electron.renderer.ui.menu.change_language(\"" cc "\")")
-                     click #(do
-                              (info "click" cc)
-                              (put-fn (broadcast [:exec/js {:js js}])))]
-                 {:label label :click click}))
-        no-spellcheck "window.spellCheckHandler.currentSpellchecker=null;;"
-        no-spellcheck #(put-fn (broadcast [:exec/js {:js no-spellcheck}]))]
+               {:click #(put-fn (broadcast [:spellcheck/lang cc]))
+                :label label})
+        no-spellcheck #(put-fn (broadcast [:spellcheck/off]))]
     {:label   "Edit"
      :submenu [{:label       "Undo"
                 :accelerator "CmdOrCtrl+Z"
@@ -79,7 +75,8 @@
                           (lang "it-IT" "Italian")
                           (lang "es-ES" "Spanish")
                           {:type "separator"}
-                          {:label "none" :click no-spellcheck}]}]}))
+                          {:label "OFF"
+                           :click no-spellcheck}]}]}))
 
 (defn view-menu [put-fn]
   (let [index-page (:index-page rt/runtime-info)

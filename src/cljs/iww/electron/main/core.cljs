@@ -31,6 +31,8 @@
                 :firehose/cmp-recv
                 :update/status
                 :screenshot/take
+                :spellcheck/lang
+                :spellcheck/off
                 :import/listen})
 
 (def app-path (:app-path rt/runtime-info))

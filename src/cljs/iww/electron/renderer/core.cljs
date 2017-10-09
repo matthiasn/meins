@@ -4,6 +4,7 @@
             [iww.electron.renderer.ui.re-frame :as rf]
             [iww.electron.renderer.router :as router]
             [iww.electron.renderer.screenshot :as screenshot]
+            [iww.electron.renderer.spellcheck :as spellcheck]
             [taoensso.timbre :as timbre :refer-macros [info debug]]
             [matthiasn.systems-toolbox-electron.ipc-renderer :as ipc]
             [matthiasn.systems-toolbox-sente.client :as sente]
@@ -41,6 +42,7 @@
                                                       :window/show})
                      (sente/cmp-map :renderer/ws-cmp sente-cfg)
                      (store/cmp-map :renderer/store-cmp)
+                     (spellcheck/cmp-map :renderer/spellcheck-cmp)
                      (router/cmp-map :renderer/router-cmp)
                      (screenshot/cmp-map :renderer/screenshot-cmp)
                      (rf/cmp-map :renderer/ui-cmp)
@@ -55,6 +57,7 @@
                     :to   #{:renderer/exec-cmp
                             :renderer/store-cmp
                             :renderer/screenshot-cmp
+                            :renderer/spellcheck-cmp
                             :renderer/ws-cmp}}]
 
        [:cmd/route {:from :renderer/router-cmp
