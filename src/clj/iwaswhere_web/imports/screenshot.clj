@@ -9,6 +9,7 @@
 (defn import-screenshot [{:keys [put-fn msg-meta msg-payload]}]
   (let [filename (str fu/img-path (:filename msg-payload))]
     (log/info "importing screenshot" filename)
-    (sh "/usr/sbin/screencapture" filename))
+    (sh "/usr/sbin/screencapture" filename)
+    (sh "/usr/bin/scrot" filename))
   {:emit-msg [:cmd/schedule-new
               {:timeout 3000 :message (with-meta [:search/refresh] msg-meta)}]})
