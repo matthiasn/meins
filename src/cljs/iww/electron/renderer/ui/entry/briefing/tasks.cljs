@@ -3,6 +3,7 @@
             [reagent.ratom :refer-macros [reaction]]
             [re-frame.core :refer [subscribe]]
             [iwaswhere-web.utils.misc :as u]
+            [taoensso.timbre :as timbre :refer-macros [info debug]]
             [iww.electron.renderer.ui.entry.actions :as a]
             [iwaswhere-web.utils.parse :as up]
             [clojure.string :as s]
@@ -141,6 +142,7 @@
             saga-filter (fn [entry]
                           (if-let [selected (:selected @local)]
                             (let [story (get @stories (:primary-story entry))]
+                              (debug :saga-filter selected story)
                               (= selected (:linked-saga story)))
                             true))
             active-filter (fn [t]

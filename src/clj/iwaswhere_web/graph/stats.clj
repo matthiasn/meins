@@ -117,9 +117,9 @@
   {:tags #{"#habit"}
    :opts #{":waiting"}})
 
-(defn map-w-names [items k]
+(defn map-w-names [items ks]
   (into {} (map (fn [[ts st]]
-                  [ts (select-keys st #{k :timestamp})])
+                  [ts (select-keys st (set/union ks #{:timestamp}))])
                 items)))
 
 (defn make-stats-tags
@@ -129,8 +129,9 @@
    :pvt-hashtags  (gq/find-all-pvt-hashtags state)
    :pvt-displayed (:pvt-displayed (:cfg state))
    :mentions      (gq/find-all-mentions state)
-   :stories       (map-w-names (gq/find-all-stories state) :story-name)
-   :sagas         (map-w-names (gq/find-all-sagas state) :saga-name)
+   :stories       (map-w-names
+                    (gq/find-all-stories state) #{:story-name :linked-saga})
+   :sagas         (map-w-names (gq/find-all-sagas state) #{:saga-name})
    :locations     (gq/find-all-locations state)
    :cfg           (merge (:cfg state) {:pid (pid/current)})})
 
