@@ -105,6 +105,21 @@
                                               ;:install-deps   true
                                               :optimizations  :advanced
                                               :parallel-build true}}
+                              {:id           "geonames"
+                               :source-paths ["src/cljs"]
+                               :compiler     {:main           iww.electron.geonames.core
+                                              :target         :nodejs
+                                              :output-to      "prod/geonames/geonames.js"
+                                              :output-dir     "prod/geonames"
+                                              ;:source-map     "prod/geonames/geonames.js.map"
+                                              :externs        ["externs/externs.js"]
+                                              :npm-deps       {:electron-log           "2.2.7"
+                                                               :electron-updater       "2.8.7"
+                                                               :local-reverse-geocoder "0.3.2"
+                                                               :electron               "1.7.8"}
+                                              ;:install-deps   true
+                                              :optimizations  :none
+                                              :parallel-build true}}
                               {:id           "renderer"
                                :source-paths ["src/cljc" "src/cljs"]
                                :compiler     {:main           iww.electron.renderer.core

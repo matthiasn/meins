@@ -66,6 +66,11 @@
                                 [(str app-path "/electron/geocoder.js")]
                                 {:detached true
                                  :stdio    "ignore"
+                                 :cwd      app-path})
+        geonames (spawn-process node-path
+                                [(str app-path "/prod/geonames/geonames.js")]
+                                {:detached false
+                                 ;:stdio    "ignore"
                                  :cwd      app-path})]
     (info "GEOCODER spawned" geocoder)
     {}))
