@@ -1,6 +1,6 @@
 {
   "name": "iWasWhere",
-  "version": "0.3.32",
+  "version": "0.3.33",
   "description": "iWasWhere - a personal information manager",
   "main": "prod/main/main.js",
   "scripts": {
@@ -47,8 +47,8 @@
   "devDependencies": {
     "browser-resolve": "1.11.2",
     "electron": "1.7.8",
-    "electron-builder": "19.34.2",
-    "electron-publisher-s3": "19.35.0",
+    "electron-builder": "19.37.0",
+    "electron-publisher-s3": "19.37.0",
     "module-deps": "4.1.1",
     "resolve": "^1.4.0"
   }

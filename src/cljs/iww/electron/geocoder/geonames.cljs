@@ -1,6 +1,5 @@
 (ns iww.electron.geocoder.geonames
   (:require [taoensso.timbre :as timbre :refer-macros [info error debug]]
-            [electron :refer [app]]
             [fs :refer [mkdirSync existsSync]]
             [camel-snake-kebab.extras :refer [transform-keys]]
             [camel-snake-kebab.core :refer [->kebab-case-keyword]]

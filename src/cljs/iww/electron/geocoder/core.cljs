@@ -4,7 +4,6 @@
             [electron-log :as l]
             [iww.electron.geocoder.geonames :as geonames]
             [taoensso.timbre :as timbre :refer-macros [info]]
-            [electron :refer [app]]
             [matthiasn.systems-toolbox.scheduler :as sched]
             [matthiasn.systems-toolbox.switchboard :as sb]
             [cljs.nodejs :as nodejs :refer [process]]))
