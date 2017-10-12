@@ -67,7 +67,8 @@
    yet, and sets that contain information for which entries to show the map,
    or the edit mode."
   [put-fn]
-  (let [initial-state (atom {:entries         []
+  (let [cfg (assoc-in @c/app-cfg [:qr-code] false)
+        initial-state (atom {:entries         []
                              :last-alive      (st/now)
                              :new-entries     @cse/new-entries-ls
                              :query-cfg       @s/query-cfg
@@ -75,7 +76,7 @@
                              :task-stats      (sorted-map)
                              :wordcount-stats (sorted-map)
                              :options         {:pvt-hashtags #{"#pvt"}}
-                             :cfg             @c/app-cfg})]
+                             :cfg             cfg})]
     (put-fn [:state/stats-tags-get])
     (put-fn [:stats/get2])
     (put-fn [:cfg/refresh])
