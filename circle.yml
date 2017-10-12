@@ -3,6 +3,9 @@ machine:
     version: openjdk8
   node:
     version: 7
+dependencies:
+  override:
+    - npm install --ignore-scripts
 test:
   override:
     - lein test2junit
