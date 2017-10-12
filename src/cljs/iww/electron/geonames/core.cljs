@@ -1,5 +1,6 @@
 (ns iww.electron.geonames.core
   (:require [iww.electron.geonames.log]
+            [iww.electron.geonames.ipc :as ipc]
             [electron-log :as l]
             [iww.electron.geonames.geonames :as geonames]
             [taoensso.timbre :as timbre :refer-macros [info]]
@@ -10,7 +11,7 @@
 
 (nodejs/enable-util-print!)
 
-(defonce switchboard (sb/component :geonames/switchboard))
+(defonce switchboard (sb/component :geocoder/switchboard))
 
 (def OBSERVER true)
 
@@ -23,20 +24,21 @@
 
 (defn start []
   (info "Starting geonames CORE")
-  (let [components #{(geonames/cmp-map :geonames/service)}
+  (let [components #{(geonames/cmp-map :geocoder/service)
+                     (ipc/cmp-map :geocoder/ipc #{:geonames/res
+                                                  :firehose/cmp-put
+                                                  :firehose/cmp-recv})}
         components (make-observable components)]
     (sb/send-mult-cmd
       switchboard
       [[:cmd/init-comp components]
-       #_
-       [:cmd/route {:from :electron/menu-cmp
-                    :to   #{:electron/window-manager
-                            :electron/startup-cmp
-                            :electron/scheduler-cmp
-                            :electron/update-cmp}}]
-       #_
+
+       [:cmd/route {:from :geocoder/service
+                    :to   :geocoder/ipc}]
+       [:cmd/route {:from :geocoder/ipc
+                    :to   :geocoder/service}]
+
        (when OBSERVER
-         [:cmd/attach-to-firehose :electron/window-manager])
-       ])))
+         [:cmd/attach-to-firehose :geocoder/ipc])])))
 
 (start)

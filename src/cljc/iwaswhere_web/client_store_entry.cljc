@@ -118,12 +118,17 @@
 
 (defn update-local-fn
   "Update locally stored new entry with changes from edit element."
-  [{:keys [current-state msg-payload]}]
+  [{:keys [current-state msg-payload put-fn]}]
   (let [ts (:timestamp msg-payload)
+        {:keys [latitude longitude geoname]} msg-payload
         saved (get-in current-state [:entries-map ts])
         relevant #(select-keys % [:md :questionnaires :custom-fields :task
                                   :habit :completed-time :starred])
         changed? (not= (relevant saved) (relevant msg-payload))]
+    (when (and latitude longitude (not geoname))
+      (put-fn [:geonames/lookup {:timestamp ts
+                                 :latitude  latitude
+                                 :longitude longitude}]))
     (if changed?
       (let [new-entry (get-in current-state [:new-entries ts])
             entry (u/deep-merge saved new-entry msg-payload)
@@ -137,19 +142,22 @@
         {:new-state new-state})
       {})))
 
-(defn remove-local-fn
-  "Remove new entry from local when saving is confirmed by backend."
-  [{:keys [current-state msg-payload]}]
+(defn remove-local-fn [{:keys [current-state msg-payload]}]
   (let [ts (:timestamp msg-payload)
         new-state (update-in current-state [:new-entries] dissoc ts)]
     (update-local-storage new-state)
     {:new-state new-state}))
 
-(defn found-entry-fn
-  "Save retrieved entry in entries-map."
-  [{:keys [current-state msg-payload]}]
+(defn found-entry-fn [{:keys [current-state msg-payload]}]
   (let [ts (:timestamp msg-payload)
         new-state (assoc-in current-state [:entries-map ts] msg-payload)]
+    {:new-state new-state}))
+
+(defn geo-res [{:keys [current-state msg-payload]}]
+  (prn :geo-res msg-payload)
+  (let [ts (:timestamp msg-payload)
+        geoname (:geoname msg-payload)
+        new-state (assoc-in current-state [:new-entries ts :geoname] geoname)]
     {:new-state new-state}))
 
 (def entry-handler-map
@@ -159,5 +167,6 @@
    :entry/update-local update-local-fn
    :entry/remove-local remove-local-fn
    :entry/saved        entry-saved-fn
+   :geonames/res       geo-res
    :cmd/pomodoro-inc   pomodoro-inc-fn
    :cmd/pomodoro-start pomodoro-start-fn})

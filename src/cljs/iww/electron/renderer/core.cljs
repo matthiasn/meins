@@ -22,14 +22,14 @@
                                :stats/get :stats/get2 :import/movie :blink/busy
                                :state/stats-tags-get :import/weight :import/listen
                                :state/search :cfg/refresh :firehose/cmp-recv
-                               :firehose/cmp-put}
+                               :firehose/cmp-put }
                 :sente-opts  {:host     (.-iwwHOST js/window)
                               :protocol "http:"}})
 
-(def OBSERVER (.-OBSERVER js/window))
+;(def OBSERVER (.-OBSERVER js/window))
+(def OBSERVER true)
 
-(defn make-observable
-  [components]
+(defn make-observable [components]
   (if OBSERVER
     (let [mapper #(assoc-in % [:opts :msgs-on-firehose] true)]
       (set (mapv mapper components)))
@@ -38,13 +38,14 @@
 (defn start []
   (info "Starting SYSTEM")
   (let [components #{(ipc/cmp-map :renderer/ipc-cmp #{:app/open-external
+                                                      :geonames/lookup
                                                       :window/hide
                                                       :window/show})
-                     (sente/cmp-map :renderer/ws-cmp sente-cfg)
-                     (store/cmp-map :renderer/store-cmp)
                      (spellcheck/cmp-map :renderer/spellcheck-cmp)
-                     (router/cmp-map :renderer/router-cmp)
                      (screenshot/cmp-map :renderer/screenshot-cmp)
+                     (sente/cmp-map :renderer/ws-cmp sente-cfg)
+                     (router/cmp-map :renderer/router-cmp)
+                     (store/cmp-map :renderer/store-cmp)
                      (rf/cmp-map :renderer/ui-cmp)
                      (sched/cmp-map :renderer/scheduler-cmp)
                      (exec/cmp-map :renderer/exec-cmp #{})}

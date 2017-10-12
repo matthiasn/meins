@@ -3,6 +3,7 @@
             [child_process :refer [spawn fork]]
             [electron :refer [app session shell]]
             [http :as http]
+            [cljs.reader :refer [read-string]]
             [path :refer [join normalize]]
             [iww.electron.main.runtime :as rt]
             [fs :refer [existsSync renameSync readFileSync]]
@@ -40,6 +41,10 @@
   (info "STARTUP: spawning" cmd args opts)
   (spawn cmd (clj->js args) (clj->js opts)))
 
+(defn fork-process [args opts]
+  (info "STARTUP: forking" args opts)
+  (fork (clj->js args) (clj->js opts)))
+
 (defn start-jvm [{:keys [current-state]}]
   (let [{:keys [user-data app-path jar blink data-path java cwd
                 repo-dir]} rt/runtime-info
@@ -58,22 +63,6 @@
     (.on std-out "data" #(info "JVM " (.toString % "utf8")))
     (.on std-err "data" #(error "JVM " (.toString % "utf8")))
     {:new-state (assoc-in current-state [:service] service)}))
-
-(defn start-geocoder [_]
-  (info "STARTUP: start geocoder")
-  (let [{:keys [user-data app-path cwd node-path]} rt/runtime-info
-        geocoder (spawn-process node-path
-                                [(str app-path "/electron/geocoder.js")]
-                                {:detached true
-                                 :stdio    "ignore"
-                                 :cwd      app-path})
-        geonames (spawn-process node-path
-                                [(str app-path "/prod/geonames/geonames.js")]
-                                {:detached false
-                                 ;:stdio    "ignore"
-                                 :cwd      app-path})]
-    (info "GEOCODER spawned" geocoder)
-    {}))
 
 (defn start-spotify [_]
   (info "STARTUP: start spotify")
@@ -135,7 +124,6 @@
    :handler-map {:jvm/start           start-jvm
                  :jvm/loaded?         jvm-up?
                  :spotify/start       start-spotify
-                 :geocoder/start      start-geocoder
                  :app/shutdown        shutdown
                  :app/open-external   open-external
                  :app/shutdown-jvm    shutdown-jvm

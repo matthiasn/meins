@@ -1,24 +1,40 @@
 (ns iww.electron.geonames.geonames
-  (:require [taoensso.timbre :as timbre :refer-macros [info error]]
+  (:require [taoensso.timbre :as timbre :refer-macros [info error debug]]
             [electron :refer [app]]
             [fs :refer [mkdirSync existsSync]]
-            [local-reverse-geocoder :as geocoder]
-            [cljs.nodejs :as nodejs :refer [process]]))
+            [camel-snake-kebab.extras :refer [transform-keys]]
+            [camel-snake-kebab.core :refer [->kebab-case-keyword]]
+            [local-reverse-geocoder :as geocoder]))
 
 (aset js/console "log" #(info "GEOCODER" %))
+(aset js/console "error" #(error "GEOCODER" %))
+
+(defn format-geoname [geoname]
+  (info :format-geoname geoname)
+  (let [keywordized (transform-keys ->kebab-case-keyword geoname)]
+    (-> keywordized
+      (select-keys [:name :country-code :geo-name-id])
+      (assoc-in [:admin-1-name] (get-in keywordized [:admin-1-code :name]))
+      (assoc-in [:admin-2-name] (get-in keywordized [:admin-2-code :name]))
+      (assoc-in [:admin-3-name] (get-in keywordized [:admin-3-code :name]))
+      (assoc-in [:admin-4-name] (get-in keywordized [:admin-4-code :name])))))
 
 (defn lookup [{:keys [msg-payload put-fn]}]
+  (info "GEOCODER looking up" msg-payload)
   (let [points (clj->js msg-payload)
         callback (fn [err addresses]
                    (when err (error "GEOCODER" err))
                    (when addresses
-                     (info "GEOCODER result" msg-payload (js->clj addresses))))
-        res (.lookUp geocoder points 1 callback)])
-  {})
+                     (let [geoname (format-geoname (ffirst (js->clj addresses)))
+                           res (assoc-in msg-payload [:geoname] geoname)]
+                       (debug "GEOCODER result" msg-payload)
+                       (put-fn [:geonames/res res]))))]
+    (.lookUp geocoder points 1 callback)
+    {}))
 
 (defn state-fn [put-fn]
   (let [state (atom {})
-        dump-dir "/tmp/geonames1"]
+        dump-dir "/tmp/geonames"]
     (info "Starting GEONAMES")
     (when-not (existsSync dump-dir)
       (mkdirSync dump-dir))
@@ -28,10 +44,7 @@
                                      :admin2         true
                                      :admin3And4     false
                                      :alternateNames false}})
-           #(do
-              (info "GEOCODER started")
-              (lookup {:msg-payload [{:latitude  53.5805329
-                                      :longitude 9.964600599999999}]})))
+           #(info "GEOCODER started"))
     {:state state}))
 
 (defn cmp-map [cmp-id]

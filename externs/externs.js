@@ -93,6 +93,7 @@ child_process.ChildProcess = function(var_args) {};
 child_process.ChildProcess.spawn = function(command, args, options) {};
 child_process.exec = function(command, options, callback) {};
 child_process.fork = function(modulePath, args, options) {};
+child_process.send = function() {};
 child_process.ChildProcess.prototype.stdin;
 child_process.ChildProcess.prototype.stdout;
 child_process.ChildProcess.prototype.stderr;
@@ -125,3 +126,7 @@ var moment = function () {};
 moment.format = function () {};
 
 var Draft = {};
+
+var goog = {};
+goog.global = {};
+goog.global.setTimeout = function () {};

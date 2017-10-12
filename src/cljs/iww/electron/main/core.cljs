@@ -5,6 +5,7 @@
             [matthiasn.systems-toolbox-electron.window-manager :as wm]
             [iww.electron.main.menu :as menu]
             [iww.electron.main.update :as upd]
+            [iww.electron.main.geocoder :as geocoder]
             [iww.electron.main.startup :as st]
             [electron :refer [app]]
             [matthiasn.systems-toolbox.scheduler :as sched]
@@ -31,6 +32,7 @@
                 :firehose/cmp-recv
                 :update/status
                 :screenshot/take
+                :geonames/res
                 :spellcheck/lang
                 :spellcheck/off
                 :import/listen})
@@ -44,7 +46,8 @@
                      (ipc/cmp-map :electron/ipc-cmp)
                      (upd/cmp-map :electron/update-cmp)
                      (sched/cmp-map :electron/scheduler-cmp)
-                     (menu/cmp-map :electron/menu-cmp)}
+                     (menu/cmp-map :electron/menu-cmp)
+                     (geocoder/cmp-map :electron/geocoder #{:geonames/lookup})}
         components (make-observable components)]
     (sb/send-mult-cmd
       switchboard
@@ -54,20 +57,26 @@
                     :to   #{:electron/window-manager
                             :electron/startup-cmp
                             :electron/scheduler-cmp
+                            :electron/geocoder
                             :electron/update-cmp}}]
 
        [:cmd/route {:from :electron/scheduler-cmp
                     :to   #{:electron/update-cmp
                             :electron/window-manager
+                            :electron/geocoder
                             :electron/startup-cmp}}]
 
        [:cmd/route {:from :electron/ipc-cmp
                     :to   #{:electron/startup-cmp
                             :electron/update-cmp
+                            :electron/geocoder
                             :electron/window-manager}}]
 
        [:cmd/route {:from :electron/window-manager
                     :to   :electron/startup-cmp}]
+
+       [:cmd/route {:from :electron/geocoder
+                    :to   :electron/window-manager}]
 
        [:cmd/route {:from :electron/update-cmp
                     :to   #{:electron/scheduler-cmp
@@ -83,6 +92,10 @@
 
        [:cmd/send {:to  :electron/startup-cmp
                    :msg [:jvm/loaded?]}]
+
+       [:cmd/send {:to  :electron/scheduler-cmp
+                   :msg [:cmd/schedule-new {:message [:geocoder/start]
+                                            :timeout 5000}]}]
 
        [:cmd/send {:to  :electron/scheduler-cmp
                    :msg [:cmd/schedule-new {:timeout (* 24 60 60 1000)
