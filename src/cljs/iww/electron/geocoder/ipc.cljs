@@ -1,4 +1,4 @@
-(ns iww.electron.geonames.ipc
+(ns iww.electron.geocoder.ipc
   (:require [taoensso.timbre :as timbre :refer-macros [info error debug]]
             [process]
             [cljs.reader :refer [read-string]]))

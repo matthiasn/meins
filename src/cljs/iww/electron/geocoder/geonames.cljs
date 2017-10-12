@@ -1,4 +1,4 @@
-(ns iww.electron.geonames.geonames
+(ns iww.electron.geocoder.geonames
   (:require [taoensso.timbre :as timbre :refer-macros [info error debug]]
             [electron :refer [app]]
             [fs :refer [mkdirSync existsSync]]
@@ -10,7 +10,6 @@
 (aset js/console "error" #(error "GEOCODER" %))
 
 (defn format-geoname [geoname]
-  (info :format-geoname geoname)
   (let [keywordized (transform-keys ->kebab-case-keyword geoname)]
     (-> keywordized
       (select-keys [:name :country-code :geo-name-id])
@@ -35,7 +34,7 @@
 (defn state-fn [put-fn]
   (let [state (atom {})
         dump-dir "/tmp/geonames"]
-    (info "Starting GEONAMES")
+    (info "Starting")
     (when-not (existsSync dump-dir)
       (mkdirSync dump-dir))
     (.init geocoder

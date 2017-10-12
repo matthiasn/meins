@@ -12,7 +12,7 @@
             [clojure.string :as str]))
 
 (defn fork-process [args opts]
-  (info "STARTUP: forking" args opts)
+  (info "forking" args opts)
   (fork (clj->js args) (clj->js opts)))
 
 (defn serialize [msg-type msg-payload msg-meta]
@@ -27,9 +27,9 @@
   {})
 
 (defn start-geocoder [{:keys [current-state put-fn]}]
-  (info "STARTUP: start geocoder")
+  (info "starting geocoder")
   (let [{:keys [user-data app-path cwd node-path]} rt/runtime-info
-        geocoder (fork-process [(str app-path "/prod/geonames/geonames.js")]
+        geocoder (fork-process [(str app-path "/prod/geocoder/geocoder.js")]
                                {:detached false
                                 :cwd      app-path})
         relay (fn [msg]
@@ -38,12 +38,11 @@
                         msg-type (first parsed)
                         {:keys [msg-payload msg-meta]} (second parsed)
                         msg (with-meta [msg-type msg-payload] msg-meta)]
-                    (info "IPC received" msg-type)
+                    (debug "IPC received" msg-type)
                     (put-fn msg))
                   (catch js/Object e (error e "when parsing" msg))))
         new-state (assoc-in current-state [:geocoder] geocoder)]
     (.on geocoder "message" relay)
-    (info "IOP component forked" geocoder)
     {:new-state new-state}))
 
 (defn cmp-map [cmp-id relay-types]

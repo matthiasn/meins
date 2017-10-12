@@ -1,8 +1,8 @@
-(ns iww.electron.geonames.core
-  (:require [iww.electron.geonames.log]
-            [iww.electron.geonames.ipc :as ipc]
+(ns iww.electron.geocoder.core
+  (:require [iww.electron.geocoder.log]
+            [iww.electron.geocoder.ipc :as ipc]
             [electron-log :as l]
-            [iww.electron.geonames.geonames :as geonames]
+            [iww.electron.geocoder.geonames :as geonames]
             [taoensso.timbre :as timbre :refer-macros [info]]
             [electron :refer [app]]
             [matthiasn.systems-toolbox.scheduler :as sched]

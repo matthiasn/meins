@@ -80,6 +80,7 @@
                      ["shell" "yarn" "install"]
                      ["cljsbuild" "once" "main"]
                      ["cljsbuild" "once" "renderer"]
+                     ["cljsbuild" "once" "geocoder"]
                      ["cljsbuild" "once" "updater"]
                      ["sass"]
                      ["uberjar"]
@@ -106,12 +107,12 @@
                                               ;:install-deps   true
                                               :optimizations  :advanced
                                               :parallel-build true}}
-                              {:id           "geonames"
+                              {:id           "geocoder"
                                :source-paths ["src/cljs"]
-                               :compiler     {:main           iww.electron.geonames.core
+                               :compiler     {:main           iww.electron.geocoder.core
                                               :target         :nodejs
-                                              :output-to      "prod/geonames/geonames.js"
-                                              :output-dir     "prod/geonames"
+                                              :output-to      "prod/geocoder/geocoder.js"
+                                              :output-dir     "prod/geocoder"
                                               ;:source-map     "prod/geonames/geonames.js.map"
                                               :externs        ["externs/externs.js"
                                                                "externs/misc.js"]

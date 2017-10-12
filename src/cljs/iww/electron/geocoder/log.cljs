@@ -1,4 +1,4 @@
-(ns iww.electron.geonames.log
+(ns iww.electron.geocoder.log
   (:require [electron-log :as l]
             [cljs.nodejs :as nodejs]
             [taoensso.timbre :as timbre :refer-macros [info]]
