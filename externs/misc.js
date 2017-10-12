@@ -13,3 +13,7 @@ window.setTimeout = function () {};
 window.clearTimeout = function () {};
 window.iwwHOST = {};
 window.OBSERVER = {};
+
+var localReverseGeocoder = {};
+localReverseGeocoder.init = function () {};
+localReverseGeocoder.lookUp = function () {};

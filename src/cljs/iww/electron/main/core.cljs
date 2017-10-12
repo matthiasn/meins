@@ -41,6 +41,7 @@
 
 (defn start []
   (info "Starting CORE:" (.-resourcesPath process))
+  (info "download-path" (:downloads rt/runtime-info))
   (let [components #{(wm/cmp-map :electron/window-manager wm-relay app-path)
                      (st/cmp-map :electron/startup-cmp)
                      (ipc/cmp-map :electron/ipc-cmp)

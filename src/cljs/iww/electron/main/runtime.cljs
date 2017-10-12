@@ -11,13 +11,15 @@
         repo-dir (s/includes? rp "Electron.app")
         app-path (if repo-dir cwd (str rp "/app"))
         platform (.-platform process)
+        download-path (.getPath app "downloads")
         data-path (str user-data "/data")
         jdk (case platform
-              "darwin" "/bin/zulu8.23.0.3-jdk8.0.144-mac_x64/bin/java"
-              "win32" "/bin/zulu8.23.0.3-jdk8.0.144-win_x64/bin/java"
-              "/bin/zulu8.23.0.3-jdk8.0.144-linux_x64/bin/java")
+              "darwin" "/zulu8.23.0.3-jdk8.0.144-macosx_x64/bin/java"
+              "win32" "/zulu8.23.0.3-jdk8.0.144-win_x64/bin/java"
+              "/zulu8.23.0.3-jdk8.0.144-linux_x64/bin/java")
         info {:platform       (.-platform process)
-              :java           (str app-path jdk)
+              :download-path  download-path
+              :java           (str download-path jdk)
               :electron-path  (first (.-argv process))
               :node-path      "/usr/local/bin/node"
               :data-path      data-path
