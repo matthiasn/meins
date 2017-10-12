@@ -14,10 +14,10 @@
   (.getCurrentPosition
     (.-geolocation js/navigator)
     (fn [pos]
-      (let [coords (.-coords pos)]
-        (put-fn [:entry/geo-enrich
-                 (merge data {:latitude  (.-latitude coords)
-                              :longitude (.-longitude coords)})])))
+      (let [coords (.-coords pos)
+            updated (merge data {:latitude  (.-latitude coords)
+                                 :longitude (.-longitude coords)})]
+        (put-fn [:entry/geo-enrich updated])))
     (fn [err] (prn err))))
 
 (defn new-entry-fn

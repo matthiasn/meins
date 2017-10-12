@@ -46,11 +46,11 @@
         geo-info (select-keys msg-payload [:timestamp :latitude :longitude])
         local-entry (get-in current-state [:new-entries ts])
         new-state (update-in current-state [:new-entries ts] #(merge geo-info %))]
-    (when-not local-entry
-      (put-fn [:entry/update geo-info]))
-    (when local-entry
-      (update-local-storage new-state)
-      {:new-state new-state})))
+    (if local-entry
+      (do (update-local-storage new-state)
+          {:new-state new-state
+           :emit-msg  [:geonames/lookup geo-info]})
+      {:emit-msg [:entry/update geo-info]})))
 
 (defn entry-saved-fn
   "Remove new entry from local when saving is confirmed by backend."
