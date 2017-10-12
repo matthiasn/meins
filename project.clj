@@ -121,7 +121,7 @@
                                                                :local-reverse-geocoder "0.3.2"
                                                                :electron               "1.7.8"}
                                               ;:install-deps   true
-                                              :optimizations  :advanced
+                                              :optimizations  :simple
                                               :parallel-build true}}
                               {:id           "renderer"
                                :source-paths ["src/cljc" "src/cljs"]
