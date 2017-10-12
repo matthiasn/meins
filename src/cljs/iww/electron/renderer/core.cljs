@@ -78,11 +78,6 @@
                             :renderer/screenshot-cmp
                             :renderer/ipc-cmp}}]
 
-       [:cmd/route {:from :renderer/scheduler-cmp
-                    :to   #{:renderer/store-cmp
-                            :renderer/ipc-cmp
-                            :renderer/ws-cmp}}]
-
        [:cmd/route {:from :renderer/screenshot-cmp
                     :to   #{:renderer/ipc-cmp
                             :renderer/store-cmp}}]
