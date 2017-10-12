@@ -121,6 +121,7 @@ var fs = {};
 fs.renameSync = function(oldPath, newPath) {};
 fs.existsSync = function(path) {};
 fs.readFileSync = function(path) {};
+fs.mkdirSync = function(path) {};
 
 var moment = function () {};
 moment.format = function () {};
