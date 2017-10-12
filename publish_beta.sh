@@ -11,6 +11,6 @@ npm update -g electron-builder
 npm update -g electron-publisher-s3
 
 export ELECTRON_BUILDER_COMPRESSION_LEVEL=3
-DEBUG=electron-builder,electron-builder:* electron-builder -c electron-builder-beta.yml --publish always -m
+DEBUG=electron-builder,electron-builder:* electron-builder -c electron-builder-beta.yml --publish always -m zip
 
 open dist

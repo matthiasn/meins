@@ -94,7 +94,7 @@
 
   :cljsbuild {:test-commands {"cljs-test" ["phantomjs" "test/phantom/test.js" "test/phantom/test.html"]}
               :builds        [{:id           "main"
-                               :source-paths ["src/cljs"]
+                               :source-paths ["src/cljc" "src/cljs"]
                                :compiler     {:main           iww.electron.main.core
                                               :target         :nodejs
                                               :output-to      "prod/main/main.js"
@@ -108,7 +108,7 @@
                                               :optimizations  :advanced
                                               :parallel-build true}}
                               {:id           "geocoder"
-                               :source-paths ["src/cljs"]
+                               :source-paths ["src/cljc" "src/cljs"]
                                :compiler     {:main           iww.electron.geocoder.core
                                               :target         :nodejs
                                               :output-to      "prod/geocoder/geocoder.js"

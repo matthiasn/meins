@@ -154,7 +154,6 @@
     {:new-state new-state}))
 
 (defn geo-res [{:keys [current-state msg-payload]}]
-  (prn :geo-res msg-payload)
   (let [ts (:timestamp msg-payload)
         geoname (:geoname msg-payload)
         new-state (assoc-in current-state [:new-entries ts :geoname] geoname)]

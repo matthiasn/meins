@@ -2,6 +2,7 @@
   (:require [iww.electron.geocoder.log]
             [iww.electron.geocoder.ipc :as ipc]
             [electron-log :as l]
+            [iwaswhere-web.specs]
             [iww.electron.geocoder.geonames :as geonames]
             [taoensso.timbre :as timbre :refer-macros [info]]
             [matthiasn.systems-toolbox.scheduler :as sched]
