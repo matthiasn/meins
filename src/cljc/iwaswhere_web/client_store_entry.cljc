@@ -78,7 +78,11 @@
    increment message. Finally plays completion sound."
   [{:keys [current-state msg-payload]}]
   (let [ts (:timestamp msg-payload)
-        new-state (update-in current-state [:new-entries ts :completed-time] inc)]
+        started (:started msg-payload)
+        completed-time (:completed-time msg-payload)
+        dur (+ completed-time
+               (/ (- (st/now) started) 1000))
+        new-state (assoc-in current-state [:new-entries ts :completed-time] dur)]
     (when (get-in current-state [:new-entries ts])
       (let [new-entry (get-in new-state [:new-entries ts])
             done? (= (:planned-dur new-entry) (:completed-time new-entry))
@@ -100,7 +104,10 @@
                             [[:blink/busy {:pomodoro-completed done?}]
                              [:cmd/schedule-new
                               {:timeout 1000
-                               :message [:cmd/pomodoro-inc {:timestamp ts}]}]])})
+                               :message [:cmd/pomodoro-inc
+                                         {:started        started
+                                          :completed-time completed-time
+                                          :timestamp      ts}]}]])})
           {:new-state current-state})))))
 
 (defn pomodoro-start-fn
@@ -111,10 +118,15 @@
         new-state (-> current-state
                       (update-in [:new-entries ts :pomodoro-running] not)
                       (assoc-in [:busy] false))]
-    (when (get-in current-state [:new-entries ts])
+    (when-let [entry (get-in current-state [:new-entries ts])]
       (update-local-storage new-state)
-      {:new-state    new-state
-       :send-to-self [:cmd/pomodoro-inc {:timestamp ts}]})))
+      {:new-state new-state
+       :emit-msg  [:cmd/schedule-new
+                   {:message [:cmd/pomodoro-inc
+                              {:started        (st/now)
+                               :completed-time (:completed-time entry)
+                               :timestamp      ts}]
+                    :timeout 1}]})))
 
 (defn update-local-fn
   "Update locally stored new entry with changes from edit element."

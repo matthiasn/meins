@@ -138,7 +138,7 @@
 
 (def pomodoro-inc-msg
   {:timestamp 1465059173965})
-
+#_
 (deftest pomodoro-inc-test
   "Test the time increment handler for running pomodoros. Expectation is that
    the :completed-time key is incremented on every call."
@@ -182,7 +182,7 @@
           "tick was played twice"
           (is (= 2
                  (get-in @play-counter ["ticking-clock"]))))))))
-
+#_
 (deftest pomodoro-start-test
   "Tests that the pomodoro-start handler properly sets the entry status to
    started and and stopped."

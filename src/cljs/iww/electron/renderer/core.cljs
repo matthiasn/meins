@@ -1,5 +1,6 @@
 (ns iww.electron.renderer.core
-  (:require [iww.electron.renderer.log]
+  (:require [iwaswhere-web.specs]
+            [iww.electron.renderer.log]
             [iwaswhere-web.client-store :as store]
             [iww.electron.renderer.ui.re-frame :as rf]
             [iww.electron.renderer.router :as router]
@@ -22,7 +23,7 @@
                                :stats/get :stats/get2 :import/movie :blink/busy
                                :state/stats-tags-get :import/weight :import/listen
                                :state/search :cfg/refresh :firehose/cmp-recv
-                               :firehose/cmp-put }
+                               :firehose/cmp-put}
                 :sente-opts  {:host     (.-iwwHOST js/window)
                               :protocol "http:"}})
 
@@ -40,14 +41,13 @@
   (let [components #{(ipc/cmp-map :renderer/ipc-cmp #{:app/open-external
                                                       :geonames/lookup
                                                       :window/hide
-                                                      :window/show})
+                                                      :cmd/schedule-new})
                      (spellcheck/cmp-map :renderer/spellcheck-cmp)
                      (screenshot/cmp-map :renderer/screenshot-cmp)
                      (sente/cmp-map :renderer/ws-cmp sente-cfg)
                      (router/cmp-map :renderer/router-cmp)
                      (store/cmp-map :renderer/store-cmp)
                      (rf/cmp-map :renderer/ui-cmp)
-                     (sched/cmp-map :renderer/scheduler-cmp)
                      (exec/cmp-map :renderer/exec-cmp #{})}
         components (make-observable components)]
     (sb/send-mult-cmd
@@ -70,7 +70,6 @@
        [:cmd/route {:from #{:renderer/ui-cmp
                             :renderer/store-cmp}
                     :to   #{:renderer/ws-cmp
-                            :renderer/scheduler-cmp
                             :renderer/ipc-cmp}}]
 
        [:cmd/route {:from #{:renderer/ui-cmp
@@ -86,8 +85,7 @@
 
        [:cmd/route {:from :renderer/screenshot-cmp
                     :to   #{:renderer/ipc-cmp
-                            :renderer/store-cmp
-                            :renderer/scheduler-cmp}}]
+                            :renderer/store-cmp}}]
 
        [:cmd/observe-state {:from :renderer/store-cmp
                             :to   :renderer/ui-cmp}]

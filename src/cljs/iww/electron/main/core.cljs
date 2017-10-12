@@ -1,5 +1,6 @@
 (ns iww.electron.main.core
   (:require [iww.electron.main.log]
+            [iwaswhere-web.specs]
             [taoensso.timbre :as timbre :refer-macros [info]]
             [matthiasn.systems-toolbox-electron.ipc-main :as ipc]
             [matthiasn.systems-toolbox-electron.window-manager :as wm]
@@ -32,9 +33,11 @@
                 :firehose/cmp-recv
                 :update/status
                 :screenshot/take
+                :cmd/pomodoro-inc
                 :geonames/res
                 :spellcheck/lang
                 :spellcheck/off
+                :import/screenshot
                 :import/listen})
 
 (def app-path (:app-path rt/runtime-info))
@@ -43,10 +46,10 @@
   (info "Starting CORE:" (.-resourcesPath process))
   (info "download-path" (:downloads rt/runtime-info))
   (let [components #{(wm/cmp-map :electron/window-manager wm-relay app-path)
-                     (st/cmp-map :electron/startup-cmp)
+                     (st/cmp-map :electron/startup)
                      (ipc/cmp-map :electron/ipc-cmp)
-                     (upd/cmp-map :electron/update-cmp)
-                     (sched/cmp-map :electron/scheduler-cmp)
+                     (upd/cmp-map :electron/updater)
+                     (sched/cmp-map :electron/scheduler)
                      (menu/cmp-map :electron/menu-cmp)
                      (geocoder/cmp-map :electron/geocoder #{:geonames/lookup})}
         components (make-observable components)]
@@ -56,49 +59,50 @@
 
        [:cmd/route {:from :electron/menu-cmp
                     :to   #{:electron/window-manager
-                            :electron/startup-cmp
-                            :electron/scheduler-cmp
+                            :electron/startup
+                            :electron/scheduler
                             :electron/geocoder
-                            :electron/update-cmp}}]
+                            :electron/updater}}]
 
-       [:cmd/route {:from :electron/scheduler-cmp
-                    :to   #{:electron/update-cmp
+       [:cmd/route {:from :electron/scheduler
+                    :to   #{:electron/updater
                             :electron/window-manager
                             :electron/geocoder
-                            :electron/startup-cmp}}]
+                            :electron/startup}}]
 
        [:cmd/route {:from :electron/ipc-cmp
-                    :to   #{:electron/startup-cmp
-                            :electron/update-cmp
+                    :to   #{:electron/startup
+                            :electron/updater
                             :electron/geocoder
+                            :electron/scheduler
                             :electron/window-manager}}]
 
        [:cmd/route {:from :electron/window-manager
-                    :to   :electron/startup-cmp}]
+                    :to   :electron/startup}]
 
        [:cmd/route {:from :electron/geocoder
                     :to   :electron/window-manager}]
 
-       [:cmd/route {:from :electron/update-cmp
-                    :to   #{:electron/scheduler-cmp
+       [:cmd/route {:from :electron/updater
+                    :to   #{:electron/scheduler
                             :electron/window-manager
-                            :electron/startup-cmp}}]
+                            :electron/startup}}]
 
-       [:cmd/route {:from :electron/startup-cmp
-                    :to   #{:electron/scheduler-cmp
+       [:cmd/route {:from :electron/startup
+                    :to   #{:electron/scheduler
                             :electron/window-manager}}]
 
        (when OBSERVER
          [:cmd/attach-to-firehose :electron/window-manager])
 
-       [:cmd/send {:to  :electron/startup-cmp
+       [:cmd/send {:to  :electron/startup
                    :msg [:jvm/loaded?]}]
 
-       [:cmd/send {:to  :electron/scheduler-cmp
+       [:cmd/send {:to  :electron/scheduler
                    :msg [:cmd/schedule-new {:message [:geocoder/start]
                                             :timeout 5000}]}]
 
-       [:cmd/send {:to  :electron/scheduler-cmp
+       [:cmd/send {:to  :electron/scheduler
                    :msg [:cmd/schedule-new {:timeout (* 24 60 60 1000)
                                             :message [:update/auto-check]
                                             :repeat  true
