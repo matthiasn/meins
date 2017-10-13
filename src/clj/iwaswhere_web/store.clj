@@ -26,12 +26,14 @@
           (doseq [line lines]
             (try
               (let [parsed (clojure.edn/read-string line)
-                    ts (:timestamp parsed)]
+                    ts (:timestamp parsed)
+                    cnt (count @entries-to-index)]
                 (if (:deleted parsed)
                   (do (swap! state ga/remove-node ts)
                       (swap! entries-to-index dissoc ts))
                   (do (swap! entries-to-index assoc-in [ts] parsed)
-                      (swap! state ga/add-node ts parsed :startup))))
+                      (swap! state ga/add-node ts parsed :startup)))
+                (when (zero? (mod cnt 5000)) (log/info "Entries read:" cnt)))
               (catch Exception ex
                 (log/error "Exception" ex "when parsing line:\n" line)))))))))
 
