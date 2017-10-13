@@ -53,9 +53,9 @@
               :cwd      user-data
               :env      {:PORT            PORT
                          :DATA_PATH       data-path
-                         :BLINK_PATH      blink
-                         :GIT_COMMITS     (not repo-dir)
-                         :CACHED_APPSTATE true}}
+                         ;:GIT_COMMITS     (not repo-dir)
+                         ;:CACHED_APPSTATE true
+                         :BLINK_PATH      blink}}
         service (spawn-process java args opts)
         std-out (.-stdout service)
         std-err (.-stderr service)]

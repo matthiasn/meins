@@ -119,7 +119,7 @@
          [m/audioplayer-view @entry put-fn]
          [l/leaflet-map @entry @show-map? local-cfg put-fn]
          [loc/location-details @entry put-fn edit-mode?]
-         [m/image-view @entry]
+         [m/image-view entry]
          [m/videoplayer-view @entry]
          [m/imdb-view @entry put-fn]
          [m/spotify-view @entry put-fn]

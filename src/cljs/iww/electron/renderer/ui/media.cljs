@@ -5,21 +5,17 @@
 
 (def iww-host (.-iwwHOST js/window))
 
-(defn image-view
-  "Renders image view. Used resized and properly rotated image endpoint
-   when JPEG file requested."
-  [entry query-params]
-  (when-let [file (:img-file entry)]
+(defn image-view [entry query-params]
+  (when-let [file (:img-file @entry)]
     (let [path (str "http://" iww-host "/photos/" file)
           resized (if (s/includes? (s/lower-case path) ".jpg")
                     (str "http://" iww-host "/photos2/" file query-params)
                     path)]
       [:a {:href path :target "_blank"}
-       [:img {:src resized}]])))
+       [:img {:style {:width (str (or (:img-size @entry) 50) "%")}
+              :src   resized}]])))
 
-(defn audioplayer-view
-  "Renders audio player view."
-  [entry put-fn]
+(defn audioplayer-view [entry put-fn]
   (when-let [audio-file (:audio-file entry)]
     [:audio {:id       audio-file
              :controls true
@@ -34,17 +30,13 @@
      [:source {:src  (str "http://" iww-host "/audio/" audio-file)
                :type "audio/mp4"}]]))
 
-(defn videoplayer-view
-  "Renders video player view."
-  [entry]
+(defn videoplayer-view [entry]
   (when-let [video-file (:video-file entry)]
     [:video {:controls true :preload "none"}
      [:source {:src  (str "http://" iww-host "/videos/" video-file)
                :type "video/mp4"}]]))
 
-(defn imdb-view
-  "Renders IMDb view."
-  [entry put-fn]
+(defn imdb-view [entry put-fn]
   (when-let [imdb-id (get-in entry [:custom-fields "#imdb" :imdb-id])]
     (let [imdb (:imdb entry)
           series (:series imdb)]
@@ -62,9 +54,7 @@
         (put-fn [:import/movie {:entry   entry
                                 :imdb-id imdb-id}])))))
 
-(defn spotify-view
-  "Renders IMDb view."
-  [entry put-fn]
+(defn spotify-view [entry put-fn]
   (when-let [spotify (get-in entry [:spotify])]
     [:div.spotify
      [:div.title (:name spotify)]

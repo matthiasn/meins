@@ -3,29 +3,26 @@
             [re-frame.core :refer [subscribe]]
             [reagent.ratom :refer-macros [reaction]]
             [reagent.core :as r]
+            [taoensso.timbre :as timbre :refer-macros [info debug]]
             [draft-js :as Draft]
             [iwaswhere-web.utils.parse :as p]
             [iwaswhere-web.utils.misc :as u]
             [iww.electron.renderer.ui.entry.utils :as eu]
             [clojure.set :as set]))
 
-(defn editor-state-from-text
-  [text]
+(defn editor-state-from-text [text]
   (let [content-from-text (.createFromText Draft.ContentState text)]
     (.createWithContent Draft.EditorState content-from-text)))
 
-(defn editor-state-from-raw
-  [editor-state]
+(defn editor-state-from-raw [editor-state]
   (let [content-from-raw (.convertFromRaw Draft editor-state)]
     (.createWithContent Draft.EditorState content-from-raw)))
 
-(defn story-mapper
-  [[ts story]]
+(defn story-mapper [[ts story]]
   {:name (:story-name story)
    :id   ts})
 
-(defn on-editor-change
-  [update-cb]
+(defn on-editor-change [update-cb]
   (fn [new-state]
     (let [current-content (.getCurrentContent new-state)
           plain (.getPlainText current-content)
@@ -34,8 +31,7 @@
           new-state (js->clj via-json :keywordize-keys true)]
       (update-cb plain new-state))))
 
-(defn adapt-react-class
-  [cls]
+(defn adapt-react-class [cls]
   (r/adapt-react-class (aget js/window "deps" cls "default")))
 
 (defn entry-stories [editor-state]
@@ -46,8 +42,7 @@
        (map #(-> % :data :mention :id))
        (map #(when % (js/parseInt %)))))
 
-(defn draft-search-field
-  [editor-state update-cb]
+(defn draft-search-field [editor-state update-cb]
   (let [editor (adapt-react-class "SearchFieldEditor")
         options (subscribe [:options])
         sorted-stories (reaction (:sorted-stories @options))
@@ -70,8 +65,7 @@
                :stories     @stories-list
                :onChange    on-change}])))
 
-(defn draft-text-editor
-  [editor-state md update-cb save-fn changed]
+(defn draft-text-editor [editor-state md update-cb save-fn small-img changed]
   (let [editor (adapt-react-class "EntryTextEditor")
         options (subscribe [:options])
         sorted-stories (reaction (:sorted-stories @options))
@@ -86,7 +80,7 @@
                                     (concat hashtags pvt-hashtags)
                                     hashtags)]
                      (map (fn [h] {:name h}) hashtags)))]
-    (fn [editor-state md update-cb save-fn changed]
+    (fn [editor-state md update-cb save-fn small-img changed]
       [editor {:editorState editor-state
                :md          md
                :changed     changed
@@ -94,10 +88,10 @@
                :hashtags    @hashtags
                :stories     @stories-list
                :saveFn      save-fn
+               :smallImg    small-img
                :onChange    update-cb}])))
 
-(defn entry-editor
-  [entry put-fn]
+(defn entry-editor [entry put-fn]
   (let [ts (:timestamp @entry)
         {:keys [entry edit-mode entries-map new-entries unsaved]} (eu/entry-reaction ts)
         local (r/atom {:editor-state (:editor-state @entry)})
@@ -131,9 +125,15 @@
                                         (assoc-in [:pomodoro-running] false))
                                     cleaned)]
                         (put-fn [:entry/update entry])))
+            small-img (fn [smaller]
+                        (let [img-size (:img-size @entry 50)
+                              img-size (if smaller (- img-size 10) (+ img-size 10))
+                              updated (assoc-in @entry [:img-size] img-size)]
+                          (when (and (pos? img-size) (< img-size 101))
+                            (put-fn [:entry/update-local updated]))))
             md (or (:md @entry) "")]
         [:div
-         [draft-text-editor editor-state md editor-cb save-fn @unsaved]
+         [draft-text-editor editor-state md editor-cb save-fn small-img @unsaved]
          (when @unsaved
            [:div.save [:span.not-saved {:on-click save-fn}
                        [:span.fa.fa-floppy-o] "  click to save"]])]))))

@@ -98,14 +98,14 @@
                                :compiler     {:main           iww.electron.main.core
                                               :target         :nodejs
                                               :output-to      "prod/main/main.js"
-                                              :output-dir     "out/main"
+                                              :output-dir     "prod/main"
                                               :externs        ["externs/externs.js"
                                                                "externs/misc.js"]
                                               :npm-deps       {:electron-log     "2.2.7"
                                                                :electron-updater "2.8.7"
                                                                :electron         "1.7.8"}
                                               ;:install-deps   true
-                                              :optimizations  :advanced
+                                              :optimizations  :none
                                               :parallel-build true}}
                               {:id           "geocoder"
                                :source-paths ["src/cljc" "src/cljs"]
@@ -130,7 +130,7 @@
                                               ;:source-map     "prod/renderer/renderer.js.map"
                                               ;:source-map     true
                                               :target         :nodejs
-                                              :output-dir     "out/renderer"
+                                              :output-dir     "prod/renderer"
                                               :externs        ["externs/externs.js"
                                                                "externs/misc.js"
                                                                "externs/leaflet.ext.js"]
@@ -142,19 +142,19 @@
                                                                :electron-spellchecker "1.1.2"
                                                                :electron              "1.7.8"}
                                               ;:install-deps   true
-                                              :optimizations  :simple
+                                              :optimizations  :none
                                               :parallel-build true}}
                               {:id           "updater"
                                :source-paths ["src/cljs"]
                                :compiler     {:main           iww.electron.update.core
                                               :output-to      "prod/updater/update.js"
                                               :target         :nodejs
-                                              :output-dir     "out/updater"
+                                              :output-dir     "prod/updater"
                                               :externs        ["externs/externs.js"]
                                               :npm-deps       {:electron-log "2.2.7"
                                                                :electron     "1.7.8"}
                                               ;:install-deps   true
-                                              :optimizations  :advanced
+                                              :optimizations  :none
                                               :parallel-build true}}
 
                               {:id           "cljs-test"

@@ -135,7 +135,7 @@
         {:keys [latitude longitude geoname]} msg-payload
         saved (get-in current-state [:entries-map ts])
         relevant #(select-keys % [:md :questionnaires :custom-fields :task
-                                  :habit :completed-time :starred])
+                                  :habit :completed-time :starred :img-size])
         changed? (not= (relevant saved) (relevant msg-payload))]
     (when (and latitude longitude (not geoname))
       (put-fn [:geonames/lookup {:timestamp ts

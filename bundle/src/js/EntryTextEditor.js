@@ -18,7 +18,13 @@ const {hasCommandModifier} = KeyBindingUtil;
 
 function myKeyBindingFn(e) {
     if (e.keyCode === 83 /* `S` key */ && hasCommandModifier(e)) {
-        return 'myeditor-save';
+        return 'editor-save';
+    }
+    if (e.keyCode === 187 && hasCommandModifier(e)) {
+        return 'cmd-plus';
+    }
+    if (e.keyCode === 189 && hasCommandModifier(e)) {
+        return 'cmd-minus';
     }
     return getDefaultKeyBinding(e);
 }
@@ -47,8 +53,17 @@ export default class EntryTextEditor extends Component {
     handleKeyCommand = (command) => {
         const {editorState} = this.state;
 
-        if (command === 'myeditor-save') {
+        if (command === 'editor-save') {
             this.props.saveFn();
+            return 'handled';
+        }
+
+        if (command === 'cmd-plus') {
+            this.props.smallImg(false);
+            return 'handled';
+        }
+        if (command === 'cmd-minus') {
+            this.props.smallImg(true);
             return 'handled';
         }
 
