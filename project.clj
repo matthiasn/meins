@@ -105,14 +105,14 @@
                                                                :electron-updater "2.8.7"
                                                                :electron         "1.7.8"}
                                               ;:install-deps   true
-                                              :optimizations  :advanced
+                                              :optimizations  :simple
                                               :parallel-build true}}
                               {:id           "geocoder"
                                :source-paths ["src/cljc" "src/cljs"]
                                :compiler     {:main           iww.electron.geocoder.core
                                               :target         :nodejs
                                               :output-to      "prod/geocoder/geocoder.js"
-                                              :output-dir     "prod/geocoder"
+                                              :output-dir     "out/geocoder"
                                               ;:source-map     "prod/geonames/geonames.js.map"
                                               :externs        ["externs/externs.js"
                                                                "externs/misc.js"]
@@ -121,7 +121,7 @@
                                                                :local-reverse-geocoder "0.3.2"
                                                                :electron               "1.7.8"}
                                               ;:install-deps   true
-                                              :optimizations  :none
+                                              :optimizations  :simple
                                               :parallel-build true}}
                               {:id           "renderer"
                                :source-paths ["src/cljc" "src/cljs"]

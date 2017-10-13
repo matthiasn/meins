@@ -12,7 +12,12 @@
             [matthiasn.systems-toolbox.scheduler :as sched]
             [matthiasn.systems-toolbox.switchboard :as sb]
             [cljs.nodejs :as nodejs :refer [process]]
-            [iww.electron.main.runtime :as rt]))
+            [iww.electron.main.runtime :as rt]
+            [cljs.pprint :as pp]))
+
+(when-not (aget js/goog "global" "setTimeout")
+  (info "goog.global.setTimeout not defined - let's change that")
+  (aset js/goog "global" "setTimeout" js/setTimeout))
 
 (aset process "env" "GOOGLE_API_KEY" "AIzaSyD78NTnhgt--LCGBdIGPEg8GtBYzQl0gKU")
 
@@ -43,8 +48,7 @@
 (def app-path (:app-path rt/runtime-info))
 
 (defn start []
-  (info "Starting CORE:" (.-resourcesPath process))
-  (info "download-path" (:downloads rt/runtime-info))
+  (info "Starting CORE:" (with-out-str (pp/pprint rt/runtime-info)))
   (let [components #{(wm/cmp-map :electron/window-manager wm-relay app-path)
                      (st/cmp-map :electron/startup)
                      (ipc/cmp-map :electron/ipc-cmp)

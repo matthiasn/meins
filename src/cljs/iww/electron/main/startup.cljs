@@ -60,7 +60,7 @@
         service (spawn-process java args opts)
         std-out (.-stdout service)
         std-err (.-stderr service)]
-    (info "JVM: startup" (with-out-str (pp/pprint rt/runtime-info)))
+    (info "JVM: startup")
     (.on std-out "data" #(info "JVM " (.toString % "utf8")))
     (.on std-err "data" #(error "JVM " (.toString % "utf8")))
     {:new-state (assoc-in current-state [:service] service)}))
