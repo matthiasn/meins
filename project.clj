@@ -128,7 +128,6 @@
                                :compiler     {:main           iww.electron.renderer.core
                                               :output-to      "prod/renderer/renderer.js"
                                               ;:source-map     "prod/renderer/renderer.js.map"
-                                              ;:source-map     true
                                               :target         :nodejs
                                               :output-dir     "out/renderer"
                                               :externs        ["externs/externs.js"
@@ -143,6 +142,27 @@
                                                                :electron              "1.7.8"}
                                               ;:install-deps   true
                                               :optimizations  :simple
+                                              :parallel-build true}}
+                              {:id           "renderer-dev"
+                               :source-paths ["src/cljc" "src/cljs"]
+                               :compiler     {:main           iww.electron.renderer.core
+                                              :output-to      "dev/renderer/renderer.js"
+                                              ;:source-map     "prod/renderer/renderer.js.map"
+                                              :source-map     true
+                                              :target         :nodejs
+                                              :output-dir     "dev/renderer"
+                                              :externs        ["externs/externs.js"
+                                                               "externs/misc.js"
+                                                               "externs/leaflet.ext.js"]
+                                              :npm-deps       {:electron-log          "2.2.7"
+                                                               :react                 "15.6.1"
+                                                               :react-dom             "15.6.1"
+                                                               :draft-js              "0.10.3"
+                                                               :moment                "2.18.1"
+                                                               :electron-spellchecker "1.1.2"
+                                                               :electron              "1.7.8"}
+                                              ;:install-deps   true
+                                              :optimizations  :none
                                               :parallel-build true}}
                               {:id           "updater"
                                :source-paths ["src/cljs"]
