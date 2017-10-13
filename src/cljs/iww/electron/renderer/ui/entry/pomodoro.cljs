@@ -14,14 +14,15 @@
       (let [running? (:pomodoro-running @entry)
             completed-time (:completed-time @entry)]
         (when (= (:entry-type @entry) :pomodoro)
-          [:div.pomodoro {:on-click click}
+          [:div.pomodoro
            [:span.fa.fa-clock-o.completed]
            (when (pos? completed-time)
              (if (and edit-mode? (:edit @local))
                [:input {:value     completed-time
                         :type      :number
                         :on-change on-change}]
-               [:span.dur (u/duration-string completed-time)]))
+               [:span.dur {:on-click click}
+                (u/duration-string completed-time)]))
            (when edit-mode?
              [:span.btn {:on-click start-fn
                          :class    (if running? "stop" "start")}

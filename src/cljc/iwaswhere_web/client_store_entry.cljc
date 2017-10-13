@@ -82,18 +82,16 @@
         completed-time (:completed-time msg-payload)
         dur (+ completed-time
                (/ (- (st/now) started) 1000))
-
+        dur  #?(:cljs (js/parseInt dur)
+                :clj dur)
         new-state (assoc-in current-state [:new-entries ts :completed-time] dur)]
     (when (get-in current-state [:new-entries ts])
       (let [new-entry (get-in new-state [:new-entries ts])
-            done? (= (:planned-dur new-entry) (:completed-time new-entry))
+            done? (> (:completed-time new-entry) (:planned-dur new-entry))
             cfg (:cfg current-state)
             new-state (-> new-state
                           (assoc-in [:busy] (not done?))
-                          (assoc-in [:last-busy] (st/now)))
-            new-state (if done?
-                        (update-in new-state [:new-entries ts :pomodoro-running] not)
-                        new-state)]
+                          (assoc-in [:last-busy] (st/now)))]
         (if (:pomodoro-running new-entry)
           (do (when-not (:mute cfg)
                 (if done? (play-audio "ringer")
@@ -101,14 +99,13 @@
                             (play-audio "ticking-clock"))))
               (update-local-storage new-state)
               {:new-state new-state
-               :emit-msg  (when (not done?)
-                            [[:blink/busy {:pomodoro-completed done?}]
-                             [:cmd/schedule-new
-                              {:timeout 1000
-                               :message [:cmd/pomodoro-inc
-                                         {:started        started
-                                          :completed-time completed-time
-                                          :timestamp      ts}]}]])})
+               :emit-msg  [[:blink/busy {:pomodoro-completed done?}]
+                           [:cmd/schedule-new
+                            {:timeout 1000
+                             :message [:cmd/pomodoro-inc
+                                       {:started        started
+                                        :completed-time completed-time
+                                        :timestamp      ts}]}]]})
           {:new-state current-state})))))
 
 (defn pomodoro-start-fn

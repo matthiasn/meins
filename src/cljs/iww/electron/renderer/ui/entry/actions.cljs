@@ -6,7 +6,9 @@
             [iww.electron.renderer.ui.entry.utils :as eu]
             [iwaswhere-web.utils.misc :as u]
             [clojure.set :as set]
-            [matthiasn.systems-toolbox.component :as st]))
+            [taoensso.timbre :as timbre :refer-macros [info]]
+            [matthiasn.systems-toolbox.component :as st]
+            [clojure.pprint :as pp]))
 
 (defn trash-icon
   "Renders a trash icon, which transforms into a warning button that needs to be
@@ -36,10 +38,11 @@
     (fn [toggle-edit edit-mode? entry]
       (if edit-mode?
         (if @clicked
-          (let [discard-click-fn #(do (toggle-edit)
-                                      (swap! clicked not)
-                                      (prn "Discarding local changes:" entry))]
-            [:span.delete-warn {:on-click discard-click-fn}
+          (let [click #(do (toggle-edit)
+                           (swap! clicked not)
+                           (info "Discarding local changes:\n"
+                                 (with-out-str (pp/pprint entry))))]
+            [:span.delete-warn {:on-click click}
              [:span.fa.fa-trash] "  discard changes?"])
           [:span.fa.fa-pencil-square-o.toggle {:on-click guarded-edit-fn}])
         [:span.fa.fa-pencil-square-o.toggle {:on-click toggle-edit}]))))
