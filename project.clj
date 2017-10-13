@@ -24,7 +24,7 @@
                  [factual/geo "1.2.0"]
                  [camel-snake-kebab "0.4.0"]
                  [matthiasn/systems-toolbox-kafka "0.6.13"]
-                 [matthiasn/systems-toolbox "0.6.19"]
+                 [matthiasn/systems-toolbox "0.6.21"]
                  [matthiasn/systems-toolbox-sente "0.6.17"]
                  [matthiasn/systems-toolbox-electron "0.6.13"]
                  [reagent "0.7.0" :exclusions [cljsjs/react cljsjs/react-dom]]
@@ -45,7 +45,8 @@
 
   :source-paths ["src/cljc" "src/clj/"]
 
-  :clean-targets ^{:protect false} ["resources/public/js/build" "prod" "target" "out"]
+  :clean-targets ^{:protect false} ["resources/public/js/build" "prod" "target"
+                                    "out" "dev"]
   :auto-clean false
   :uberjar-name "iwaswhere.jar"
 
