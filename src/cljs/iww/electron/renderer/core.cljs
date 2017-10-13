@@ -27,8 +27,7 @@
                 :sente-opts  {:host     (.-iwwHOST js/window)
                               :protocol "http:"}})
 
-;(def OBSERVER (.-OBSERVER js/window))
-(def OBSERVER true)
+(def OBSERVER (.-OBSERVER js/window))
 
 (defn make-observable [components]
   (if OBSERVER

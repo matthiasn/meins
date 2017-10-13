@@ -18,7 +18,7 @@
 
 (defonce switchboard (sb/component :electron/switchboard))
 
-(def OBSERVER true)
+(def OBSERVER (:repo-dir rt/runtime-info))
 
 (defn make-observable
   [components]
