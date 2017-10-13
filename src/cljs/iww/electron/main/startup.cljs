@@ -30,7 +30,8 @@
             (info "HTTP response: " status-code (= status-code 200))
             (if (= status-code 200)
               (do (put-fn [:window/new {:url    (:index-page rt/runtime-info)
-                                        :cached true}])
+                                        ;:cached true
+                                        }])
                   (put-fn (with-meta [:window/close] {:window-id "loading"})))
               (try-again res))))
         req (http/get (clj->js {:host "localhost" :port PORT}) res-handler)]

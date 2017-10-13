@@ -19,9 +19,9 @@
 (defonce switchboard (sb/component :electron/switchboard))
 
 (def OBSERVER (:repo-dir rt/runtime-info))
+(info "OBSERVER" OBSERVER)
 
-(defn make-observable
-  [components]
+(defn make-observable [components]
   (if OBSERVER
     (let [mapper #(assoc-in % [:opts :msgs-on-firehose] true)]
       (set (mapv mapper components)))
