@@ -1,7 +1,7 @@
 (ns iww.electron.renderer.ui.entry.entry
   (:require [iww.electron.renderer.ui.leaflet :as l]
             [iww.electron.renderer.ui.media :as m]
-            [iwaswhere-web.ui.pomodoro :as pomo]
+            [iww.electron.renderer.ui.entry.pomodoro :as pomo]
             [re-frame.core :refer [subscribe]]
             [reagent.ratom :refer-macros [reaction]]
             [iwaswhere-web.utils.parse :as up]
@@ -100,7 +100,7 @@
            [:a [:time {:on-click add-search} formatted-time]]
            [:time (u/visit-duration @entry)]]
           (if (= :pomodoro (:entry-type @entry))
-            [pomo/pomodoro-header @entry pomo-start edit-mode?]
+            [pomo/pomodoro-header entry pomo-start edit-mode? put-fn]
             [:div (when-not (:comment-for @entry) [total-time-logged ts])])
           [:div
            (when (seq (:linked-entries-list @entry))

@@ -82,6 +82,7 @@
         completed-time (:completed-time msg-payload)
         dur (+ completed-time
                (/ (- (st/now) started) 1000))
+
         new-state (assoc-in current-state [:new-entries ts :completed-time] dur)]
     (when (get-in current-state [:new-entries ts])
       (let [new-entry (get-in new-state [:new-entries ts])
