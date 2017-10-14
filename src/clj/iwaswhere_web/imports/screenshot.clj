@@ -1,15 +1,16 @@
 (ns iwaswhere-web.imports.screenshot
-  "This namespace does imports, for example of photos."
   (:require [clojure.pprint :as pp]
             [clojure.java.shell :refer [sh]]
             [clojure.tools.logging :as log]
             [iwaswhere-web.file-utils :as fu]))
 
-
 (defn import-screenshot [{:keys [put-fn msg-meta msg-payload]}]
-  (let [filename (str fu/img-path (:filename msg-payload))]
+  (let [filename (str fu/img-path (:filename msg-payload))
+        os (System/getProperty "os.name")]
     (log/info "importing screenshot" filename)
-    (sh "/usr/sbin/screencapture" filename)
-    (sh "/usr/bin/scrot" filename))
+    (when (= os "Mac OS X")
+      (sh "/usr/sbin/screencapture" filename))
+    (when (= os "Linux")
+      (sh "/usr/bin/scrot" filename)))
   {:emit-msg [:cmd/schedule-new
               {:timeout 3000 :message (with-meta [:search/refresh] msg-meta)}]})
