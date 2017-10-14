@@ -27,6 +27,7 @@
 (def sente-map
   {:index-page-fn index-page
    :routes-fn     routes-fn
+   :host          "0.0.0.0"
    :port          8765
    :relay-types   #{:entry/saved :entry/found :state/new
                     :stats/result :stats/result2 :state/stats-tags :cmd/toggle-key

@@ -1,6 +1,8 @@
 (ns iwaswhere-web.client-store
-  (:require #?(:cljs [reagent.core :refer [atom]])
+  (:require
+    #?(:cljs [reagent.core :refer [atom]])
     [matthiasn.systems-toolbox.component :as st]
+    [re-frame.db :as rdb]
     [iwaswhere-web.client-store-entry :as cse]
     [iwaswhere-web.client-store-search :as s]
     [iwaswhere-web.client-store-cfg :as c]
@@ -9,7 +11,7 @@
 (defn new-state-fn
   "Update client side state with list of journal entries received from backend."
   [{:keys [current-state msg-payload msg-meta]}]
-  (let [store-meta (:renderer/store-cmp msg-meta)
+  (let [store-meta (:client/store-cmp msg-meta)
         {:keys [entries entries-map]} msg-payload
         new-state (-> current-state
                       (assoc-in [:results] entries)
@@ -61,6 +63,7 @@
 
 (defn initial-state-fn [put-fn]
   (let [initial-state (atom {:entries         []
+                             :greeting "Hello iWasWhere!"
                              :last-alive      (st/now)
                              :new-entries     @cse/new-entries-ls
                              :query-cfg       @s/query-cfg
@@ -68,7 +71,7 @@
                              :task-stats      (sorted-map)
                              :wordcount-stats (sorted-map)
                              :options         {:pvt-hashtags #{"#pvt"}}
-                             :cfg             cfg})]
+                             :cfg             @c/app-cfg})]
     (put-fn [:state/stats-tags-get])
     (put-fn [:stats/get2])
     (put-fn [:cfg/refresh])
