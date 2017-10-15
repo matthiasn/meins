@@ -20,7 +20,25 @@
 (def image (r/adapt-react-class (.-Image ReactNative)))
 (def touchable-highlight (r/adapt-react-class (.-TouchableHighlight ReactNative)))
 (def logo-img (js/require "./images/icon.png"))
+(def health-kit (js/require "rn-apple-healthkit"))
 
+(def health-kit-opts
+  (clj->js
+    {:permissions {:read  ["Height" "Weight" "StepCount" "BodyMassIndex"
+                           "FlightsClimbed"]
+                   :write ["Weight" "StepCount" "BodyMassIndex"]}}))
+
+(defn get-steps [y m d put-fn local]
+  (let [d (js/Date. y m d)
+        opts (clj->js {:date (.toISOString d)})
+        cb (fn [err res]
+             (let [res (js->clj res)]
+               (put-fn [:health/res {:steps res :err err}])
+               (swap! local assoc-in [:steps] res)))
+        init-cb (fn [err res] (.getStepCount health-kit opts cb))]
+    (.initHealthKit health-kit health-kit-opts init-cb)))
+
+(.log js/console "foooooooooooooo")
 
 (defonce switchboard (sb/component :client/switchboard))
 
@@ -41,7 +59,7 @@
                                :state/stats-tags-get :import/weight :import/listen
                                :state/search :cfg/refresh :firehose/cmp-recv
                                :firehose/cmp-put}
-                :sente-opts  {:host "localhost:8765"}})
+                :sente-opts  {:host "192.168.0.104:8765"}})
 
 (defn alert [title]
   (.alert (.-Alert ReactNative) title))
@@ -68,7 +86,7 @@
                :style  {:width         80
                         :height        80
                         :margin-bottom 10}}]
-       [text-input {:style          {:height           320
+       [text-input {:style          {:height           300
                                      :font-weight      "100"
                                      :padding          10
                                      :font-size        20
@@ -86,6 +104,7 @@
                           new-entry (p/parse-entry (:md @local))
                           new-entry-fn (h/new-entry-fn put-fn new-entry nil)]
                       (new-entry-fn)
+                      (get-steps 2017 9 1 put-fn local)
                       (swap! local assoc-in [:md] "")
                       (put-fn [:stats/get2]))}
         [text {:style {:color       "white"
@@ -93,10 +112,11 @@
                        :font-weight "bold"}}
          "press me"]]
        [text {:style {:font-size     30
-                      :font-weight   "100"
+                      :font-weight   "500"
                       :margin-bottom 20
                       :text-align    "center"}}
-        (:open-tasks-cnt @stats) " open tasks"]])))
+        (:open-tasks-cnt @stats) " open tasks "
+        (str (:steps @local))]])))
 
 (defn init []
   (dispatch-sync [:initialize-db])
@@ -105,7 +125,6 @@
                      (sched/cmp-map :app/scheduler-cmp)
                      (ui/cmp-map :app/ui-cmp)}
         components (make-observable components)]
-    (prn components)
     (sb/send-mult-cmd
       switchboard
       [[:cmd/init-comp components]
@@ -130,6 +149,4 @@
 
        [:cmd/route {:from :app/scheduler-cmp
                     :to   #{:app/store-cmp
-                            :app/ws-cmp}}]
-       ]))
-  )
+                            :app/ws-cmp}}]])))

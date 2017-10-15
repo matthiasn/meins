@@ -28,7 +28,8 @@
                                                  :compiler     {:output-to     "target/ios/not-used.js"
                                                                 :main          "env.ios.main"
                                                                 :output-dir    "target/ios"
-                                                                :optimizations :none}}
+                                                                :optimizations :none
+                                                                :npm-deps {:rn-apple-healthkit "0.6.1"}}}
                                                 {:id           "android"
                                                  :source-paths ["src" "env/dev"]
                                                  :figwheel     true

@@ -1,0 +1,2 @@
+var modules={'react-native': require('react-native'), 'react': require('react'), 'create-react-class': require('create-react-class')};modules['react-native']=require('react-native');modules['./images/cljs.png']=require('./images/cljs.png');modules['react-native']=require('react-native');modules['./images/cljs.png']=require('./images/cljs.png');
+require('figwheel-bridge').withModules(modules).start('iWasWhereApp','android','localhost');

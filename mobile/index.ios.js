@@ -1,0 +1,2 @@
+var modules={'react-native': require('react-native'), 'react': require('react'), 'create-react-class': require('create-react-class')};modules['react-native']=require('react-native');modules['./images/cljs.png']=require('./images/cljs.png');modules['react-native']=require('react-native');modules['./images/icon.png']=require('./images/icon.png');modules['rn-apple-healthkit']=require('rn-apple-healthkit');
+require('figwheel-bridge').withModules(modules).start('iWasWhereApp','ios','192.168.0.104');
