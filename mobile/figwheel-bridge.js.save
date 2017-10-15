@@ -1,5 +1,5 @@
-/*
- * Originally taken from https://github.com/decker405/figwheel-react-native
+AAAOAOOBBBBBOBOBBBBBOBOOOOAAOAOAO/*
+ * Originally taken frBOBom https://github.com/decker405/figwheel-react-native
  *
  * @providesModule figwheel-bridge
  */
@@ -190,7 +190,7 @@ function loadApp(platform, devHost, onLoadCb) {
     var fileBasePath = serverBaseUrl((isChrome() ? "localhost" : devHost)) + "/" + config.basePath + platform;
 
     // callback when app is ready to get the reloadable component
-    var mainJs = `/env/${platform}/main.js`;
+    var mainJs = '/figwheel/connect/build_' + platform + '.js';
     evalListeners.waitForFinalEval = function (url) {
         if (url.indexOf(mainJs) > -1) {
 	    assertRootElExists(platform);
@@ -212,7 +212,7 @@ function loadApp(platform, devHost, onLoadCb) {
                 // seriously React packager? why.
                 var googreq = goog.require;
 
-                googreq(`env.${platform}.main`);
+                googreq('figwheel.connect.build_' + platform);
             });
         });
     }

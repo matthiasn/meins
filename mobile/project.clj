@@ -29,7 +29,7 @@
                                                                 :main          "env.ios.main"
                                                                 :output-dir    "target/ios"
                                                                 :optimizations :none
-                                                                :npm-deps {:rn-apple-healthkit "0.6.1"}}}
+                                                                :npm-deps      {:rn-apple-healthkit "0.6.1"}}}
                                                 {:id           "android"
                                                  :source-paths ["src" "env/dev"]
                                                  :figwheel     true
@@ -41,16 +41,17 @@
                         :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}}
              :prod     {:cljsbuild {:builds [
                                              {:id           "ios"
-                                              :source-paths ["src" "env/prod"]
+                                              :source-paths ["src/cljc" "src/cljs" "env/prod"]
                                               :compiler     {:output-to          "index.ios.js"
                                                              :main               "env.ios.main"
                                                              :output-dir         "target/ios"
                                                              :static-fns         true
                                                              :optimize-constants true
                                                              :optimizations      :simple
+                                                             :npm-deps           {:rn-apple-healthkit "0.6.1"}
                                                              :closure-defines    {"goog.DEBUG" false}}}
                                              {:id           "android"
-                                              :source-paths ["src" "env/prod"]
+                                              :source-paths ["src/cljc" "src/cljs" "env/prod"]
                                               :compiler     {:output-to          "index.android.js"
                                                              :main               "env.android.main"
                                                              :output-dir         "target/android"

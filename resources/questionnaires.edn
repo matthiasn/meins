@@ -950,6 +950,11 @@
                              :k    :cnt
                              :cls  "done"}
                             {:type :barchart-row
+                             :tag  "#flights-of-stairs"
+                             :h    33
+                             :k    :cnt
+                             :cls  "done"}
+                            {:type :barchart-row
                              :tag  "#sleep"
                              :h    33
                              :k    :duration

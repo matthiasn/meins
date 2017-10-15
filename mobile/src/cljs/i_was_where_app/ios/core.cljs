@@ -21,6 +21,7 @@
 (def touchable-highlight (r/adapt-react-class (.-TouchableHighlight ReactNative)))
 (def logo-img (js/require "./images/icon.png"))
 (def health-kit (js/require "rn-apple-healthkit"))
+(def moment (js/require "moment"))
 
 (def health-kit-opts
   (clj->js
@@ -28,17 +29,30 @@
                            "FlightsClimbed"]
                    :write ["Weight" "StepCount" "BodyMassIndex"]}}))
 
-(defn get-steps [y m d put-fn local]
-  (let [d (js/Date. y m d)
+(defn get-steps [days-ago put-fn local]
+  (let [d (js/Date.)
+        _ (.setTime d (- (.getTime d) (* days-ago 24 60 60 1000)))
         opts (clj->js {:date (.toISOString d)})
-        cb (fn [err res]
-             (let [res (js->clj res)]
-               (put-fn [:health/res {:steps res :err err}])
-               (swap! local assoc-in [:steps] res)))
-        init-cb (fn [err res] (.getStepCount health-kit opts cb))]
+        cb (fn [tag]
+             (fn [err res]
+               (let [res (js->clj res)
+                     v (get-in res ["value"])
+                     end-date (get-in res ["endDate"])]
+                 (when v
+                   (let [end-ts (.valueOf (moment end-date))
+                         cnt (js/parseInt v)]
+                     (put-fn [:entry/update
+                              {:timestamp      end-ts
+                               :md             (str cnt " " tag)
+                               :tags           #{tag}
+                               :linked-stories #{1475314976880}
+                               :primary-story  1475314976880
+                               :custom-fields  {tag {:cnt cnt}}}])))
+                 (swap! local assoc-in [:steps] res))))
+        init-cb (fn [err res]
+                  (.getFlightsClimbed health-kit opts (cb "#flights-of-stairs"))
+                  (.getStepCount health-kit opts (cb "#steps")))]
     (.initHealthKit health-kit health-kit-opts init-cb)))
-
-(.log js/console "foooooooooooooo")
 
 (defonce switchboard (sb/component :client/switchboard))
 
@@ -59,7 +73,7 @@
                                :state/stats-tags-get :import/weight :import/listen
                                :state/search :cfg/refresh :firehose/cmp-recv
                                :firehose/cmp-put}
-                :sente-opts  {:host "192.168.0.104:8765"}})
+                :sente-opts  {:host "172.20.10.2:8765"}})
 
 (defn alert [title]
   (.alert (.-Alert ReactNative) title))
@@ -70,12 +84,12 @@
         local (r/atom {:md "hello world"})]
     (fn []
       [view {:style {:flex-direction   "column"
-                     :padding-top      40
-                     :padding-bottom   40
+                     :padding-top      30
+                     :padding-bottom   30
                      :padding-left     20
                      :padding-right    20
                      :height           "100%"
-                     :background-color "#EEE"
+                     :background-color "#222"
                      :align-items      "center"}}
        #_[text {:style {:font-size     30
                         :font-weight   "100"
@@ -85,15 +99,16 @@
        [image {:source logo-img
                :style  {:width         80
                         :height        80
-                        :margin-bottom 10}}]
-       [text-input {:style          {:height           300
+                        :margin-bottom 5}}]
+       [text-input {:style          {:height           280
                                      :font-weight      "100"
                                      :padding          10
                                      :font-size        20
-                                     :background-color :white
+                                     :background-color "#CCC"
                                      :width            "100%"}
                     :multiline      true
                     :default-value  (:md @local)
+                    :keyboard-type  "twitter"
                     :on-change-text (fn [text]
                                       (swap! local assoc-in [:md] text))}]
        [touchable-highlight
@@ -104,7 +119,8 @@
                           new-entry (p/parse-entry (:md @local))
                           new-entry-fn (h/new-entry-fn put-fn new-entry nil)]
                       (new-entry-fn)
-                      (get-steps 2017 9 1 put-fn local)
+                      (dotimes [n 365]
+                        (get-steps n put-fn local))
                       (swap! local assoc-in [:md] "")
                       (put-fn [:stats/get2]))}
         [text {:style {:color       "white"
@@ -113,6 +129,7 @@
          "press me"]]
        [text {:style {:font-size     30
                       :font-weight   "500"
+                      :color         "#CCC"
                       :margin-bottom 20
                       :text-align    "center"}}
         (:open-tasks-cnt @stats) " open tasks "
