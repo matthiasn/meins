@@ -6,9 +6,7 @@
     [iwaswhere-web.client-store-cfg :as c]
     [iwaswhere-web.utils.misc :as u]))
 
-(defn new-state-fn
-  "Update client side state with list of journal entries received from backend."
-  [{:keys [current-state msg-payload msg-meta]}]
+(defn new-state-fn [{:keys [current-state msg-payload msg-meta]}]
   (let [store-meta (:renderer/store-cmp msg-meta)
         {:keys [entries entries-map]} msg-payload
         new-state (-> current-state
@@ -20,9 +18,7 @@
                                            :count (count entries-map)}))]
     {:new-state new-state}))
 
-(defn stats-tags-fn
-  "Update client side state with stats and tags received from backend."
-  [{:keys [current-state msg-payload put-fn]}]
+(defn stats-tags-fn [{:keys [current-state msg-payload put-fn]}]
   (let [stories (:stories msg-payload)
         sorted-stories (sort (fn [[_ x] [_ y]]
                                (< (:story-name x) (:story-name y)))
@@ -49,9 +45,7 @@
             (assoc-in [:cfg :briefing] (-> msg-payload :cfg :briefing)))]
     {:new-state new-state}))
 
-(defn stats-tags-fn2
-  "Update client side state with stats and tags received from backend."
-  [{:keys [current-state msg-payload put-fn]}]
+(defn stats-tags-fn2 [{:keys [current-state msg-payload put-fn]}]
   (let [new-state (merge current-state msg-payload)]
     {:new-state new-state}))
 
@@ -60,20 +54,21 @@
     {:new-state new-state}))
 
 (defn initial-state-fn [put-fn]
-  (let [initial-state (atom {:entries         []
-                             :last-alive      (st/now)
-                             :new-entries     @cse/new-entries-ls
-                             :query-cfg       @s/query-cfg
-                             :pomodoro-stats  (sorted-map)
-                             :task-stats      (sorted-map)
-                             :wordcount-stats (sorted-map)
-                             :options         {:pvt-hashtags #{"#pvt"}}
-                             :cfg             cfg})]
+  (let [cfg (assoc-in @c/app-cfg [:qr-code] false)
+        state (atom {:entries         []
+                     :last-alive      (st/now)
+                     :new-entries     @cse/new-entries-ls
+                     :query-cfg       @s/query-cfg
+                     :pomodoro-stats  (sorted-map)
+                     :task-stats      (sorted-map)
+                     :wordcount-stats (sorted-map)
+                     :options         {:pvt-hashtags #{"#pvt"}}
+                     :cfg             cfg})]
     (put-fn [:state/stats-tags-get])
     (put-fn [:stats/get2])
     (put-fn [:cfg/refresh])
-    (put-fn [:state/search (u/search-from-cfg @initial-state)])
-    {:state initial-state}))
+    (put-fn [:state/search (u/search-from-cfg @state)])
+    {:state state}))
 
 (defn save-stats-fn [{:keys [current-state msg-payload]}]
   (let [k (case (:type msg-payload)

@@ -90,7 +90,8 @@
         entry (loc/enrich-geoname entry)
         g (:graph current-state)
         prev (when (uc/has-node? g ts) (uc/attrs g ts))
-        new-state (ga/add-node current-state ts entry false)]
+        new-state (ga/add-node current-state ts entry false)
+        broadcast-meta (merge msg-meta {:sente-uid :broadcast})]
     (when (System/getenv "CACHED_APPSTATE")
       (future (persist-state! new-state)))
     (when (not= (dissoc prev :last-saved)
@@ -99,7 +100,7 @@
     {:new-state    new-state
      :send-to-self (when-let [comment-for (:comment-for msg-payload)]
                      (with-meta [:entry/find {:timestamp comment-for}] msg-meta))
-     :emit-msg     [(with-meta [:entry/saved entry] {:sente-uid :broadcast})
+     :emit-msg     [(with-meta [:entry/saved entry] broadcast-meta)
                     [:ft/add entry]]}))
 
 (defn move-attachment-to-trash
