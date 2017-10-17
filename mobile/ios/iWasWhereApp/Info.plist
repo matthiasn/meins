@@ -2,18 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>save photos taken in app to camera roll</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>taking audio notes</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>upload photos to iWasWhere desktop app</string>
-	<key>NSCameraUsageDescription</key>
-	<string>taking photos</string>
-	<key>NSHealthUpdateUsageDescription</key>
-	<string>iWasWhere Update</string>
-	<key>NSHealthShareUsageDescription</key>
-	<string>upload health data to iWasWhere on the desktop</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -21,7 +9,7 @@
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
-	<string>org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)</string>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -36,6 +24,31 @@
 	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>localhost</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
+		</dict>
+	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>taking photos</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>upload health data to iWasWhere on the desktop</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>iWasWhere Update</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string></string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>taking audio notes</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>save photos taken in app to camera roll</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>upload photos to iWasWhere desktop app</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIRequiredDeviceCapabilities</key>
@@ -50,18 +63,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
-	<key>NSAppTransportSecurity</key>
-	<dict>
-		<key>NSExceptionDomains</key>
-		<dict>
-			<key>localhost</key>
-			<dict>
-				<key>NSExceptionAllowsInsecureHTTPLoads</key>
-				<true/>
-			</dict>
-		</dict>
-	</dict>
 </dict>
 </plist>
