@@ -19,8 +19,7 @@
   (let [test-ts (System/currentTimeMillis)
         {:keys [current-state logs-path test-path]} (st/mk-test-state test-ts)]
     (with-redefs [fu/daily-logs-path logs-path
-                  fu/app-cache-file (str test-path "/cache.dat")
-                  loc/enrich-geoname stc/enrich-geoname-mock]
+                  fu/app-cache-file (str test-path "/cache.dat")]
       (let [simple-query-uid (comp/make-uuid)
             simple-query2-uid (comp/make-uuid)
             no-results-query-uid (comp/make-uuid)

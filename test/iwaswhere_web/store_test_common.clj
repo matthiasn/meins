@@ -74,12 +74,3 @@
   [acc entry]
   (:new-state (f/geo-entry-persist-fn {:current-state acc
                                        :msg-payload   entry})))
-
-(defn enrich-geoname-mock [entry]
-  (assoc-in entry [:geoname] {:admin-1-name "Lower Saxony"
-                              :admin-2-name nil
-                              :admin-3-name "Landkreis Heidekreis"
-                              :admin-4-name "Bispingen"
-                              :country-code "DE"
-                              :geo-name-id  "2948222"
-                              :name         "Bispingen"}))

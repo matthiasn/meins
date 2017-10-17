@@ -40,7 +40,6 @@
   [{:keys [current-state msg-payload]}]
   (let [id (or (:id msg-payload) (uuid/v1))
         entry (merge msg-payload {:last-saved (st/now) :id id})
-        entry (loc/enrich-geoname entry)
         ts (:timestamp entry)
         graph (:graph current-state)
         exists? (uc/has-node? graph ts)
@@ -87,7 +86,6 @@
   (let [ts (:timestamp msg-payload)
         id (or (:id msg-payload) (uuid/v1))
         entry (merge msg-payload {:last-saved (st/now) :id id})
-        entry (loc/enrich-geoname entry)
         g (:graph current-state)
         prev (when (uc/has-node? g ts) (uc/attrs g ts))
         new-state (ga/add-node current-state ts entry false)

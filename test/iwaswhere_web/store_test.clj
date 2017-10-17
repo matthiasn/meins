@@ -66,10 +66,9 @@
      storing the hashtags and mentions in graph."
     (let [test-ts (System/currentTimeMillis)
           {:keys [current-state test-path logs-path]} (mk-test-state test-ts)
-          test-entry (stc/enrich-geoname-mock (mk-test-entry test-ts))]
+          test-entry (mk-test-entry test-ts)]
       (with-redefs [fu/data-path test-path
-                    fu/daily-logs-path logs-path
-                    loc/enrich-geoname stc/enrich-geoname-mock]
+                    fu/daily-logs-path logs-path]
         (let [{:keys [new-state emit-msg]}
               (f/geo-entry-persist-fn {:current-state current-state
                                        :msg-payload   test-entry})
@@ -147,10 +146,9 @@
                                     {:tags     #{"#testing" "#new" "#entry"}
                                      :md       "Some #testing #entry @me #new"
                                      :mentions #{"@me"}})
-          updated-test-entry (stc/enrich-geoname-mock updated-test-entry)]
+          updated-test-entry updated-test-entry]
       (with-redefs [fu/data-path test-path
-                    fu/daily-logs-path logs-path
-                    loc/enrich-geoname stc/enrich-geoname-mock]
+                    fu/daily-logs-path logs-path]
         (let [{:keys [new-state]} (f/geo-entry-persist-fn
                                     {:current-state current-state
                                      :msg-payload   test-entry})
