@@ -21,6 +21,8 @@
 (def touchable-highlight (r/adapt-react-class (.-TouchableHighlight ReactNative)))
 (def logo-img (js/require "./images/icon.png"))
 (def health-kit (js/require "rn-apple-healthkit"))
+(def react-native-camera (js/require "react-native-camera"))
+(def cam (r/adapt-react-class react-native-camera))
 (def moment (js/require "moment"))
 
 (def health-kit-opts
@@ -100,6 +102,7 @@
                :style  {:width         80
                         :height        80
                         :margin-bottom 5}}]
+       ;[cam {}]
        [text-input {:style          {:height           280
                                      :font-weight      "100"
                                      :padding          10
@@ -127,6 +130,22 @@
                        :text-align  "center"
                        :font-weight "bold"}}
          "press me"]]
+       [touchable-highlight
+        {:style    {:background-color "#999"
+                    :padding          10
+                    :border-radius    5}
+         :on-press #(let [put-fn @ui/put-fn-atom
+                          new-entry (p/parse-entry (:md @local))
+                          new-entry-fn (h/new-entry-fn put-fn new-entry nil)]
+                      (new-entry-fn)
+                      (dotimes [n 365]
+                        (get-steps n put-fn local))
+                      (swap! local assoc-in [:md] "")
+                      (put-fn [:stats/get2]))}
+        [text {:style {:color       "white"
+                       :text-align  "center"
+                       :font-weight "bold"}}
+         "cam"]]
        [text {:style {:font-size     30
                       :font-weight   "500"
                       :color         "#CCC"

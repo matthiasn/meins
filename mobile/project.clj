@@ -7,8 +7,10 @@
                  [org.clojure/clojurescript "1.9.946"]
                  [matthiasn/systems-toolbox "0.6.21"]
                  [matthiasn/systems-toolbox-sente "0.6.17"]
-                 [reagent "0.7.0" :exclusions [cljsjs/react cljsjs/react-dom cljsjs/react-dom-server cljsjs/create-react-class]]
-                 [re-frame "0.9.2"]]
+                 [reagent "0.7.0" :exclusions [cljsjs/react cljsjs/react-dom
+                                               cljsjs/react-dom-server
+                                               cljsjs/create-react-class]]
+                 [re-frame "0.10.2"]]
   :plugins [[lein-cljsbuild "1.1.7"]
             [lein-figwheel "0.5.14"]]
   :clean-targets ["target/" "index.ios.js" "index.android.js" #_($PLATFORM_CLEAN$)]
@@ -21,15 +23,15 @@
   :profiles {:dev      {:dependencies [[figwheel-sidecar "0.5.14"]
                                        [com.cemerick/piggieback "0.2.2"]]
                         :source-paths ["src" "env/dev"]
-                        :cljsbuild    {:builds [
-                                                {:id           "ios"
+                        :cljsbuild    {:builds [{:id           "ios"
                                                  :source-paths ["src/cljc" "src/cljs" "env/dev"]
                                                  :figwheel     true
                                                  :compiler     {:output-to     "target/ios/not-used.js"
                                                                 :main          "env.ios.main"
                                                                 :output-dir    "target/ios"
                                                                 :optimizations :none
-                                                                :npm-deps      {:rn-apple-healthkit "0.6.1"}}}
+                                                                :npm-deps      {:react-native-camera "0.10.0"
+                                                                                :rn-apple-healthkit  "0.6.1"}}}
                                                 {:id           "android"
                                                  :source-paths ["src" "env/dev"]
                                                  :figwheel     true
