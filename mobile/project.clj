@@ -30,6 +30,7 @@
                                                                 :main          "env.ios.main"
                                                                 :output-dir    "target/ios"
                                                                 :optimizations :none
+                                                                :target        :nodejs
                                                                 :npm-deps      {:react-native-camera "0.10.0"
                                                                                 :rn-apple-healthkit  "0.6.1"}}}
                                                 {:id           "android"

@@ -9,21 +9,19 @@
             [matthiasn.systems-toolbox-sente.client :as sente]
             [matthiasn.systems-toolbox.scheduler :as sched]
             [i-was-where-app.subs]
+            [react-native :refer [TextInput View Text Image TouchableHighlight]]
+            [react-native-camera]
+            [moment]
+            [rn-apple-healthkit :as health-kit]
             [iwaswhere-web.utils.parse :as p]))
 
-(def ReactNative (js/require "react-native"))
-
-(def app-registry (.-AppRegistry ReactNative))
-(def text (r/adapt-react-class (.-Text ReactNative)))
-(def text-input (r/adapt-react-class (.-TextInput ReactNative)))
-(def view (r/adapt-react-class (.-View ReactNative)))
-(def image (r/adapt-react-class (.-Image ReactNative)))
-(def touchable-highlight (r/adapt-react-class (.-TouchableHighlight ReactNative)))
+(def text (r/adapt-react-class Text))
+(def text-input (r/adapt-react-class TextInput))
+(def view (r/adapt-react-class View))
+(def image (r/adapt-react-class Image))
+(def touchable-highlight (r/adapt-react-class TouchableHighlight))
 (def logo-img (js/require "./images/icon.png"))
-(def health-kit (js/require "rn-apple-healthkit"))
-(def react-native-camera (js/require "react-native-camera"))
 (def cam (r/adapt-react-class react-native-camera))
-(def moment (js/require "moment"))
 
 (def health-kit-opts
   (clj->js
@@ -78,7 +76,7 @@
                 :sente-opts  {:host "172.20.10.2:8765"}})
 
 (defn alert [title]
-  (.alert (.-Alert ReactNative) title))
+  (.alert (.-Alert react-native) title))
 
 (defn app-root []
   (let [greeting (subscribe [:get-greeting])
