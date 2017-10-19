@@ -114,6 +114,10 @@
                {:label       "Toggle Split View"
                 :accelerator "CmdOrCtrl+Alt+S"
                 :click       #(put-fn [:cmd/toggle-key {:path [:cfg :single-column]}])}
+               {:type "separator"}
+               {:role "zoomin"}
+               {:role "zoomout"}
+               {:type "separator"}
                {:label       "Open Dev Tools"
                 :accelerator "CmdOrCtrl+Alt+I"
                 :click       #(put-fn [:window/dev-tools])}]}))
