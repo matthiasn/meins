@@ -71,27 +71,21 @@
 
   :test2junit-run-ant true
 
-  :aliases {"sass"  ["do"
-                     ["shell" "sass" "src/scss/iwaswhere.scss" "resources/public/css/iwaswhere.css"]
-                     ["shell" "sass" "src/scss/updater.scss" "resources/public/css/updater.css"]
-                     ["shell" "sass" "src/scss/loader.scss" "resources/public/css/loader.css"]]
-            "build" ["do"
-                     ["clean"]
-                     ["test"]
-                     ["shell" "yarn" "install"]
-                     ["cljsbuild" "once" "main"]
-                     ["cljsbuild" "once" "renderer"]
-                     ["cljsbuild" "once" "geocoder"]
-                     ["cljsbuild" "once" "updater"]
-                     ["sass"]
-                     ["uberjar"]
-                     ["shell" "cp" "target/iwaswhere.jar" "bin/"]]
-            "dist"  ["do"
-                     ["build"]
-                     ["shell" "./publish.sh"]]
-            "beta"  ["do"
-                     ["build"]
-                     ["shell" "./publish_beta.sh"]]}
+  :aliases {"sass" ["do"
+                    ["shell" "sass" "src/scss/iwaswhere.scss" "resources/public/css/iwaswhere.css"]
+                    ["shell" "sass" "src/scss/updater.scss" "resources/public/css/updater.css"]
+                    ["shell" "sass" "src/scss/loader.scss" "resources/public/css/loader.css"]]
+            "dist" ["do"
+                    ["clean"]
+                    ["test"]
+                    ["shell" "yarn" "install"]
+                    ["cljsbuild" "once" "main"]
+                    ["cljsbuild" "once" "renderer"]
+                    ["cljsbuild" "once" "geocoder"]
+                    ["cljsbuild" "once" "updater"]
+                    ["sass"]
+                    ["uberjar"]
+                    ["shell" "cp" "target/iwaswhere.jar" "bin/"]]}
 
   :cljsbuild {:test-commands {"cljs-test" ["phantomjs" "test/phantom/test.js" "test/phantom/test.html"]}
               :builds        [{:id           "main"
