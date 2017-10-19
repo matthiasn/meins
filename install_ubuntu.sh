@@ -18,3 +18,4 @@ npm install -g electron-build-env
 npm install -g electron-publisher-s3
 npm install -g node-gyp
 npm install -g yarn
+npm install -g webpack

@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 
-cd bundle
-yarn install
-webpack -p
-cd ..
-
 yarn install
 
 mkdir bin
 rm -rf ./dist
 lein dist
+
+cd bundle
+yarn install
+webpack -p
+cd ..
 
 PLATFORMS=$1
 ELECTRON_BUILDER_COMPRESSION_LEVEL=3
