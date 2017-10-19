@@ -8,7 +8,7 @@
   (let [user-data (.getPath app "userData")
         cwd (.cwd process)
         rp (.-resourcesPath process)
-        repo-dir (s/includes? rp "Electron.app")
+        repo-dir (s/includes? (s/lower-case rp) "electron")
         app-path (if repo-dir cwd (str rp "/app"))
         platform (.-platform process)
         download-path (.getPath app "downloads")

@@ -5,9 +5,9 @@ yarn install
 webpack -p
 cd ..
 
-npm update -g electron-builder
-npm update -g electron-publisher-s3
+yarn install
 
+mkdir bin
 rm -rf ./dist
 lein dist
 

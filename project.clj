@@ -78,7 +78,6 @@
             "dist" ["do"
                     ["clean"]
                     ["test"]
-                    ["shell" "yarn" "install"]
                     ["cljsbuild" "once" "main"]
                     ["cljsbuild" "once" "renderer"]
                     ["cljsbuild" "once" "geocoder"]
