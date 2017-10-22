@@ -12,7 +12,6 @@
             [iwaswhere-web.store :as st]
             [iwaswhere-web.fulltext-search :as ft]
             [iwaswhere-web.upload :as up]
-            [iwaswhere-web.blink :as bl]
             [iwaswhere-web.backup :as bak]
             [iwaswhere-web.imports :as i]
             [iwaswhere-web.export :as e]
@@ -49,7 +48,6 @@
                      (st/cmp-map :server/store-cmp)
                      (bak/cmp-map :server/backup-cmp)
                      (up/cmp-map :server/upload-cmp)
-                     (bl/cmp-map :server/blink-cmp)
                      (ft/cmp-map :server/ft-cmp)}
         components (make-observable components)]
     (sb/send-mult-cmd
@@ -58,7 +56,6 @@
 
        [:cmd/route {:from :server/ws-cmp
                     :to   #{:server/store-cmp
-                            :server/blink-cmp
                             :server/export-cmp
                             :server/upload-cmp
                             :server/imports-cmp}}]
@@ -76,14 +73,12 @@
 
        [:cmd/route {:from :server/scheduler-cmp
                     :to   #{:server/store-cmp
-                            :server/blink-cmp
                             :server/backup-cmp
                             :server/imports-cmp
                             :server/upload-cmp
                             :server/ws-cmp}}]
 
        [:cmd/route {:from #{:server/store-cmp
-                            :server/blink-cmp
                             :server/upload-cmp
                             :server/backup-cmp
                             :server/imports-cmp}

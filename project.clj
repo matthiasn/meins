@@ -97,6 +97,7 @@
                                                                "externs/misc.js"]
                                               :npm-deps       {:electron-log     "2.2.7"
                                                                :electron-updater "2.8.7"
+                                                               :moment           "2.18.1"
                                                                :electron         "1.7.8"}
                                               ;:install-deps   true
                                               :optimizations  :simple

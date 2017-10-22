@@ -6,6 +6,7 @@
             [matthiasn.systems-toolbox-electron.window-manager :as wm]
             [iww.electron.main.menu :as menu]
             [iww.electron.main.update :as upd]
+            [iww.electron.main.blink :as bl]
             [iww.electron.main.geocoder :as geocoder]
             [iww.electron.main.startup :as st]
             [electron :refer [app]]
@@ -52,6 +53,7 @@
   (let [components #{(wm/cmp-map :electron/window-manager wm-relay app-path)
                      (st/cmp-map :electron/startup)
                      (ipc/cmp-map :electron/ipc-cmp)
+                     (bl/cmp-map :electron/blink)
                      (upd/cmp-map :electron/updater)
                      (sched/cmp-map :electron/scheduler)
                      (menu/cmp-map :electron/menu-cmp)
@@ -72,14 +74,19 @@
                     :to   #{:electron/updater
                             :electron/window-manager
                             :electron/geocoder
+                            :electron/blink
                             :electron/startup}}]
 
        [:cmd/route {:from :electron/ipc-cmp
                     :to   #{:electron/startup
                             :electron/updater
                             :electron/geocoder
+                            :electron/blink
                             :electron/scheduler
                             :electron/window-manager}}]
+
+       [:cmd/route {:from :electron/blink
+                    :to   :electron/scheduler}]
 
        [:cmd/route {:from :electron/window-manager
                     :to   :electron/startup}]

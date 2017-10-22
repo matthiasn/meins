@@ -29,7 +29,7 @@
           (let [status-code (.-statusCode res)]
             (info "HTTP response: " status-code (= status-code 200))
             (if (= status-code 200)
-              (do (put-fn [:window/new {:url    (:index-page rt/runtime-info)
+              (do (put-fn [:window/new {:url (:index-page rt/runtime-info)
                                         ;:cached true
                                         }])
                   (put-fn (with-meta [:window/close] {:window-id "loading"})))
@@ -42,21 +42,15 @@
   (info "STARTUP: spawning" cmd args opts)
   (spawn cmd (clj->js args) (clj->js opts)))
 
-(defn fork-process [args opts]
-  (info "STARTUP: forking" args opts)
-  (fork (clj->js args) (clj->js opts)))
-
 (defn start-jvm [{:keys [current-state]}]
   (let [{:keys [user-data app-path jar blink data-path java cwd
                 repo-dir]} rt/runtime-info
         args ["-Dapple.awt.UIElement=true" "-XX:+AggressiveOpts" "-jar" jar]
         opts {:detached false
               :cwd      user-data
-              :env      {:PORT            PORT
-                         :DATA_PATH       data-path
-                         ;:GIT_COMMITS     (not repo-dir)
+              :env      {:PORT      PORT
                          ;:CACHED_APPSTATE true
-                         :BLINK_PATH      blink}}
+                         :DATA_PATH data-path}}
         service (spawn-process java args opts)
         std-out (.-stdout service)
         std-err (.-stderr service)]
@@ -115,7 +109,7 @@
 (defn clear-iww-cache [{:keys []}]
   (info "Clearing iWasWhere Cache")
   (let [cache-file (:cache rt/runtime-info)
-        cache-exists? (.existsSync fs cache-file)]
+        cache-exists? (existsSync cache-file)]
     (when cache-exists?
       (.renameSync fs cache-file (str cache-file ".bak"))))
   {})

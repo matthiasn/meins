@@ -20,7 +20,7 @@
                                :import/geo :import/photos :import/phone
                                :import/spotify :import/flight :export/pdf
                                :stats/pomo-day-get :import/screenshot
-                               :stats/get :stats/get2 :import/movie :blink/busy
+                               :stats/get :stats/get2 :import/movie
                                :state/stats-tags-get :import/weight :import/listen
                                :state/search :cfg/refresh :firehose/cmp-recv
                                :firehose/cmp-put}
@@ -40,6 +40,7 @@
   (let [components #{(ipc/cmp-map :renderer/ipc-cmp #{:app/open-external
                                                       :geonames/lookup
                                                       :window/hide
+                                                      :blink/busy
                                                       :cmd/schedule-new})
                      (spellcheck/cmp-map :renderer/spellcheck-cmp)
                      (screenshot/cmp-map :renderer/screenshot-cmp)
