@@ -319,8 +319,8 @@
                    :iww.widget-cfg/h
                    :iww.widget-cfg/i]))
 
-(s/def :iww.blink/pomodoro-completed boolean?)
-(s/def :blink/busy (s/keys :req-un [:iww.blink/pomodoro-completed]))
+(s/def :iww.blink/color #{:green :yellow :red})
+(s/def :blink/busy (s/keys :req-un [:iww.blink/color]))
 
 (s/def :layout/save (s/coll-of :iww.cfg/widget-cfg))
 

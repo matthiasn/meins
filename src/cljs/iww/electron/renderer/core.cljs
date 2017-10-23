@@ -40,13 +40,13 @@
   (let [components #{(ipc/cmp-map :renderer/ipc-cmp #{:app/open-external
                                                       :geonames/lookup
                                                       :window/hide
-                                                      :blink/busy
-                                                      :cmd/schedule-new})
-                     (spellcheck/cmp-map :renderer/spellcheck-cmp)
-                     (screenshot/cmp-map :renderer/screenshot-cmp)
+                                                      :blink/busy})
+                     (spellcheck/cmp-map :renderer/spellcheck)
+                     (screenshot/cmp-map :renderer/screenshot)
                      (sente/cmp-map :renderer/ws-cmp sente-cfg)
-                     (router/cmp-map :renderer/router-cmp)
-                     (store/cmp-map :renderer/store-cmp)
+                     (router/cmp-map :renderer/router)
+                     (store/cmp-map :renderer/store)
+                     (sched/cmp-map :renderer/scheduler)
                      (rf/cmp-map :renderer/ui-cmp)
                      (exec/cmp-map :renderer/exec-cmp #{})}
         components (make-observable components)]
@@ -56,37 +56,39 @@
 
        [:cmd/route {:from :renderer/ipc-cmp
                     :to   #{:renderer/exec-cmp
-                            :renderer/store-cmp
-                            :renderer/screenshot-cmp
-                            :renderer/spellcheck-cmp
+                            :renderer/store
+                            :renderer/screenshot
+                            :renderer/spellcheck
                             :renderer/ws-cmp}}]
 
-       [:cmd/route {:from :renderer/router-cmp
-                    :to   :renderer/store-cmp}]
+       [:cmd/route {:from #{:renderer/router
+                            :renderer/scheduler}
+                    :to   :renderer/store}]
 
-       [:cmd/route {:from :renderer/store-cmp
-                    :to   :renderer/router-cmp}]
+       [:cmd/route {:from :renderer/store
+                    :to   #{:renderer/router
+                            :renderer/scheduler}}]
 
        [:cmd/route {:from #{:renderer/ui-cmp
-                            :renderer/store-cmp}
+                            :renderer/store}
                     :to   #{:renderer/ws-cmp
                             :renderer/ipc-cmp}}]
 
        [:cmd/route {:from #{:renderer/ui-cmp
                             :renderer/ws-cmp}
-                    :to   #{:renderer/store-cmp
-                            :renderer/screenshot-cmp
+                    :to   #{:renderer/store
+                            :renderer/screenshot
                             :renderer/ipc-cmp}}]
 
-       [:cmd/route {:from :renderer/screenshot-cmp
+       [:cmd/route {:from :renderer/screenshot
                     :to   #{:renderer/ipc-cmp
-                            :renderer/store-cmp}}]
+                            :renderer/store}}]
 
-       [:cmd/observe-state {:from :renderer/store-cmp
+       [:cmd/observe-state {:from :renderer/store
                             :to   :renderer/ui-cmp}]
 
-       [:cmd/observe-state {:from :renderer/store-cmp
-                            :to   :renderer/screenshot-cmp}]
+       [:cmd/observe-state {:from :renderer/store
+                            :to   :renderer/screenshot}]
 
        (when OBSERVER [:cmd/attach-to-firehose :renderer/ws-cmp])])))
 

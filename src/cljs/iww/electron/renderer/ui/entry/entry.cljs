@@ -79,7 +79,6 @@
         formatted-time (.format (moment ts) "ddd YY-MM-DD HH:mm")
         tab-group (:tab-group local-cfg)
         add-search (up/add-search q-date-string tab-group put-fn)
-        pomo-start #(put-fn [:cmd/pomodoro-start @entry])
         open-linked (up/add-search (str "l:" ts) tab-group put-fn)
         drop-fn (a/drop-linked-fn entry entries-map cfg put-fn)
         toggle-edit #(if @edit-mode (put-fn [:entry/remove-local @entry])
@@ -100,7 +99,7 @@
            [:a [:time {:on-click add-search} formatted-time]]
            [:time (u/visit-duration @entry)]]
           (if (= :pomodoro (:entry-type @entry))
-            [pomo/pomodoro-header entry pomo-start edit-mode? put-fn]
+            [pomo/pomodoro-header entry edit-mode? put-fn]
             [:div (when-not (:comment-for @entry) [total-time-logged ts])])
           [:div
            (when (seq (:linked-entries-list @entry))

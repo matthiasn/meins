@@ -39,7 +39,6 @@
                 :firehose/cmp-recv
                 :update/status
                 :screenshot/take
-                :cmd/pomodoro-inc
                 :geonames/res
                 :spellcheck/lang
                 :spellcheck/off

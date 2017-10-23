@@ -99,8 +99,7 @@
                             (play-audio "ticking-clock"))))
               (update-local-storage new-state)
               {:new-state new-state
-               :emit-msg  [[:blink/busy {:pomodoro-completed done?}]
-                           [:cmd/schedule-new
+               :emit-msg  [[:cmd/schedule-new
                             {:timeout 1000
                              :message [:cmd/pomodoro-inc
                                        {:started        started

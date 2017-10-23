@@ -9,9 +9,10 @@
             [child_process :refer [spawn]]
             [moment]))
 
-(def red {:day "--hsb=10,255,255" :night "--hsb=10,255,100"})
-(def yellow {:day "--hsb=32,255,255" :night "--hsb=32,255,100"})
-(def green {:day "--hsb=65,255,255" :night "--hsb=65,255,100"})
+(def colors
+  {:red    {:day "--hsb=10,255,255" :night "--hsb=10,255,100"}
+   :yellow {:day "--hsb=32,255,255" :night "--hsb=32,255,100"}
+   :green  {:day "--hsb=65,255,255" :night "--hsb=65,255,100"}})
 
 (defn spawn-process [cmd args opts]
   (debug "BLINK: spawning" cmd args opts)
@@ -26,41 +27,29 @@
     (if (existsSync blink-path)
       (spawn-process blink-path [args] []))))
 
-(defn state-fn [put-fn]
-  (let [state (atom {:last-busy 0})]
-    (put-fn [:cmd/schedule-new {:timeout 1000
-                                :message [:blink/heartbeat]
-                                :repeat  true}])
-    {:state state}))
-
 (defn day-night? []
   (let [h (.hour (moment))]
     (if (or (< h 8) (> h 18)) :night :day)))
 
-(defn blink-fn
-  "Sets color to green when last busy timestamp is longer ago than one second.
-   Called with each heartbeat."
-  [{:keys [current-state]}]
-  (let [now (st/now)
-        k (day-night?)
-        last-busy (get-in current-state [:last-busy])]
-    (when (> (- now last-busy) 1000)
-      (debug "blink green")
-      (blink (k green)))
-    {}))
+(defn state-fn [put-fn]
+  (let [state (atom {:last-busy 0})
+        k (day-night?)]
+    (blink (k (:green colors)))
+    {:state state}))
 
 (defn blink-busy
   "Set light to red when busy and save last busy timestamp."
   [{:keys [current-state msg-payload]}]
   (let [ts (st/now)
         pomodoro-completed (:pomodoro-completed msg-payload)
-        k (day-night?)]
-    (debug "blink red")
-    (blink (k (if pomodoro-completed yellow red)))
+        k (day-night?)
+        color (:color msg-payload)
+        arg (get-in colors [color k])]
+    (debug "blink" arg)
+    (blink arg)
     {:new-state (assoc-in current-state [:last-busy] ts)}))
 
 (defn cmp-map [cmp-id]
   {:cmp-id      cmp-id
    :state-fn    state-fn
-   :handler-map {:blink/heartbeat blink-fn
-                 :blink/busy      blink-busy}})
+   :handler-map {:blink/busy blink-busy}})
