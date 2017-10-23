@@ -40,6 +40,7 @@
   (let [components #{(ipc/cmp-map :renderer/ipc-cmp #{:app/open-external
                                                       :geonames/lookup
                                                       :window/hide
+                                                      :window/show
                                                       :blink/busy})
                      (spellcheck/cmp-map :renderer/spellcheck)
                      (screenshot/cmp-map :renderer/screenshot)
@@ -61,9 +62,17 @@
                             :renderer/spellcheck
                             :renderer/ws-cmp}}]
 
-       [:cmd/route {:from #{:renderer/router
-                            :renderer/scheduler}
+       [:cmd/route {:from #{:renderer/router}
                     :to   :renderer/store}]
+
+       [:cmd/route {:from #{:renderer/screenshot}
+                    :to   :renderer/scheduler}]
+
+       [:cmd/route {:from :renderer/scheduler
+                    :to   #{:renderer/ipc-cmp
+                            :renderer/screenshot
+                            :renderer/ws-cmp
+                            :renderer/store}}]
 
        [:cmd/route {:from :renderer/store
                     :to   #{:renderer/router
