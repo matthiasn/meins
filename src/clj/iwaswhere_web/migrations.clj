@@ -2,6 +2,7 @@
   "This namespace is used for migrating entries to new versions."
   (:require [iwaswhere-web.files :as f]
             [iwaswhere-web.location :as loc]
+            [iwaswhere-web.net :as net]
             [clojure.pprint :as pp]
             [clojure.tools.logging :as log]
             [clj-uuid :as uuid]
@@ -193,6 +194,30 @@
                       serialized (str (pr-str entry) "\n")]
                   (swap! line-count inc)
                   (swap! ts-uuids assoc-in [ts] entry)
+                  (spit (str out-path "/" filename) serialized :append true))
+                (catch Exception ex
+                  (log/error "Exception" ex "when parsing line:\n" line)))))))
+      (log/info (count @ts-uuids) "entries in" @line-count "lines migrated."))))
+
+(defn migrate-to-vclock
+  ; (m/migrate-to-vclock "./data/migrations/vclock" "./data/migrations/vclock-out")
+  [path out-path]
+  (let [files (file-seq (clojure.java.io/file path))
+        ts-uuids (atom {})
+        mac-address (net/mac-address)
+        line-count (atom 0)]
+    (doseq [f (f/filter-by-name files #"\d{4}-\d{2}-\d{2}a?.jrn")]
+      (with-open [reader (clojure.java.io/reader f)]
+        (let [filename (.getName f)]
+          (let [lines (line-seq reader)]
+            (doseq [line lines]
+              (try
+                (swap! line-count inc)
+                (let [entry (-> (clojure.edn/read-string line)
+                                (assoc-in [:vclock] {mac-address @line-count}))
+                      id (:timestamp entry)
+                      serialized (str (pr-str entry) "\n")]
+                  (swap! ts-uuids assoc-in [id] entry)
                   (spit (str out-path "/" filename) serialized :append true))
                 (catch Exception ex
                   (log/error "Exception" ex "when parsing line:\n" line)))))))

@@ -82,6 +82,7 @@
             (is (= test-entry (-> (get (:entries-map res) (:timestamp test-entry))
                                   (dissoc :comments)
                                   (dissoc :last-saved)
+                                  (dissoc :vclock)
                                   (dissoc :id)
                                   (dissoc :linked-entries-list)))))
 
@@ -101,14 +102,14 @@
               (with-open [reader (clojure.java.io/reader last-log)]
                 (let [last-line (last (line-seq reader))
                       parsed (clojure.edn/read-string last-line)]
-                  (is (= (dissoc parsed :id :last-saved) test-entry))))))
+                  (is (= test-entry (dissoc parsed :id :last-saved :vclock)))))))
 
           (testing
             "handler emits saved message"
             (let [entry-saved-msg (first emit-msg)
                   saved-msg (second entry-saved-msg)]
               (is (= :entry/saved (first entry-saved-msg)))
-              (is (= test-entry (dissoc saved-msg :id :last-saved))))))))))
+              (is (= test-entry (dissoc saved-msg :id :last-saved :vclock))))))))))
 
 (defn geo-entry-update-assertions
   "Common assertions in geo-entry-update-test, can be used with both the initial in-memory graph
@@ -122,6 +123,7 @@
     (is (= test-entry (-> (get (:entries-map res) (:timestamp test-entry))
                           (dissoc :comments)
                           (dissoc :id)
+                          (dissoc :vclock)
                           (dissoc :last-saved)
                           (dissoc :linked-entries-list)))))
 
@@ -170,7 +172,7 @@
                 (let [last-line (last (line-seq reader))
                       parsed (clojure.edn/read-string last-line)]
                   (is (= updated-test-entry
-                         (dissoc parsed :id :last-saved)))))))
+                         (dissoc parsed :id :last-saved :vclock)))))))
 
           (testing
             "handler emits updated message"
@@ -178,7 +180,7 @@
                   saved-msg (second entry-saved-msg)]
               (is (= :entry/saved (first entry-saved-msg)))
               (is (= updated-test-entry
-                     (dissoc saved-msg :id :last-saved)))))
+                     (dissoc saved-msg :id :last-saved :vclock)))))
 
           ;; test with graph reconstructed from disk
           (geo-entry-update-assertions state-from-disk res-from-disk updated-test-entry))))))

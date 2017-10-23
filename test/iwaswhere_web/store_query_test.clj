@@ -150,6 +150,6 @@
                                                :timestamp           1450998400000}}}
                  (-> res
                      (update-in [:entries-map] #(into {} (map (fn [[k v]]
-                                                                [k (dissoc v :id)])
+                                                                [k (dissoc v :id :vclock)])
                                                               %)))
                      (dissoc :duration-ms)))))))))

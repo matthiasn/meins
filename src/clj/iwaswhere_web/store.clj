@@ -33,6 +33,7 @@
                       (swap! entries-to-index dissoc ts))
                   (do (swap! entries-to-index assoc-in [ts] parsed)
                       (swap! state ga/add-node ts parsed :startup)))
+                (swap! state assoc-in [:latest-vclock] (:vclock parsed))
                 (when (zero? (mod cnt 5000)) (log/info "Entries read:" cnt)))
               (catch Exception ex
                 (log/error "Exception" ex "when parsing line:\n" line)))))))))

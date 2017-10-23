@@ -18,7 +18,8 @@
             [clojure.pprint :as pp]
             [iwaswhere-web.file-utils :as fu]
             [iwaswhere-web.location :as loc]
-            [ubergraph.core :as uc])
+            [ubergraph.core :as uc]
+            [iwaswhere-web.net :as net])
   (:import [java.io DataInputStream DataOutputStream]))
 
 (defn filter-by-name
@@ -84,11 +85,17 @@
   "Handler function for persisting journal entry."
   [{:keys [current-state msg-payload msg-meta]}]
   (let [ts (:timestamp msg-payload)
+        last-vclock (:latest-vclock current-state)
+        mac-address (net/mac-address)
+        new-vclock (update-in last-vclock [mac-address] #(inc (or % 0)))
         id (or (:id msg-payload) (uuid/v1))
-        entry (merge msg-payload {:last-saved (st/now) :id id})
+        entry (merge msg-payload {:last-saved (st/now)
+                                  :id         id
+                                  :vclock     new-vclock})
         g (:graph current-state)
         prev (when (uc/has-node? g ts) (uc/attrs g ts))
         new-state (ga/add-node current-state ts entry false)
+        new-state (assoc-in new-state [:latest-vclock] new-vclock)
         broadcast-meta (merge msg-meta {:sente-uid :broadcast})]
     (when (System/getenv "CACHED_APPSTATE")
       (future (persist-state! new-state)))
