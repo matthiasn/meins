@@ -109,8 +109,8 @@
                                       (when (and story (not (:primary-story @entry)))
                                         {:primary-story story})
                                       {:linked-stories stories
-                                       :editor-state new-state
-                                       :text         plain})]
+                                       :editor-state   new-state
+                                       :text           plain})]
                         (put-fn [:entry/update-local updated]))))]
     (fn [entry put-fn]
       (let [latest-entry (dissoc @entry :comments)
@@ -118,13 +118,15 @@
                            (editor-state-from-raw (clj->js editor-state)))
             save-fn (fn [_ev]
                       (let [cleaned (u/clean-entry latest-entry)
-                            entry (if (and (:new-entry entry)
-                                           (not (:comment-for entry)))
-                                    (-> cleaned
-                                        (update-in [:tags] conj "#new")
-                                        (assoc-in [:pomodoro-running] false))
-                                    cleaned)]
-                        (put-fn [:entry/update entry])))
+                            updated (if (and (:new-entry entry)
+                                             (not (:comment-for entry)))
+                                      (-> cleaned
+                                          (update-in [:tags] conj "#new")
+                                          (assoc-in [:pomodoro-running] false))
+                                      cleaned)]
+                        (when (:pomodoro-running @entry)
+                          (put-fn [:blink/busy {:color :green}]))
+                        (put-fn [:entry/update updated])))
             small-img (fn [smaller]
                         (let [img-size (:img-size @entry 50)
                               img-size (if smaller (- img-size 10) (+ img-size 10))

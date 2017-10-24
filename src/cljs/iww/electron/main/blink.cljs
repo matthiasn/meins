@@ -11,7 +11,7 @@
 
 (def colors
   {:red    {:day "--hsb=10,255,255" :night "--hsb=10,255,100"}
-   :yellow {:day "--hsb=32,255,255" :night "--hsb=32,255,100"}
+   :orange {:day "--hsb=33,150,150" :night "--hsb=33,255,100"}
    :green  {:day "--hsb=65,255,255" :night "--hsb=65,255,100"}})
 
 (defn spawn-process [cmd args opts]

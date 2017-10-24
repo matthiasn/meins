@@ -76,7 +76,7 @@
 (defn pomodoro-inc-fn
   "Increments completed time of entry. Plays next tick sound and schedules a new
    increment message. Finally plays completion sound."
-  [{:keys [current-state msg-payload]}]
+  [{:keys [current-state msg-payload put-fn]}]
   (let [ts (:timestamp msg-payload)
         started (:started msg-payload)
         completed-time (:completed-time msg-payload)
@@ -93,7 +93,12 @@
                           (assoc-in [:busy] (not done?))
                           (assoc-in [:last-busy] (st/now)))]
         (if (:pomodoro-running new-entry)
-          (do (when-not (:mute cfg)
+          (let [color (if done? :orange :red)
+                new-state (assoc-in new-state [:busy-color] color)]
+            (when (and (= :orange color)
+                       (not= :orange (:busy-color current-state)))
+              (put-fn [:blink/busy {:color :orange}]))
+            (when-not (:mute cfg)
                 (if done? (play-audio "ringer")
                           (when (:ticking-clock cfg)
                             (play-audio "ticking-clock"))))

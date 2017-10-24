@@ -111,9 +111,9 @@
                     :briefings   briefings}]]))))
 
 (defn busy-status []
-  (let [busy (subscribe [:busy])]
+  (let [busy-color (subscribe [:busy-color])]
     (fn busy-status-render []
-      [:div.busy-status {:class (if @busy "red" "green")}])))
+      [:div.busy-status {:class (name (or @busy-color :green))}])))
 
 (defn menu-view [put-fn]
   [:div.menu-header

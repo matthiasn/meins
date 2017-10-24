@@ -57,6 +57,7 @@
   (let [cfg (assoc-in @c/app-cfg [:qr-code] false)
         state (atom {:entries         []
                      :last-alive      (st/now)
+                     :busy-color      :green
                      :new-entries     @cse/new-entries-ls
                      :query-cfg       @s/query-cfg
                      :pomodoro-stats  (sorted-map)
@@ -87,6 +88,10 @@
   (let [new-state (assoc-in current-state [:current-page] msg-payload)]
     {:new-state new-state}))
 
+(defn blink-busy [{:keys [current-state msg-payload]}]
+  (let [new-state (assoc-in current-state [:busy-color] (:color msg-payload))]
+    {:new-state new-state}))
+
 (defn cmp-map [cmp-id]
   {:cmp-id            cmp-id
    :state-fn          initial-state-fn
@@ -101,6 +106,7 @@
                               :state/stats-tags2 stats-tags-fn2
                               :cfg/save          c/save-cfg
                               :nav/to            nav-handler
+                              :blink/busy        blink-busy
                               :cfg/show-qr       c/show-qr-code
                               :cmd/toggle        c/toggle-set-fn
                               :cmd/set-opt       c/set-conj-fn
