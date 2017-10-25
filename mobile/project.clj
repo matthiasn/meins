@@ -31,8 +31,10 @@
                                                                 :output-dir    "target/ios"
                                                                 :optimizations :none
                                                                 :target        :nodejs
-                                                                :npm-deps      {:react-native-camera "0.10.0"
-                                                                                :rn-apple-healthkit  "0.6.1"}}}
+                                                                :npm-deps      {:react-native-camera      "0.10.0"
+                                                                                :moment                   "2.19.1"
+                                                                                :react-native-device-info "0.12.1",
+                                                                                :rn-apple-healthkit       "0.6.1"}}}
                                                 {:id           "android"
                                                  :source-paths ["src" "env/dev"]
                                                  :figwheel     true

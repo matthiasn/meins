@@ -10,9 +10,6 @@
             [matthiasn.systems-toolbox.scheduler :as sched]
             [i-was-where-app.subs]
             [react-native :refer [TextInput View Text Image TouchableHighlight]]
-            [react-native-camera]
-            [moment]
-            [rn-apple-healthkit :as health-kit]
             [iwaswhere-web.utils.parse :as p]))
 
 (def text (r/adapt-react-class Text))
@@ -21,7 +18,11 @@
 (def image (r/adapt-react-class Image))
 (def touchable-highlight (r/adapt-react-class TouchableHighlight))
 (def logo-img (js/require "./images/icon.png"))
+(def health-kit (js/require "rn-apple-healthkit"))
+(def moment (js/require "moment"))
+(def react-native-camera (js/require "react-native-camera"))
 (def cam (r/adapt-react-class react-native-camera))
+(def device-info (js/require "react-native-device-info"))
 
 (def health-kit-opts
   (clj->js
@@ -31,6 +32,7 @@
 
 (defn get-steps [days-ago put-fn local]
   (let [d (js/Date.)
+        device-id (.getUniqueID device-info)
         _ (.setTime d (- (.getTime d) (* days-ago 24 60 60 1000)))
         opts (clj->js {:date (.toISOString d)})
         cb (fn [tag]
@@ -45,6 +47,7 @@
                               {:timestamp      end-ts
                                :md             (str cnt " " tag)
                                :tags           #{tag}
+                               :vclock         {(str device-id) 1}
                                :linked-stories #{1475314976880}
                                :primary-story  1475314976880
                                :custom-fields  {tag {:cnt cnt}}}])))
@@ -81,7 +84,8 @@
 (defn app-root []
   (let [greeting (subscribe [:get-greeting])
         stats (subscribe [:stats])
-        local (r/atom {:md "hello world"})]
+        local (r/atom {:md "hello world"})
+        device-id (.getUniqueID device-info)]
     (fn []
       [view {:style {:flex-direction   "column"
                      :padding-top      30
@@ -91,17 +95,18 @@
                      :height           "100%"
                      :background-color "#222"
                      :align-items      "center"}}
-       #_[text {:style {:font-size     30
-                        :font-weight   "100"
-                        :margin-bottom 10
-                        :text-align    "center"}}
-          @greeting]
+       [text {:style {:font-size     10
+                      :color         :white
+                      :font-weight   "100"
+                      :margin-bottom 10
+                      :text-align    "center"}}
+        (str device-id)]
        [image {:source logo-img
                :style  {:width         80
                         :height        80
                         :margin-bottom 5}}]
        ;[cam {}]
-       [text-input {:style          {:height           280
+       [text-input {:style          {:height           250
                                      :font-weight      "100"
                                      :padding          10
                                      :font-size        20
@@ -117,10 +122,11 @@
                     :padding          10
                     :border-radius    5}
          :on-press #(let [put-fn @ui/put-fn-atom
-                          new-entry (p/parse-entry (:md @local))
+                          new-entry (merge (p/parse-entry (:md @local))
+                                           {:vclock {(str device-id) 1}})
                           new-entry-fn (h/new-entry-fn put-fn new-entry nil)]
                       (new-entry-fn)
-                      (dotimes [n 365]
+                      (dotimes [n 30]
                         (get-steps n put-fn local))
                       (swap! local assoc-in [:md] "")
                       (put-fn [:stats/get2]))}
@@ -132,14 +138,8 @@
         {:style    {:background-color "#999"
                     :padding          10
                     :border-radius    5}
-         :on-press #(let [put-fn @ui/put-fn-atom
-                          new-entry (p/parse-entry (:md @local))
-                          new-entry-fn (h/new-entry-fn put-fn new-entry nil)]
-                      (new-entry-fn)
-                      (dotimes [n 365]
-                        (get-steps n put-fn local))
-                      (swap! local assoc-in [:md] "")
-                      (put-fn [:stats/get2]))}
+         :on-press #(let [put-fn @ui/put-fn-atom]
+                      )}
         [text {:style {:color       "white"
                        :text-align  "center"
                        :font-weight "bold"}}

@@ -88,6 +88,7 @@
         last-vclock (:latest-vclock current-state)
         mac-address (net/mac-address)
         new-vclock (update-in last-vclock [mac-address] #(inc (or % 0)))
+        new-vclock (merge (:vclock msg-payload) new-vclock)
         id (or (:id msg-payload) (uuid/v1))
         entry (merge msg-payload {:last-saved (st/now)
                                   :id         id
