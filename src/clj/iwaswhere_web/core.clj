@@ -25,6 +25,7 @@
                              :auto-offset-reset "latest"
                              :topic             "firehose"}
                :relay-types #{:firehose/cmp-put
+                              :firehose/cmp-publish-state
                               :firehose/cmp-recv}}
           mapper #(assoc-in % [:opts :msgs-on-firehose] true)
           components (set (mapv mapper components))

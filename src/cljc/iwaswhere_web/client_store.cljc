@@ -95,8 +95,8 @@
 (defn cmp-map [cmp-id]
   {:cmp-id            cmp-id
    :state-fn          initial-state-fn
-   :snapshot-xform-fn #(dissoc % :last-alive)
    :state-spec        :state/client-store-spec
+   :opts              {:snapshots-on-firehose true}
    :handler-map       (merge cse/entry-handler-map
                              s/search-handler-map
                              {:state/new         new-state-fn
