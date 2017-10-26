@@ -16,16 +16,21 @@
 
 (defonce switchboard (sb/component :renderer/switchboard))
 
-(def sente-cfg {:relay-types #{:entry/update :entry/find :entry/trash
-                               :import/geo :import/photos :import/phone
-                               :import/spotify :import/flight :export/pdf
-                               :stats/pomo-day-get :import/screenshot
-                               :stats/get :stats/get2 :import/movie
-                               :state/stats-tags-get :import/weight :import/listen
-                               :state/search :cfg/refresh :firehose/cmp-recv
-                               :firehose/cmp-put}
-                :sente-opts  {:host     (.-iwwHOST js/window)
-                              :protocol "http:"}})
+(def sente-base-cfg
+  {:sente-opts {:host     (.-iwwHOST js/window)
+                :protocol "http:"}})
+
+(def sente-cfg
+  (merge sente-base-cfg
+         {:relay-types #{:entry/update :entry/find :entry/trash
+                         :import/geo :import/photos :import/phone
+                         :import/spotify :import/flight :export/pdf
+                         :stats/pomo-day-get :import/screenshot
+                         :stats/get :stats/get2 :import/movie
+                         :state/stats-tags-get :import/weight :import/listen
+                         :state/search :cfg/refresh}}))
+
+(def sente-firehose-cfg (merge sente-base-cfg {:opts {:in-chan [:buffer 100]}}))
 
 (def OBSERVER (.-OBSERVER js/window))
 
@@ -45,6 +50,8 @@
                      (spellcheck/cmp-map :renderer/spellcheck)
                      (screenshot/cmp-map :renderer/screenshot)
                      (sente/cmp-map :renderer/ws-cmp sente-cfg)
+                     (when OBSERVER
+                       (sente/cmp-map :renderer/ws-firehose sente-firehose-cfg))
                      (router/cmp-map :renderer/router)
                      (store/cmp-map :renderer/store)
                      (sched/cmp-map :renderer/scheduler)
@@ -99,7 +106,8 @@
        [:cmd/observe-state {:from :renderer/store
                             :to   :renderer/screenshot}]
 
-       (when OBSERVER [:cmd/attach-to-firehose :renderer/ws-cmp])])))
+       (when OBSERVER
+         [:cmd/attach-to-firehose :renderer/ws-firehose])])))
 
 (defn load-handler [ev]
   (info "RENDERER loaded")

@@ -35,8 +35,6 @@
 
 (def wm-relay #{:exec/js
                 :cmd/toggle-key
-                :firehose/cmp-put
-                :firehose/cmp-recv
                 :update/status
                 :screenshot/take
                 :geonames/res

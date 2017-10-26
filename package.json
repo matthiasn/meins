@@ -1,11 +1,11 @@
 {
-  "name": "iWasWhere",
-  "version": "0.3.59",
+  "name": "iWasWhereDev",
+  "version": "0.3.60",
   "description": "iWasWhere - a personal information manager",
   "main": "prod/main/main.js",
   "scripts": {
     "start": "electron .",
-    "postinstall": "electron-builder install-app-deps",
+    "build": "electron-builder install-app-deps",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
