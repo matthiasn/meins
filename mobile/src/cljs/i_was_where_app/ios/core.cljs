@@ -10,7 +10,9 @@
             [matthiasn.systems-toolbox.scheduler :as sched]
             [i-was-where-app.subs]
             [react-native :refer [TextInput View Text Image TouchableHighlight]]
-            [iwaswhere-web.utils.parse :as p]))
+            [iwaswhere-web.utils.parse :as p]
+            [matthiasn.systems-toolbox.component :as st]
+            [clojure.pprint :as pp]))
 
 (def text (r/adapt-react-class Text))
 (def text-input (r/adapt-react-class TextInput))
@@ -57,6 +59,30 @@
                   (.getStepCount health-kit opts (cb "#steps")))]
     (.initHealthKit health-kit health-kit-opts init-cb)))
 
+(defn get-weight [put-fn local]
+  (let [device-id (.getUniqueID device-info)
+        weight-opts (clj->js {:unit      "gram"
+                              :startDate (.toISOString (js/Date. 2015 9 1))})
+        weight-cb (fn [err res]
+                    (let [samples (js->clj res)]
+                      (doseq [sample (js->clj res)]
+                        (let [v (get-in sample ["value"])
+                              end-date (get-in sample ["endDate"])
+                              end-ts (.valueOf (moment end-date))
+                              grams (js/parseInt v)
+                              kg (/ grams 1000)]
+                          (put-fn [:entry/update
+                                   {:timestamp      end-ts
+                                    :md             (str kg " #weight")
+                                    :tags           #{"#weight"}
+                                    :custom-fields  {"#weight" {:weight kg}}
+                                    :vclock         {(str device-id) 1}
+                                    :linked-stories #{1475314976880}
+                                    :primary-story  1475314976880}])))))
+        init-cb (fn [err res]
+                  (.getWeightSamples health-kit weight-opts weight-cb))]
+    (.initHealthKit health-kit health-kit-opts init-cb)))
+
 (defonce switchboard (sb/component :client/switchboard))
 
 (def OBSERVER true)
@@ -76,7 +102,7 @@
                                :state/stats-tags-get :import/weight :import/listen
                                :state/search :cfg/refresh :firehose/cmp-recv
                                :firehose/cmp-put}
-                :sente-opts  {:host "172.20.10.2:8765"}})
+                :sente-opts  {:host "192.168.178.21:8765"}})
 
 (defn alert [title]
   (.alert (.-Alert react-native) title))
@@ -117,33 +143,67 @@
                     :keyboard-type  "twitter"
                     :on-change-text (fn [text]
                                       (swap! local assoc-in [:md] text))}]
-       [touchable-highlight
-        {:style    {:background-color "#999"
-                    :padding          10
-                    :border-radius    5}
-         :on-press #(let [put-fn @ui/put-fn-atom
-                          new-entry (merge (p/parse-entry (:md @local))
-                                           {:vclock {(str device-id) 1}})
-                          new-entry-fn (h/new-entry-fn put-fn new-entry nil)]
-                      (new-entry-fn)
-                      (dotimes [n 30]
-                        (get-steps n put-fn local))
-                      (swap! local assoc-in [:md] "")
-                      (put-fn [:stats/get2]))}
-        [text {:style {:color       "white"
-                       :text-align  "center"
-                       :font-weight "bold"}}
-         "press me"]]
-       [touchable-highlight
-        {:style    {:background-color "#999"
-                    :padding          10
-                    :border-radius    5}
-         :on-press #(let [put-fn @ui/put-fn-atom]
-                      )}
-        [text {:style {:color       "white"
-                       :text-align  "center"
-                       :font-weight "bold"}}
-         "cam"]]
+       [view {:style {:flex-direction "row"
+                      :padding-top    10
+                      :padding-bottom 10
+                      :padding-left   20
+                      :padding-right  20}}
+        [touchable-highlight
+         {:style    {:background-color "green"
+                     :padding-left     20
+                     :padding-right    20
+                     :padding-top      12
+                     :padding-bottom   12
+                     :margin-right     20}
+          :on-press #(let [put-fn @ui/put-fn-atom
+                           new-entry (merge (p/parse-entry (:md @local))
+                                            {:vclock {(str device-id) 1}})
+                           new-entry-fn (h/new-entry-fn put-fn new-entry nil)]
+                       (new-entry-fn)
+                       (swap! local assoc-in [:md] ""))}
+         [text {:style {:color       "white"
+                        :text-align  "center"
+                        :font-weight "bold"}}
+          "new"]]
+        [touchable-highlight
+         {:style    {:background-color "blue"
+                     :padding-left     20
+                     :padding-right    20
+                     :padding-top      12
+                     :padding-bottom   12
+                     :margin-right     20}
+          :on-press #(let [put-fn @ui/put-fn-atom]
+                       (dotimes [n 30]
+                         (get-steps n put-fn local)))}
+         [text {:style {:color       "white"
+                        :text-align  "center"
+                        :font-weight "bold"}}
+          "steps"]]
+        [touchable-highlight
+         {:style    {:background-color "blue"
+                     :padding-left     20
+                     :padding-right    20
+                     :padding-top      12
+                     :padding-bottom   12
+                     :margin-right     20}
+          :on-press #(let [put-fn @ui/put-fn-atom]
+                       (get-weight put-fn local))}
+         [text {:style {:color       "white"
+                        :text-align  "center"
+                        :font-weight "bold"}}
+          "weight"]]
+        [touchable-highlight
+         {:style    {:background-color "#999"
+                     :padding-left     20
+                     :padding-right    20
+                     :padding-top      12
+                     :padding-bottom   12}
+          :on-press #(let [put-fn @ui/put-fn-atom])}
+         [text {:style {:color       "white"
+                        :text-align  "center"
+                        :font-weight "bold"}}
+          "cam"]]]
+
        [text {:style {:font-size     30
                       :font-weight   "500"
                       :color         "#CCC"

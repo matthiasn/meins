@@ -96,7 +96,6 @@
   {:cmp-id            cmp-id
    :state-fn          initial-state-fn
    :state-spec        :state/client-store-spec
-   :opts              {:snapshots-on-firehose true}
    :handler-map       (merge cse/entry-handler-map
                              s/search-handler-map
                              {:state/new         new-state-fn
