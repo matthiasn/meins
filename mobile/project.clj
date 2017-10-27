@@ -52,8 +52,8 @@
                                                              :output-dir         "target/ios"
                                                              :static-fns         true
                                                              :optimize-constants true
+                                                             :target             :nodejs
                                                              :optimizations      :simple
-                                                             :npm-deps           {:rn-apple-healthkit "0.6.1"}
                                                              :closure-defines    {"goog.DEBUG" false}}}
                                              {:id           "android"
                                               :source-paths ["src/cljc" "src/cljs" "env/prod"]

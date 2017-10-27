@@ -14,6 +14,8 @@ or
     $ lein figwheel ios
 
     $ react-native run-ios
+    
+    $ lein with-profile prod cljsbuild auto ios
 
 ## License
 
