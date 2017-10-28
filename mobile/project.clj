@@ -29,12 +29,7 @@
                                                  :compiler     {:output-to     "target/ios/not-used.js"
                                                                 :main          "env.ios.main"
                                                                 :output-dir    "target/ios"
-                                                                :optimizations :none
-                                                                :target        :nodejs
-                                                                :npm-deps      {:react-native-camera      "0.10.0"
-                                                                                :moment                   "2.19.1"
-                                                                                :react-native-device-info "0.12.1",
-                                                                                :rn-apple-healthkit       "0.6.1"}}}
+                                                                :optimizations :none}}
                                                 {:id           "android"
                                                  :source-paths ["src" "env/dev"]
                                                  :figwheel     true
@@ -52,7 +47,6 @@
                                                              :output-dir         "target/ios"
                                                              :static-fns         true
                                                              :optimize-constants true
-                                                             :target             :nodejs
                                                              :optimizations      :simple
                                                              :closure-defines    {"goog.DEBUG" false}}}
                                              {:id           "android"
