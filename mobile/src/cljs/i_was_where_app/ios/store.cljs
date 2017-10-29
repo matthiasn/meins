@@ -1,5 +1,8 @@
 (ns i-was-where-app.ios.store
-  (:require [matthiasn.systems-toolbox.component :as st]))
+  (:require [matthiasn.systems-toolbox.component :as st]
+            [glittershark.core-async-storage :as as]
+            [cljs.core.async :refer [<!]])
+  (:require-macros [cljs.core.async.macros :refer [go]]))
 
 (def device-info (js/require "react-native-device-info"))
 
@@ -17,7 +20,9 @@
         new-state (-> current-state
                       (assoc-in [:entries timestamp] entry)
                       (assoc-in [:latest-vclock] new-vclock))]
-    (prn msg-payload)
+    (go
+      (<! (as/set-item timestamp entry))
+      (println :persisted (<! (as/get-item timestamp))))
     {:new-state new-state}))
 
 (defn cmp-map [cmp-id]
