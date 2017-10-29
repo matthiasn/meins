@@ -3,9 +3,9 @@
             [re-frame.core :refer [subscribe dispatch dispatch-sync]]
             [i-was-where-app.events]
             [i-was-where-app.ios.healthkit :as hk]
+            [i-was-where-app.ios.store :as store]
             [i-was-where-app.ui :as ui]
             [i-was-where-app.helpers :as h]
-            [iwaswhere-web.client-store :as store]
             [matthiasn.systems-toolbox.switchboard :as sb]
             [matthiasn.systems-toolbox-sente.client :as sente]
             [matthiasn.systems-toolbox.scheduler :as sched]
@@ -48,7 +48,7 @@
                 :sente-opts  {:host "172.20.10.2:8765"}})
 
 (defn app-root []
-  (let [greeting (subscribe [:get-greeting])
+  (let [entries (subscribe [:entries])
         stats (subscribe [:stats])
         local (r/atom {:md "hello world"})
         device-id (.getUniqueID device-info)]
@@ -66,13 +66,9 @@
                       :font-weight   "100"
                       :margin-bottom 5
                       :text-align    "center"}}
-        (str device-id)]
-       [image {:source logo-img
-               :style  {:width         80
-                        :height        80
-                        :margin-bottom 5}}]
+        (str device-id " - " (count @entries) " entries")]
        ;[cam {}]
-       [text-input {:style          {:height           250
+       [text-input {:style          {:height           200
                                      :font-weight      "100"
                                      :padding          10
                                      :font-size        20
@@ -96,8 +92,7 @@
                      :padding-bottom   12
                      :margin-right     20}
           :on-press #(let [put-fn @ui/put-fn-atom
-                           new-entry (merge (p/parse-entry (:md @local))
-                                            {:vclock {(str device-id) 1}})
+                           new-entry (p/parse-entry (:md @local))
                            new-entry-fn (h/new-entry-fn put-fn new-entry nil)]
                        (new-entry-fn)
                        (swap! local assoc-in [:md] ""))}
@@ -144,13 +139,16 @@
                         :font-weight "bold"}}
           "cam"]]]
 
-       [text {:style {:font-size     30
+       [text {:style {:font-size     10
                       :font-weight   "500"
                       :color         "#CCC"
                       :margin-bottom 20
                       :text-align    "center"}}
-        (:open-tasks-cnt @stats) " open tasks "
-        (str (:steps @local))]])))
+        (with-out-str (pp/pprint (second (last (sort-by first @entries)))))]
+       [image {:source logo-img
+               :style  {:width         80
+                        :height        80
+                        :margin-bottom 5}}]])))
 
 (defn init []
   (dispatch-sync [:initialize-db])
