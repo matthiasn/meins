@@ -19,13 +19,29 @@
                       :vclock     new-vclock})
         new-state (-> current-state
                       (assoc-in [:entries timestamp] entry)
-                      (assoc-in [:latest-vclock] new-vclock))]
+                      (assoc-in [:latest-vclock] new-vclock))
+        prev (dissoc (get-in current-state [:entries timestamp])
+                     :id :last-saved :vclock)]
+    (when-not (= prev (dissoc msg-payload :id :last-saved :vclock))
+      (go (<! (as/set-item timestamp entry)))
+      (go (<! (as/set-item :latest-vclock last-vclock)))
+      (go (<! (as/set-item :timestamps (set (keys (:entries new-state))))))
+      {:new-state new-state})))
+
+(defn state-fn [put-fn]
+  (let [state (atom {})
+        device-id (.getUniqueID device-info)]
     (go
-      (<! (as/set-item timestamp entry))
-      (println :persisted (<! (as/get-item timestamp))))
-    {:new-state new-state}))
+      (let [latest-vclock (second (<! (as/get-item :latest-vclock)))]
+        (swap! state assoc-in [:latest-vclock] latest-vclock)))
+    (go
+      (let [timestamps (second (<! (as/get-item :timestamps)))]
+        (doseq [ts timestamps]
+          (swap! state assoc-in [:entries ts] (second (<! (as/get-item ts)))))))
+    {:state state}))
 
 (defn cmp-map [cmp-id]
   {:cmp-id      cmp-id
+   :state-fn    state-fn
    :handler-map {:entry/update persist
                  :entry/new    persist}})
