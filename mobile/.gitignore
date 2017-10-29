@@ -54,3 +54,4 @@ fastlane/screenshots
 target/
 .re-natal.local
 index.ios.js
+index.android.js
