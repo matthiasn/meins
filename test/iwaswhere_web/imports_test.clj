@@ -19,6 +19,4 @@
           handler-map (:handler-map cmp-map)]
       (is (= (:cmp-id cmp-map) cmp-id))
       (is (fn? (:import/photos handler-map)))
-      (is (fn? (:import/geo handler-map)))
-      (is (fn? (:import/movie handler-map)))
-      (is (fn? (:import/phone handler-map))))))
+      (is (fn? (:import/movie handler-map))))))

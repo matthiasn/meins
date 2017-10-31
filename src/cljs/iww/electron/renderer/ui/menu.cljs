@@ -50,10 +50,7 @@
           {:on-click (h/new-entry-fn put-fn {:entry-type :story} nil)}
           [:span.fa.fa-plus-square] " new story"]
          [:button {:on-click #(do (put-fn [:import/photos])
-                                  (put-fn [:import/geo])
-                                  (put-fn [:import/spotify])
-                                  (put-fn [:import/weight])
-                                  (put-fn [:import/phone]))}
+                                  (put-fn [:import/spotify]))}
           [:span.fa.fa-map] " import"]]))))
 
 (defn cfg-view

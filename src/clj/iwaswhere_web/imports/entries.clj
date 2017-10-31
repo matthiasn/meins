@@ -45,17 +45,6 @@
             (log/warn "negative timestamp?" visit)))))
     (catch Exception ex (log/error "Error while importing " filename ex))))
 
-(defn import-geo
-  "Imports geo data from respective directory.
-  For now, only pays attention to visits."
-  [{:keys [put-fn msg-meta]}]
-  (let [files (file-seq (io/file (str fu/data-path "/geo-import")))]
-    (log/info "importing photos")
-    (doseq [file (f/filter-by-name files #"visits.json" #_#"[-0-9]+.(json)")]
-      (let [filename (.getName file)]
-        (log/info "Trying to import " filename)
-        (import-visits-fn (io/reader file) put-fn msg-meta filename)))))
-
 (defn update-audio-tag
   [entry]
   (if (:audio-file entry)
@@ -86,15 +75,3 @@
                (put-fn (with-meta [:entry/import entry] msg-meta))))))
        (catch Exception ex (log/error (str "Error while importing "
                                            filename) ex))))
-
-(defn import-text-entries
-  "Imports text entries from phone."
-  [{:keys [put-fn msg-meta]}]
-  (let [files (file-seq (io/file (str fu/data-path "/geo-import")))]
-    (log/info "importing photos")
-    (doseq [file (f/filter-by-name files #"text-entries.json")]
-      (let [filename (.getName file)]
-        (log/info "Trying to import " filename)
-        (import-text-entries-fn (io/reader file) put-fn msg-meta filename)))
-    {:emit-msg [:search/refresh]}))
-

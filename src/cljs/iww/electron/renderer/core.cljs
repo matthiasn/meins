@@ -23,11 +23,10 @@
 (def sente-cfg
   (merge sente-base-cfg
          {:relay-types #{:entry/update :entry/find :entry/trash
-                         :import/geo :import/photos :import/phone
-                         :import/spotify :import/flight :export/pdf
-                         :stats/pomo-day-get :import/screenshot
+                         :import/photos :import/spotify :import/flight
+                         :export/pdf :stats/pomo-day-get :import/screenshot
                          :stats/get :stats/get2 :import/movie
-                         :state/stats-tags-get :import/weight :import/listen
+                         :state/stats-tags-get :import/listen
                          :state/search :cfg/refresh}}))
 
 (def sente-firehose-cfg (merge sente-base-cfg {:opts {:in-chan [:buffer 100]}}))
