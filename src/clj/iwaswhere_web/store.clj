@@ -98,6 +98,7 @@
                   gs/stats-handler-map
                   {:entry/import   f/entry-import-fn
                    :entry/find     gq/find-entry
+                   :entry/unlink   ga/unlink
                    :entry/update   f/geo-entry-persist-fn
                    :entry/trash    f/trash-entry-fn
                    :state/search   gq/query-fn

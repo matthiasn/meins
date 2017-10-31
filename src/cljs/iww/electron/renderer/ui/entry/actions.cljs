@@ -131,7 +131,7 @@
         create-comment (h/new-entry-fn put-fn {:comment-for ts} show-comments)
         screenshot #(put-fn [:screenshot/take {:comment-for ts}])
         story (:primary-story entry)
-        create-linked-entry (h/new-entry-fn put-fn {:linked-entries [ts]
+        create-linked-entry (h/new-entry-fn put-fn {:linked-entries #{ts}
                                                     :primary-story  story
                                                     :linked-stories #{story}} nil)
         new-pomodoro (h/new-entry-fn

@@ -425,8 +425,6 @@
           width: 12px;
         }
 
-        padding: 0 3px 0 0;
-
         &.left {
           text-align: left;
         }
@@ -518,15 +516,26 @@ u {
 }
 
 .habits, .tasks {
+  width: 100%;
   .fa-diamond {
     color: $green;
     &.penalty {
       color: $red;
     }
   }
+  .xs {
+    width: 10px;
+  }
+  .fa-star {
+    color: gold;
+  }
+  .fa-unlink {
+    cursor: not-allowed;
+  }
   .award-points, .estimate {
-    padding: 0 4px 0 3px;
+    padding: 0 3px 0 2px;
     text-align:right;
+    width: 20px;
   }
   .award-points {
     font-weight: 700;

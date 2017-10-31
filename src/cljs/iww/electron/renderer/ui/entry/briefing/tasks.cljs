@@ -160,7 +160,11 @@
                               (filter active-filter)
                               (sort-by #(or (-> % :task :priority) :X)))
             time-reducer (fn [acc t] (+ acc (get-in t [:task :estimate-m] 0)))
-            total-time (reduce time-reducer 0 linked-tasks)]
+            total-time (reduce time-reducer 0 linked-tasks)
+            unlink (fn [entry ts]
+                     (let [rm-link #(disj (set %) ts)
+                           upd (update-in entry [:linked-entries] rm-link)]
+                       (put-fn [:entry/update upd])))]
         [:div.linked-tasks
          [filter-btn :active (str " - " (m-to-hhmm total-time))]
          [filter-btn :open (str " - " (m-to-hhmm total-time))]
@@ -171,16 +175,24 @@
            [:table.tasks
             [:tbody
              [:tr
-              [:th ""]
+              [:th.xs [:span.fa.fa-star-o]]
+              [:th.xs ""]
               [:th [:span.fa.fa-diamond]]
               [:th [:span.fa.fa-clock-o]]
-              [:th [:strong "tasks"]]]
+              [:th [:strong "tasks"]]
+              [:th.xs [:span.fa.fa-link]]]
              (for [task linked-tasks]
-               (let [ts (:timestamp task)
+               (let [tts (:timestamp task)
                      on-drag-start (a/drag-start-fn task put-fn)
-                     text (eu/first-line task)]
-                 ^{:key ts}
-                 [:tr {:on-click (up/add-search ts tab-group put-fn)}
+                     text (eu/first-line task)
+                     unlink (fn [_]
+                              (put-fn [:entry/unlink #{ts tts}])
+                              (unlink task ts)
+                              (unlink @entry tts))]
+                 ^{:key tts}
+                 [:tr {:on-click (up/add-search tts tab-group put-fn)}
+                  [:td (when (:starred task)
+                         [:span.fa.fa-star])]
                   (let [prio (or (-> task :task :priority) "-")]
                     [:td
                      [:span.prio {:class         prio
@@ -193,4 +205,5 @@
                   [:td.estimate
                    (when-let [estimate (-> task :task :estimate-m)]
                      (m-to-hhmm estimate))]
-                  [:td.left [:strong text]]]))]])]))))
+                  [:td.left [:strong text]]
+                  [:span.fa.fa-unlink {:on-click unlink}]]))]])]))))

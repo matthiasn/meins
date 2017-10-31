@@ -18,9 +18,6 @@
 (def logo-img (js/require "./images/icon.png"))
 (def text-input (r/adapt-react-class (.-TextInput ReactNative)))
 
-(def react-native-camera (js/require "react-native-camera"))
-(def cam (r/adapt-react-class react-native-camera))
-
 (defn alert [title]
   (.alert (.-Alert ReactNative) title))
 

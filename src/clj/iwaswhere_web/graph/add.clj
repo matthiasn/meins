@@ -168,6 +168,11 @@
             graph
             linked-entries)))
 
+(defn unlink [{:keys [current-state msg-payload]}]
+  (let [rm-edges #(uc/remove-edges % (vec msg-payload))
+        new-state (update-in current-state [:graph] rm-edges)]
+    {:new-state new-state}))
+
 (defn add-linked-visit
   "Adds linked entry when the entry has been captured during a visit."
   [g entry]

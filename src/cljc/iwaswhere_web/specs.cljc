@@ -112,6 +112,8 @@
 ;; the following message types only require timestamp to be present
 (s/def :entry/remove-local timestamp-required-spec)
 (s/def :entry/trash timestamp-required-spec)
+(s/def :entry/unlink (s/coll-of possible-timestamp?))
+
 (s/def :cmd/pomodoro-inc timestamp-required-spec)
 (s/def :cmd/pomodoro-start timestamp-required-spec)
 
