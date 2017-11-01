@@ -214,7 +214,8 @@
       background-color: $red;
     }
     input {
-      width: 60px;
+      min-width: 60px;
+      font-size: 0.8em;
     }
   }
 

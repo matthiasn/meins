@@ -1,16 +1,20 @@
 (ns iww.electron.renderer.ui.entry.pomodoro
   (:require [iwaswhere-web.utils.misc :as u]
-            [reagent.core :as r]))
+            [reagent.core :as r]
+            [moment]
+            [iww.electron.renderer.helpers :as h]))
 
 (defn pomodoro-header [entry edit-mode? put-fn]
   (let [local (r/atom {:edit false})
         click #(swap! local assoc-in [:edit] true)
         on-change (fn [ev]
                     (let [v (.. ev -target -value)
-                          parsed (when (seq v) (js/parseInt v))
+                          parsed (when (seq v)
+                                   (* 60 (.asMinutes (.duration moment v))))
                           updated (assoc-in @entry [:completed-time] parsed)]
                       (put-fn [:entry/update-local updated])))]
     (fn [entry edit-mode? put-fn]
+      (when-not edit-mode? (swap! local assoc-in [:edit] false))
       (let [running? (:pomodoro-running @entry)
             completed-time (:completed-time @entry)
             start-stop #(let [color (if running? :green :red)]
@@ -20,9 +24,9 @@
           [:div.pomodoro
            [:span.fa.fa-clock-o.completed]
            (when (pos? completed-time)
-             (if (and edit-mode? (:edit @local))
-               [:input {:value     completed-time
-                        :type      :number
+             (if (and edit-mode? (:edit @local) (not running?))
+               [:input {:value     (h/s-to-hh-mm completed-time)
+                        :type      :time
                         :on-change on-change}]
                [:span.dur {:on-click click}
                 (u/duration-string completed-time)]))
