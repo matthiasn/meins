@@ -4,7 +4,9 @@
             [re-frame.core :refer [subscribe]]
             [iww.electron.renderer.ui.charts.common :as cc]
             [iwaswhere-web.utils.misc :as u]
-            [iwaswhere-web.utils.parse :as up]))
+            [iwaswhere-web.utils.parse :as up]
+            [moment]
+            [iww.electron.renderer.helpers :as h]))
 
 (defn time-by-stories
   "Render list of times spent on individual stories, plus the total."
@@ -49,13 +51,15 @@
 (defn time-by-sagas
   [entry day-stats local edit-mode? put-fn]
   (let [sagas (subscribe [:sagas])
-        time-alloc-input-fn
-        (fn [entry saga]
-          (fn [ev]
-            (let [m (js/parseInt (-> ev .-nativeEvent .-target .-value))
-                  s (* m 60)
-                  updated (assoc-in entry [:briefing :time-allocation saga] s)]
-              (put-fn [:entry/update-local updated]))))
+        time-alloc (fn [entry saga]
+                     (fn [ev]
+                       (let [v (.. ev -target -value)
+                             s (when (seq v)
+                                 (* 60 (.asMinutes (.duration moment v))))
+                             path [:briefing :time-allocation saga]
+                             updated (assoc-in entry path s)]
+                         (when s
+                           (put-fn [:entry/update-local updated])))))
         filter-click #(swap! local update-in [:outstanding-time-filter] not)]
     (fn [entry day-stats local edit-mode? put-fn]
       (let [actual-times (:time-by-saga day-stats)
@@ -69,7 +73,7 @@
           [:tr
            [:th [:span.fa.fa-filter
                  {:on-click filter-click
-                  :class filter-cls}]]
+                  :class    filter-cls}]]
            [:th "saga"]
            [:th "planned"]
            [:th "actual"]
@@ -93,9 +97,10 @@
                    [:td [:strong (:saga-name v)]]
                    [:td.time
                     (if edit-mode?
-                      [:input {:on-input (time-alloc-input-fn entry k)
-                               :value    (when allocation (/ allocation 60))
-                               :type     :number}]
+                      [:input {:on-input (time-alloc entry k)
+                               :value    (when allocation
+                                           (h/s-to-hh-mm allocation))
+                               :type     :time}]
                       [:span (u/duration-string allocation)])]
                    [:td.time (u/duration-string actual)]
                    [:td.time [:strong (u/duration-string remaining)]]]))))]]))))
