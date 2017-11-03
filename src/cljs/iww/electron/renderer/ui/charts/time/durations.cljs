@@ -3,12 +3,12 @@
             [iww.electron.renderer.ui.charts.common :as cc]
             [reagent.ratom :refer-macros [reaction]]
             [iww.electron.renderer.ui.charts.time.twenty-four-hour :as tfh]
-            [iwaswhere-web.utils.misc :as u]
+            [iww.common.utils.misc :as u]
             [re-frame.core :refer [subscribe]]
             [reagent.ratom :refer-macros [reaction]]
             [clojure.pprint :as pp]
             [moment]
-            [iwaswhere-web.charts.data :as cd]
+            [iww.electron.renderer.charts.data :as cd]
             [iww.electron.renderer.helpers :as h]))
 
 (defn day-bars

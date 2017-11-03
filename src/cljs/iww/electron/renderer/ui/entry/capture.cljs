@@ -1,7 +1,7 @@
 (ns iww.electron.renderer.ui.entry.capture
   (:require [clojure.string :as s]
             [re-frame.core :refer [subscribe]]
-            [iwaswhere-web.ui.questionnaires :as q]
+            [iww.electron.renderer.ui.questionnaires :as q]
             [iww.electron.renderer.helpers :as h]
             [moment]
             [reagent.ratom :refer-macros [reaction]]

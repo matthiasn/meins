@@ -6,7 +6,7 @@
             [reagent.ratom :refer-macros [reaction]]
             [reagent.core :as r]
             [clojure.string :as s]
-            [iwaswhere-web.utils.parse :as up]))
+            [iww.common.utils.parse :as up]))
 
 (defn editable-field
   [on-input-fn on-keydown-fn text]

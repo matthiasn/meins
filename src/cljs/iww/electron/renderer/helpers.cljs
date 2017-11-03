@@ -3,7 +3,7 @@
             [goog.dom.Range]
             [moment]
             [clojure.string :as s]
-            [iwaswhere-web.utils.parse :as p]
+            [iww.common.utils.parse :as p]
             [matthiasn.systems-toolbox.component.helpers :as h]
             [matthiasn.systems-toolbox.log :as l]))
 

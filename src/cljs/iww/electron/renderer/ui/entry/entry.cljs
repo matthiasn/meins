@@ -4,7 +4,7 @@
             [iww.electron.renderer.ui.entry.pomodoro :as pomo]
             [re-frame.core :refer [subscribe]]
             [reagent.ratom :refer-macros [reaction]]
-            [iwaswhere-web.utils.parse :as up]
+            [iww.common.utils.parse :as up]
             [iww.electron.renderer.ui.entry.actions :as a]
             [iww.electron.renderer.ui.entry.location :as loc]
             [iww.electron.renderer.ui.entry.capture :as c]
@@ -17,11 +17,11 @@
             [iww.electron.renderer.ui.entry.utils :as eu]
             [iww.electron.renderer.ui.entry.thumbnails :as t]
             [moment]
-            [iwaswhere-web.utils.misc :as u]
+            [iww.common.utils.misc :as u]
             [iww.electron.renderer.helpers :as h]
             [clojure.set :as set]
             [iww.electron.renderer.ui.draft :as d]
-            [iwaswhere-web.utils.parse :as p]))
+            [iww.common.utils.parse :as p]))
 
 (defn all-comments-set
   "Finds all comments for a particular entry."

@@ -2,7 +2,7 @@
   (:require [reagent.core :as r]
             [re-frame.core :refer [subscribe]]
             [matthiasn.systems-toolbox.component :as st]
-            [iwaswhere-web.utils.parse :as up]
+            [iww.common.utils.parse :as up]
             [moment]
             [iww.electron.renderer.ui.charts.common :as cc]))
 

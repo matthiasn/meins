@@ -1,7 +1,7 @@
 (ns iww.electron.renderer.core
-  (:require [iwaswhere-web.specs]
+  (:require [iww.common.specs]
             [iww.electron.renderer.log]
-            [iwaswhere-web.client-store :as store]
+            [iww.electron.renderer.client-store :as store]
             [iww.electron.renderer.ui.re-frame :as rf]
             [iww.electron.renderer.router :as router]
             [iww.electron.renderer.screenshot :as screenshot]

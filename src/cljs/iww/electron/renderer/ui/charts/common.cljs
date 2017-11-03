@@ -2,8 +2,8 @@
   (:require [clojure.string :as s]
             [randomcolor]
             [moment]
-            [iwaswhere-web.utils.parse :as up]
-            [iwaswhere-web.charts.data :as cd]
+            [iww.common.utils.parse :as up]
+            [iww.electron.renderer.charts.data :as cd]
             [reagent.core :as rc]))
 
 (defn line-points

@@ -2,7 +2,7 @@
   (:require [reagent.core :as rc]
             [iww.electron.renderer.ui.charts.common :as cc]
             [iww.electron.renderer.helpers :as h]
-            [iwaswhere-web.charts.custom-fields-cfg :as cf]
+            [iww.electron.renderer.charts.custom-fields-cfg :as cf]
             [re-frame.core :refer [subscribe]]
             [goog.string :as gstring]
             [goog.string.format]

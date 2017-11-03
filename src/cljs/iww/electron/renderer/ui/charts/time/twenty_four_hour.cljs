@@ -1,12 +1,12 @@
 (ns iww.electron.renderer.ui.charts.time.twenty-four-hour
   (:require [reagent.core :as rc]
             [iww.electron.renderer.ui.charts.common :as cc]
-            [iwaswhere-web.utils.misc :as u]
+            [iww.common.utils.misc :as u]
             [re-frame.core :refer [subscribe]]
             [reagent.ratom :refer-macros [reaction]]
             [clojure.pprint :as pp]
             [moment]
-            [iwaswhere-web.charts.data :as cd]))
+            [iww.electron.renderer.charts.data :as cd]))
 
 (defn ts-bars
   "Renders group with rects for all stories of the particular day."

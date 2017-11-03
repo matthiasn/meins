@@ -1,5 +1,5 @@
 (ns iww.electron.renderer.ui.entry.pomodoro
-  (:require [iwaswhere-web.utils.misc :as u]
+  (:require [iww.common.utils.misc :as u]
             [reagent.core :as r]
             [moment]
             [iww.electron.renderer.helpers :as h]))

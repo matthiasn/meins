@@ -2,10 +2,10 @@
   (:require [matthiasn.systems-toolbox.component :as st]
             [reagent.ratom :refer-macros [reaction]]
             [re-frame.core :refer [subscribe]]
-            [iwaswhere-web.utils.misc :as u]
+            [iww.common.utils.misc :as u]
             [taoensso.timbre :as timbre :refer-macros [info debug]]
             [iww.electron.renderer.ui.entry.actions :as a]
-            [iwaswhere-web.utils.parse :as up]
+            [iww.common.utils.parse :as up]
             [clojure.string :as s]
             [moment]
             [iww.electron.renderer.ui.entry.utils :as eu]))

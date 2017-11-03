@@ -2,10 +2,10 @@
   (:require [iww.electron.renderer.ui.media :as m]
             [re-frame.core :refer [subscribe]]
             [reagent.ratom :refer-macros [reaction]]
-            [iwaswhere-web.utils.misc :as u]
+            [iww.common.utils.misc :as u]
             [clojure.string :as s]
             [cljs.pprint :as pp]
-            [iwaswhere-web.utils.parse :as up]))
+            [iww.common.utils.parse :as up]))
 
 (def iww-host (.-iwwHOST js/window))
 

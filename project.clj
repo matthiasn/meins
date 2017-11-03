@@ -50,7 +50,7 @@
   :auto-clean false
   :uberjar-name "iwaswhere.jar"
 
-  :main iwaswhere-web.core
+  :main iww.jvm.core
   :jvm-opts ["-XX:-OmitStackTraceInFastThrow" "-XX:+AggressiveOpts"]
 
   :profiles {:uberjar      {:aot :all}
@@ -176,6 +176,6 @@
                                :source-paths ["src/cljs" "src/cljc" "test"]
                                :compiler     {:output-to     "out/testable.js"
                                               :output-dir    "out/"
-                                              :main          iwaswhere-web.runner
+                                              :main          iww.jvm.runner
                                               :process-shim  false
                                               :optimizations :whitespace}}]})

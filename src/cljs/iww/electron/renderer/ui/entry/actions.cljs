@@ -1,10 +1,10 @@
 (ns iww.electron.renderer.ui.entry.actions
-  (:require [iwaswhere-web.ui.pomodoro :as p]
-            [iwaswhere-web.utils.parse :as up]
+  (:require [iww.electron.renderer.ui.pomodoro :as p]
+            [iww.common.utils.parse :as up]
             [iww.electron.renderer.helpers :as h]
             [reagent.core :as r]
             [iww.electron.renderer.ui.entry.utils :as eu]
-            [iwaswhere-web.utils.misc :as u]
+            [iww.common.utils.misc :as u]
             [clojure.set :as set]
             [taoensso.timbre :as timbre :refer-macros [info]]
             [matthiasn.systems-toolbox.component :as st]

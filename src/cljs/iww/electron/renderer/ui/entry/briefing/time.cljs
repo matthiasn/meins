@@ -3,8 +3,8 @@
             [reagent.ratom :refer-macros [reaction]]
             [re-frame.core :refer [subscribe]]
             [iww.electron.renderer.ui.charts.common :as cc]
-            [iwaswhere-web.utils.misc :as u]
-            [iwaswhere-web.utils.parse :as up]
+            [iww.common.utils.misc :as u]
+            [iww.common.utils.parse :as up]
             [moment]
             [iww.electron.renderer.helpers :as h]))
 

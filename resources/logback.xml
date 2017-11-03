@@ -39,7 +39,7 @@
     <logger name="io.undertow" level="warn"/>
     <logger name="org.xnio.nio" level="warn"/>
     <logger name="matthiasn.systems-toolbox" level="info"/>
-    <logger name="iwaswhere-web.store" level="debug"/>
+    <logger name="iww.jvm.store" level="debug"/>
     <logger name="matthiasn.systems-toolbox-sente" level="info"/>
 
     <root level="INFO">

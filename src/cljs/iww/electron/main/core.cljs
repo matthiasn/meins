@@ -1,6 +1,6 @@
 (ns iww.electron.main.core
   (:require [iww.electron.main.log]
-            [iwaswhere-web.specs]
+            [iww.common.specs]
             [taoensso.timbre :as timbre :refer-macros [info]]
             [matthiasn.systems-toolbox-electron.ipc-main :as ipc]
             [matthiasn.systems-toolbox-electron.window-manager :as wm]

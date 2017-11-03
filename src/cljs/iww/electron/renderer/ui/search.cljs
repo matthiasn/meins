@@ -1,7 +1,7 @@
 (ns iww.electron.renderer.ui.search
   (:require [iww.electron.renderer.helpers :as h]
-            [iwaswhere-web.utils.misc :as u]
-            [iwaswhere-web.utils.parse :as p]
+            [iww.common.utils.misc :as u]
+            [iww.common.utils.parse :as p]
             [iww.electron.renderer.ui.draft :as d]
             [reagent.ratom :refer-macros [reaction]]
             [clojure.string :as s]

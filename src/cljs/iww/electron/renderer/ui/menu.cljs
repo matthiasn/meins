@@ -5,8 +5,8 @@
             [matthiasn.systems-toolbox.component :as stc]
             [reagent.core :as r]
             [cljs.reader :refer [read-string]]
-            [iwaswhere-web.utils.parse :as up]
-            [iwaswhere-web.utils.parse :as p]
+            [iww.common.utils.parse :as up]
+            [iww.common.utils.parse :as p]
             [clojure.pprint :as pp]
             [matthiasn.systems-toolbox.component :as st]))
 

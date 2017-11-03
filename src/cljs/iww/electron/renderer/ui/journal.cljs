@@ -1,8 +1,8 @@
 (ns iww.electron.renderer.ui.journal
-  (:require [iwaswhere-web.utils.misc :as u]
+  (:require [iww.common.utils.misc :as u]
             [iww.electron.renderer.ui.entry.entry :as e]
             [re-frame.core :refer [subscribe]]
-            [iwaswhere-web.utils.parse :as ps]
+            [iww.common.utils.parse :as ps]
             [reagent.ratom :refer-macros [reaction]]
             [clojure.set :as set]
             [iww.electron.renderer.ui.draft :as draft]))

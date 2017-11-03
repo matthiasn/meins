@@ -107,8 +107,8 @@ Building the JS bundle:
 Inspecting the store component:
 
 ````
-(use 'iwaswhere-web.core)
-(require '[iwaswhere-web.file-utils :as fu])
+(use 'iww.jvm.core)
+(require '[iww.jvm.file-utils :as fu])
 (with-redefs [fu/data-path "data"] (restart! switchboard))
 (def store (:cmp-state (:server/store-cmp (:components @(:cmp-state switchboard)))))
 (def g (:graph @store))

@@ -5,8 +5,8 @@
             [reagent.core :as r]
             [taoensso.timbre :as timbre :refer-macros [info debug]]
             [draft-js :as Draft]
-            [iwaswhere-web.utils.parse :as p]
-            [iwaswhere-web.utils.misc :as u]
+            [iww.common.utils.parse :as p]
+            [iww.common.utils.misc :as u]
             [iww.electron.renderer.ui.entry.utils :as eu]
             [clojure.set :as set]))
 
