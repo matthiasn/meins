@@ -87,11 +87,15 @@
         new-state (assoc-in current-state [:new-entries ts :completed-time] dur)]
     (when (get-in current-state [:new-entries ts])
       (let [new-entry (get-in new-state [:new-entries ts])
-            done? (> (:completed-time new-entry) (:planned-dur new-entry))
+            completed (:completed-time new-entry)
+            planned (:planned-dur new-entry)
+            done? (> completed planned)
+            progress (min (/ completed planned) 1)
             cfg (:cfg current-state)
             new-state (-> new-state
                           (assoc-in [:busy] (not done?))
                           (assoc-in [:last-busy] (st/now)))]
+        (put-fn [:window/progress {:v progress}])
         (if (:pomodoro-running new-entry)
           (let [color (if done? :orange :red)
                 new-state (assoc-in new-state [:busy-color] color)]

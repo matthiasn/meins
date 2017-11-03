@@ -45,6 +45,7 @@
                                                       :geonames/lookup
                                                       :window/hide
                                                       :window/show
+                                                      :window/progress
                                                       :blink/busy})
                      (spellcheck/cmp-map :renderer/spellcheck)
                      (screenshot/cmp-map :renderer/screenshot)
