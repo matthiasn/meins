@@ -1,6 +1,6 @@
 (ns iww.electron.renderer.ui.re-frame
   (:require-macros [reagent.ratom :refer [reaction]])
-  (:require [reagent.core :as reagent]
+  (:require [reagent.core :as rc]
             [iww.electron.renderer.ui.menu :as menu]
             [re-frame.core :refer [reg-sub subscribe]]
             [iww.electron.renderer.ui.grid :as g]
@@ -99,8 +99,7 @@
           [main-page put-fn])))))
 
 (defn state-fn [put-fn]
-  (reagent/render [re-frame-ui put-fn]
-                  (.getElementById js/document "reframe"))
+  (rc/render [re-frame-ui put-fn] (.getElementById js/document "reframe"))
   {:observed rdb/app-db})
 
 (defn cmp-map [cmp-id]

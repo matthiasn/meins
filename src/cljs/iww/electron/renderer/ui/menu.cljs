@@ -7,7 +7,6 @@
             [cljs.reader :refer [read-string]]
             [iww.common.utils.parse :as up]
             [iww.common.utils.parse :as p]
-            [clojure.pprint :as pp]
             [matthiasn.systems-toolbox.component :as st]))
 
 (defn toggle-option-view [{:keys [option cls]} put-fn]
