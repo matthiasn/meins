@@ -64,25 +64,25 @@
              :exclusions [org.apache.commons/commons-compress]]
             [lein-figwheel "0.5.14"]
             [test2junit "1.3.3"]
+            [deraen/lein-sass4clj "0.3.1"]
             [lein-shell "0.5.0"]
             [lein-ancient "0.6.14"]]
 
   ;:global-vars {*assert* false}
 
   :test2junit-run-ant true
+  
+  :sass {:source-paths ["src/scss/"]
+         :target-path  "resources/public/css/"}
 
-  :aliases {"sass" ["do"
-                    ["shell" "sass" "src/scss/iwaswhere.scss" "resources/public/css/iwaswhere.css"]
-                    ["shell" "sass" "src/scss/updater.scss" "resources/public/css/updater.css"]
-                    ["shell" "sass" "src/scss/loader.scss" "resources/public/css/loader.css"]]
-            "dist" ["do"
+  :aliases {"dist" ["do"
                     ["clean"]
                     ["test"]
                     ["cljsbuild" "once" "main"]
                     ["cljsbuild" "once" "renderer"]
                     ["cljsbuild" "once" "geocoder"]
                     ["cljsbuild" "once" "updater"]
-                    ["sass"]
+                    ["sass4clj" "once"]
                     ["uberjar"]
                     ["shell" "cp" "target/iwaswhere.jar" "bin/"]]}
 
