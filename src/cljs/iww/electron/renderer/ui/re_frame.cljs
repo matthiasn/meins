@@ -31,6 +31,7 @@
 (reg-sub :new-entries (fn [db _] (:new-entries db)))
 (reg-sub :combined-entries (fn [db _] (merge (:entries-map db) (:new-entries db))))
 (reg-sub :cfg (fn [db _] (:cfg db)))
+(reg-sub :planning-mode (fn [db _] (:planning-mode (:cfg db))))
 (reg-sub :stats (fn [db _] (:stats db)))
 (reg-sub :briefings (fn [db _] (:briefings db)))
 (reg-sub :started-tasks (fn [db _] (:started-tasks db)))
@@ -42,19 +43,18 @@
                                         :wordcount-stats
                                         :media-stats])))
 
-(defn main-page
-  "Main view component"
-  [put-fn]
+(defn main-page [put-fn]
   (let [cfg (subscribe [:cfg])
+        planning-mode (subscribe [:planning-mode])
         single-column (reaction (:single-column @cfg))]
     (fn [put-fn]
       [:div.flex-container
        [:div.grid
-        [:div.wrapper
-         [:div.menu
-          [menu/menu-view put-fn]]
-         [:div.briefing
-          [g/tabs-view :briefing put-fn]]
+        [:div.wrapper {:class (when @planning-mode "col-3")}
+         [menu/menu-view put-fn]
+         (when @planning-mode
+           [:div.briefing
+            [g/tabs-view :briefing put-fn]])
          [:div {:class (if @single-column "single" "left")}
           [g/tabs-view :left put-fn]]
          (when-not @single-column
@@ -64,42 +64,28 @@
           [stats/stats-text]]]]
        [n/new-entries-view put-fn]])))
 
-(defn charts-page
-  "Main view component"
-  [put-fn]
+(defn charts-page [put-fn]
   [:div.flex-container
    [:div.charts-grid
     [:div.wrapper
-     [:div.durations
-      [:div.charts
-       [cd/durations-bar-chart 200 5 put-fn]]]
-     [:div.custom
-      [cf2/custom-fields-chart put-fn]]
+     [cd/durations-bar-chart 200 5 put-fn]
+     [cf2/custom-fields-chart put-fn]
      [aw/award-points put-fn]
-     [:div.stats
-      [stats/stats-view put-fn]]]]])
+     [stats/stats-view put-fn]]]])
 
-(defn countries-page
-  "Main view component"
-  [put-fn]
+(defn countries-page [put-fn]
   [:div.flex-container
    [loc/location-chart]])
 
-(defn dashboards
-  "Dashboard view component"
-  [put-fn]
+(defn dashboards [put-fn]
   [:div.flex-container
    [cq/dashboard put-fn]])
 
-(defn cal
-  "Calendar view component"
-  [put-fn]
+(defn cal [put-fn]
   [:div.flex-container
    [cal/calendar-view put-fn]])
 
-(defn re-frame-ui
-  "Main view component"
-  [put-fn]
+(defn re-frame-ui [put-fn]
   (let [current-page (subscribe [:current-page])]
     (fn [put-fn]
       (let [current-page @current-page]
@@ -112,11 +98,7 @@
           :empty [:div.flex-container]
           [main-page put-fn])))))
 
-(defn state-fn
-  "Renders main view component and wires the central re-frame app-db as the
-   observed component state, which will then be updated whenever the store-cmp
-   changes."
-  [put-fn]
+(defn state-fn [put-fn]
   (reagent/render [re-frame-ui put-fn]
                   (.getElementById js/document "reframe"))
   {:observed rdb/app-db})

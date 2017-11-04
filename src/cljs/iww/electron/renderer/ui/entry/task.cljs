@@ -2,11 +2,13 @@
   (:require [matthiasn.systems-toolbox.component :as st]
             [clojure.string :as s]
             [moment]
+            [re-frame.core :refer [subscribe]]
             [iww.electron.renderer.helpers :as h]))
 
 (defn task-details
   [entry local-cfg put-fn edit-mode?]
   (let [format-time #(.format (moment %) "ddd MMM DD - HH:mm")
+        planning-mode (subscribe [:planning-mode])
         input-fn (fn [entry k]
                    (fn [ev]
                      (let [dt (moment (-> ev .-nativeEvent .-target .-value))
@@ -38,7 +40,7 @@
                  (let [updated (update-in entry [:task :on-hold] not)]
                    (put-fn [:entry/update updated]))))]
     (fn [entry local-cfg put-fn edit-mode?]
-      (when (contains? (:tags entry) "#task")
+      (when (and (contains? (:tags entry) "#task") @planning-mode)
         (when (and edit-mode? (not (:task entry)))
           (let [d (* 24 60 60 1000)
                 now (st/now)

@@ -13,22 +13,18 @@
    :mute              true
    :thumbnails        true
    :app-screenshot    false
+   :planning-mode     false
    :lines-shortened   10})
 
 #?(:clj  (defonce app-cfg (atom default-config))
    :cljs (defonce app-cfg (sa/local-storage (atom default-config)
                                             "iWasWhere_cfg")))
 
-(defn save-cfg
-  "Saves current configuration in localstorage."
-  [{:keys [current-state]}]
+(defn save-cfg [{:keys [current-state]}]
   (reset! app-cfg (:cfg current-state))
   {})
 
-(defn toggle-key-fn
-  "Toggles config key. If reset key is set, changes the value in path to the
-   specified value, rather than applying the 'not' function."
-  [{:keys [current-state msg-payload]}]
+(defn toggle-key-fn [{:keys [current-state msg-payload]}]
   (let [{:keys [path reset-to]} msg-payload
         new-state (if reset-to
                     (assoc-in current-state path reset-to)
@@ -43,9 +39,7 @@
                    :message [:cmd/toggle-key {:path     [:cfg :qr-code]
                                               :reset-to false}]}]})
 
-(defn set-currently-dragged
-  "Set the currently dragged entry for drag and drop."
-  [{:keys [current-state msg-payload]}]
+(defn set-currently-dragged [{:keys [current-state msg-payload]}]
   (let [ts (:timestamp msg-payload)
         new-state (assoc-in current-state [:cfg :currently-dragged] ts)]
     {:new-state new-state}))
@@ -72,9 +66,7 @@
     {:new-state    new-state
      :send-to-self [:cfg/save]}))
 
-(defn assoc-in-state
-  "Assoc the provided value in the app state at the provided path."
-  [{:keys [current-state msg-payload]}]
+(defn assoc-in-state [{:keys [current-state msg-payload]}]
   (let [path (:path msg-payload)
         value (:value msg-payload)
         new-state (assoc-in current-state path value)]

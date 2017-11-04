@@ -2,6 +2,7 @@
   (:require [matthiasn.systems-toolbox.component :as st]
             [clojure.string :as s]
             [moment]
+            [re-frame.core :refer [subscribe]]
             [iww.electron.renderer.helpers :as h]))
 
 (defn next-habit-entry
@@ -29,7 +30,8 @@
 
 (defn habit-details
   [entry local-cfg put-fn edit-mode?]
-  (let [active-from (fn [entry]
+  (let [planning-mode (subscribe [:planning-mode])
+        active-from (fn [entry]
                       (fn [ev]
                         (let [dt (-> ev .-nativeEvent .-target .-value)
                               updated (assoc-in entry [:habit :active-from] dt)]
@@ -107,50 +109,51 @@
                        :done        false}
                 updated (assoc-in entry [:habit] habit)]
             (put-fn [:entry/update-local updated])))
-        [:form.habit-details
-         [:fieldset
-          [:legend "Habit details"]
-          [:div
-           [:label "Sun"] [day-checkbox entry 0]
-           [:label "Mon"] [day-checkbox entry 1]
-           [:label "Tue"] [day-checkbox entry 2]
-           [:label "Wed"] [day-checkbox entry 3]
-           [:label "Thu"] [day-checkbox entry 4]
-           [:label "Fri"] [day-checkbox entry 5]
-           [:label "Sat"] [day-checkbox entry 6]]
-          [:div
-           [:span " Priority: "]
-           [:select {:value     (get-in entry [:habit :priority] "")
-                     :disabled  (not edit-mode?)
-                     :on-change (priority-select entry)}
-            [:option ""]
-            [:option {:value :A} "A"]
-            [:option {:value :B} "B"]
-            [:option {:value :C} "C"]
-            [:option {:value :D} "D"]
-            [:option {:value :E} "E"]]
-           [:label "Active: "]
-           [:input {:type      :datetime-local
-                    :read-only (not edit-mode?)
-                    :on-input  (active-from entry)
-                    :value     (get-in entry [:habit :active-from])}]]
-          [:div
-           [:label [:span.fa.fa-diamond.bonus]]
-           [:input {:type      :number
-                    :read-only (not edit-mode?)
-                    :on-input  (set-points entry :points)
-                    :value     (get-in entry [:habit :points] 0)}]
-           [:label [:span.fa.fa-diamond.penalty]]
-           [:input {:type      :number
-                    :read-only (not edit-mode?)
-                    :on-input  (set-points entry :penalty)
-                    :value     (get-in entry [:habit :penalty] 0)}]]
-          [:div
-           [:label "Done? "]
-           [:input {:type      :checkbox
-                    :checked   (get-in entry [:habit :done])
-                    :on-change (done entry)}]
-           [:label "Skipped? "]
-           [:input {:type      :checkbox
-                    :checked   (get-in entry [:habit :skipped])
-                    :on-change (skipped entry)}]]]]))))
+        (when @planning-mode
+          [:form.habit-details
+           [:fieldset
+            [:legend "Habit details"]
+            [:div
+             [:label "Sun"] [day-checkbox entry 0]
+             [:label "Mon"] [day-checkbox entry 1]
+             [:label "Tue"] [day-checkbox entry 2]
+             [:label "Wed"] [day-checkbox entry 3]
+             [:label "Thu"] [day-checkbox entry 4]
+             [:label "Fri"] [day-checkbox entry 5]
+             [:label "Sat"] [day-checkbox entry 6]]
+            [:div
+             [:span " Priority: "]
+             [:select {:value     (get-in entry [:habit :priority] "")
+                       :disabled  (not edit-mode?)
+                       :on-change (priority-select entry)}
+              [:option ""]
+              [:option {:value :A} "A"]
+              [:option {:value :B} "B"]
+              [:option {:value :C} "C"]
+              [:option {:value :D} "D"]
+              [:option {:value :E} "E"]]
+             [:label "Active: "]
+             [:input {:type      :datetime-local
+                      :read-only (not edit-mode?)
+                      :on-input  (active-from entry)
+                      :value     (get-in entry [:habit :active-from])}]]
+            [:div
+             [:label [:span.fa.fa-diamond.bonus]]
+             [:input {:type      :number
+                      :read-only (not edit-mode?)
+                      :on-input  (set-points entry :points)
+                      :value     (get-in entry [:habit :points] 0)}]
+             [:label [:span.fa.fa-diamond.penalty]]
+             [:input {:type      :number
+                      :read-only (not edit-mode?)
+                      :on-input  (set-points entry :penalty)
+                      :value     (get-in entry [:habit :penalty] 0)}]]
+            [:div
+             [:label "Done? "]
+             [:input {:type      :checkbox
+                      :checked   (get-in entry [:habit :done])
+                      :on-change (done entry)}]
+             [:label "Skipped? "]
+             [:input {:type      :checkbox
+                      :checked   (get-in entry [:habit :skipped])
+                      :on-change (skipped entry)}]]]])))))

@@ -1,12 +1,14 @@
 (ns iww.electron.renderer.ui.entry.pomodoro
   (:require [iww.common.utils.misc :as u]
             [reagent.core :as r]
+            [re-frame.core :refer [subscribe]]
             [moment]
             [iww.electron.renderer.helpers :as h]))
 
 (defn pomodoro-header [entry edit-mode? put-fn]
   (let [local (r/atom {:edit false})
         click #(swap! local assoc-in [:edit] true)
+        planning-mode (subscribe [:planning-mode])
         on-change (fn [ev]
                     (let [v (.. ev -target -value)
                           parsed (when (seq v)
@@ -20,7 +22,7 @@
             start-stop #(let [color (if running? :green :red)]
                           (put-fn [:blink/busy {:color color}])
                           (put-fn [:cmd/pomodoro-start @entry]))]
-        (when (= (:entry-type @entry) :pomodoro)
+        (when (and (= (:entry-type @entry) :pomodoro) @planning-mode)
           [:div.pomodoro
            [:span.fa.fa-clock-o.completed]
            (when (pos? completed-time)

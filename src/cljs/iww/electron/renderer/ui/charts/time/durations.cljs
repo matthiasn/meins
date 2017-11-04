@@ -11,9 +11,7 @@
             [iww.electron.renderer.charts.data :as cd]
             [iww.electron.renderer.helpers :as h]))
 
-(defn day-bars
-  "Renders group with rects for all stories of the particular day."
-  [day-stats local idx chart-h y-scale put-fn]
+(defn day-bars [day-stats local idx chart-h y-scale put-fn]
   (let [options (subscribe [:options])
         stories (subscribe [:stories])
         stacked-reducer (fn [acc [k v]]
@@ -30,9 +28,8 @@
             stacked (reduce stacked-reducer {} time-by-story)
             time-by-story2 (reverse (sort-by #(str (first %)) (:items stacked)))
             weekend? (cc/weekend? (:date-string day-stats))]
-        [:g
-         {:on-mouse-enter mouse-enter-fn
-          :on-mouse-leave mouse-leave-fn}
+        [:g {:on-mouse-enter mouse-enter-fn
+             :on-mouse-leave mouse-leave-fn}
          (for [[story {:keys [y v]}] time-by-story2]
            (let [h (* y-scale v)
                  y (- chart-h (+ h (* y-scale y)))
@@ -52,19 +49,15 @@
                    :width   26
                    :height  chart-h}])]))))
 
-(defn bars-by-story
-  "Renders chart with daily recorded times, split up by story."
-  [indexed local chart-h y-scale put-fn]
-  [:svg
-   {:viewBox (str "0 0 600 " chart-h)}
+(defn bars-by-story [indexed local chart-h y-scale put-fn]
+  [:svg {:viewBox (str "0 0 600 " chart-h)}
    [:g
-    [:g
-     (for [[idx v] indexed]
-       (let [h (* y-scale (:total-time v))
-             mouse-enter-fn (cc/mouse-enter-fn local v)
-             mouse-leave-fn (cc/mouse-leave-fn local v)]
-         ^{:key (str idx)}
-         [day-bars v local idx chart-h y-scale put-fn]))]
+    [:g (for [[idx v] indexed]
+          (let [h (* y-scale (:total-time v))
+                mouse-enter-fn (cc/mouse-enter-fn local v)
+                mouse-leave-fn (cc/mouse-leave-fn local v)]
+            ^{:key (str idx)}
+            [day-bars v local idx chart-h y-scale put-fn]))]
     [cc/chart-title "by story"]]])
 
 ;; TODO: either DRY up or rethink
@@ -110,14 +103,10 @@
                    :width   26
                    :height  chart-h}])]))))
 
-(defn bars-by-saga
-  "Renders chart with daily recorded times, split up by story."
-  [indexed local chart-h y-scale put-fn]
-  [:svg
-   {:viewBox (str "0 0 600 " chart-h)}
+(defn bars-by-saga [indexed local chart-h y-scale put-fn]
+  [:svg {:viewBox (str "0 0 600 " chart-h)}
    [:g
-    [:g
-     (for [[idx v] indexed]
+    [:g (for [[idx v] indexed]
        (let [h (* y-scale (:total-time v))
              mouse-enter-fn (cc/mouse-enter-fn local v)
              mouse-leave-fn (cc/mouse-leave-fn local v)]
@@ -125,9 +114,7 @@
          [day-bars-by-saga v local idx chart-h y-scale put-fn]))]
     [cc/chart-title "by saga"]]])
 
-(defn time-by-stories-list
-  "Render list of times spent on individual stories, plus the total."
-  [day-stats]
+(defn time-by-stories-list [day-stats]
   (let [stories (subscribe [:stories])
         sagas (subscribe [:sagas])]
     (fn [day-stats]
@@ -187,8 +174,7 @@
         (h/keep-updated :stats/pomodoro 60 local @last-update put-fn)
         [:div
          [:div.times-by-day
-          [:div.story-time
-           {:class (when expanded? "expanded")}
+          [:div.story-time {:class (when expanded? "expanded")}
            [:div.content.white
             [:div {:on-click #(swap! local update-in [:expanded] not)}
              [:span.fa {:class (if expanded? "fa-compress" "fa-expand")}]]
@@ -245,7 +231,7 @@
             dur (u/duration-string (:total-time day-stats))
             fmt-date (.format (moment (:date-string day-stats)) "ddd YY-MM-DD")]
         (h/keep-updated :stats/pomodoro 60 local @last-update put-fn)
-        [:div
+        [:div.charts.durations
          [:div.times-by-day
           [:div.story-time
            {:class (when expanded? "expanded")}

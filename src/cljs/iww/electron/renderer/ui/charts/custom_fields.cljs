@@ -118,9 +118,8 @@
             n 120
             indexed (map-indexed (fn [idx [k v]] [idx v]) (take-last n @stats))]
         (h/keep-updated :stats/custom-fields n local @last-update put-fn)
-        [:div.stats
-         [:svg
-          {:viewBox (str "0 0 " (* 2 w) " " charts-h)}
+        [:div.stats.custom
+         [:svg {:viewBox (str "0 0 " (* 2 w) " " charts-h)}
           [cc/chart-title "custom fields" w]
           [cc/bg-bars indexed local charts-h :custom]
           (for [row-cfg (:charts chart-map)]

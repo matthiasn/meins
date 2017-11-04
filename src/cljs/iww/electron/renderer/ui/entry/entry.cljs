@@ -23,9 +23,7 @@
             [iww.electron.renderer.ui.draft :as d]
             [iww.common.utils.parse :as p]))
 
-(defn all-comments-set
-  "Finds all comments for a particular entry."
-  [ts]
+(defn all-comments-set [ts]
   (let [{:keys [entry combined-entries new-entries]} (eu/entry-reaction ts)
         comments-set (reaction (set (:comments @entry)))
         comments-filter (fn [[_ts c]] (= (:comment-for c) ts))
@@ -33,22 +31,19 @@
     (reaction (sort (set/union (set (:comments @entry))
                                (set (keys @local-comments)))))))
 
-(defn total-time-logged
-  "Renders time logged in entry and its comments."
-  [ts]
+(defn total-time-logged [ts]
   (let [{:keys [entry combined-entries]} (eu/entry-reaction ts)
+        planning-mode (subscribe [:planning-mode])
         all-comments-set (all-comments-set ts)
         total-dur (reaction
                     (apply + (map #(:completed-time (get @combined-entries %))
                                   @all-comments-set)))]
     (fn [ts]
-      (when (pos? @total-dur)
+      (when (and (pos? @total-dur) @planning-mode)
         [:span [:span.fa.fa-clock-o.completed]
          [:span.dur (u/duration-string @total-dur)]]))))
 
-(defn hashtags-mentions-list
-  "Horizontally renders list with hashtags and mentions."
-  [ts tab-group put-fn]
+(defn hashtags-mentions-list [ts tab-group put-fn]
   (let [cfg (subscribe [:cfg])
         entry (:entry (eu/entry-reaction ts))]
     (fn hashtags-mentions-render [ts tab-group put-fn]

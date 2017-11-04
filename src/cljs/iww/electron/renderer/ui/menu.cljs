@@ -19,7 +19,13 @@
          {:class    (str cls (when-not show-option? " inactive"))
           :on-click toggle-option}]))))
 
-(def toggle-options
+(def limited-options
+  [{:option :show-pvt :cls "fa-user-secret"}
+   {:option :single-column :cls "fa-columns"}
+   {:option :sort-asc :cls " fa-sort-asc"}
+   {:option :app-screenshot :cls "fa-window-minimize"}])
+
+(def all-options
   [{:option :show-pvt :cls "fa-user-secret"}
    {:option :comments-standalone :cls "fa-comments"}
    {:option :mute :cls "fa-volume-off"}
@@ -38,6 +44,7 @@
     (def ^:export new-entry (h/new-entry-fn put-fn {} nil))
     (def ^:export new-story (h/new-entry-fn put-fn {:entry-type :story} nil))
     (def ^:export new-saga (h/new-entry-fn put-fn {:entry-type :saga} nil))
+    (def ^:export planning #(put-fn [:cmd/toggle-key {:path [:cfg :planning-mode]}]))
     (fn [put-fn]
       (when (:show @local)
         [:div.new-import
@@ -53,20 +60,14 @@
                                   (put-fn [:import/spotify]))}
           [:span.fa.fa-map] " import"]]))))
 
-(defn cfg-view
-  "Renders component for toggling display of options such as maps, comments.
-   The options, with their respective config key and Font-Awesome icon classes
-   are defined in the toggle-options vector above. The value for each is then
-   set on the application's config, which is persisted in localstorage.
-   The default is always false, as initially the key would not be defined at
-   all (unless set in default-config)."
-  [put-fn]
+(defn cfg-view [put-fn]
   (let [cfg (subscribe [:cfg])
+        planning-mode (subscribe [:planning-mode])
         toggle-qr-code #(put-fn [:import/listen])
         screenshot #(put-fn [:screenshot/take])]
     (fn [put-fn]
       [:div
-       (for [option toggle-options]
+       (for [option (if @planning-mode all-options limited-options)]
          ^{:key (str "toggle" (:cls option))}
          [toggle-option-view option put-fn])
        [:span.fa.fa-desktop.toggle.inactive
@@ -87,6 +88,7 @@
   (let [calendar (r/adapt-react-class (aget js/window "deps" "Calendar" "default"))
         briefings (subscribe [:briefings])
         cfg (subscribe [:cfg])
+        planning-mode (subscribe [:planning-mode])
         select-date (fn [dt]
                       (let [fmt (.format dt "YYYY-MM-DD")
                             q (up/parse-search (str "b:" fmt))]
@@ -103,20 +105,24 @@
                         (put-fn [:search/refresh])))]
     (fn stats-view-render [put-fn]
       (let [briefings (mapv #(moment %) (keys @briefings))]
-        [:div.calendar
-         [calendar {:select-date select-date
-                    :briefings   briefings}]]))))
+        (when @planning-mode
+          [:div.calendar
+           [calendar {:select-date select-date
+                      :briefings   briefings}]])))))
 
 (defn busy-status []
-  (let [busy-color (subscribe [:busy-color])]
+  (let [busy-color (subscribe [:busy-color])
+        planning-mode (subscribe [:planning-mode])]
     (fn busy-status-render []
-      [:div.busy-status {:class (name (or @busy-color :green))}])))
+      (when @planning-mode
+        [:div.busy-status {:class (name (or @busy-color :green))}]))))
 
 (defn menu-view [put-fn]
-  [:div.menu-header
-   [busy-status]
-   [new-import-view put-fn]
-   [calendar-view put-fn]
-   [:h1 "iWasWhere?"]
-   [cfg-view put-fn]
-   [upload-view]])
+  [:div.menu
+   [:div.menu-header
+    [busy-status]
+    [new-import-view put-fn]
+    [calendar-view put-fn]
+    [:h1 "iWasWhere?"]
+    [cfg-view put-fn]
+    [upload-view]]])
