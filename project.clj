@@ -71,7 +71,7 @@
   ;:global-vars {*assert* false}
 
   :test2junit-run-ant true
-  
+
   :sass {:source-paths ["src/scss/"]
          :target-path  "resources/public/css/"}
 

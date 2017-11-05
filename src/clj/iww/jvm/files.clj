@@ -58,7 +58,7 @@
         cfg (:cfg current-state)]
     (when-not (= existing node-to-add)
       (append-daily-log cfg node-to-add))
-    {:new-state (ga/add-node current-state ts node-to-add false)
+    {:new-state (ga/add-node current-state node-to-add)
      :emit-msg  [[:ft/add entry]]}))
 
 (defn persist-state! [state]
@@ -95,7 +95,7 @@
                                   :vclock     new-vclock})
         g (:graph current-state)
         prev (when (uc/has-node? g ts) (uc/attrs g ts))
-        new-state (ga/add-node current-state ts entry false)
+        new-state (ga/add-node current-state entry)
         new-state (assoc-in new-state [:latest-vclock] new-vclock)
         broadcast-meta (merge msg-meta {:sente-uid :broadcast})]
     (when (System/getenv "CACHED_APPSTATE")

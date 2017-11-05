@@ -16,8 +16,7 @@
             [clojure.java.io :as io]
             [iww.jvm.file-utils :as fu]))
 
-(defn read-dir
-  [state entries-to-index cfg]
+(defn read-dir [state entries-to-index cfg]
   (let [path (:daily-logs-path (fu/paths))
         files (file-seq (clojure.java.io/file path))]
     (doseq [f (f/filter-by-name files #"\d{4}-\d{2}-\d{2}.jrn")]
@@ -32,14 +31,13 @@
                   (do (swap! state ga/remove-node ts)
                       (swap! entries-to-index dissoc ts))
                   (do (swap! entries-to-index assoc-in [ts] parsed)
-                      (swap! state ga/add-node ts parsed :startup)))
+                      (swap! state ga/add-node parsed)))
                 (swap! state assoc-in [:latest-vclock] (:vclock parsed))
                 (when (zero? (mod cnt 5000)) (log/info "Entries read:" cnt)))
               (catch Exception ex
                 (log/error "Exception" ex "when parsing line:\n" line)))))))))
 
-(defn ft-index
-  [entries-to-index put-fn]
+(defn ft-index [entries-to-index put-fn]
   (let [path (:clucy-path (fu/paths))
         files (file-seq (clojure.java.io/file path))
         clucy-dir-empty? (empty? (filter #(.isFile %) files))]
@@ -88,9 +86,7 @@
   [{:keys [current-state]}]
   {:new-state (assoc-in current-state [:cfg] (fu/load-cfg))})
 
-(defn cmp-map
-  "Generates component map for state-cmp."
-  [cmp-id]
+(defn cmp-map [cmp-id]
   {:cmp-id      cmp-id
    :state-fn    state-fn
    :opts        {:msgs-on-firehose true}
