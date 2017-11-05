@@ -93,13 +93,6 @@
                                               :target         :nodejs
                                               :output-to      "prod/main/main.js"
                                               :output-dir     "out/main"
-                                              :externs        ["externs/externs.js"
-                                                               "externs/misc.js"]
-                                              :npm-deps       {:electron-log     "2.2.7"
-                                                               :electron-updater "2.8.7"
-                                                               :moment           "2.18.1"
-                                                               :electron         "1.7.8"}
-                                              ;:install-deps   true
                                               :optimizations  :simple
                                               :parallel-build true}}
                               {:id           "geocoder"
@@ -109,13 +102,6 @@
                                               :output-to      "prod/geocoder/geocoder.js"
                                               :output-dir     "out/geocoder"
                                               ;:source-map     "prod/geonames/geonames.js.map"
-                                              :externs        ["externs/externs.js"
-                                                               "externs/misc.js"]
-                                              :npm-deps       {:electron-log           "2.2.7"
-                                                               :electron-updater       "2.8.7"
-                                                               :local-reverse-geocoder "0.3.2"
-                                                               :electron               "1.7.8"}
-                                              ;:install-deps   true
                                               :optimizations  :simple
                                               :parallel-build true}}
                               {:id           "renderer"
@@ -125,17 +111,6 @@
                                               ;:source-map     "prod/renderer/renderer.js.map"
                                               :target         :nodejs
                                               :output-dir     "out/renderer"
-                                              :externs        ["externs/externs.js"
-                                                               "externs/misc.js"
-                                                               "externs/leaflet.ext.js"]
-                                              :npm-deps       {:electron-log          "2.2.7"
-                                                               :react                 "15.6.1"
-                                                               :react-dom             "15.6.1"
-                                                               :draft-js              "0.10.3"
-                                                               :moment                "2.18.1"
-                                                               :electron-spellchecker "1.1.2"
-                                                               :electron              "1.7.8"}
-                                              ;:install-deps   true
                                               :optimizations  :simple
                                               :parallel-build true}}
                               {:id           "renderer-dev"
@@ -146,17 +121,6 @@
                                               :source-map     true
                                               :target         :nodejs
                                               :output-dir     "dev/renderer"
-                                              :externs        ["externs/externs.js"
-                                                               "externs/misc.js"
-                                                               "externs/leaflet.ext.js"]
-                                              :npm-deps       {:electron-log          "2.2.7"
-                                                               :react                 "15.6.1"
-                                                               :react-dom             "15.6.1"
-                                                               :draft-js              "0.10.3"
-                                                               :moment                "2.18.1"
-                                                               :electron-spellchecker "1.1.2"
-                                                               :electron              "1.7.8"}
-                                              ;:install-deps   true
                                               :optimizations  :none
                                               :parallel-build true}}
                               {:id           "updater"
@@ -165,10 +129,6 @@
                                               :output-to      "prod/updater/update.js"
                                               :target         :nodejs
                                               :output-dir     "out/updater"
-                                              :externs        ["externs/externs.js"]
-                                              :npm-deps       {:electron-log "2.2.7"
-                                                               :electron     "1.7.8"}
-                                              ;:install-deps   true
                                               :optimizations  :simple
                                               :parallel-build true}}
 
