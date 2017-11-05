@@ -61,20 +61,15 @@
                      :video-cnt   (count (filter :video-file day-nodes-attrs))}]
       [date-string day-stats])))
 
-(defn res-count
-  "Count results for specified query."
-  [current-state query]
-  (let [res (gq/extract-sorted-entries2 current-state (merge {:n Integer/MAX_VALUE}
-                                                             query))]
+(defn res-count [state query]
+  (let [res (gq/extract-sorted2 state (merge {:n Integer/MAX_VALUE} query))]
     (count (set res))))
 
-(defn completed-count
-  "Count completed tasks."
-  [current-state]
+(defn completed-count [current-state]
   (let [q1 {:tags #{"#task" "#done"} :n Integer/MAX_VALUE}
         q2 {:tags #{"#task"} :opts #{":done"} :n Integer/MAX_VALUE}
-        res1 (set (gq/extract-sorted-entries2 current-state q1))
-        res2 (set (gq/extract-sorted-entries2 current-state q2))]
+        res1 (set (gq/extract-sorted2 current-state q1))
+        res2 (set (gq/extract-sorted2 current-state q2))]
     (count (set/union res1 res2))))
 
 (defn get-stats-fn
@@ -101,9 +96,7 @@
         (l/warn "No mapper defined for" stats-type))))
   {})
 
-(defn get-basic-stats
-  "Generate some very basic stats about the graph size for display in UI."
-  [state]
+(defn get-basic-stats [state]
   {:entry-count (count (:sorted-entries state))
    :import-cnt  (res-count state {:tags #{"#import"}})
    :locations   (sl/locations state)})

@@ -18,8 +18,9 @@
 
 (defn read-dir [state entries-to-index cfg]
   (let [path (:daily-logs-path (fu/paths))
-        files (file-seq (clojure.java.io/file path))]
-    (doseq [f (f/filter-by-name files #"\d{4}-\d{2}-\d{2}.jrn")]
+        files (file-seq (clojure.java.io/file path))
+        filtered (f/filter-by-name files #"\d{4}-\d{2}-\d{2}.jrn")]
+    (doseq [f (sort-by #(.getName %) filtered)]
       (with-open [reader (clojure.java.io/reader f)]
         (let [lines (line-seq reader)]
           (doseq [line lines]

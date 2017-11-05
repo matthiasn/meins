@@ -279,7 +279,7 @@
         parents (map mapper-fn parent-ids)]
     (flatten [matched-entries parents])))
 
-(defn extract-sorted-entries2
+(defn extract-sorted2
   "Extracts nodes and their properties in descending timestamp order by looking
    for node by mapping over the sorted set and extracting attributes for each
    node.

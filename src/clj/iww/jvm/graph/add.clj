@@ -15,9 +15,7 @@
             [clj-time.core :as t]
             [iww.jvm.graph.stats :as gs]))
 
-(defn add-entry
-  "Adds entry to graph."
-  [graph entry]
+(defn add-entry [graph entry]
   (let [ts (:timestamp entry)
         id (:id entry)]
     (uc/add-nodes-with-attrs graph [ts entry] [id entry])))
@@ -72,9 +70,7 @@
       graph
       mentions)))
 
-(defn local-dt
-  "Return joda dt in local timezone for given entry."
-  [entry]
+(defn local-dt [entry]
   (-> (:timestamp entry)
       (ctc/from-long)
       (ct/to-time-zone (ct/default-time-zone))))
@@ -100,9 +96,7 @@
                                     (:timestamp entry)
                                     {:relationship :DATE}])))))
 
-(defn add-geoname
-  "Add geoname info"
-  [state entry]
+(defn add-geoname [state entry]
   (let [geoname (:geoname entry)]
     (if (and geoname (:latitude entry))
       (let [g (:graph state)
@@ -145,9 +139,7 @@
                                         {:relationship :DATE}]))))
       state)))
 
-(defn add-parent-ref
-  "Adds an edge to parent node when :comment-for key on the entry exists."
-  [graph entry]
+(defn add-parent-ref [graph entry]
   (if-let [comment-for (:comment-for entry)]
     (uc/add-edges graph
                   [(:timestamp entry) comment-for {:relationship :COMMENT}])
@@ -173,9 +165,7 @@
         new-state (update-in current-state [:graph] rm-edges)]
     {:new-state new-state}))
 
-(defn add-linked-visit
-  "Adds linked entry when the entry has been captured during a visit."
-  [g entry]
+(defn add-linked-visit [g entry]
   (let [{:keys [arrival-ts departure-ts]} (u/visit-timestamps entry)]
     (if departure-ts
       (let [ts (:timestamp entry)
@@ -209,10 +199,7 @@
     graph
     tags))
 
-(defn remove-node
-  "Removes node from graph and sorted set if node for specified timestamp
-   exists."
-  [current-state ts]
+(defn remove-node [current-state ts]
   (let [g (:graph current-state)]
     (if (uc/has-node? g ts)
       (let [entry (uc/attrs g ts)]
@@ -225,18 +212,14 @@
       (do (log/warn "remove-node cannot find node: " ts)
           current-state))))
 
-(defn add-location
-  "When entry defines a :location, adds node for location. Does nothing otherwise."
-  [graph entry]
+(defn add-location [graph entry]
   (if (:location entry)
     (-> graph
         (uc/add-nodes :locations)
         (uc/add-edges [:locations (:timestamp entry)]))
     graph))
 
-(defn add-briefing
-  "When entry defines a :briefing, adds node. Does nothing otherwise."
-  [graph entry]
+(defn add-briefing [graph entry]
   (if-let [briefing-day (-> entry :briefing :day)]
     (let [dt (ctf/parse (ctf/formatters :year-month-day) briefing-day)
           year (ct/year dt)
@@ -249,48 +232,35 @@
                         [:briefings (:timestamp entry)])))
     graph))
 
-(defn add-story
-  "When entry is a :story, adds node for story.
-   Does nothing when entry is not of type :story."
-  [graph entry]
+(defn add-story [graph entry]
   (if (= (:entry-type entry) :story)
     (-> graph
         (uc/add-nodes :stories)
         (uc/add-edges [:stories (:timestamp entry)]))
     graph))
 
-(defn add-saga
-  "When entry is a :saga, adds node for saga.
-   Does nothing when entry is not of type :saga."
-  [graph entry]
+(defn add-saga [graph entry]
   (if (= (:entry-type entry) :saga)
     (-> graph
         (uc/add-nodes :saga)
         (uc/add-edges [:sagas (:timestamp entry)]))
     graph))
 
-(defn add-starred
-  "When entry is starred, add edge to starred entries. Otherwise do nothing."
-  [graph entry]
+(defn add-starred [graph entry]
   (if (:starred entry)
     (-> graph
         (uc/add-nodes :starred)
         (uc/add-edges [:starred (:timestamp entry)]))
     graph))
 
-(defn add-done
-  "When entry is a task that's done, add edge to :done node for faster lookup."
-  [graph entry]
+(defn add-done [graph entry]
   (if (get-in entry [:task :done])
     (-> graph
         (uc/add-nodes :done)
         (uc/add-edges [:done (:timestamp entry)]))
     graph))
 
-(defn add-story-set
-  "When entry is linked to a story, add that entry timestamp to the set with
-   the entry ids on that timeline."
-  [current-state entry]
+(defn add-story-set [current-state entry]
   (if-let [linked-story (:primary-story entry)]
     (let [ts (:timestamp entry)
           path [:sorted-story-entries linked-story]
@@ -298,9 +268,7 @@
       (assoc-in current-state path (conj entries-set ts)))
     current-state))
 
-(defn add-tasks-set
-  "When entry is a task, add it to sorted tasks set."
-  [current-state entry]
+(defn add-tasks-set [current-state entry]
   (if (:task entry)
     (let [ts (:timestamp entry)
           path [:sorted-tasks]
