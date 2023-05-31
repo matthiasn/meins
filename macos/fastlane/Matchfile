@@ -1,4 +1,0 @@
-git_url("https://github.com/matthiasn/lotti-fastlane")
-storage_mode("git")
-type("appstore")
-platform("macos")

@@ -1,4 +1,0 @@
-app_identifier(ENV["APP_ID"] || "com.matthiasnehlsen.lotti")
-apple_id(ENV["APPLE_ID"])
-itc_team_id(ENV["APPLE_ITC_TEAM_ID"])
-team_id(ENV["APPLE_DEV_TEAM_ID"])
