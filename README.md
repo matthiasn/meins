@@ -1,6 +1,6 @@
 # meins
 
-The **open-source** application **meins** is an experimentation toolkit for **designing your life**. It helps you collect relevant information,  design, and then implement change. Most importantly, it does so without leaking data, because everything stays within your realm of control, and you can always verify this claim in the [source code](https://github.com/matthiasn/meins/tree/master/src). Please have a look at the [manual](https://github.com/matthiasn/meins/blob/master/doc/manual.md) to find out more about what it does. The same text is available in the application under the help menu. 
+The **open-source** application **meins** is an experimentation toolkit for **designing your life**. It helps you collect relevant information,  design, and then implement change. Most importantly, it does so without leaking data, because everything stays within your realm of control, and you can always verify this claim in the [source code](https://github.com/matthiasn/meins/tree/master/src). Please have a look at the [manual](https://github.com/matthiasn/meins/blob/master/docs/source/overview.rst) to find out more about what it does. The same text is available in the application under the help menu. 
 
 Here's how that currently looks like:
 
